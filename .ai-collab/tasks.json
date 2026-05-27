@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27T22:00:00+08:00",
+  "lastUpdated": "2026-05-27T23:30:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -139,6 +139,7 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
+      "relatedCommit": "6df98a0",
       "completedAt": "2026-05-27T22:30:00+08:00"
     },
     {
@@ -232,10 +233,11 @@
       "title": "实现 PluginCapability 声明式权限系统",
       "description": "为插件系统添加声明式权限机制，允许插件通过Attribute声明所需能力，加载时根据声明放宽对应安全扫描规则。支持权限叠加（单个插件可声明多个Capability）。\n\n【设计要点】\n1. PluginCapabilityAttribute：可多次标注（AllowMultiple=true），每个声明一个Capability枚举值+Reason字符串\n2. Capability枚举：Network(网络访问)、FileIO(文件直接访问)、Process(进程操作)、AI(AI服务客户端)，后续可扩展\n3. PluginLoader集成：加载时反射读取插件类型上的Capability声明，未声明的保持现有严格扫描；声明了的在对应扫描规则中跳过拦截\n4. 权限审计日志：所有Capability声明记录到加载日志，运行时调用也走审计\n5. 不可声明的能力：Reflection.Emit、PInvoke、Unsafe、Registry等仍硬性禁止，即使声明也无效\n6. 加载策略：声明的Capability需与ForbiddenNamespaces/ForbiddenTypes/ForbiddenMembers映射，声明Network则放行System.Net.*相关TypeRef/MemberRef/ILString\n\n【参考现有架构】\n- PermissionedStreamFactory：文件流的受控入口\n- NetworkExecutor：网络请求的受控入口\n- CommandLineExecutor：命令执行的受控入口\n- 新增的IAIService：AI服务的受控入口（与Capability.AI对应）\n\n【文件产出】\n- src/SiliconLife.Core/Plugins/PluginCapabilityAttribute.cs\n- src/SiliconLife.Core/Plugins/Capability.cs（枚举）\n- 修改 PluginLoader.cs 集成权限声明读取与扫描规则放宽\n- 单元测试覆盖：有声明/无声明/不可声明/多权限叠加",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T10:10:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "qoder",
+      "completedAt": "2026-05-27T23:30:00+08:00"
     },
     {
       "id": "task-380",
@@ -358,6 +360,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-379",
       "task-371",
       "task-362",
       "task-363",

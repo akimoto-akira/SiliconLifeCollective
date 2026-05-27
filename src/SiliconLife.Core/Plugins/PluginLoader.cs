@@ -64,8 +64,9 @@ public class PluginLoader
         // Collect TypeRefs from all whitelisted DLLs in the plugin directory for transitive exemption
         HashSet<(string Namespace, string Name)> trustedTypeRefs = CollectTrustedTypeRefs(pluginDir);
 
-        // Pre-load scan: enforce plugin security rules, accumulate all violations and report at once
-        if (!ScanForbiddenReferences(dllPath, out List<string> violations, trustedTypeRefs))
+        // Pre-load scan: enforce plugin security rules; capability declarations are read from PE
+        // metadata first and used to relax the corresponding scan rules.
+        if (!ScanForbiddenReferences(dllPath, out List<string> violations, trustedTypeRefs, out HashSet<Capability> capabilities))
         {
             _logger.Error(null,
                 "Plugin rejected: {0} violated {1} security rule(s):\n  - {2}",
@@ -100,9 +101,13 @@ public class PluginLoader
             }
 
             IPlugin plugin = (IPlugin)Activator.CreateInstance(pluginTypes[0])!;
+
+            // Security audit: log all capability declarations with their Reason fields
+            AuditCapabilityDeclarations(pluginTypes[0], plugin.Id, capabilities);
+
             plugin.OnLoad();
 
-            _loadedPlugins.Add(new LoadedPlugin(plugin, context, dllPath));
+            _loadedPlugins.Add(new LoadedPlugin(plugin, context, dllPath, capabilities));
             _logger.Info(null, "Plugin loaded: {0} v{1} from {2}", plugin.Id, plugin.Version, dirName);
         }
         catch (Exception ex)
@@ -162,7 +167,7 @@ public class PluginLoader
         _logger.Info(null, "All plugins unloaded");
     }
 
-    private record LoadedPlugin(IPlugin Plugin, AssemblyLoadContext Context, string DllPath);
+    private record LoadedPlugin(IPlugin Plugin, AssemblyLoadContext Context, string DllPath, HashSet<Capability> DeclaredCapabilities);
 
     /// <summary>
     /// Trusted open-source dependency assembly whitelist: the scanner passes these assemblies directly,
@@ -443,10 +448,12 @@ public class PluginLoader
     /// <param name="dllPath">Plugin DLL path</param>
     /// <param name="violations">List of all violation descriptions (empty list means passed)</param>
     /// <param name="trustedTypeRefs">TypeRef set from whitelisted DLLs (transitive exemption)</param>
+    /// <param name="declaredCapabilities">Output: the set of capabilities declared by the plugin via <see cref="PluginCapabilityAttribute"/>; empty if none.</param>
     /// <returns>Returns true if scan passes, false if any violations exist</returns>
-    private static bool ScanForbiddenReferences(string dllPath, out List<string> violations, HashSet<(string Namespace, string Name)> trustedTypeRefs)
+    private static bool ScanForbiddenReferences(string dllPath, out List<string> violations, HashSet<(string Namespace, string Name)> trustedTypeRefs, out HashSet<Capability> declaredCapabilities)
     {
         violations = new List<string>();
+        declaredCapabilities = new HashSet<Capability>();
         try
         {
             using var stream = File.OpenRead(dllPath);
@@ -470,6 +477,18 @@ public class PluginLoader
                 }
             }
 
+            // 0.75. Read PluginCapability declarations from PE metadata before scanning.
+            //       Declared capabilities relax the corresponding scan rules (see IsExemptedByCapability).
+            //       This must happen before any scan step so that all five scan steps can apply exemptions.
+            declaredCapabilities = ReadDeclaredCapabilities(reader);
+            if (declaredCapabilities.Count > 0)
+            {
+                _logger.Info(null,
+                    "Security audit: plugin {0} declared {1} capability/capabilities: [{2}]",
+                    dllPath, declaredCapabilities.Count,
+                    string.Join(", ", declaredCapabilities));
+            }
+
             // 1. TypeRef table
             foreach (TypeReferenceHandle handle in reader.TypeReferences)
             {
@@ -483,7 +502,7 @@ public class PluginLoader
                     continue;
                 }
 
-                if (IsForbidden(ns, name))
+                if (IsForbidden(ns, name) && !IsExemptedByCapability(declaredCapabilities, ns, name))
                 {
                     violations.Add($"[TypeRef] {FormatTypeName(ns, name)}");
                 }
@@ -495,20 +514,23 @@ public class PluginLoader
                 ExportedType exported = reader.GetExportedType(handle);
                 string ns = reader.GetString(exported.Namespace);
                 string name = reader.GetString(exported.Name);
-                if (IsForbidden(ns, name))
+                if (IsForbidden(ns, name) && !IsExemptedByCapability(declaredCapabilities, ns, name))
                 {
                     violations.Add($"[ExportedType] {FormatTypeName(ns, name)}");
                 }
             }
 
             // 3. MemberRef table — member-level blacklist
-            ScanMemberReferences(reader, violations);
+            //    Note: ForbiddenMembers (Assembly.Load*, Type.GetType*, Activator.CreateInstance*,
+            //    Environment.Exit, Expression.Compile, etc.) are security-critical and cannot be
+            //    exempted by any Capability declaration.
+            ScanMemberReferences(reader, violations, declaredCapabilities);
 
-            // 4. Unsafe code markers + P/Invoke
+            // 4. Unsafe code markers + P/Invoke — always checked, never capability-exemptable
             ScanUnsafeMarkers(reader, violations);
 
             // 5. IL string constants (#US heap)
-            ScanUserStrings(reader, violations);
+            ScanUserStrings(reader, violations, declaredCapabilities);
 
             return violations.Count == 0;
         }
@@ -523,8 +545,9 @@ public class PluginLoader
     /// <summary>
     /// Scans the MemberRef table to intercept calls to forbidden members (e.g., Assembly.Load / Type.GetType / Environment.Exit).
     /// Only matches method references whose Parent is a TypeReference, avoiding internal methods.
+    /// Note: No forbidden members are currently exemptable by capabilities; the parameter is reserved for future use.
     /// </summary>
-    private static void ScanMemberReferences(MetadataReader reader, List<string> violations)
+    private static void ScanMemberReferences(MetadataReader reader, List<string> violations, HashSet<Capability> capabilities)
     {
         foreach (MemberReferenceHandle handle in reader.MemberReferences)
         {
@@ -556,8 +579,9 @@ public class PluginLoader
     /// <summary>
     /// Scans the #US (UserString) heap — i.e., all string operands of ldstr instructions in IL.
     /// Matching any forbidden prefix is considered a violation, used to intercept reflection string dynamic loading.
+    /// Strings that match a capability-exempted prefix (e.g., "System.Net.Http" when Network is declared) are skipped.
     /// </summary>
-    private static void ScanUserStrings(MetadataReader reader, List<string> violations)
+    private static void ScanUserStrings(MetadataReader reader, List<string> violations, HashSet<Capability> capabilities)
     {
         // Start from offset 0 (Nil); GetNextHandle returns the first actual user string in the heap
         UserStringHandle handle = MetadataTokens.UserStringHandle(0);
@@ -577,7 +601,8 @@ public class PluginLoader
 
             foreach (string prefix in ForbiddenStringPrefixes)
             {
-                if (value.StartsWith(prefix, StringComparison.Ordinal))
+                if (value.StartsWith(prefix, StringComparison.Ordinal)
+                    && !IsStringExemptedByCapability(capabilities, value))
                 {
                     string display = value.Length > 80 ? value.Substring(0, 80) + "..." : value;
                     violations.Add($"[ILString] \"{display}\" matches forbidden prefix \"{prefix}\"");
@@ -725,6 +750,187 @@ public class PluginLoader
     private static string FormatTypeName(string ns, string name)
     {
         return string.IsNullOrEmpty(ns) ? name : $"{ns}.{name}";
+    }
+
+    /// <summary>
+    /// Reads all <see cref="PluginCapabilityAttribute"/> declarations from the PE metadata.
+    /// Called before the full security scan so that declared capabilities can relax scan rules.
+    /// </summary>
+    /// <param name="reader">The metadata reader for the plugin DLL.</param>
+    /// <returns>The set of all declared capabilities; empty if none are declared.</returns>
+    private static HashSet<Capability> ReadDeclaredCapabilities(MetadataReader reader)
+    {
+        var capabilities = new HashSet<Capability>();
+        const string CapabilityAttrNamespace = "SiliconLife.Collective";
+        const string CapabilityAttrName = "PluginCapabilityAttribute";
+
+        foreach (CustomAttributeHandle attrHandle in reader.CustomAttributes)
+        {
+            CustomAttribute attr = reader.GetCustomAttribute(attrHandle);
+
+            // The constructor must be a MemberReference to an external type (our Core assembly)
+            if (attr.Constructor.Kind != HandleKind.MemberReference)
+                continue;
+
+            MemberReference ctorRef = reader.GetMemberReference((MemberReferenceHandle)attr.Constructor);
+            if (ctorRef.Parent.Kind != HandleKind.TypeReference)
+                continue;
+
+            TypeReference typeRef = reader.GetTypeReference((TypeReferenceHandle)ctorRef.Parent);
+            string attrNs   = reader.GetString(typeRef.Namespace);
+            string attrName = reader.GetString(typeRef.Name);
+
+            if (attrNs != CapabilityAttrNamespace || attrName != CapabilityAttrName)
+                continue;
+
+            // Custom attribute blob layout (ECMA-335 §II.23.3):
+            //   Prolog   : 2 bytes  → 0x01 0x00
+            //   FixedArg : 4 bytes  → Capability enum value as int32 (little-endian)
+            //   NumNamed : 2 bytes  → number of named arguments (may be 0)
+            //   [named args follow if NumNamed > 0]
+            BlobReader blobReader = reader.GetBlobReader(attr.Value);
+            if (blobReader.RemainingBytes < 6) // prolog(2) + int32(4)
+                continue;
+
+            ushort prolog = blobReader.ReadUInt16();
+            if (prolog != 0x0001)
+                continue;
+
+            int capabilityValue = blobReader.ReadInt32();
+            if (Enum.IsDefined(typeof(Capability), capabilityValue))
+            {
+                capabilities.Add((Capability)capabilityValue);
+            }
+        }
+
+        return capabilities;
+    }
+
+    /// <summary>
+    /// Determines whether a forbidden type reference is exempted by a declared capability.
+    /// </summary>
+    /// <param name="capabilities">The set of capabilities declared by the plugin.</param>
+    /// <param name="ns">The type namespace (e.g., "System.Net.Http").</param>
+    /// <param name="name">The type name (e.g., "HttpClient").</param>
+    /// <returns>
+    /// <see langword="true"/> if the type is exempted by a declared capability and should not
+    /// be treated as a violation; <see langword="false"/> otherwise.
+    /// </returns>
+    /// <remarks>
+    /// The following types are <b>never</b> exempted regardless of any capability declaration:
+    /// P/Invoke types, unsafe markers, dynamic IL emission, assembly loaders, and registry types.
+    /// </remarks>
+    internal static bool IsExemptedByCapability(HashSet<Capability> capabilities, string ns, string name)
+    {
+        if (capabilities.Count == 0)
+            return false;
+
+        if (capabilities.Contains(Capability.Network))
+        {
+            // Exempt the six System.Net sub-namespaces used for network I/O
+            if (ns == "System.Net.Http"               || ns.StartsWith("System.Net.Http.",               StringComparison.Ordinal) ||
+                ns == "System.Net.WebSockets"         || ns.StartsWith("System.Net.WebSockets.",         StringComparison.Ordinal) ||
+                ns == "System.Net.Sockets"            || ns.StartsWith("System.Net.Sockets.",            StringComparison.Ordinal) ||
+                ns == "System.Net.Mail"               || ns.StartsWith("System.Net.Mail.",               StringComparison.Ordinal) ||
+                ns == "System.Net.NetworkInformation" || ns.StartsWith("System.Net.NetworkInformation.", StringComparison.Ordinal) ||
+                ns == "System.Net.Security"           || ns.StartsWith("System.Net.Security.",           StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            // Exempt all per-type bans inside System.Net (HttpWebRequest, WebClient, Dns, etc.)
+            if (ns == "System.Net")
+                return true;
+        }
+
+        if (capabilities.Contains(Capability.FileIO))
+        {
+            // Exempt all of System.IO (beyond the default SystemIOAllowedTypes whitelist)
+            if (ns == "System.IO" || ns.StartsWith("System.IO.", StringComparison.Ordinal))
+                return true;
+        }
+
+        if (capabilities.Contains(Capability.Process))
+        {
+            // Exempt the Process* type-level bans under System.Diagnostics
+            if (ns == "System.Diagnostics" && name.StartsWith("Process", StringComparison.Ordinal))
+                return true;
+        }
+
+        // Capability.AI does not exempt any forbidden type:
+        // IAIService lives in our own namespace and is never in the forbidden lists.
+
+        return false;
+    }
+
+    /// <summary>
+    /// Determines whether a forbidden IL string constant is exempted by a declared capability.
+    /// </summary>
+    /// <param name="capabilities">The set of capabilities declared by the plugin.</param>
+    /// <param name="value">The user string from the #US heap.</param>
+    /// <returns>
+    /// <see langword="true"/> if the string is exempted; <see langword="false"/> otherwise.
+    /// </returns>
+    internal static bool IsStringExemptedByCapability(HashSet<Capability> capabilities, string value)
+    {
+        if (capabilities.Count == 0)
+            return false;
+
+        if (capabilities.Contains(Capability.Network))
+        {
+            if (value.StartsWith("System.Net.Http",               StringComparison.Ordinal) ||
+                value.StartsWith("System.Net.WebSockets",         StringComparison.Ordinal) ||
+                value.StartsWith("System.Net.Sockets",            StringComparison.Ordinal) ||
+                value.StartsWith("System.Net.Mail",               StringComparison.Ordinal) ||
+                value.StartsWith("System.Net.NetworkInformation", StringComparison.Ordinal) ||
+                value.StartsWith("System.Net.Security",           StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        if (capabilities.Contains(Capability.FileIO))
+        {
+            if (value.StartsWith("System.IO.", StringComparison.Ordinal))
+                return true;
+        }
+
+        if (capabilities.Contains(Capability.Process))
+        {
+            if (value.StartsWith("System.Diagnostics.Process", StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Writes security audit log entries for all capability declarations on the plugin type,
+    /// including the <see cref="PluginCapabilityAttribute.Reason"/> field when provided.
+    /// Called after the assembly is loaded and the plugin type is known.
+    /// </summary>
+    /// <param name="pluginType">The concrete <see cref="IPlugin"/> type.</param>
+    /// <param name="pluginId">The plugin's stable identifier (used in log messages).</param>
+    /// <param name="capabilities">The capability set read from PE metadata (used to verify consistency).</param>
+    private static void AuditCapabilityDeclarations(Type pluginType, string pluginId, HashSet<Capability> capabilities)
+    {
+        if (capabilities.Count == 0)
+            return;
+
+        var capAttrs = pluginType.GetCustomAttributes(typeof(PluginCapabilityAttribute), inherit: false)
+            .Cast<PluginCapabilityAttribute>()
+            .ToArray();
+
+        foreach (PluginCapabilityAttribute capAttr in capAttrs)
+        {
+            string reason = string.IsNullOrWhiteSpace(capAttr.Reason)
+                ? "(no reason provided)"
+                : capAttr.Reason;
+
+            _logger.Info(null,
+                "Security audit: [{0}] {1} declared Capability.{2} — reason: {3}",
+                pluginType.Name, pluginId, capAttr.Capability, reason);
+        }
     }
 }
 

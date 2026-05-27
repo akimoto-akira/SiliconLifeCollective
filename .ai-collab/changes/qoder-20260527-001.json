@@ -1,0 +1,25 @@
+{
+  "sessionId": "qoder-20260527-001",
+  "actorId": "qoder",
+  "startTime": "2026-05-27T23:10:00+08:00",
+  "endTime": "2026-05-27T23:30:00+08:00",
+  "files": [
+    {
+      "path": "src/SiliconLife.Core/Plugins/Capability.cs",
+      "intent": "新增 Capability 枚举：Network、FileIO、Process、AI 四种声明式权限",
+      "relatedTask": "task-379"
+    },
+    {
+      "path": "src/SiliconLife.Core/Plugins/PluginCapabilityAttribute.cs",
+      "intent": "新增 PluginCapabilityAttribute 特性，支持 AllowMultiple 和 Reason 属性",
+      "relatedTask": "task-379"
+    },
+    {
+      "path": "src/SiliconLife.Core/Plugins/PluginLoader.cs",
+      "intent": "集成声明式权限：ReadDeclaredCapabilities 从 PE 元数据读取能力声明，IsExemptedByCapability/IsStringExemptedByCapability 实现扫描豁免，AuditCapabilityDeclarations 记录审计日志",
+      "relatedTask": "task-379"
+    }
+  ],
+  "tasksCompleted": ["task-379"],
+  "tasksCreated": []
+}
