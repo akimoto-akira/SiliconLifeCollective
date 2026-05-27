@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27T12:30:00+08:00",
+  "lastUpdated": "2026-05-27T13:30:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -83,7 +83,7 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "bbdfa3c",
       "completedAt": "2026-05-27T12:30:00+08:00"
     },
     {
@@ -93,10 +93,12 @@
       "title": "PluginDemo-02: ITypeRegistry注册与查询示例",
       "description": "实现IPlugin，OnLoad中通过ITypeRegistry注册3个自定义类型(GreetingTool, FarewellTool, StatusTool)，定义抽象基类DemoTool。OnStart中用FindSubtypesOf查找所有Tool子类型并打印。每个文件夹含Plugin.cs + 13语言README。README重点：ITypeRegistry注册与查询完整流程、RegisterFromAssembly用法。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-27T13:30:00+08:00"
     },
     {
       "id": "task-369",
@@ -221,7 +223,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-368",
       "task-369",
       "task-370",
       "task-371",
@@ -240,7 +241,8 @@
       "task-364",
       "task-365",
       "task-366",
-      "task-367"
+      "task-367",
+      "task-368"
     ],
     "cancelled": []
   },
