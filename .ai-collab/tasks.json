@@ -223,7 +223,7 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "qoder",
-      "relatedCommit": null,
+      "relatedCommit": "348c410",
       "completedAt": "2026-05-28T02:30:00+08:00"
     },
     {
@@ -233,10 +233,11 @@
       "title": "PluginDemo-12: 禁止的字符串反射绕过反例",
       "description": "反例：演示用ldstr字符串拼接反射绕过Type.GetType(\"System.IO.File, System.Runtime\")/Assembly.Load(\"System.Net.Http\")。标注⚠️VIOLATION: [ILString]并说明即使字符串拼接或加密也无法绕过(扫描编译后IL的#US堆)。每个文件夹含Plugin.cs + 13语言README。README重点：#US堆扫描机制、为什么字符串混淆也无法绕过、最后一道防线。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "qoder",
+      "completedAt": "2026-05-27T23:30:00+08:00"
     },
     {
       "id": "task-379",
@@ -362,11 +363,10 @@
     }
   ],
   "taskIndex": {
-    "pending": [
-      "task-378"
-    ],
+    "pending": [],
     "inProgress": [],
     "completed": [
+      "task-378",
       "task-377",
       "task-376",
       "task-375",
