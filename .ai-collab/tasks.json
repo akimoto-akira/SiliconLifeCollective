@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27T10:24:00+08:00",
+  "lastUpdated": "2026-05-27T22:00:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -125,7 +125,7 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "trae-glm5",
-      "relatedCommit": null,
+      "relatedCommit": "5e5e9d1",
       "completedAt": "2026-05-27T15:30:00+08:00"
     },
     {
@@ -135,10 +135,11 @@
       "title": "PluginDemo-05: IWorkflowPlugin工作流插件示例",
       "description": "同时实现IPlugin和IWorkflowPlugin，RegisterTemplates返回自定义模板，InjectTransitions向现有模板注入转移规则。每个文件夹含Plugin.cs + 13语言README。README重点：IWorkflowPlugin接口用途、如何同时实现两个接口。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-27T22:30:00+08:00"
     },
     {
       "id": "task-372",
@@ -347,7 +348,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-371",
       "task-372",
       "task-373",
       "task-374",
@@ -358,6 +358,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-371",
       "task-362",
       "task-363",
       "task-364",
