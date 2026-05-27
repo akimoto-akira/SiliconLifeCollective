@@ -1,0 +1,1445 @@
+{
+  "archiveDate": "2026-05-27",
+  "type": "changes",
+  "count": 10,
+  "archivedAt": "2026-05-27T10:22:50.968935+08:00",
+  "changes": [
+    {
+      "sessionId": "catpaw-20260527-001",
+      "actorId": "catpaw",
+      "startTime": "2026-05-27T22:00:00+08:00",
+      "endTime": "2026-05-27T22:30:00+08:00",
+      "files": [
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/Plugin.cs",
+          "intent": "创建IWorkflowPlugin工作流插件示例：同时实现IPlugin和IWorkflowPlugin，RegisterTemplates返回PluginApproval工作流模板，InjectTransitions向CodeReview注入FastTrack转移",
+          "changeSummary": {
+            "additions": 180,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.md",
+          "intent": "英语README：IWorkflowPlugin接口全貌、如何同时实现两个接口、PluginApproval工作流状态图、InjectTransitions演示、调用顺序",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.zh-CN.md",
+          "intent": "简体中文README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.zh-HK.md",
+          "intent": "繁体中文README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.ja-JP.md",
+          "intent": "日语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.ko-KR.md",
+          "intent": "韩语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.de-DE.md",
+          "intent": "德语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.fr-FR.md",
+          "intent": "法语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.es-ES.md",
+          "intent": "西班牙语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.it-IT.md",
+          "intent": "意大利语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.ru-RU.md",
+          "intent": "俄语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.pl-PL.md",
+          "intent": "波兰语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.pt-PT.md",
+          "intent": "葡萄牙语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        },
+        {
+          "path": "PluginDemo/05-WorkflowPlugin/README.cs-CZ.md",
+          "intent": "捷克语README",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-371"
+        }
+      ],
+      "commitHash": "6df98a0",
+      "tasksCompleted": [
+        "task-371"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "catpaw-20260527-002",
+      "actorId": "catpaw",
+      "timestamp": "2026-05-28T02:00:00+08:00",
+      "tasks": [
+        {
+          "taskId": "task-380",
+          "action": "completed",
+          "target": "PluginDemo/13-CapabilityNetwork/",
+          "files": [
+            "PluginDemo/13-CapabilityNetwork/Plugin.cs",
+            "PluginDemo/13-CapabilityNetwork/README.md",
+            "PluginDemo/13-CapabilityNetwork/README.zh-CN.md",
+            "PluginDemo/13-CapabilityNetwork/README.zh-HK.md",
+            "PluginDemo/13-CapabilityNetwork/README.ja-JP.md",
+            "PluginDemo/13-CapabilityNetwork/README.ko-KR.md",
+            "PluginDemo/13-CapabilityNetwork/README.de-DE.md",
+            "PluginDemo/13-CapabilityNetwork/README.fr-FR.md",
+            "PluginDemo/13-CapabilityNetwork/README.es-ES.md",
+            "PluginDemo/13-CapabilityNetwork/README.it-IT.md",
+            "PluginDemo/13-CapabilityNetwork/README.ru-RU.md",
+            "PluginDemo/13-CapabilityNetwork/README.pt-PT.md",
+            "PluginDemo/13-CapabilityNetwork/README.pl-PL.md",
+            "PluginDemo/13-CapabilityNetwork/README.cs-CZ.md"
+          ]
+        },
+        {
+          "taskId": "task-381",
+          "action": "completed",
+          "target": "PluginDemo/14-CapabilityFileIO/",
+          "files": [
+            "PluginDemo/14-CapabilityFileIO/Plugin.cs",
+            "PluginDemo/14-CapabilityFileIO/README.md",
+            "PluginDemo/14-CapabilityFileIO/README.zh-CN.md",
+            "PluginDemo/14-CapabilityFileIO/README.zh-HK.md",
+            "PluginDemo/14-CapabilityFileIO/README.ja-JP.md",
+            "PluginDemo/14-CapabilityFileIO/README.ko-KR.md",
+            "PluginDemo/14-CapabilityFileIO/README.de-DE.md",
+            "PluginDemo/14-CapabilityFileIO/README.fr-FR.md",
+            "PluginDemo/14-CapabilityFileIO/README.es-ES.md",
+            "PluginDemo/14-CapabilityFileIO/README.it-IT.md",
+            "PluginDemo/14-CapabilityFileIO/README.ru-RU.md",
+            "PluginDemo/14-CapabilityFileIO/README.pt-PT.md",
+            "PluginDemo/14-CapabilityFileIO/README.pl-PL.md",
+            "PluginDemo/14-CapabilityFileIO/README.cs-CZ.md"
+          ]
+        },
+        {
+          "taskId": "task-382",
+          "action": "completed",
+          "target": "PluginDemo/15-CapabilityProcess/",
+          "files": [
+            "PluginDemo/15-CapabilityProcess/Plugin.cs",
+            "PluginDemo/15-CapabilityProcess/README.md",
+            "PluginDemo/15-CapabilityProcess/README.zh-CN.md",
+            "PluginDemo/15-CapabilityProcess/README.zh-HK.md",
+            "PluginDemo/15-CapabilityProcess/README.ja-JP.md",
+            "PluginDemo/15-CapabilityProcess/README.ko-KR.md",
+            "PluginDemo/15-CapabilityProcess/README.de-DE.md",
+            "PluginDemo/15-CapabilityProcess/README.fr-FR.md",
+            "PluginDemo/15-CapabilityProcess/README.es-ES.md",
+            "PluginDemo/15-CapabilityProcess/README.it-IT.md",
+            "PluginDemo/15-CapabilityProcess/README.ru-RU.md",
+            "PluginDemo/15-CapabilityProcess/README.pt-PT.md",
+            "PluginDemo/15-CapabilityProcess/README.pl-PL.md",
+            "PluginDemo/15-CapabilityProcess/README.cs-CZ.md"
+          ]
+        },
+        {
+          "taskId": "task-383",
+          "action": "completed",
+          "target": "PluginDemo/16-CapabilityAI/",
+          "files": [
+            "PluginDemo/16-CapabilityAI/Plugin.cs",
+            "PluginDemo/16-CapabilityAI/README.md",
+            "PluginDemo/16-CapabilityAI/README.zh-CN.md",
+            "PluginDemo/16-CapabilityAI/README.zh-HK.md",
+            "PluginDemo/16-CapabilityAI/README.ja-JP.md",
+            "PluginDemo/16-CapabilityAI/README.ko-KR.md",
+            "PluginDemo/16-CapabilityAI/README.de-DE.md",
+            "PluginDemo/16-CapabilityAI/README.fr-FR.md",
+            "PluginDemo/16-CapabilityAI/README.es-ES.md",
+            "PluginDemo/16-CapabilityAI/README.it-IT.md",
+            "PluginDemo/16-CapabilityAI/README.ru-RU.md",
+            "PluginDemo/16-CapabilityAI/README.pt-PT.md",
+            "PluginDemo/16-CapabilityAI/README.pl-PL.md",
+            "PluginDemo/16-CapabilityAI/README.cs-CZ.md"
+          ]
+        },
+        {
+          "taskId": "task-384",
+          "action": "completed",
+          "target": "PluginDemo/17-CapabilityStacked/",
+          "files": [
+            "PluginDemo/17-CapabilityStacked/Plugin.cs",
+            "PluginDemo/17-CapabilityStacked/README.md",
+            "PluginDemo/17-CapabilityStacked/README.zh-CN.md",
+            "PluginDemo/17-CapabilityStacked/README.zh-HK.md",
+            "PluginDemo/17-CapabilityStacked/README.ja-JP.md",
+            "PluginDemo/17-CapabilityStacked/README.ko-KR.md",
+            "PluginDemo/17-CapabilityStacked/README.de-DE.md",
+            "PluginDemo/17-CapabilityStacked/README.fr-FR.md",
+            "PluginDemo/17-CapabilityStacked/README.es-ES.md",
+            "PluginDemo/17-CapabilityStacked/README.it-IT.md",
+            "PluginDemo/17-CapabilityStacked/README.ru-RU.md",
+            "PluginDemo/17-CapabilityStacked/README.pt-PT.md",
+            "PluginDemo/17-CapabilityStacked/README.pl-PL.md",
+            "PluginDemo/17-CapabilityStacked/README.cs-CZ.md"
+          ]
+        },
+        {
+          "taskId": "task-385",
+          "action": "completed",
+          "target": "PluginDemo/18-CapabilityDenied/",
+          "files": [
+            "PluginDemo/18-CapabilityDenied/Plugin.cs",
+            "PluginDemo/18-CapabilityDenied/README.md",
+            "PluginDemo/18-CapabilityDenied/README.zh-CN.md",
+            "PluginDemo/18-CapabilityDenied/README.zh-HK.md",
+            "PluginDemo/18-CapabilityDenied/README.ja-JP.md",
+            "PluginDemo/18-CapabilityDenied/README.ko-KR.md",
+            "PluginDemo/18-CapabilityDenied/README.de-DE.md",
+            "PluginDemo/18-CapabilityDenied/README.fr-FR.md",
+            "PluginDemo/18-CapabilityDenied/README.es-ES.md",
+            "PluginDemo/18-CapabilityDenied/README.it-IT.md",
+            "PluginDemo/18-CapabilityDenied/README.ru-RU.md",
+            "PluginDemo/18-CapabilityDenied/README.pt-PT.md",
+            "PluginDemo/18-CapabilityDenied/README.pl-PL.md",
+            "PluginDemo/18-CapabilityDenied/README.cs-CZ.md"
+          ]
+        },
+        {
+          "taskId": "task-386",
+          "action": "completed",
+          "target": "PluginDemo/19-TickObject/",
+          "files": [
+            "PluginDemo/19-TickObject/Plugin.cs",
+            "PluginDemo/19-TickObject/README.md",
+            "PluginDemo/19-TickObject/README.zh-CN.md",
+            "PluginDemo/19-TickObject/README.zh-HK.md",
+            "PluginDemo/19-TickObject/README.ja-JP.md",
+            "PluginDemo/19-TickObject/README.ko-KR.md",
+            "PluginDemo/19-TickObject/README.de-DE.md",
+            "PluginDemo/19-TickObject/README.fr-FR.md",
+            "PluginDemo/19-TickObject/README.es-ES.md",
+            "PluginDemo/19-TickObject/README.it-IT.md",
+            "PluginDemo/19-TickObject/README.ru-RU.md",
+            "PluginDemo/19-TickObject/README.pt-PT.md",
+            "PluginDemo/19-TickObject/README.pl-PL.md",
+            "PluginDemo/19-TickObject/README.cs-CZ.md"
+          ]
+        },
+        {
+          "taskId": "task-387",
+          "action": "completed",
+          "target": "PluginDemo/20-SpeedyPack/",
+          "files": [
+            "PluginDemo/20-SpeedyPack/Plugin.cs",
+            "PluginDemo/20-SpeedyPack/README.md",
+            "PluginDemo/20-SpeedyPack/README.zh-CN.md",
+            "PluginDemo/20-SpeedyPack/README.zh-HK.md",
+            "PluginDemo/20-SpeedyPack/README.ja-JP.md",
+            "PluginDemo/20-SpeedyPack/README.ko-KR.md",
+            "PluginDemo/20-SpeedyPack/README.de-DE.md",
+            "PluginDemo/20-SpeedyPack/README.fr-FR.md",
+            "PluginDemo/20-SpeedyPack/README.es-ES.md",
+            "PluginDemo/20-SpeedyPack/README.it-IT.md",
+            "PluginDemo/20-SpeedyPack/README.ru-RU.md",
+            "PluginDemo/20-SpeedyPack/README.pt-PT.md",
+            "PluginDemo/20-SpeedyPack/README.pl-PL.md",
+            "PluginDemo/20-SpeedyPack/README.cs-CZ.md"
+          ]
+        }
+      ],
+      "summary": "Completed 8 PluginDemo tasks (task-380 through task-387): 13-CapabilityNetwork, 14-CapabilityFileIO, 15-CapabilityProcess, 16-CapabilityAI, 17-CapabilityStacked, 18-CapabilityDenied, 19-TickObject, 20-SpeedyPack. Each demo includes Plugin.cs + 13 language READMEs (en, zh-CN, zh-HK, ja-JP, ko-KR, de-DE, fr-FR, es-ES, it-IT, ru-RU, pt-PT, pl-PL, cs-CZ). No scripts were used — all files created manually."
+    },
+    {
+      "sessionId": "qoder-20260527-001",
+      "actorId": "qoder",
+      "startTime": "2026-05-27T23:10:00+08:00",
+      "endTime": "2026-05-27T23:30:00+08:00",
+      "files": [
+        {
+          "path": "src/SiliconLife.Core/Plugins/Capability.cs",
+          "intent": "新增 Capability 枚举：Network、FileIO、Process、AI 四种声明式权限",
+          "relatedTask": "task-379"
+        },
+        {
+          "path": "src/SiliconLife.Core/Plugins/PluginCapabilityAttribute.cs",
+          "intent": "新增 PluginCapabilityAttribute 特性，支持 AllowMultiple 和 Reason 属性",
+          "relatedTask": "task-379"
+        },
+        {
+          "path": "src/SiliconLife.Core/Plugins/PluginLoader.cs",
+          "intent": "集成声明式权限：ReadDeclaredCapabilities 从 PE 元数据读取能力声明，IsExemptedByCapability/IsStringExemptedByCapability 实现扫描豁免，AuditCapabilityDeclarations 记录审计日志",
+          "relatedTask": "task-379"
+        }
+      ],
+      "tasksCompleted": [
+        "task-379"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "qoder-20260527-004",
+      "actorId": "qoder",
+      "startTime": "2026-05-27T22:00:00+08:00",
+      "endTime": "2026-05-27T22:30:00+08:00",
+      "files": [
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/Plugin.cs",
+          "intent": "创建禁止反射操作反例插件，演示Type.GetType/Activator.CreateInstance/Assembly.Load等被禁止的MemberRef及正确替代方案",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.md",
+          "intent": "英文README，详解反射绕过威胁、typeof(X).Assembly安全性、ITypeRegistry/IObjectFactory替代方案",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.zh-CN.md",
+          "intent": "简体中文README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.zh-HK.md",
+          "intent": "繁體中文README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.ja-JP.md",
+          "intent": "日本語README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.ko-KR.md",
+          "intent": "한국어README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.de-DE.md",
+          "intent": "Deutsch README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.fr-FR.md",
+          "intent": "Français README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.es-ES.md",
+          "intent": "Español README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.it-IT.md",
+          "intent": "Italiano README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.ru-RU.md",
+          "intent": "Русский README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.pt-PT.md",
+          "intent": "Português README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.pl-PL.md",
+          "intent": "Polski README",
+          "relatedTask": "task-376"
+        },
+        {
+          "path": "PluginDemo/10-ForbiddenReflection/README.cs-CZ.md",
+          "intent": "Čeština README",
+          "relatedTask": "task-376"
+        }
+      ],
+      "tasksCompleted": [
+        "task-376"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "qoder-20260527-005",
+      "actorId": "qoder",
+      "startTime": "2026-05-27T23:00:00+08:00",
+      "endTime": "2026-05-27T23:30:00+08:00",
+      "files": [
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/Plugin.cs",
+          "intent": "创建禁止字符串绕过反例插件，演示6种字符串混淆尝试及为何全部失败",
+          "changeSummary": {
+            "additions": 330,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.md",
+          "intent": "创建英语README，详述#US堆扫描机制、禁止前缀列表、混淆失败原因",
+          "changeSummary": {
+            "additions": 192,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.zh-CN.md",
+          "intent": "创建简体中文README文档",
+          "changeSummary": {
+            "additions": 192,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.zh-HK.md",
+          "intent": "创建繁体中文README文档",
+          "changeSummary": {
+            "additions": 192,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.ja-JP.md",
+          "intent": "创建日语README文档",
+          "changeSummary": {
+            "additions": 192,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.ko-KR.md",
+          "intent": "创建韩语README文档",
+          "changeSummary": {
+            "additions": 192,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.de-DE.md",
+          "intent": "创建德语README文档",
+          "changeSummary": {
+            "additions": 192,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.fr-FR.md",
+          "intent": "创建法语README文档",
+          "changeSummary": {
+            "additions": 143,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.es-ES.md",
+          "intent": "创建西班牙语README文档",
+          "changeSummary": {
+            "additions": 143,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.it-IT.md",
+          "intent": "创建意大利语README文档",
+          "changeSummary": {
+            "additions": 143,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.ru-RU.md",
+          "intent": "创建俄语README文档",
+          "changeSummary": {
+            "additions": 143,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.pt-PT.md",
+          "intent": "创建葡萄牙语README文档",
+          "changeSummary": {
+            "additions": 143,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.pl-PL.md",
+          "intent": "创建波兰语README文档",
+          "changeSummary": {
+            "additions": 143,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        },
+        {
+          "path": "PluginDemo/12-ForbiddenStringBypass/README.cs-CZ.md",
+          "intent": "创建捷克语README文档",
+          "changeSummary": {
+            "additions": 143,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-378"
+        }
+      ],
+      "commitHash": null,
+      "tasksCompleted": [
+        "task-378"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "qoder-20260527-006",
+      "actorId": "qoder",
+      "startTime": "2026-05-27T14:15:00+08:00",
+      "endTime": "2026-05-27T14:30:00+08:00",
+      "files": [
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/Plugin.cs",
+          "intent": "实现 PluginOnboarding 完整业务工作流示例（5状态、5转移、角色约束、超时检测）",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/Plugin.cs",
+          "changeSummary": {
+            "additions": 349,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.md",
+          "intent": "创建英文使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.md",
+          "changeSummary": {
+            "additions": 197,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.zh-CN.md",
+          "intent": "创建简体中文使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.zh-CN.md",
+          "changeSummary": {
+            "additions": 197,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.zh-HK.md",
+          "intent": "创建繁体中文使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.zh-HK.md",
+          "changeSummary": {
+            "additions": 169,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.cs-CZ.md",
+          "intent": "创建捷克语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.cs-CZ.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.de-DE.md",
+          "intent": "创建德语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.de-DE.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.es-ES.md",
+          "intent": "创建西班牙语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.es-ES.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.fr-FR.md",
+          "intent": "创建法语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.fr-FR.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.it-IT.md",
+          "intent": "创建意大利语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.it-IT.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.ja-JP.md",
+          "intent": "创建日语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.ja-JP.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.ko-KR.md",
+          "intent": "创建韩语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.ko-KR.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.pl-PL.md",
+          "intent": "创建波兰语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.pl-PL.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.pt-PT.md",
+          "intent": "创建葡萄牙语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.pt-PT.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": "PluginDemo/21-WorkflowTemplate/README.ru-RU.md",
+          "intent": "创建俄语使用文档",
+          "gitDiff": "git diff HEAD~1 HEAD -- PluginDemo/21-WorkflowTemplate/README.ru-RU.md",
+          "changeSummary": {
+            "additions": 59,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": ".ai-collab/tasks.json",
+          "intent": "更新 task-388 状态为 completed",
+          "gitDiff": "git diff HEAD~1 HEAD -- .ai-collab/tasks.json",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 4,
+            "modifications": 2
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": ".ai-collab/state.json",
+          "intent": "更新会话状态（currentActor/currentSession 清理）",
+          "gitDiff": "git diff HEAD~1 HEAD -- .ai-collab/state.json",
+          "changeSummary": {
+            "additions": 0,
+            "deletions": 0,
+            "modifications": 2
+          },
+          "relatedTask": "task-388"
+        },
+        {
+          "path": ".ai-collab/activity.log",
+          "intent": "追加 session_start/task_claim/task_complete/session_end 日志",
+          "gitDiff": "git diff HEAD~1 HEAD -- .ai-collab/activity.log",
+          "changeSummary": {
+            "additions": 4,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-388"
+        }
+      ],
+      "commitHash": "a820507da296147f5538c10249cde2dc1dd9fe8a",
+      "tasksCompleted": [
+        "task-388"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "trae-glm5-20260527-001",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-27T12:00:00+08:00",
+      "endTime": "2026-05-27T12:30:00+08:00",
+      "files": [
+        {
+          "path": "PluginDemo/01-MinimalPlugin/Plugin.cs",
+          "intent": "创建最简IPlugin实现，所有属性返回硬编码值，生命周期方法空体加注释说明调用时机",
+          "changeSummary": {
+            "additions": 68,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.md",
+          "intent": "英语README：IPlugin接口全貌、生命周期调用顺序、安全说明",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.zh-CN.md",
+          "intent": "简体中文README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.zh-HK.md",
+          "intent": "繁体中文README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.ja-JP.md",
+          "intent": "日语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.ko-KR.md",
+          "intent": "韩语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.de-DE.md",
+          "intent": "德语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.fr-FR.md",
+          "intent": "法语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.es-ES.md",
+          "intent": "西班牙语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.it-IT.md",
+          "intent": "意大利语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.ru-RU.md",
+          "intent": "俄语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.pl-PL.md",
+          "intent": "波兰语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.pt-PT.md",
+          "intent": "葡萄牙语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        },
+        {
+          "path": "PluginDemo/01-MinimalPlugin/README.cs-CZ.md",
+          "intent": "捷克语README",
+          "changeSummary": {
+            "additions": 62,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-367"
+        }
+      ],
+      "commitHash": "bbdfa3c",
+      "tasksCompleted": [
+        "task-367"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "trae-glm5-20260527-002",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-27T13:00:00+08:00",
+      "endTime": "2026-05-27T13:30:00+08:00",
+      "files": [
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/Plugin.cs",
+          "intent": "创建ITypeRegistry注册与查询示例，定义DemoTool抽象基类+3个具体子类型，OnLoad注册，OnStart查询",
+          "changeSummary": {
+            "additions": 98,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.md",
+          "intent": "英语README：ITypeRegistry接口全貌、注册与查询流程、RegisterFromAssembly用法、DemoTool与ITool无关说明",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.zh-CN.md",
+          "intent": "简体中文README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.zh-HK.md",
+          "intent": "繁体中文README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.ja-JP.md",
+          "intent": "日语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.ko-KR.md",
+          "intent": "韩语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.de-DE.md",
+          "intent": "德语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.fr-FR.md",
+          "intent": "法语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.es-ES.md",
+          "intent": "西班牙语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.it-IT.md",
+          "intent": "意大利语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.ru-RU.md",
+          "intent": "俄语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.pl-PL.md",
+          "intent": "波兰语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.pt-PT.md",
+          "intent": "葡萄牙语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        },
+        {
+          "path": "PluginDemo/02-TypeRegistryUsage/README.cs-CZ.md",
+          "intent": "捷克语README",
+          "changeSummary": {
+            "additions": 80,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-368"
+        }
+      ],
+      "commitHash": "bb4324d",
+      "tasksCompleted": [
+        "task-368"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "trae-glm5-20260527-003",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-27T14:00:00+08:00",
+      "endTime": "2026-05-27T14:30:00+08:00",
+      "files": [
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/Plugin.cs",
+          "intent": "创建IObjectFactory注册与创建示例，定义SimpleService(无参)和ConfiguredService(带参)两个演示类型，OnLoad中RegisterAutoFactory注册，OnStart中CreateInstance创建实例",
+          "changeSummary": {
+            "additions": 98,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.md",
+          "intent": "英语README：IObjectFactory接口全貌、替代Activator.CreateInstance原理、RegisterAutoFactory工作方式、注册与创建流程",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.zh-CN.md",
+          "intent": "简体中文README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.zh-HK.md",
+          "intent": "繁体中文README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.ja-JP.md",
+          "intent": "日语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.ko-KR.md",
+          "intent": "韩语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.de-DE.md",
+          "intent": "德语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.fr-FR.md",
+          "intent": "法语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.es-ES.md",
+          "intent": "西班牙语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.it-IT.md",
+          "intent": "意大利语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.ru-RU.md",
+          "intent": "俄语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.pl-PL.md",
+          "intent": "波兰语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.pt-PT.md",
+          "intent": "葡萄牙语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        },
+        {
+          "path": "PluginDemo/03-ObjectFactoryUsage/README.cs-CZ.md",
+          "intent": "捷克语README",
+          "changeSummary": {
+            "additions": 95,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-369"
+        }
+      ],
+      "commitHash": "f3787ba",
+      "tasksCompleted": [
+        "task-369"
+      ],
+      "tasksCreated": []
+    },
+    {
+      "sessionId": "trae-glm5-20260527-004",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-27T15:00:00+08:00",
+      "endTime": "2026-05-27T15:30:00+08:00",
+      "files": [
+        {
+          "path": "PluginDemo/04-SafeSystemIO/Plugin.cs",
+          "intent": "创建System.IO白名单安全类型示例：MemoryStream读写、GZipStream压缩/解压完整管线、BinaryReader/Writer包装流",
+          "changeSummary": {
+            "additions": 105,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.md",
+          "intent": "英语README：SystemIOAllowedTypes白名单、被阻止类型及替代方案、PermissionedStreamFactory原理、压缩管线流程",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.zh-CN.md",
+          "intent": "简体中文README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.zh-HK.md",
+          "intent": "繁体中文README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.ja-JP.md",
+          "intent": "日语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.ko-KR.md",
+          "intent": "韩语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.de-DE.md",
+          "intent": "德语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.fr-FR.md",
+          "intent": "法语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.es-ES.md",
+          "intent": "西班牙语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.it-IT.md",
+          "intent": "意大利语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.ru-RU.md",
+          "intent": "俄语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.pl-PL.md",
+          "intent": "波兰语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.pt-PT.md",
+          "intent": "葡萄牙语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        },
+        {
+          "path": "PluginDemo/04-SafeSystemIO/README.cs-CZ.md",
+          "intent": "捷克语README",
+          "changeSummary": {
+            "additions": 100,
+            "deletions": 0,
+            "modifications": 0
+          },
+          "relatedTask": "task-370"
+        }
+      ],
+      "commitHash": "5e5e9d1",
+      "tasksCompleted": [
+        "task-370"
+      ],
+      "tasksCreated": []
+    }
+  ],
+  "index": {
+    "byActor": {
+      "catpaw": [
+        "unknown",
+        "unknown"
+      ],
+      "qoder": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ],
+      "trae-glm5": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ]
+    },
+    "byTask": {
+      "unknown": [
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown",
+        "unknown"
+      ]
+    }
+  }
+}

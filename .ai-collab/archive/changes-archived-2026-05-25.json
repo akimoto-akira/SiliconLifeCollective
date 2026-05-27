@@ -1,8 +1,8 @@
 {
   "archiveDate": "2026-05-25",
   "type": "changes",
-  "count": 15,
-  "archivedAt": "2026-05-26T00:51:20.500862+08:00",
+  "count": 16,
+  "archivedAt": "2026-05-27T10:23:09.350564+08:00",
   "changes": [
     {
       "sessionId": "catpaw-20260525-001",
@@ -1133,41 +1133,135 @@
         "task-361"
       ],
       "tasksCreated": []
+    },
+    {
+      "changeId": "trae-glm5-20260525-001",
+      "actorId": "trae-glm5",
+      "sessionId": "trae-glm5-20260525-002",
+      "taskId": "task-363",
+      "timestamp": "2026-05-25T16:30:00+08:00",
+      "type": "feature",
+      "summary": "细化 ThinkOnProject 人员配备提示词：从模糊警告改为详细可执行行动计划",
+      "description": "当前 ThinkOnProject 场景中，角色人员不足时仅输出一行模糊警告，导致 AI 只创建1个硅基人便停止。改进为输出每个角色缺多少人的明细、需创建的硅基人总数、三步操作指引，并区分空角色池和部分缺人两种场景。",
+      "files": [
+        {
+          "path": "src/SiliconLife.Core/Localization/LocalizationBase.cs",
+          "change": "modified",
+          "details": "新增9个抽象属性(StaffingActionPlanHeader, TotalBeingsNeededFormat, StaffingRoleBreakdownHeader, RoleShortageDetailFormat, StaffingActionStepsHeader, StaffingStepCreateBeingsFormat, StaffingStepAssignToProject, StaffingStepAssignToRoles, EmptyRolePoolActionFormat)和4个Format方法"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
+          "change": "modified",
+          "details": "新增9个抽象属性映射(ProjectCtx_StaffingActionPlanHeader等)和9个override实现"
+        },
+        {
+          "path": "src/SiliconLife.Core/AI/ContextManager.cs",
+          "change": "modified",
+          "details": "BuildProjectScenarioContext方法中，将模糊的understaffedCount警告替换为详细的人员配备行动计划，区分isEmptyRolePool和understaffedRoles两种场景，输出角色缺口明细、总需求人数和三步操作指引"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/ZhCN.cs",
+          "change": "modified",
+          "details": "更新ProjectCtx_RoleNeedsAttention为更明确提示，新增9条中文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/EnUS.cs",
+          "change": "modified",
+          "details": "更新ProjectCtx_RoleNeedsAttention为更明确提示，新增9条英文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/JaJP.cs",
+          "change": "modified",
+          "details": "新增9条日文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/FrFR.cs",
+          "change": "modified",
+          "details": "新增9条法文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/EsES.cs",
+          "change": "modified",
+          "details": "新增9条西班牙文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/PtPT.cs",
+          "change": "modified",
+          "details": "新增9条葡萄牙文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/CsCZ.cs",
+          "change": "modified",
+          "details": "新增9条捷克文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/DeDE.cs",
+          "change": "modified",
+          "details": "新增9条德文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/KoKR.cs",
+          "change": "modified",
+          "details": "新增9条韩文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/ItIT.cs",
+          "change": "modified",
+          "details": "新增9条意大利文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/PlPL.cs",
+          "change": "modified",
+          "details": "新增9条波兰文本地化字符串"
+        },
+        {
+          "path": "src/SiliconLife.Common/Localization/ZhHK.cs",
+          "change": "modified",
+          "details": "新增9条繁体中文本地化字符串"
+        }
+      ],
+      "impact": "AI在ThinkOnProject场景下将收到详细可执行的人员配备行动计划，不再只创建1个硅基人，而是按角色缺口明细创建正确数量的硅基人并逐一分配",
+      "breakingChanges": false,
+      "testsVerified": true,
+      "buildVerified": true
     }
   ],
   "index": {
     "byActor": {
-      "unknown": [
-        null,
-        null,
-        null,
+      "catpaw": [
+        "catpaw-20260525-001",
+        "catpaw-20260525-002",
+        "catpaw-20260525-003",
         "catpaw-20260525-004",
         "catpaw-20260525-005",
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+        "catpaw-20260525-006",
+        "catpaw-20260525-007",
+        "catpaw-20260525-008",
+        "catpaw-20260525-009",
+        "catpaw-20260525-010",
+        "catpaw-20260525-011",
+        "catpaw-20260525-012",
+        "catpaw-20260525-013",
+        "catpaw-20260525-014",
+        "catpaw-20260525-015"
+      ],
+      "trae-glm5": [
+        "trae-glm5-20260525-002"
       ]
     },
     "byTask": {
       "unknown": [
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
+        "catpaw-20260525-001",
+        "catpaw-20260525-002",
+        "catpaw-20260525-003",
+        "catpaw-20260525-006",
+        "catpaw-20260525-007",
+        "catpaw-20260525-008",
+        "catpaw-20260525-009",
+        "catpaw-20260525-012",
+        "catpaw-20260525-013",
+        "catpaw-20260525-014",
+        "catpaw-20260525-015"
       ],
       "task-349": [
         "catpaw-20260525-004"
@@ -1176,10 +1270,13 @@
         "catpaw-20260525-005"
       ],
       "task-355": [
-        null
+        "catpaw-20260525-010"
       ],
       "task-356": [
-        null
+        "catpaw-20260525-011"
+      ],
+      "task-363": [
+        "trae-glm5-20260525-002"
       ]
     }
   }

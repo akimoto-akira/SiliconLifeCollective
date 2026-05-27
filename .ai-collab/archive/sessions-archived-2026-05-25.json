@@ -1,8 +1,8 @@
 {
   "archiveDate": "2026-05-25",
   "type": "sessions",
-  "count": 15,
-  "archivedAt": "2026-05-26T00:51:20.077460+08:00",
+  "count": 17,
+  "archivedAt": "2026-05-27T10:23:08.008121+08:00",
   "sessions": [
     {
       "sessionId": "catpaw-20260525-001",
@@ -270,11 +270,51 @@
         "src/SiliconLife.Common/Localization/ZhHK.cs"
       ],
       "commitHash": "b846a21"
+    },
+    {
+      "sessionId": "trae-glm5-20260525-001",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-25T14:00:00+08:00",
+      "endTime": "2026-05-25T14:30:00+08:00",
+      "status": "completed",
+      "selectedTask": "task-362",
+      "modifiedFiles": [
+        {
+          "path": "src/SiliconLife.App/Web/Views/WorkflowDetailView.cs",
+          "intent": "删除 states-overview div 及相关 JS/CSS 代码，修复 state-initial 重复字符串渲染 bug"
+        }
+      ]
+    },
+    {
+      "sessionId": "trae-glm5-20260525-002",
+      "actorId": "trae-glm5",
+      "startTime": "2026-05-25T16:30:00+08:00",
+      "endTime": "2026-05-25T16:35:00+08:00",
+      "status": "completed",
+      "selectedTask": "task-363",
+      "changeRecord": "changes/trae-glm5-20260525-001.json",
+      "modifiedFiles": [
+        "src/SiliconLife.Core/Localization/LocalizationBase.cs",
+        "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
+        "src/SiliconLife.Core/AI/ContextManager.cs",
+        "src/SiliconLife.Common/Localization/ZhCN.cs",
+        "src/SiliconLife.Common/Localization/EnUS.cs",
+        "src/SiliconLife.Common/Localization/JaJP.cs",
+        "src/SiliconLife.Common/Localization/FrFR.cs",
+        "src/SiliconLife.Common/Localization/EsES.cs",
+        "src/SiliconLife.Common/Localization/PtPT.cs",
+        "src/SiliconLife.Common/Localization/CsCZ.cs",
+        "src/SiliconLife.Common/Localization/DeDE.cs",
+        "src/SiliconLife.Common/Localization/KoKR.cs",
+        "src/SiliconLife.Common/Localization/ItIT.cs",
+        "src/SiliconLife.Common/Localization/PlPL.cs",
+        "src/SiliconLife.Common/Localization/ZhHK.cs"
+      ]
     }
   ],
   "index": {
     "byActor": {
-      "unknown": [
+      "catpaw": [
         "catpaw-20260525-001",
         "catpaw-20260525-002",
         "catpaw-20260525-003",
@@ -290,27 +330,59 @@
         "catpaw-20260525-014",
         "catpaw-20260525-015"
       ],
-      "catpaw": [
+      "unknown": [
         "catpaw-20260525-012"
+      ],
+      "trae-glm5": [
+        "trae-glm5-20260525-001",
+        "trae-glm5-20260525-002"
       ]
     },
     "byTask": {
+      "task-346": [
+        "catpaw-20260525-001"
+      ],
+      "task-347": [
+        "catpaw-20260525-002"
+      ],
+      "task-348": [
+        "catpaw-20260525-003"
+      ],
+      "task-349": [
+        "catpaw-20260525-004"
+      ],
+      "task-350": [
+        "catpaw-20260525-005"
+      ],
+      "task-353": [
+        "catpaw-20260525-006"
+      ],
+      "task-354": [
+        "catpaw-20260525-007"
+      ],
+      "task-352": [
+        "catpaw-20260525-008"
+      ],
+      "task-351": [
+        "catpaw-20260525-009"
+      ],
+      "task-355": [
+        "catpaw-20260525-010"
+      ],
+      "task-356": [
+        "catpaw-20260525-011"
+      ],
       "unknown": [
-        "catpaw-20260525-001",
-        "catpaw-20260525-002",
-        "catpaw-20260525-003",
-        "catpaw-20260525-004",
-        "catpaw-20260525-005",
-        "catpaw-20260525-006",
-        "catpaw-20260525-007",
-        "catpaw-20260525-008",
-        "catpaw-20260525-009",
-        "catpaw-20260525-010",
-        "catpaw-20260525-011",
         "catpaw-20260525-012",
         "catpaw-20260525-013",
         "catpaw-20260525-014",
         "catpaw-20260525-015"
+      ],
+      "task-362": [
+        "trae-glm5-20260525-001"
+      ],
+      "task-363": [
+        "trae-glm5-20260525-002"
       ]
     }
   }
