@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27T04:58:00+08:00",
+  "lastUpdated": "2026-05-27T12:30:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -79,10 +79,12 @@
       "title": "PluginDemo-01: 最简IPlugin实现示例",
       "description": "创建最简IPlugin实现，所有属性返回硬编码值，OnLoad/OnStart/OnStop/OnUnload空体但加注释说明用途和调用时机。Id格式: com.siliconlife.demo.minimal。每个文件夹含Plugin.cs + 13语言README(en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU)。README重点：IPlugin接口全貌、生命周期调用顺序(OnLoad→OnStart→...→OnStop→OnUnload)。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "trae-glm5",
+      "relatedCommit": null,
+      "completedAt": "2026-05-27T12:30:00+08:00"
     },
     {
       "id": "task-368",
@@ -218,14 +220,27 @@
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": [
+      "task-368",
+      "task-369",
+      "task-370",
+      "task-371",
+      "task-372",
+      "task-373",
+      "task-374",
+      "task-375",
+      "task-376",
+      "task-377",
+      "task-378"
+    ],
     "inProgress": [],
     "completed": [
       "task-362",
       "task-363",
       "task-364",
       "task-365",
-      "task-366"
+      "task-366",
+      "task-367"
     ],
     "cancelled": []
   },

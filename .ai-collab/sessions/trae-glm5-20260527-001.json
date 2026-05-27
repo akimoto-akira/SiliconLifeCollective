@@ -1,0 +1,28 @@
+{
+  "sessionId": "trae-glm5-20260527-001",
+  "actorId": "trae-glm5",
+  "startTime": "2026-05-27T12:00:00+08:00",
+  "endTime": "2026-05-27T12:30:00+08:00",
+  "status": "completed",
+  "selectedTask": "task-367",
+  "changeRecord": null,
+  "modifiedFiles": [
+    "PluginDemo/01-MinimalPlugin/Plugin.cs",
+    "PluginDemo/01-MinimalPlugin/README.md",
+    "PluginDemo/01-MinimalPlugin/README.zh-CN.md",
+    "PluginDemo/01-MinimalPlugin/README.zh-HK.md",
+    "PluginDemo/01-MinimalPlugin/README.ja-JP.md",
+    "PluginDemo/01-MinimalPlugin/README.ko-KR.md",
+    "PluginDemo/01-MinimalPlugin/README.de-DE.md",
+    "PluginDemo/01-MinimalPlugin/README.fr-FR.md",
+    "PluginDemo/01-MinimalPlugin/README.es-ES.md",
+    "PluginDemo/01-MinimalPlugin/README.it-IT.md",
+    "PluginDemo/01-MinimalPlugin/README.ru-RU.md",
+    "PluginDemo/01-MinimalPlugin/README.pl-PL.md",
+    "PluginDemo/01-MinimalPlugin/README.pt-PT.md",
+    "PluginDemo/01-MinimalPlugin/README.cs-CZ.md",
+    ".ai-collab/tasks.json",
+    ".ai-collab/state.json",
+    ".ai-collab/activity.log"
+  ]
+}
