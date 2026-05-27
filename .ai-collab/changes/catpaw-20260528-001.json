@@ -1,0 +1,48 @@
+{
+  "sessionId": "catpaw-20260528-001",
+  "actorId": "catpaw",
+  "timestamp": "2026-05-28T10:30:00+08:00",
+  "tasks": [
+    {
+      "taskId": "task-386",
+      "action": "docs_alignment",
+      "target": "PluginDemo/19-TickObject/",
+      "intent": "对齐19-TickObject所有README翻译到英文基准版本，补全缺失内容",
+      "files": [
+        "PluginDemo/19-TickObject/README.zh-CN.md",
+        "PluginDemo/19-TickObject/README.zh-HK.md",
+        "PluginDemo/19-TickObject/README.ja-JP.md",
+        "PluginDemo/19-TickObject/README.ko-KR.md",
+        "PluginDemo/19-TickObject/README.de-DE.md",
+        "PluginDemo/19-TickObject/README.fr-FR.md",
+        "PluginDemo/19-TickObject/README.es-ES.md",
+        "PluginDemo/19-TickObject/README.it-IT.md",
+        "PluginDemo/19-TickObject/README.ru-RU.md",
+        "PluginDemo/19-TickObject/README.pt-PT.md",
+        "PluginDemo/19-TickObject/README.pl-PL.md",
+        "PluginDemo/19-TickObject/README.cs-CZ.md"
+      ]
+    },
+    {
+      "taskId": "task-387",
+      "action": "docs_alignment",
+      "target": "PluginDemo/20-SpeedyPack/",
+      "intent": "对齐20-SpeedyPack所有README翻译到英文基准版本，补全缺失内容",
+      "files": [
+        "PluginDemo/20-SpeedyPack/README.zh-CN.md",
+        "PluginDemo/20-SpeedyPack/README.zh-HK.md",
+        "PluginDemo/20-SpeedyPack/README.ja-JP.md",
+        "PluginDemo/20-SpeedyPack/README.ko-KR.md",
+        "PluginDemo/20-SpeedyPack/README.de-DE.md",
+        "PluginDemo/20-SpeedyPack/README.fr-FR.md",
+        "PluginDemo/20-SpeedyPack/README.es-ES.md",
+        "PluginDemo/20-SpeedyPack/README.it-IT.md",
+        "PluginDemo/20-SpeedyPack/README.ru-RU.md",
+        "PluginDemo/20-SpeedyPack/README.pt-PT.md",
+        "PluginDemo/20-SpeedyPack/README.pl-PL.md",
+        "PluginDemo/20-SpeedyPack/README.cs-CZ.md"
+      ]
+    }
+  ],
+  "summary": "对齐 19-TickObject 和 20-SpeedyPack 的全部12个翻译README到英文基准版本。zh-CN原版缺失关键方法表、演示场景代码、SpeedyPackOptions属性表等；其余11个翻译版本均仅3行摘要，现已全部重写为完整内容。"
+}
