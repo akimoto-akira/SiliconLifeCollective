@@ -962,3 +962,6 @@
 2026-05-27T13:00:00+08:00 | trae-glm5 | task_start | task=task-368
 2026-05-27T13:30:00+08:00 | trae-glm5 | task_complete | task=task-368
 2026-05-27T13:30:00+08:00 | trae-glm5 | session_end | completed=task-368
+2026-05-27T14:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260527-003 | task=task-369
+2026-05-27T14:30:00+08:00 | trae-glm5 | task_complete | task=task-369 | sessionId=trae-glm5-20260527-003
+2026-05-27T14:30:00+08:00 | trae-glm5 | session_end | sessionId=trae-glm5-20260527-003
