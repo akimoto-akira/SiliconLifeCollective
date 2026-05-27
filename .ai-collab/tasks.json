@@ -237,7 +237,8 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "qoder",
-      "completedAt": "2026-05-27T23:30:00+08:00"
+      "completedAt": "2026-05-27T23:30:00+08:00",
+      "relatedCommit": "5d570e5"
     },
     {
       "id": "task-379",
