@@ -366,19 +366,18 @@
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": [
+      "task-380",
+      "task-381",
+      "task-382",
+      "task-383",
+      "task-384",
+      "task-385",
+      "task-386",
+      "task-387"
+    ],
     "inProgress": [],
     "completed": [
-      "task-388",
-      "task-378",
-      "task-377",
-      "task-376",
-      "task-375",
-      "task-374",
-      "task-373",
-      "task-372",
-      "task-379",
-      "task-371",
       "task-362",
       "task-363",
       "task-364",
@@ -387,7 +386,17 @@
       "task-367",
       "task-368",
       "task-369",
-      "task-370"
+      "task-370",
+      "task-371",
+      "task-372",
+      "task-373",
+      "task-374",
+      "task-375",
+      "task-376",
+      "task-377",
+      "task-378",
+      "task-379",
+      "task-388"
     ],
     "cancelled": []
   },
