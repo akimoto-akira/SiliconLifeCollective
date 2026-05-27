@@ -361,6 +361,7 @@
       "createdAt": "2026-05-27T10:24:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "qoder",
+      "relatedCommit": "e154a188f2c64c83b84908b638c0a1b67db79f9f",
       "completedAt": "2026-05-27T14:30:00+08:00"
     }
   ],
