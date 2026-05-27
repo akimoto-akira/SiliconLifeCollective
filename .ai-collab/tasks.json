@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-28T00:30:00+08:00",
+  "lastUpdated": "2026-05-28T00:45:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -153,6 +153,7 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "qoder",
+      "relatedCommit": "322312e",
       "completedAt": "2026-05-28T00:30:00+08:00"
     },
     {
@@ -162,10 +163,12 @@
       "title": "PluginDemo-07: 禁止的文件I/O操作反例",
       "description": "反例：演示直接使用System.IO.File.ReadAllText/File.WriteAllText/FileStream/Directory.GetFiles。每个违规操作标注⚠️VIOLATION: [TypeRef]并给出正确替代方案(PermissionedStreamFactory)。每个文件夹含Plugin.cs + 13语言README。README重点：为什么System.IO被整体禁止、哪些类型例外、如何通过PermissionedStreamFactory安全访问文件。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "qoder",
+      "relatedCommit": null,
+      "completedAt": "2026-05-28T00:45:00+08:00"
     },
     {
       "id": "task-374",
@@ -352,7 +355,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-373",
       "task-374",
       "task-375",
       "task-376",
@@ -361,6 +363,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-373",
       "task-372",
       "task-379",
       "task-371",
