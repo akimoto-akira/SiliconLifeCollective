@@ -209,6 +209,7 @@
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "qoder",
+      "relatedCommit": "fc92a49",
       "completedAt": "2026-05-27T22:30:00+08:00"
     },
     {
@@ -218,10 +219,12 @@
       "title": "PluginDemo-11: 禁止的P/Invoke和unsafe代码反例",
       "description": "反例：演示[DllImport]声明+Marshal.PtrToStringAnsi/NativeMemory.Alloc/GCHandle.Alloc。标注⚠️VIOLATION: [PInvoke]/[TypeRef]/[UnsafeMarker]并说明无法用Plugin机制安全替代(硬性禁止)。每个文件夹含Plugin.cs + 13语言README。README重点：P/Invoke和unsafe代码的扫描链路(MemberRef+UnverifiableCode+PinvokeImpl)、三重保险机制。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "qoder",
+      "relatedCommit": null,
+      "completedAt": "2026-05-28T02:30:00+08:00"
     },
     {
       "id": "task-378",
@@ -360,11 +363,11 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-377",
       "task-378"
     ],
     "inProgress": [],
     "completed": [
+      "task-377",
       "task-376",
       "task-375",
       "task-374",
