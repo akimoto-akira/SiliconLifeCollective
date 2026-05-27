@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27T23:30:00+08:00",
+  "lastUpdated": "2026-05-28T00:30:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -149,10 +149,11 @@
       "title": "PluginDemo-06: TrustedAssemblies受信依赖示例",
       "description": "演示引用Newtonsoft.Json做序列化/反序列化，展示TrustedAssemblies白名单机制：Newtonsoft.Json内部使用了反射但因为是受信依赖所以不被拦截。每个文件夹含Plugin.cs + 13语言README。README重点：TrustedAssemblies白名单机制、CollectTrustedTypeRefs传递豁免原理、如何添加新的受信依赖。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-27T04:54:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "qoder",
+      "completedAt": "2026-05-28T00:30:00+08:00"
     },
     {
       "id": "task-373",
@@ -237,6 +238,7 @@
       "createdAt": "2026-05-27T10:10:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "qoder",
+      "relatedCommit": "aa771b3",
       "completedAt": "2026-05-27T23:30:00+08:00"
     },
     {
@@ -350,7 +352,6 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-372",
       "task-373",
       "task-374",
       "task-375",
@@ -360,6 +361,7 @@
     ],
     "inProgress": [],
     "completed": [
+      "task-372",
       "task-379",
       "task-371",
       "task-362",

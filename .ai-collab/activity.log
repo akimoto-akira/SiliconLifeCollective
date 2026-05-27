@@ -974,5 +974,9 @@
 2026-05-27T22:30:00+08:00 | catpaw | session_end | completed=task-371
 2026-05-27T23:10:00+08:00 | qoder | session_start | sessionId=qoder-20260527-001 | task=task-379
 2026-05-27T23:10:00+08:00 | qoder | task_claim | task=task-379 | type=feature
-2026-05-27T23:30:00+08:00 | qoder | task_complete | task=task-379
+2026-05-27T23:30:00+08:00 | qoder | task_complete | task=task-379 | commit=aa771b3
 2026-05-27T23:30:00+08:00 | qoder | session_end | completed=task-379
+2026-05-28T00:00:00+08:00 | qoder | session_start | sessionId=qoder-20260528-001 | task=task-372
+2026-05-28T00:00:00+08:00 | qoder | task_claim | task=task-372 | type=docs
+2026-05-28T00:30:00+08:00 | qoder | task_complete | task=task-372
+2026-05-28T00:30:00+08:00 | qoder | session_end | completed=task-372
