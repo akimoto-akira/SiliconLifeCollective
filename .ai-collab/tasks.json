@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-27T10:15:00+08:00",
+  "lastUpdated": "2026-05-27T10:20:00+08:00",
   "tasks": [
     {
       "id": "task-362",
@@ -305,6 +305,30 @@
       "priority": "P2",
       "status": "pending",
       "createdAt": "2026-05-27T10:15:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-386",
+      "type": "docs",
+      "target": "PluginDemo/19-TickObject/",
+      "title": "PluginDemo-19: TickObject定时任务示例",
+      "description": "编写TickObject使用示例，展示插件如何通过继承TickObject接入MainLoop主循环实现定时/周期逻辑。\n\n【TickObject核心机制】\n- 继承TickObject抽象类，实现OnTick(TimeSpan deltaTime)\n- 构造函数指定Interval（tick间隔，Zero=每帧）和autoRegister（是否自动注册到MainLoop）\n- Priority属性控制执行优先级（值越小越先执行）\n- MainLoop按Priority排序遍历所有TickObject.Tick()，内部累计elapsedTime达到Interval才触发OnTick\n- MainLoop内置熔断器：连续超时maxTimeoutCount次后冷却1分钟\n- 支持PreTick/PostTick回调注册\n\n【示例内容】\n1. 基础定时器：每5秒打印一次状态（Interval=5s, autoRegister=true）\n2. 手动注册：autoRegister=false，在IPlugin.OnStart中手动MainLoop.Register\n3. 优先级演示：两个TickObject不同Priority，观察执行顺序\n4. OnStop中MainLoop.Unregister清理\n\n每个文件夹含Plugin.cs + 13语言README(en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU)。\nREADME重点：TickObject生命周期、Interval与Priority机制、MainLoop的熔断保护、与System.Threading.Timer的区别（统一主循环vs独立线程）。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T10:20:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-387",
+      "type": "docs",
+      "target": "PluginDemo/20-SpeedyPack/",
+      "title": "PluginDemo-20: SpeedyPack数据包读写示例",
+      "description": "编写SpeedyPack使用示例，展示插件如何使用.spk数据包进行持久化存储。\n\n【SpeedyPack核心API】\n- SpeedyPack.Open(path, options)：打开/创建.spk文件，自动WAL恢复\n- Read<T>(path)/ReadRaw(path)/ReadText(path)：读取数据\n- Write(path, T)/WriteRaw(path, bytes)/WriteText(path, text)：写入数据（异步持久化）\n- Delete(path)：删除条目\n- Exists(path)/ListEntries(path)/ListDirectories(path)：查询\n- BeginTransaction()：开启事务（IPackTransaction：Write+Delete+Commit/Rollback）\n- FlushAsync()：等待所有排队写入持久化\n- CompactAsync()：压缩文件移除碎片\n- GetEntryMetadata(path)/GetFileInfo()：元数据查询\n- SpeedyPackOptions：EntryCacheTtl(5min)、MaxCacheEntries(10万)、ReadOnly\n\n【示例内容】\n1. 基础读写：Open→Write JSON→Read→打印\n2. 原子事务：BeginTransaction→Write多个→Commit（演示Rollback场景）\n3. 目录结构：Write嵌套路径→ListEntries/ListDirectories遍历\n4. 元数据查询：GetEntryMetadata/GetFileInfo\n5. OnStop中FlushAsync+Dispose确保数据安全\n\n⚠️注意：SpeedyPack内部使用System.IO.FileStream，但它是Core/Speedy层代码不受插件安全扫描限制。插件若需文件存储应通过SpeedyPack而非直接File操作。\n\n每个文件夹含Plugin.cs + 13语言README(en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU)。\nREADME重点：SpeedyPack vs 直接文件访问的优势（受控入口+WAL崩溃一致性+缓存+事务）、插件通过SpeedyPack存数据不需要Capability.FileIO、事务的原子性保证、SpeedyPackOptions配置。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-27T10:20:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": null
     }
