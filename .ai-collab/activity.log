@@ -1018,3 +1018,7 @@
 2026-05-28T15:00:00+08:00 | catpaw | task_claim | task=task-389
 2026-05-28T15:30:00+08:00 | catpaw | task_complete | task=task-389
 2026-05-28T15:30:00+08:00 | catpaw | session_end | completed=task-389
+2026-05-28T16:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260528-003 | task=task-390
+2026-05-28T16:00:00+08:00 | catpaw | task_claim | task=task-390
+2026-05-28T16:30:00+08:00 | catpaw | task_complete | task=task-390
+2026-05-28T16:30:00+08:00 | catpaw | session_end | sessionId=catpaw-20260528-003

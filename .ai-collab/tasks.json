@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-28T15:30:00+08:00",
+  "lastUpdated": "2026-05-28T16:30:00+08:00",
   "lastCommitHash": "48f6702",
   "tasks": [
     {
@@ -384,6 +384,7 @@
       "createdAt": "2026-05-28T14:35:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
+      "relatedCommit": "aac46c1",
       "completedAt": "2026-05-28T15:30:00+08:00"
     },
     {
@@ -393,16 +394,15 @@
       "title": "PluginDemo-22: CS源码编译加载模式示例",
       "description": "基于task-389的PluginLoader CS源码模式，编写以CS源码形式提供的插件示例，展示无需预编译DLL即可加载插件的完整流程。\n\n【示例目录结构】\nPluginDemo/22-CSSourceMode/\n├── Plugin.cs          — IPlugin主实现\n├── Helpers.cs         — 辅助类（展示多文件编译）\n├── cs.txt             — 指定只加载Plugin.cs，Helpers.cs故意不列（展示cs.txt选择性加载）\n├── README.md          — en\n├── README.zh-CN.md    — zh-CN\n└── ...（13语言README）\n\n⚠️注意：本示例故意使用cs.txt只列出Plugin.cs，Helpers.cs不参与编译。README中需说明：如需加载所有cs文件，删除cs.txt即可；cs.txt是按行指定文件的白名单机制。\n\n【Plugin.cs内容】\n实现IPlugin，Id为com.siliconlife.demo.cssource：\n1. OnLoad：打印\"[CS-Source] plugin loaded\"，展示源码模式加载标识\n2. OnStart：通过ITypeRegistry注册一个SimpleGreeting类型，用IObjectFactory创建实例并调用\n3. OnStop/OnUnload：清理\n\n【cs.txt内容】\n```\nPlugin.cs\n```\n只列Plugin.cs，Helpers.cs不列，用于演示cs.txt的选择性加载。\n\n【Helpers.cs内容】（不参与编译，仅作目录中的示例文件）\n一个SimpleHelper静态类，含Greet方法。README中说明此文件因cs.txt未列出而不参与编译。\n\n【编译加载流程说明（README重点）】\n1. PluginLoader扫描插件目录 → 无DLL → 进入CS源码模式\n2. 发现cs.txt → 按行读取，只加载Plugin.cs\n3. 同级DLL扫描 → 无同级DLL，跳过\n4. CompilationCore受限模式编译 → 生成内存DLL\n5. 内存DLL走ScanForbiddenReferences安全扫描\n6. 通过 → 反射查找IPlugin实现 → 实例化\n7. 日志标识[CS-Source]区分DLL模式\n\n【README重点】\n- CS源码模式 vs DLL模式的选择时机（开发期用CS快速迭代，发布时预编译DLL性能更优）\n- cs.txt的作用：选择性加载白名单，避免意外编译无关文件（如代码片段、测试文件）\n- 没有.cs文件的目录会被跳过（既无DLL又无CS = 空插件）\n- 编译错误和安全扫描失败时的日志行为\n- 同级DLL经安全扫描后可作为引用程序集（本示例无同级DLL，仅说明机制）\n- 与01-MinimalPlugin的对比：01是预编译DLL，22是源码编译，功能等价但加载路径不同\n\n每个文件夹含Plugin.cs + Helpers.cs + cs.txt + 13语言README(en/zh-CN/zh-HK/cs-CZ/de-DE/es-ES/fr-FR/it-IT/ja-JP/ko-KR/pl-PL/pt-PT/ru-RU)。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-28T14:38:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-28T16:30:00+08:00"
     }
   ],
   "taskIndex": {
-    "pending": [
-      "task-390"
-    ],
+    "pending": [],
     "inProgress": [],
     "completed": [
       "task-389",
@@ -432,7 +432,8 @@
       "task-385",
       "task-386",
       "task-387",
-      "task-388"
+      "task-388",
+      "task-390"
     ],
     "cancelled": []
   },
