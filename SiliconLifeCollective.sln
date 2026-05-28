@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiliconLife.Speedy", "src\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiliconLife.App", "src\SiliconLife.App\SiliconLife.App.csproj", "{D3A8C2E6-F4B5-4D96-9B1A-7F3C5D8E9F2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TravelCodeWikiWithAI", "src\TravelCodeWikiWithAI\TravelCodeWikiWithAI.csproj", "{26E4A7F5-4167-4D66-8596-6F96D56B536F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiliconLife.Speedy.Manager", "src\SiliconLife.Speedy.Manager\SiliconLife.Speedy.Manager.csproj", "{518A9EF2-4C89-4514-A180-025248A95BD6}"
 EndProject
 Global
@@ -103,18 +101,6 @@ Global
 		{D3A8C2E6-F4B5-4D96-9B1A-7F3C5D8E9F2A}.Release|x64.Build.0 = Release|Any CPU
 		{D3A8C2E6-F4B5-4D96-9B1A-7F3C5D8E9F2A}.Release|x86.ActiveCfg = Release|Any CPU
 		{D3A8C2E6-F4B5-4D96-9B1A-7F3C5D8E9F2A}.Release|x86.Build.0 = Release|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Debug|x64.Build.0 = Debug|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Debug|x86.Build.0 = Debug|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Release|x64.ActiveCfg = Release|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Release|x64.Build.0 = Release|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Release|x86.ActiveCfg = Release|Any CPU
-		{26E4A7F5-4167-4D66-8596-6F96D56B536F}.Release|x86.Build.0 = Release|Any CPU
 		{518A9EF2-4C89-4514-A180-025248A95BD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{518A9EF2-4C89-4514-A180-025248A95BD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{518A9EF2-4C89-4514-A180-025248A95BD6}.Debug|x64.ActiveCfg = Debug|Any CPU
