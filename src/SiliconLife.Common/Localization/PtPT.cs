@@ -1858,6 +1858,8 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Atribuídos";
     public override string ProjectCtx_UnassignedRoles => "Funções obrigatórias não atribuídas";
+    public override string ProjectCtx_AvailableBeingsHeader => "Seres disponíveis (ainda não atribuídos a este projeto)";
+    public override string ProjectCtx_AvailableBeingsHint => "Dica: Considere atribuir seres existentes a funções antes de criar novos. Use project assign e project assign_role.";
     public override string ProjectCtx_AttentionReasonsHeader => "Razões pelas quais o projeto precisa de atenção";
     public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Detalhes das funções não satisfeitas";
     public override string ProjectAttention_MissingTemplate => "Modelo de workflow em falta";

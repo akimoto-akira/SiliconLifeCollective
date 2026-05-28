@@ -2057,6 +2057,8 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=Gegen�
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Zugewiesen";
     public override string ProjectCtx_UnassignedRoles => "Nicht zugewiesene erforderliche Rollen";
+    public override string ProjectCtx_AvailableBeingsHeader => "Verfügbare Wesen (noch nicht diesem Projekt zugewiesen)";
+    public override string ProjectCtx_AvailableBeingsHint => "Tipp: Erwägen Sie, vorhandene Wesen Rollen zuzuweisen, bevor Sie neue erstellen. Verwenden Sie project assign und project assign_role.";
     public override string ProjectCtx_AttentionReasonsHeader => "Gründe für die Projektaufmerksamkeit";
     public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Details zu nicht erfüllten Rollen";
     public override string ProjectAttention_MissingTemplate => "Workflow-Vorlage fehlt";

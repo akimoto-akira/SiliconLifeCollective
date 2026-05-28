@@ -2060,6 +2060,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Asignados";
     public override string ProjectCtx_UnassignedRoles => "Roles requeridos sin asignar";
+    public override string ProjectCtx_AvailableBeingsHeader => "Seres disponibles (aún no asignados a este proyecto)";
+    public override string ProjectCtx_AvailableBeingsHint => "Consejo: Considere asignar seres existentes a los roles antes de crear nuevos. Use project assign y project assign_role.";
     public override string ProjectCtx_AttentionReasonsHeader => "Razones por las que el proyecto necesita atención";
     public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Detalles de roles no satisfechos";
     public override string ProjectAttention_MissingTemplate => "Falta plantilla de flujo de trabajo";

@@ -309,6 +309,18 @@ public abstract class LocalizationBase
     /// </summary>
     public abstract string ProjectUnassignedRolesLabel { get; }
 
+    // ===== Available Beings Context Localization =====
+
+    /// <summary>
+    /// Gets the localized section header for available beings not yet assigned to the project.
+    /// </summary>
+    public abstract string ProjectAvailableBeingsHeader { get; }
+
+    /// <summary>
+    /// Gets the localized hint message suggesting to assign existing beings before creating new ones.
+    /// </summary>
+    public abstract string ProjectAvailableBeingsHint { get; }
+
     // ===== Project Attention Reason Localization =====
 
     /// <summary>

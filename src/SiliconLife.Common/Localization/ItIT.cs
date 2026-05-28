@@ -2016,6 +2016,8 @@ Uso: Chiama lo strumento chat, imposta action=""mark_read"", target_id=GUID dell
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Assegnati";
     public override string ProjectCtx_UnassignedRoles => "Ruoli richiesti non assegnati";
+    public override string ProjectCtx_AvailableBeingsHeader => "Esseri disponibili (non ancora assegnati a questo progetto)";
+    public override string ProjectCtx_AvailableBeingsHint => "Suggerimento: Considerare l'assegnazione di esseri esistenti ai ruoli prima di crearne di nuovi. Usare project assign e project assign_role.";
     public override string ProjectCtx_AttentionReasonsHeader => "Motivi per cui il progetto richiede attenzione";
     public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Dettagli dei ruoli non soddisfatti";
     public override string ProjectAttention_MissingTemplate => "Modello di workflow mancante";

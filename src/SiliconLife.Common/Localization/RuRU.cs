@@ -937,6 +937,8 @@ public class RuRU : DefaultLocalizationBase
     public override string ProjectCtx_RoleMaxCountUnlimited => "Без ограничений";
     public override string ProjectCtx_RoleAssignedCount => "Назначено";
     public override string ProjectCtx_UnassignedRoles => "Неназначенные обязательные роли";
+    public override string ProjectCtx_AvailableBeingsHeader => "Доступные существа (ещё не назначенные на этот проект)";
+    public override string ProjectCtx_AvailableBeingsHint => "Совет: Рассмотрите назначение существующих существ на роли перед созданием новых. Используйте project assign и project assign_role.";
     public override string ProjectCtx_AttentionReasonsHeader => "Причины внимания";
     public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Детализация неудовлетворённых ролей";
     public override string ProjectAttention_MissingTemplate => "Проект не имеет назначенного шаблона рабочего процесса";

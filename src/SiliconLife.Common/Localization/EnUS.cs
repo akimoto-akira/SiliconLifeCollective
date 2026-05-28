@@ -2060,6 +2060,8 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ProjectCtx_RoleMaxCountUnlimited => "∞";
     public override string ProjectCtx_RoleAssignedCount => "Assigned";
     public override string ProjectCtx_UnassignedRoles => "Unassigned required roles";
+    public override string ProjectCtx_AvailableBeingsHeader => "Available beings (not yet assigned to this project)";
+    public override string ProjectCtx_AvailableBeingsHint => "Tip: Consider assigning existing beings to roles before creating new ones. Use project assign and project assign_role.";
     public override string ProjectCtx_AttentionReasonsHeader => "Reasons this project needs attention";
     public override string ProjectCtx_UnsatisfiedRolesDetailHeader => "Unsatisfied role details";
     public override string ProjectAttention_MissingTemplate => "Missing workflow template";

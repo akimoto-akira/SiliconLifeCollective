@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-29T12:30:00+08:00",
+  "lastUpdated": "2026-05-29T13:30:00+08:00",
   "lastCommitHash": null,
   "tasks": [
     {
@@ -39,10 +39,11 @@
       "title": "ThinkOnProject场景上下文增强：增加可用硅基人信息",
       "description": "ThinkOnProject执行时AI不知道系统中已有但未分配到项目的硅基人，导致重复创建而非分配已有人员。\n\n【问题】\nBuildProjectScenarioContext（ContextManager.cs L1362-1540）只显示项目内的Team members，不显示系统中存在但未分配到当前项目的硅基人。AI看到\"角色池为空\"就直接create_being，而不是assign已有的人。\n\n【修复方案】\n在BuildProjectScenarioContext中增加\"Available beings (not yet assigned to this project)\"区块：\n1. 遍历SiliconBeingManager中的所有活跃硅基人\n2. 排除已分配到当前项目的成员（通过project.GetMembers()对比）\n3. 列出可用硅基人的Name、ID、角色描述（如有）\n4. 此信息仅在ThinkOnProject首轮（ThinkSession.State=Idle→Started，或当前无session时）注入，后续轮次从ChatHistory可见\n5. 增加13个语言文件的本地化字符串（如ProjectCtx_AvailableBeings、ProjectCtx_AvailableBeingEntry等）\n\n【预期效果】\nAI在ThinkOnProject中看到\"角色池为空\"时，同时看到可用硅基人列表，优先使用assign而非create_being。\n\n【关键代码位置】\n- ContextManager.cs L1362-1540：BuildProjectScenarioContext\n- ContextManager.cs L1332-1361：GetProjectAttentionReasons\n- DefaultSiliconBeing.cs L847-870：HasProjectsNeedingAttention\n\n【依赖】无前置依赖，可独立完成",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-29T03:30:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-29T13:30:00+08:00"
     },
     {
       "id": "task-395",
@@ -67,13 +68,14 @@
       "createdAt": "2026-05-29T03:30:00+08:00",
       "assignedTo": "trae-glm5",
       "createdBy": "coze-agent",
-      "completedAt": "2026-05-29T12:30:00+08:00"
+      "completedAt": "2026-05-29T12:30:00+08:00",
+      "relatedCommit": "07eb628"
     }
   ],
   "taskIndex": {
-    "pending": ["task-394", "task-395"],
+    "pending": ["task-395"],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-396"],
+    "completed": ["task-392", "task-393", "task-394", "task-396"],
     "cancelled": []
   },
   "metadata": {

@@ -3560,6 +3560,12 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>Label for unassigned required roles</summary>
     public abstract string ProjectCtx_UnassignedRoles { get; }
 
+    /// <summary>Header for available beings section</summary>
+    public abstract string ProjectCtx_AvailableBeingsHeader { get; }
+
+    /// <summary>Hint suggesting to assign existing beings before creating new ones</summary>
+    public abstract string ProjectCtx_AvailableBeingsHint { get; }
+
     /// <summary>Header for project attention reasons section</summary>
     public abstract string ProjectCtx_AttentionReasonsHeader { get; }
 
@@ -3637,6 +3643,12 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     /// <inheritdoc/>
     public override string ProjectUnassignedRolesLabel => ProjectCtx_UnassignedRoles;
+
+    /// <inheritdoc/>
+    public override string ProjectAvailableBeingsHeader => ProjectCtx_AvailableBeingsHeader;
+
+    /// <inheritdoc/>
+    public override string ProjectAvailableBeingsHint => ProjectCtx_AvailableBeingsHint;
 
     /// <inheritdoc/>
     public override string ProjectAttentionReasonsHeader => ProjectCtx_AttentionReasonsHeader;

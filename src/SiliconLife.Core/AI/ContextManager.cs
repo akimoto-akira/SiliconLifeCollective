@@ -1462,6 +1462,28 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
             sb.AppendLine($"  - {being?.Name ?? beingId.ToString()}");
         }
 
+        // Available beings not yet assigned to this project
+        if (beingManager != null)
+        {
+            var allBeings = beingManager.GetAllBeings();
+            var assignedSet = new HashSet<Guid>(project.AssignedBeings);
+            var availableBeings = allBeings
+                .Where(b => !assignedSet.Contains(b.Id))
+                .ToList();
+
+            if (availableBeings.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine(loc.ProjectAvailableBeingsHeader + ":");
+                foreach (var b in availableBeings)
+                {
+                    sb.AppendLine($"  - {b.Name} (ID: {b.Id})");
+                }
+                sb.AppendLine();
+                sb.AppendLine(loc.ProjectAvailableBeingsHint);
+            }
+        }
+
         // Role definitions and assignments
         sb.AppendLine();
         if (string.IsNullOrEmpty(project.WorkflowTemplateName))
