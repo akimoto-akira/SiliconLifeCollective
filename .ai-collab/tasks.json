@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-28T20:00:00+08:00",
+  "lastUpdated": "2026-05-29T11:00:00+08:00",
   "lastCommitHash": null,
   "tasks": [
     {
@@ -25,10 +25,11 @@
       "title": "修复硅基人Project/Broadcast/Stopped状态本地化缺失及展示异常",
       "description": "BeingActivity枚举有8个值(Idle/SingleChat/GroupChat/Task/Timer/Broadcast/Project/MemoryCompression/Stopped)，但本地化和前端展示存在多处缺失：\n\n【问题清单】\n1. 本地化层（13个语言文件）：GetBeingActivityName缺少BeingActivity.Broadcast和BeingActivity.Project的显式映射，回退到activity.ToString()显示英文枚举名\n2. BeingView硅基人详情页：\n   - JS activityNameMap硬编码只映射5个值，缺Broadcast/Project/Stopped\n   - statusClass只有idle/active两类，Stopped应显示为停止状态(灰色)而非活跃(绿色)\n   - 缺少.being-status.stopped CSS样式\n3. ChatView聊天界面：\n   - activityNameMap从后端序列化不缺key，但Broadcast/Project显示为英文枚举名(因本地化层缺映射)\n   - statusClass同样只有idle/active两类，Stopped应有独立样式\n   - 缺少.being-status-badge.stopped CSS样式\n\n【修复范围】\n1. 13个语言文件的GetBeingActivityName增加Broadcast和Project映射：\n   - EnUS: \"Processing Broadcast\" / \"Working on Project\"\n   - ZhCN: \"处理广播\" / \"项目工作中\"\n   - ZhHK: \"處理廣播\" / \"項目工作中\"\n   - JaJP: \"ブロードキャスト処理中\" / \"プロジェクト作業中\"\n   - KoKR: \"브로드캐스트 처리 중\" / \"프로젝트 작업 중\"\n   - DeDE: \"Broadcast verarbeiten\" / \"Projektarbeit\"\n   - FrFR: \"Traitement broadcast\" / \"Travail sur projet\"\n   - EsES: \"Procesando broadcast\" / \"Trabajando en proyecto\"\n   - ItIT: \"Elaborazione broadcast\" / \"Lavoro su progetto\"\n   - RuRU: \"Обработка вещания\" / \"Работа над проектом\"\n   - PtPT: \"Processando broadcast\" / \"Trabalhando no projeto\"\n   - PlPL: \"Przetwarzanie broadcast\" / \"Praca nad projektem\"\n   - CsCZ: \"Zpracování broadcastu\" / \"Práce na projektu\"\n2. BeingView.cs：\n   - activityNameMap增加Broadcast/Project/Stopped三个映射\n   - statusClass逻辑改为三分类：Idle→idle, Stopped→stopped, 其余→active\n   - 增加.being-status.stopped CSS（灰色背景+灰色文字）\n   - 增加.being-status-badge.stopped CSS（同上）\n3. ChatView.cs：\n   - statusClass逻辑改为三分类（同BeingView）\n   - 增加.being-status-badge.stopped CSS样式",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-29T03:27:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-29T11:15:00+08:00"
     },
     {
       "id": "task-394",
@@ -68,9 +69,9 @@
     }
   ],
   "taskIndex": {
-    "pending": ["task-393", "task-394", "task-395", "task-396"],
+    "pending": ["task-394", "task-395", "task-396"],
     "inProgress": [],
-    "completed": ["task-392"],
+    "completed": ["task-392", "task-393"],
     "cancelled": []
   },
   "metadata": {

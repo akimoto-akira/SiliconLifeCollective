@@ -976,6 +976,8 @@ public class RuRU : DefaultLocalizationBase
         BeingActivity.GroupChat => "В групповом чате",
         BeingActivity.Task => "Выполнение задачи",
         BeingActivity.Timer => "Выполнение таймера",
+        BeingActivity.Broadcast => "Обработка вещания",
+        BeingActivity.Project => "Работа над проектом",
         BeingActivity.MemoryCompression => "Сжатие памяти",
         BeingActivity.Stopped => "Остановлен",
         _ => activity.ToString()

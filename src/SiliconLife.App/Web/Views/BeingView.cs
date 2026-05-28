@@ -128,6 +128,10 @@ public class BeingView : ViewBase
                 .Property("background", "rgba(16, 185, 129, 0.15)")
                 .Property("color", "var(--status-active, var(--accent-secondary))")
             .EndSelector()
+            .Selector(".being-status.stopped")
+                .Property("background", "rgba(107, 114, 128, 0.15)")
+                .Property("color", "var(--text-muted, #6b7280)")
+            .EndSelector()
             .Selector(".status-dot")
                 .Property("width", "6px")
                 .Property("height", "6px")
@@ -219,7 +223,7 @@ public class BeingView : ViewBase
     {
         var forEachBody = Js.Block()
             .Add(() => Js.Const(() => "card", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
-            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Str(() => "active"))))
+            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Ternary(() => Js.Id(() => "b").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Stopped")), () => Js.Str(() => "stopped"), () => Js.Str(() => "active")))))
             .Add(() => Js.Const(() => "statusText", () => Js.Id(() => "activityNameMap").Index(() => Js.Id(() => "b").Prop(() => "activity"))))
             .Add(() => Js.Const(() => "isSelected", () => Js.Id(() => "selectedBeingId").Op(() => "===", () => Js.Id(() => "b").Prop(() => "id"))))
             .Add(() => Js.Assign(() => Js.Id(() => "card").Prop(() => "className"), () => Js.Ternary(() => Js.Id(() => "isSelected"), () => Js.Str(() => "being-card selected"), () => Js.Str(() => "being-card"))))
@@ -250,7 +254,7 @@ public class BeingView : ViewBase
             .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/list")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => thenBody)).Stmt());
 
         var selectThenBody = Js.Block()
-            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Str(() => "active"))))
+            .Add(() => Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Stopped")), () => Js.Str(() => "stopped"), () => Js.Str(() => "active")))))
             .Add(() => Js.Const(() => "statusText", () => Js.Id(() => "activityNameMap").Index(() => Js.Id(() => "data").Prop(() => "activity"))))
             .Add(() => Js.Assign(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "detail-content")).Prop(() => "innerHTML"), () => BuildDetailHtml(loc)));
 
@@ -268,7 +272,10 @@ public class BeingView : ViewBase
                     .Prop(() => "GroupChat", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.GroupChat)))
                     .Prop(() => "Task", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Task)))
                     .Prop(() => "Timer", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Timer)))
-                    .Prop(() => "MemoryCompression", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.MemoryCompression)));
+                    .Prop(() => "Broadcast", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Broadcast)))
+                    .Prop(() => "Project", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Project)))
+                    .Prop(() => "MemoryCompression", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.MemoryCompression)))
+                    .Prop(() => "Stopped", () => Js.Str(() => loc.GetBeingActivityName(BeingActivity.Stopped)));
                 return Js.Const(() => "activityNameMap", () => map);
             })
             .Add(() => Js.Let(() => "selectedBeingId", () => Js.Null()))

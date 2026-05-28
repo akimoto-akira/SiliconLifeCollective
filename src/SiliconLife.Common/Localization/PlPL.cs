@@ -1113,6 +1113,8 @@ public class PlPL : DefaultLocalizationBase
         BeingActivity.GroupChat => "Czat grupowy",
         BeingActivity.Task => "Wykonywanie zadania",
         BeingActivity.Timer => "Wykonywanie czasomierza",
+        BeingActivity.Broadcast => "Przetwarzanie broadcast",
+        BeingActivity.Project => "Praca nad projektem",
         BeingActivity.MemoryCompression => "Kompresja pamięci",
         BeingActivity.Stopped => "Zatrzymane",
         _ => activity.ToString()

@@ -973,6 +973,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         BeingActivity.GroupChat => "En chat grupal",
         BeingActivity.Task => "Ejecutando tarea",
         BeingActivity.Timer => "Ejecutando temporizador",
+        BeingActivity.Broadcast => "Procesando broadcast",
+        BeingActivity.Project => "Trabajando en proyecto",
         BeingActivity.MemoryCompression => "Comprimiendo memoria",
         BeingActivity.Stopped => "Detenido",
         _ => activity.ToString()

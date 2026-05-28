@@ -297,6 +297,10 @@ public class ChatView : ViewBase
                 .Property("background", "rgba(16, 185, 129, 0.15)")
                 .Property("color", "var(--status-active, var(--accent-secondary))")
             .EndSelector()
+            .Selector(".being-status-badge.stopped")
+                .Property("background", "rgba(107, 114, 128, 0.15)")
+                .Property("color", "var(--text-muted, #6b7280)")
+            .EndSelector()
             .Selector(".status-dot")
                 .Property("width", "6px")
                 .Property("height", "6px")
@@ -2870,7 +2874,7 @@ public class ChatView : ViewBase
                     {
                         { (Js.Id(() => "badge"), new List<JsSyntax>
                             {
-                                Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Str(() => "active"))),
+                                Js.Const(() => "statusClass", () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Idle")), () => Js.Str(() => "idle"), () => Js.Ternary(() => Js.Id(() => "data").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "Stopped")), () => Js.Str(() => "stopped"), () => Js.Str(() => "active")))),
                                 Js.Const(() => "statusText", () => Js.Id(() => "activityNameMap").Index(() => Js.Id(() => "data").Prop(() => "activity"))),
                                 Js.Assign(() => Js.Id(() => "badge").Prop(() => "className"), () => Js.Str(() => "being-status-badge ").Op(() => "+", () => (JsSyntax)Js.Id(() => "statusClass"))),
                                 Js.Assign(() => Js.Id(() => "badge").Prop(() => "innerHTML"), () => Js.Str(() => "<span class='status-dot'></span>").Op(() => "+", () => (JsSyntax)Js.Id(() => "statusText"))),

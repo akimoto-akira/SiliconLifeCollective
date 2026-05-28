@@ -973,6 +973,8 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
         BeingActivity.GroupChat => "In Group Chat",
         BeingActivity.Task => "Executing Task",
         BeingActivity.Timer => "Running Timer",
+        BeingActivity.Broadcast => "Processing Broadcast",
+        BeingActivity.Project => "Working on Project",
         BeingActivity.MemoryCompression => "Compressing Memory",
         BeingActivity.Stopped => "Stopped",
         _ => activity.ToString()
