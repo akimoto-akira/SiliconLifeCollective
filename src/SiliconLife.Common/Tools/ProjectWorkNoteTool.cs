@@ -22,7 +22,7 @@ namespace SiliconLife.Common.Tools;
 /// Supports creating, reading, updating, deleting, listing, searching, and generating directories.
 /// </summary>
 [ToolAction("create", "read", "update", "delete", "list", "directory", "search")]
-[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer | ToolScenarioFlag.Project)]
 public class ProjectWorkNoteTool : ITool
 {
     /// <inheritdoc/>

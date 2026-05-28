@@ -23,7 +23,7 @@ namespace SiliconLife.Common.Tools;
 /// Supports creating, listing, updating, assigning, and tracking project tasks.
 /// </summary>
 [ToolAction("create", "list", "get", "update", "assign", "remove_assignee", "start", "complete", "fail", "cancel", "delete", "stats")]
-[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer | ToolScenarioFlag.Project)]
 public class ProjectTaskTool : ITool
 {
     /// <inheritdoc/>

@@ -24,29 +24,64 @@ public class PluginLoader
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<PluginLoader>();
     private readonly List<LoadedPlugin> _loadedPlugins = [];
-    private readonly string _pluginDirectory;
+    private readonly List<string> _pluginDirectories = [];
 
+    /// <summary>
+    /// Creates a PluginLoader for a single plugin directory.
+    /// </summary>
     public PluginLoader(string pluginDirectory)
     {
-        _pluginDirectory = pluginDirectory;
+        _pluginDirectories.Add(pluginDirectory);
     }
+
+    /// <summary>
+    /// Creates a PluginLoader for multiple plugin directories.
+    /// </summary>
+    public PluginLoader(IEnumerable<string> pluginDirectories)
+    {
+        _pluginDirectories.AddRange(pluginDirectories);
+    }
+
+    /// <summary>
+    /// Adds an additional plugin directory to be scanned on the next <see cref="LoadAll"/> call.
+    /// </summary>
+    public void AddDirectory(string pluginDirectory)
+    {
+        _pluginDirectories.Add(pluginDirectory);
+    }
+
+    /// <summary>
+    /// Gets the list of configured plugin directories.
+    /// </summary>
+    public IReadOnlyList<string> PluginDirectories => _pluginDirectories.AsReadOnly();
 
     public IReadOnlyList<IPlugin> Plugins => _loadedPlugins.Select(p => p.Plugin).ToList();
 
+    /// <summary>
+    /// Loads plugins from all configured directories. Each directory's sub-directories
+    /// are scanned for plugin assemblies.
+    /// </summary>
     public void LoadAll()
     {
-        if (!Directory.Exists(_pluginDirectory))
+        int countBefore = _loadedPlugins.Count;
+
+        foreach (string pluginDir in _pluginDirectories)
         {
-            _logger.Warn(null, "Plugin directory does not exist: {0}", _pluginDirectory);
-            return;
+            if (!Directory.Exists(pluginDir))
+            {
+                _logger.Warn(null, "Plugin directory does not exist: {0}", pluginDir);
+                continue;
+            }
+
+            foreach (string subDir in Directory.GetDirectories(pluginDir))
+            {
+                LoadPluginFromDirectory(subDir);
+            }
         }
 
-        foreach (string subDir in Directory.GetDirectories(_pluginDirectory))
-        {
-            LoadPluginFromDirectory(subDir);
-        }
-
-        _logger.Info(null, "Loaded {0} plugin(s) from {1}", _loadedPlugins.Count, _pluginDirectory);
+        _logger.Info(null, "Loaded {0} plugin(s) from {1} director{2}",
+            _loadedPlugins.Count - countBefore, _pluginDirectories.Count,
+            _pluginDirectories.Count == 1 ? "y" : "ies");
     }
 
     private void LoadPluginFromDirectory(string pluginDir)

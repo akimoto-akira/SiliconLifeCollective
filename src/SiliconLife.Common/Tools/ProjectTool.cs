@@ -24,7 +24,7 @@ namespace SiliconLife.Common.Tools;
 /// </summary>
 [ToolAction("create", "archive", "restore", "destroy", "list", "get", "assign", "remove", "update", "list-workflow-templates", "assign_role", "remove_role", "list_roles")]
 [SiliconManagerOnly]
-[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer | ToolScenarioFlag.Project)]
 public class ProjectTool : ITool
 {
     /// <inheritdoc/>

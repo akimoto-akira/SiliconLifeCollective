@@ -41,7 +41,7 @@ public class Program
     private static CoreHost? _host;
     private static WebHost? _webHost;
     private static TrayStatusWindow? _trayWindow;
-    private static List<PluginLoader> _pluginLoaders = new();
+    private static PluginLoader? _pluginLoader;
 
     static Program()
     {
@@ -100,18 +100,10 @@ public class Program
             }
         }
 
-        // Load plugins from all configured directories
-        foreach (string pluginDir in configData.PluginDirectories)
-        {
-            var loader = new PluginLoader(pluginDir);
-            loader.LoadAll();
-            _pluginLoaders.Add(loader);
-            _logger.Info(null, "Plugins loaded from {0}", pluginDir);
-        }
-        foreach (var loader in _pluginLoaders)
-        {
-            ServiceLocator.Instance.Register(loader);
-        }
+        // Load plugins from all configured directories using a single PluginLoader
+        _pluginLoader = new PluginLoader(configData.PluginDirectories);
+        _pluginLoader.LoadAll();
+        ServiceLocator.Instance.Register(_pluginLoader);
         ServiceLocator.Instance.RegisterToolAssembly(typeof(SiliconLife.App.Web.Router).Assembly);
 
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
@@ -229,8 +221,7 @@ public class Program
         _logger.Info(null, "CoreHost started");
 
         // Notify all plugins that the host is fully started
-        foreach (var loader in _pluginLoaders)
-            loader.NotifyAllStarted();
+        _pluginLoader?.NotifyAllStarted();
 
         // Only create curator if it was previously initialized (CuratorGuid is set)
         if (configData.CuratorGuid != Guid.Empty)
@@ -342,12 +333,12 @@ public class Program
         }
 
         // Unload all plugins before disposing core resources
-        foreach (var loader in _pluginLoaders)
+        if (_pluginLoader != null)
         {
-            loader.NotifyAllStopping();
-            loader.UnloadAll();
+            _pluginLoader.NotifyAllStopping();
+            _pluginLoader.UnloadAll();
+            _logger.Info(null, "Plugins unloaded");
         }
-        _logger.Info(null, "Plugins unloaded");
 
         // Flush and close the single SpeedyPack file handle
         SpeedyPackRegistry.Dispose();

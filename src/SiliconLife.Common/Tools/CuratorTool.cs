@@ -24,7 +24,7 @@ namespace SiliconLife.Common.Tools;
 /// </summary>
 [ToolAction("list_beings", "create_being", "get_code", "reset")]
 [SiliconManagerOnly]
-[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer)]
+[ToolScenario(ToolScenarioFlag.Chat | ToolScenarioFlag.Task | ToolScenarioFlag.Timer | ToolScenarioFlag.Project)]
 public class CuratorTool : ITool
 {
     public string Name => "silicon_manager";
