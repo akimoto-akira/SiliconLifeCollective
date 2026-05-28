@@ -37,7 +37,7 @@
       "intent": "使用 PluginLoader 多目录构造函数替代逐目录创建多个实例，统一插件加载逻辑"
     }
   ],
-  "commitHash": null,
+  "commitHash": "800030a",
   "tasksCompleted": [],
   "tasksCreated": []
 }
