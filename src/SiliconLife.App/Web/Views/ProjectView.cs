@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -112,6 +112,10 @@ public class ProjectView : ViewBase
             .Selector(".broadcast-link")
                 .Property("background", "rgba(236,72,153,0.12)")
                 .Property("color", "#ec4899")
+            .EndSelector()
+            .Selector(".think-link")
+                .Property("background", "rgba(249,115,22,0.12)")
+                .Property("color", "#f97316")
             .EndSelector()
             .Selector(".project-status-badge")
                 .Property("display", "inline-flex")
@@ -237,6 +241,11 @@ public class ProjectView : ViewBase
                 .Op(() => "+", () => Js.Id(() => "p").Prop(() => "broadcastChannelId"))
                 .Op(() => "+", () => Js.Str(() => $"'>{loc.ProjectBroadcastLinkLabel}</a>"))
                 .Op(() => ":", () => Js.Str(() => ""))))
+            .Add(() => Js.Const(() => "thinkHtml", () => Js.Str(() => "<a class='project-link think-link' href='/project/")
+                .Op(() => "+", () => Js.Id(() => "p").Prop(() => "id"))
+                .Op(() => "+", () => Js.Str(() => "/think-history'>"))
+                .Op(() => "+", () => Js.Str(() => loc.ProjectThinkHistoryLinkLabel))
+                .Op(() => "+", () => Js.Str(() => "</a>"))))
             .Add(() => Js.Assign(() => Js.Id(() => "item").Prop(() => "innerHTML"), () =>
                 Js.Str(() => "<div class='project-header'><h3>")
                 .Op(() => "+", () => Js.Id(() => "p").Prop(() => "name"))
@@ -266,6 +275,7 @@ public class ProjectView : ViewBase
                 .Op(() => "+", () => Js.Str(() => "</a>"))
                 .Op(() => "+", () => Js.Id(() => "gcHtml"))
                 .Op(() => "+", () => Js.Id(() => "bcHtml"))
+                .Op(() => "+", () => Js.Id(() => "thinkHtml"))
                 .Op(() => "+", () => Js.Str(() => "</div>"))
             ))
             .Add(() => Js.Return(() => Js.Id(() => "item")));

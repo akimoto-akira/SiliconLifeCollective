@@ -71,3 +71,36 @@ public class WorkflowStateItem
     public bool IsInitial { get; set; }
     public bool IsTerminal { get; set; }
 }
+
+public class ProjectThinkHistoryViewModel : ViewModelBase
+{
+    public Guid ProjectId { get; set; }
+    public string ProjectName { get; set; } = "";
+}
+
+public class ProjectThinkSessionItem
+{
+    public string SessionId { get; set; } = "";
+    public string BeingId { get; set; } = "";
+    public string BeingName { get; set; } = "";
+    public string State { get; set; } = "";
+    public int CurrentRound { get; set; }
+    public int MaxRounds { get; set; }
+    public string CreatedAt { get; set; } = "";
+    public string? CompletedAt { get; set; }
+    public int CycleCount { get; set; }
+    public int MessageCount { get; set; }
+}
+
+public class ProjectThinkDetailViewModel : ViewModelBase
+{
+    public Guid ProjectId { get; set; }
+    public string ProjectName { get; set; } = "";
+    public string SessionId { get; set; } = "";
+    public string State { get; set; } = "";
+    public int CurrentRound { get; set; }
+    public int MaxRounds { get; set; }
+    public string CreatedAt { get; set; } = "";
+    public string? CompletedAt { get; set; }
+    public Dictionary<string, string> ToolDisplayNames { get; set; } = new();
+}

@@ -992,4 +992,20 @@ public class RuRU : DefaultLocalizationBase
 
     public override string FormatMemoryEventProject(string content)
         => $"[Проект] Размышление над проектом, результат: {content}";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "История обработки";
+    public override string ProjectThinkHistoryTitle => "История обработки проекта";
+    public override string ProjectThinkHistoryHeader => "История обработки";
+    public override string ProjectThinkBackToProjects => "← Вернуться к проектам";
+    public override string ProjectThinkProjectName => "Проект: {0}";
+    public override string ProjectThinkNoRecords => "Нет сеансов обработки";
+    public override string ProjectThinkStateStarted => "Запущен";
+    public override string ProjectThinkStateExecuting => "Выполняется";
+    public override string ProjectThinkStateCompleted => "Завершён";
+    public override string ProjectThinkStateFailed => "Ошибка";
+    public override string ProjectThinkDetailTitle => "Детали сеанса";
+    public override string ProjectThinkDetailHeader => "Детали сеанса";
+    public override string ProjectThinkRoundLabel => "Раунд: ";
+    public override string ProjectThinkMessageCountLabel => "Сообщений: ";
 }

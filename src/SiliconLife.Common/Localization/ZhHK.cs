@@ -1932,4 +1932,20 @@ _ => permissionType.ToString()
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[工作流角色通知] 項目「{0}」的工作流在轉移「{1}」（{2} → {3}）時被阻塞。\n\n缺失角色：{4}\n\n請使用 project_tool 的 assign_role 動作為項目分配所需角色，工作流將在下次檢查時自動恢復。";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "處理記錄";
+    public override string ProjectThinkHistoryTitle => "項目處理記錄";
+    public override string ProjectThinkHistoryHeader => "處理記錄";
+    public override string ProjectThinkBackToProjects => "← 返回項目列表";
+    public override string ProjectThinkProjectName => "項目：{0}";
+    public override string ProjectThinkNoRecords => "暫無處理記錄";
+    public override string ProjectThinkStateStarted => "已啟動";
+    public override string ProjectThinkStateExecuting => "執行中";
+    public override string ProjectThinkStateCompleted => "已完成";
+    public override string ProjectThinkStateFailed => "已失敗";
+    public override string ProjectThinkDetailTitle => "處理詳情";
+    public override string ProjectThinkDetailHeader => "處理詳情";
+    public override string ProjectThinkRoundLabel => "輪次：";
+    public override string ProjectThinkMessageCountLabel => "訊息數：";
 }

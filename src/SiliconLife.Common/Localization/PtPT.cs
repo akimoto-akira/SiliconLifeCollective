@@ -1878,4 +1878,20 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[Notificação de Função de Workflow] O workflow do projeto '{0}' está bloqueado na transição '{1}' ({2} → {3}).\n\nFunções em falta: {4}\n\nUtilize a ação assign_role da project_tool para atribuir as funções necessárias. O workflow será retomado automaticamente na próxima verificação.";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "Histórico de processamento";
+    public override string ProjectThinkHistoryTitle => "Histórico de processamento do projeto";
+    public override string ProjectThinkHistoryHeader => "Histórico de processamento";
+    public override string ProjectThinkBackToProjects => "← Voltar aos projetos";
+    public override string ProjectThinkProjectName => "Projeto: {0}";
+    public override string ProjectThinkNoRecords => "Sem sessões de processamento";
+    public override string ProjectThinkStateStarted => "Iniciado";
+    public override string ProjectThinkStateExecuting => "Em execução";
+    public override string ProjectThinkStateCompleted => "Concluído";
+    public override string ProjectThinkStateFailed => "Falhado";
+    public override string ProjectThinkDetailTitle => "Detalhe da sessão";
+    public override string ProjectThinkDetailHeader => "Detalhe da sessão";
+    public override string ProjectThinkRoundLabel => "Ronda: ";
+    public override string ProjectThinkMessageCountLabel => "Mensagens: ";
 }

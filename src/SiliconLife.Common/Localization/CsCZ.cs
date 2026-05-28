@@ -1139,4 +1139,20 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[Oznámení role workflow] Workflow projektu '{0}' je zablokován na přechodu '{1}' ({2} → {3}).\n\nChybějící role: {4}\n\nPoužijte akci assign_role nástroje project_tool k přiřazení potřebných rolí. Workflow se automaticky obnoví při další kontrole.";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "Historie zpracování";
+    public override string ProjectThinkHistoryTitle => "Historie zpracování projektu";
+    public override string ProjectThinkHistoryHeader => "Historie zpracování";
+    public override string ProjectThinkBackToProjects => "← Zpět na projekty";
+    public override string ProjectThinkProjectName => "Projekt: {0}";
+    public override string ProjectThinkNoRecords => "Žádné relace zpracování";
+    public override string ProjectThinkStateStarted => "Spuštěno";
+    public override string ProjectThinkStateExecuting => "Probíhá";
+    public override string ProjectThinkStateCompleted => "Dokončeno";
+    public override string ProjectThinkStateFailed => "Selhalo";
+    public override string ProjectThinkDetailTitle => "Detail relace";
+    public override string ProjectThinkDetailHeader => "Detail relace";
+    public override string ProjectThinkRoundLabel => "Kolo: ";
+    public override string ProjectThinkMessageCountLabel => "Zprávy: ";
 }

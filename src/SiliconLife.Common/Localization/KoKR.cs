@@ -2078,4 +2078,20 @@ _ => permissionType.ToString()
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[워크플로 역할 알림] 프로젝트 '{0}'의 워크플로가 전환 '{1}'({2} → {3})에서 차단되었습니다.\n\n부족한 역할: {4}\n\nproject_tool의 assign_role 작업을 사용하여 필요한 역할을 할당하십시오. 워크플로는 다음 검사 시 자동으로 재개됩니다.";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "처리 기록";
+    public override string ProjectThinkHistoryTitle => "프로젝트 처리 기록";
+    public override string ProjectThinkHistoryHeader => "처리 기록";
+    public override string ProjectThinkBackToProjects => "← 프로젝트 목록으로 돌아가기";
+    public override string ProjectThinkProjectName => "프로젝트: {0}";
+    public override string ProjectThinkNoRecords => "처리 기록이 없습니다";
+    public override string ProjectThinkStateStarted => "시작됨";
+    public override string ProjectThinkStateExecuting => "실행 중";
+    public override string ProjectThinkStateCompleted => "완료";
+    public override string ProjectThinkStateFailed => "실패";
+    public override string ProjectThinkDetailTitle => "처리 상세";
+    public override string ProjectThinkDetailHeader => "처리 상세";
+    public override string ProjectThinkRoundLabel => "라운드: ";
+    public override string ProjectThinkMessageCountLabel => "메시지 수: ";
 }

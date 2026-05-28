@@ -2036,4 +2036,20 @@ Uso: Chiama lo strumento chat, imposta action=""mark_read"", target_id=GUID dell
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[Notifica ruolo workflow] Il workflow del progetto '{0}' è bloccato alla transizione '{1}' ({2} → {3}).\n\nRuoli mancanti: {4}\n\nUtilizza l'azione assign_role di project_tool per assegnare i ruoli necessari. Il workflow riprenderà automaticamente al prossimo controllo.";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "Cronologia elaborazione";
+    public override string ProjectThinkHistoryTitle => "Cronologia elaborazione progetto";
+    public override string ProjectThinkHistoryHeader => "Cronologia elaborazione";
+    public override string ProjectThinkBackToProjects => "← Torna ai progetti";
+    public override string ProjectThinkProjectName => "Progetto: {0}";
+    public override string ProjectThinkNoRecords => "Nessuna sessione di elaborazione";
+    public override string ProjectThinkStateStarted => "Avviato";
+    public override string ProjectThinkStateExecuting => "In esecuzione";
+    public override string ProjectThinkStateCompleted => "Completato";
+    public override string ProjectThinkStateFailed => "Fallito";
+    public override string ProjectThinkDetailTitle => "Dettaglio sessione";
+    public override string ProjectThinkDetailHeader => "Dettaglio sessione";
+    public override string ProjectThinkRoundLabel => "Turno: ";
+    public override string ProjectThinkMessageCountLabel => "Messaggi: ";
 }

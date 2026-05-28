@@ -2080,4 +2080,20 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[Workflow Role Notice] Workflow in project '{0}' is blocked at transition '{1}' ({2} \u2192 {3}).\n\nMissing roles: {4}\n\nPlease use the assign_role action of project_tool to assign the required roles. The workflow will resume automatically on the next check.";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "Think History";
+    public override string ProjectThinkHistoryTitle => "Project Think History";
+    public override string ProjectThinkHistoryHeader => "Think History";
+    public override string ProjectThinkBackToProjects => "← Back to Projects";
+    public override string ProjectThinkProjectName => "Project: {0}";
+    public override string ProjectThinkNoRecords => "No think sessions yet";
+    public override string ProjectThinkStateStarted => "Started";
+    public override string ProjectThinkStateExecuting => "Executing";
+    public override string ProjectThinkStateCompleted => "Completed";
+    public override string ProjectThinkStateFailed => "Failed";
+    public override string ProjectThinkDetailTitle => "Think Session Detail";
+    public override string ProjectThinkDetailHeader => "Think Session Detail";
+    public override string ProjectThinkRoundLabel => "Round: ";
+    public override string ProjectThinkMessageCountLabel => "Messages: ";
 }

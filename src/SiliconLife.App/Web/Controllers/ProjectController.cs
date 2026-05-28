@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -76,6 +76,14 @@ public class ProjectController : Controller
             DeleteProjectWorkNote();
         else if (path.StartsWith("/project/") && path.EndsWith("/tasks"))
             ProjectTasksPage();
+        else if (path.StartsWith("/project/") && path.EndsWith("/think-history"))
+            ThinkHistoryPage();
+        else if (path.StartsWith("/project-think-session/"))
+            ThinkSessionDetailPage();
+        else if (path.StartsWith("/api/projects/") && path.EndsWith("/think-sessions/list"))
+            GetThinkSessionList();
+        else if (path.StartsWith("/api/projects/") && path.EndsWith("/think-sessions/detail"))
+            GetThinkSessionDetail();
         else if (path.StartsWith("/api/projects/") && path.Contains("/tasks/list"))
             ListProjectTasks();
         else if (path.StartsWith("/api/projects/") && path.EndsWith("/tasks/create"))
@@ -1767,5 +1775,370 @@ public class ProjectController : Controller
     }
 
     #endregion
+
+        #region Project Think Session
+
+        private void ThinkHistoryPage()
+        {
+            try
+            {
+                if (_projectManager == null)
+                {
+                    Response.StatusCode = 500;
+                    RenderHtml("<p>Project manager not available</p>");
+                    return;
+                }
+
+                var projectId = ExtractProjectIdFromPagePath();
+                if (projectId == Guid.Empty)
+                {
+                    Response.StatusCode = 400;
+                    RenderHtml("<p>Invalid project ID</p>");
+                    return;
+                }
+
+                var project = _projectManager.GetProject(projectId);
+                if (project == null)
+                {
+                    Response.StatusCode = 404;
+                    RenderHtml("<p>Project not found</p>");
+                    return;
+                }
+
+                var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+                var view = new Views.ProjectThinkHistoryView();
+                var vm = new Models.ProjectThinkHistoryViewModel
+                {
+                    Skin = skin,
+                    ActiveMenu = "projects",
+                    ProjectId = projectId,
+                    ProjectName = project.Name
+                };
+                var html = view.Render(vm);
+                RenderHtml(html);
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+                RenderHtml($"<p>Error: {ex.Message}</p>");
+            }
+        }
+
+        private void ThinkSessionDetailPage()
+        {
+            try
+            {
+                if (_projectManager == null)
+                {
+                    Response.StatusCode = 500;
+                    RenderHtml("<p>Project manager not available</p>");
+                    return;
+                }
+
+                var path = Request.Url?.AbsolutePath ?? "";
+                var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                if (segments.Length < 2)
+                {
+                    Response.StatusCode = 400;
+                    RenderHtml("<p>Invalid URL</p>");
+                    return;
+                }
+
+                var sessionId = segments[1];
+                var projectIdStr = Request.QueryString["projectId"];
+                if (string.IsNullOrEmpty(projectIdStr) || !Guid.TryParse(projectIdStr, out var projectId))
+                {
+                    Response.StatusCode = 400;
+                    RenderHtml("<p>Missing or invalid projectId</p>");
+                    return;
+                }
+
+                var project = _projectManager.GetProject(projectId);
+                if (project == null)
+                {
+                    Response.StatusCode = 404;
+                    RenderHtml("<p>Project not found</p>");
+                    return;
+                }
+
+                var session = project.ThinkSessions.Values.FirstOrDefault(s => s.Id.ToString() == sessionId)
+                    ?? project.ThinkSessionHistory.FirstOrDefault(s => s.Id.ToString() == sessionId);
+
+                if (session == null)
+                {
+                    Response.StatusCode = 404;
+                    RenderHtml("<p>Think session not found</p>");
+                    return;
+                }
+
+                var being = ServiceLocator.Instance.BeingManager?.GetBeing(session.BeingId);
+                var skin = _skinManager.GetSkin() ?? new Skins.ChatSkin();
+                var view = new Views.ProjectThinkDetailView();
+                var vm = new Models.ProjectThinkDetailViewModel
+                {
+                    Skin = skin,
+                    ActiveMenu = "projects",
+                    ProjectId = projectId,
+                    ProjectName = project.Name,
+                    SessionId = sessionId,
+                    State = session.State.ToString(),
+                    CurrentRound = session.CurrentRound,
+                    MaxRounds = session.MaxRounds,
+                    CreatedAt = session.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                    CompletedAt = session.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
+                    ToolDisplayNames = GetToolDisplayNames(being)
+                };
+                var html = view.Render(vm);
+                RenderHtml(html);
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+                RenderHtml($"<p>Error: {ex.Message}</p>");
+            }
+        }
+
+        private void GetThinkSessionList()
+        {
+            try
+            {
+                if (_projectManager == null)
+                {
+                    RenderJson(new List<object>());
+                    return;
+                }
+
+                var projectId = ExtractProjectIdFromPath();
+                if (projectId == Guid.Empty)
+                {
+                    RenderJson(new List<object>());
+                    return;
+                }
+
+                var project = _projectManager.GetProject(projectId);
+                if (project == null)
+                {
+                    RenderJson(new List<object>());
+                    return;
+                }
+
+                var beingManager = ServiceLocator.Instance.BeingManager;
+                var result = new List<object>();
+
+                foreach (var session in project.ThinkSessions.Values)
+                {
+                    var being = beingManager?.GetBeing(session.BeingId);
+                    result.Add(new
+                    {
+                        sessionId = session.Id.ToString(),
+                        beingId = session.BeingId.ToString(),
+                        beingName = being?.Name ?? session.BeingId.ToString("N"),
+                        state = session.State.ToString(),
+                        currentRound = session.CurrentRound,
+                        maxRounds = session.MaxRounds,
+                        createdAt = session.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                        completedAt = session.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
+                        cycleCount = session.ChatHistory.Count,
+                        messageCount = session.ChatHistory.Sum(c => c.Messages.Count)
+                    });
+                }
+
+                foreach (var session in project.ThinkSessionHistory)
+                {
+                    var being = beingManager?.GetBeing(session.BeingId);
+                    result.Add(new
+                    {
+                        sessionId = session.Id.ToString(),
+                        beingId = session.BeingId.ToString(),
+                        beingName = being?.Name ?? session.BeingId.ToString("N"),
+                        state = session.State.ToString(),
+                        currentRound = session.CurrentRound,
+                        maxRounds = session.MaxRounds,
+                        createdAt = session.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"),
+                        completedAt = session.CompletedAt?.ToString("yyyy-MM-dd HH:mm:ss"),
+                        cycleCount = session.ChatHistory.Count,
+                        messageCount = session.ChatHistory.Sum(c => c.Messages.Count)
+                    });
+                }
+
+                RenderJson(result);
+            }
+            catch (Exception ex)
+            {
+                RenderJson(new { error = ex.Message });
+            }
+        }
+
+        private void GetThinkSessionDetail()
+        {
+            try
+            {
+                if (_projectManager == null)
+                {
+                    RenderJson(new { messages = Array.Empty<object>() });
+                    return;
+                }
+
+                var sessionIdStr = Request.QueryString["sessionId"];
+                if (string.IsNullOrEmpty(sessionIdStr))
+                {
+                    RenderJson(new { messages = Array.Empty<object>() });
+                    return;
+                }
+
+                var projectId = ExtractProjectIdFromPath();
+                if (projectId == Guid.Empty)
+                {
+                    RenderJson(new { messages = Array.Empty<object>() });
+                    return;
+                }
+
+                var project = _projectManager.GetProject(projectId);
+                if (project == null)
+                {
+                    RenderJson(new { messages = Array.Empty<object>() });
+                    return;
+                }
+
+                var session = project.ThinkSessions.Values.FirstOrDefault(s => s.Id.ToString() == sessionIdStr)
+                    ?? project.ThinkSessionHistory.FirstOrDefault(s => s.Id.ToString() == sessionIdStr);
+
+                if (session == null)
+                {
+                    RenderJson(new { messages = Array.Empty<object>() });
+                    return;
+                }
+
+                var beingManager = ServiceLocator.Instance.BeingManager;
+                var userNickname = Config.Instance?.Data?.UserNickname ?? "User";
+                var userId = Config.Instance?.Data?.UserGuid ?? Guid.Empty;
+
+                var toolCallMap = new Dictionary<string, int>();
+                var result = new List<dynamic>();
+
+                foreach (var cycle in session.ChatHistory)
+                {
+                    foreach (var m in cycle.Messages)
+                    {
+                        var senderBeing = beingManager?.GetBeing(m.SenderId);
+                        var senderName = senderBeing?.Name ?? (m.SenderId == userId ? userNickname : m.SenderId.ToString("N"));
+
+                        if (m.Role == MessageRole.Tool && !string.IsNullOrEmpty(m.ToolCallId))
+                        {
+                            if (toolCallMap.TryGetValue(m.ToolCallId, out var toolCallIndex))
+                            {
+                                var original = result[toolCallIndex];
+                                var existingResults = (List<dynamic>)original.toolResults;
+                                existingResults.Add(new
+                                {
+                                    toolCallId = m.ToolCallId,
+                                    content = m.Content,
+                                    timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
+                                });
+                            }
+                            else
+                            {
+                                result.Add(new
+                                {
+                                    id = m.Id.ToString(),
+                                    senderId = m.SenderId.ToString(),
+                                    content = m.Content,
+                                    thinking = (string?)null,
+                                    role = "Tool",
+                                    senderName = senderName,
+                                    timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
+                                    toolCallsJson = (string?)null,
+                                    toolCallId = m.ToolCallId,
+                                    toolResults = new List<dynamic>()
+                                });
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(m.ToolCallsJson))
+                        {
+                            var toolCallData = new
+                            {
+                                id = m.Id.ToString(),
+                                senderId = m.SenderId.ToString(),
+                                content = m.Content,
+                                thinking = m.Thinking,
+                                role = m.Role.ToString(),
+                                senderName = senderName,
+                                timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
+                                toolCallsJson = m.ToolCallsJson,
+                                toolCallId = (string?)null,
+                                toolResults = new List<dynamic>()
+                            } as dynamic;
+
+                            try
+                            {
+                                var toolCalls = System.Text.Json.JsonSerializer.Deserialize<List<Dictionary<string, object>>>(m.ToolCallsJson);
+                                if (toolCalls != null)
+                                {
+                                    foreach (var tc in toolCalls)
+                                    {
+                                        if (tc.ContainsKey("Id") && tc["Id"] != null)
+                                        {
+                                            toolCallMap[tc["Id"].ToString()!] = result.Count;
+                                        }
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                toolCallMap[m.Id.ToString()] = result.Count;
+                            }
+
+                            result.Add(toolCallData);
+                        }
+                        else
+                        {
+                            if (m.Role != MessageRole.User && string.IsNullOrEmpty(m.Content) && string.IsNullOrEmpty(m.Thinking))
+                            {
+                                continue;
+                            }
+
+                            result.Add(new
+                            {
+                                id = m.Id.ToString(),
+                                senderId = m.SenderId.ToString(),
+                                content = m.Content,
+                                thinking = m.Thinking,
+                                role = m.Role.ToString(),
+                                senderName = senderName,
+                                timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
+                                toolCallsJson = (string?)null,
+                                toolCallId = (string?)null,
+                                toolResults = new List<dynamic>()
+                            });
+                        }
+                    }
+                }
+
+                RenderJson(new { messages = result });
+            }
+            catch (Exception ex)
+            {
+                RenderJson(new { messages = Array.Empty<object>(), error = ex.Message });
+            }
+        }
+
+        private static Dictionary<string, string> GetToolDisplayNames(SiliconBeingBase? being)
+        {
+            var result = new Dictionary<string, string>();
+            if (being?.ToolManager == null)
+                return result;
+
+            var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            foreach (var toolName in being.ToolManager.GetToolNames())
+            {
+                if (result.ContainsKey(toolName)) continue;
+                var tool = being.ToolManager.GetTool(toolName);
+                if (tool != null)
+                    result[toolName] = tool.GetDisplayName(language);
+            }
+            return result;
+        }
+
+        #endregion
 }
 

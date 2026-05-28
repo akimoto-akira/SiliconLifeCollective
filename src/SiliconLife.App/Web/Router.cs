@@ -115,6 +115,10 @@ public class Router
         RegisterController(() => new ProjectController(), "/project/{id}/tasks");
         RegisterController(() => new ProjectController(), "/project/{id}/tool-permissions");
         RegisterController(() => new ProjectController(), "/project/{id}/workflow");
+        RegisterController(() => new ProjectController(), "/project/{id}/think-history");
+        RegisterController(() => new ProjectController(), "/project-think-session/{sessionId}");
+        RegisterController(() => new ProjectController(), "/api/projects/{id}/think-sessions/list");
+        RegisterController(() => new ProjectController(), "/api/projects/{id}/think-sessions/detail");
         RegisterController(() => new ProjectController(), "/api/projects/list");
         RegisterController(() => new ProjectController(), "/api/projects/list-workflow-templates");
         RegisterController(() => new ProjectController(), "/api/projects/create", "POST");

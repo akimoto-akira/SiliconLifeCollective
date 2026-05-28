@@ -2078,4 +2078,20 @@ _ => permissionType.ToString()
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[ワークフローロール通知] プロジェクト「{0}」のワークフローが遷移「{1}」（{2} → {3}）でブロックされました。\n\n不足ロール：{4}\n\nproject_tool の assign_role アクションを使用して必要なロールを割り当ててください。ワークフローは次回のチェック時に自動的に再開されます。";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "処理記録";
+    public override string ProjectThinkHistoryTitle => "プロジェクト処理記録";
+    public override string ProjectThinkHistoryHeader => "処理記録";
+    public override string ProjectThinkBackToProjects => "← プロジェクト一覧に戻る";
+    public override string ProjectThinkProjectName => "プロジェクト：{0}";
+    public override string ProjectThinkNoRecords => "処理記録がありません";
+    public override string ProjectThinkStateStarted => "開始済み";
+    public override string ProjectThinkStateExecuting => "実行中";
+    public override string ProjectThinkStateCompleted => "完了";
+    public override string ProjectThinkStateFailed => "失敗";
+    public override string ProjectThinkDetailTitle => "処理詳細";
+    public override string ProjectThinkDetailHeader => "処理詳細";
+    public override string ProjectThinkRoundLabel => "ラウンド：";
+    public override string ProjectThinkMessageCountLabel => "メッセージ数：";
 }

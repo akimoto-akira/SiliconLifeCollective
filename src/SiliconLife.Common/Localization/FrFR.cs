@@ -2040,4 +2040,20 @@ Utilisation : Appelle l'outil chat, définis action=""mark_read"", target_id=GUI
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[Notification de rôle de workflow] Le workflow du projet '{0}' est bloqué à la transition '{1}' ({2} → {3}).\n\nRôles manquants : {4}\n\nUtilisez l'action assign_role de project_tool pour attribuer les rôles nécessaires. Le workflow reprendra automatiquement lors de la prochaine vérification.";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "Historique de réflexion";
+    public override string ProjectThinkHistoryTitle => "Historique de réflexion du projet";
+    public override string ProjectThinkHistoryHeader => "Historique de réflexion";
+    public override string ProjectThinkBackToProjects => "← Retour aux projets";
+    public override string ProjectThinkProjectName => "Projet : {0}";
+    public override string ProjectThinkNoRecords => "Aucune session de réflexion";
+    public override string ProjectThinkStateStarted => "Démarré";
+    public override string ProjectThinkStateExecuting => "En cours d'exécution";
+    public override string ProjectThinkStateCompleted => "Terminé";
+    public override string ProjectThinkStateFailed => "Échoué";
+    public override string ProjectThinkDetailTitle => "Détail de la session";
+    public override string ProjectThinkDetailHeader => "Détail de la session";
+    public override string ProjectThinkRoundLabel => "Tour : ";
+    public override string ProjectThinkMessageCountLabel => "Messages : ";
 }

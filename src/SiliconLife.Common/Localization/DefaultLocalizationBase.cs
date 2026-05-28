@@ -3717,6 +3717,22 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// {0}=projectName, {1}=transitionName, {2}=fromState, {3}=toState, {4}=missingRoles</summary>
     public abstract string WorkflowRoleBlockedNotificationFormat { get; }
 
+    // ===== Project Think Session Localization =====
+    public abstract string ProjectThinkHistoryLinkLabel { get; }
+    public abstract string ProjectThinkHistoryTitle { get; }
+    public abstract string ProjectThinkHistoryHeader { get; }
+    public abstract string ProjectThinkBackToProjects { get; }
+    public abstract string ProjectThinkProjectName { get; }
+    public abstract string ProjectThinkNoRecords { get; }
+    public abstract string ProjectThinkStateStarted { get; }
+    public abstract string ProjectThinkStateExecuting { get; }
+    public abstract string ProjectThinkStateCompleted { get; }
+    public abstract string ProjectThinkStateFailed { get; }
+    public abstract string ProjectThinkDetailTitle { get; }
+    public abstract string ProjectThinkDetailHeader { get; }
+    public abstract string ProjectThinkRoundLabel { get; }
+    public abstract string ProjectThinkMessageCountLabel { get; }
+
     /// <inheritdoc/>
     public override string FormatWorkflowRoleBlockedNotification(
         string projectName, string transitionName, string fromState, string toState, string missingRoles)

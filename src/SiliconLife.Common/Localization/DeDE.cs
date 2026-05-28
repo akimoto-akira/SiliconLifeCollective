@@ -2077,4 +2077,20 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=Gegen�
 
     // ===== Workflow Role Notification =====
     public override string WorkflowRoleBlockedNotificationFormat => "[Workflow-Rollenbenachrichtigung] Der Workflow im Projekt '{0}' ist beim Übergang '{1}' ({2} → {3}) blockiert.\n\nFehlende Rollen: {4}\n\nVerwenden Sie die Aktion assign_role des project_tool, um die erforderlichen Rollen zuzuweisen. Der Workflow wird bei der nächsten Prüfung automatisch fortgesetzt.";
+
+    // ===== Project Think Session Localization =====
+    public override string ProjectThinkHistoryLinkLabel => "Denkverlauf";
+    public override string ProjectThinkHistoryTitle => "Projekt-Denkverlauf";
+    public override string ProjectThinkHistoryHeader => "Denkverlauf";
+    public override string ProjectThinkBackToProjects => "← Zurück zu Projekten";
+    public override string ProjectThinkProjectName => "Projekt: {0}";
+    public override string ProjectThinkNoRecords => "Noch keine Denksitzungen";
+    public override string ProjectThinkStateStarted => "Gestartet";
+    public override string ProjectThinkStateExecuting => "Wird ausgeführt";
+    public override string ProjectThinkStateCompleted => "Abgeschlossen";
+    public override string ProjectThinkStateFailed => "Fehlgeschlagen";
+    public override string ProjectThinkDetailTitle => "Denksitzungsdetail";
+    public override string ProjectThinkDetailHeader => "Denksitzungsdetail";
+    public override string ProjectThinkRoundLabel => "Runde: ";
+    public override string ProjectThinkMessageCountLabel => "Nachrichten: ";
 }
