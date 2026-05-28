@@ -604,6 +604,16 @@ public class ProjectManager : IProjectManager
         return _workflowEngine;
     }
 
+    /// <inheritdoc/>
+    public void SaveProject(ProjectSpace project)
+    {
+        lock (_lock)
+        {
+            string projectKey = $"{ProjectsPrefix}{project.Id}/meta";
+            _storage.Write(projectKey, project);
+        }
+    }
+
     /// <summary>
     /// Sets the workflow engine for this project manager.
     /// Called during initialization to register the engine.

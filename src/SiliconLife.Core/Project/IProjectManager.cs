@@ -150,4 +150,12 @@ public interface IProjectManager
     /// </summary>
     /// <returns>The workflow engine, or null</returns>
     WorkflowEngine? GetWorkflowEngine();
+
+    /// <summary>
+    /// Persists a single project's data to storage.
+    /// Used when only one project has been modified (e.g., think session state changes)
+    /// to avoid the overhead of loading and saving all projects.
+    /// </summary>
+    /// <param name="project">The project to save</param>
+    void SaveProject(ProjectSpace project);
 }

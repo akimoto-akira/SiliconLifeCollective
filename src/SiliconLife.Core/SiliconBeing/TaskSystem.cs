@@ -54,13 +54,22 @@ public sealed class ChatHistoryCycle
         TriggerTime = triggerTime;
     }
 
+    public ChatHistoryCycle(ProjectThinkState startStatus)
+    {
+        StartStatus = startStatus.ToString();
+        StartedAt = DateTime.Now;
+    }
+
     public TaskStatus GetTaskStartStatus() => Enum.TryParse<TaskStatus>(StartStatus, out var s) ? s : TaskStatus.Pending;
     public TaskStatus? GetTaskEndStatus() => EndStatus != null && Enum.TryParse<TaskStatus>(EndStatus, out var s) ? s : null;
     public TimerExecutionState GetTimerStartStatus() => Enum.TryParse<TimerExecutionState>(StartStatus, out var s) ? s : TimerExecutionState.Idle;
     public TimerExecutionState? GetTimerEndStatus() => EndStatus != null && Enum.TryParse<TimerExecutionState>(EndStatus, out var s) ? s : null;
+    public ProjectThinkState GetProjectThinkStartStatus() => Enum.TryParse<ProjectThinkState>(StartStatus, out var s) ? s : ProjectThinkState.Idle;
+    public ProjectThinkState? GetProjectThinkEndStatus() => EndStatus != null && Enum.TryParse<ProjectThinkState>(EndStatus, out var s) ? s : null;
 
     public void SetEndStatus(TaskStatus status) { EndStatus = status.ToString(); EndedAt = DateTime.Now; }
     public void SetEndStatus(TimerExecutionState status) { EndStatus = status.ToString(); EndedAt = DateTime.Now; }
+    public void SetEndStatus(ProjectThinkState status) { EndStatus = status.ToString(); EndedAt = DateTime.Now; }
 }
 
 /// <summary>

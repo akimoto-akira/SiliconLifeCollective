@@ -107,6 +107,14 @@ public sealed class ProjectSpace
     public ToolActionPermissionConfig? ToolActionPermissions { get; set; }
 
     /// <summary>
+    /// Gets or sets the active think sessions for this project.
+    /// Key: curator being GUID, Value: the think session for that curator.
+    /// Each curator can have at most one active think session per project.
+    /// Sessions are persisted as part of the project data and cleaned up after completion.
+    /// </summary>
+    public Dictionary<Guid, ProjectThinkSession> ThinkSessions { get; set; } = new();
+
+    /// <summary>
     /// Creates a new project space with default values
     /// </summary>
     public ProjectSpace()

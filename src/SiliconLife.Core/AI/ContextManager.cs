@@ -58,6 +58,11 @@ public class ContextManager
     private TimerItem? _timerForContext;
 
     /// <summary>
+    /// Project think session context (for ThinkOnProject multi-round scenarios, null for other scenarios)
+    /// </summary>
+    private ProjectThinkSession? _projectThinkSession;
+
+    /// <summary>
     /// Gets whether this brain session has work to do.
     /// True if there are pending user messages or an unfinished tool call loop
     /// (detected from chat history → last message is a Tool result).
@@ -148,6 +153,36 @@ public class ContextManager
         }
 
         _logger.Info(_being.Id, "ContextManager created for being {0}, task={1} ({2})", _being.Name, task.Title, task.Id);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the ContextManager class for project think session continuation.
+    /// Loads existing chat history from the think session.
+    /// </summary>
+    /// <param name="being">The silicon being that owns this context</param>
+    /// <param name="thinkSession">The project think session to continue</param>
+    /// <exception cref="ArgumentNullException">Thrown when being or its AIClient is null</exception>
+    public ContextManager(SiliconBeingBase being, ProjectThinkSession thinkSession)
+    {
+        _being = being ?? throw new ArgumentNullException(nameof(being));
+        _aiClient = being.AIClient ?? throw new ArgumentNullException(nameof(being.AIClient));
+        _session = null;
+        _messages = new List<ChatMessage>();
+        _contextMessageIds = new HashSet<Guid>();
+        _pendingMarkAsReadIds = new List<Guid>();
+        _projectThinkSession = thinkSession;
+
+        ChatHistoryCycle currentCycle = thinkSession.GetCurrentCycle();
+        if (currentCycle.Messages.Count > 0)
+        {
+            foreach (var msg in currentCycle.Messages)
+            {
+                _messages.Add(msg);
+            }
+        }
+
+        _logger.Info(_being.Id, "ContextManager created for being {0}, projectThinkSession={1} (round={2})",
+            _being.Name, thinkSession.Id, thinkSession.CurrentRound);
     }
 
     /// <summary>
@@ -1317,17 +1352,145 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
             _being.Name, project.Name, project.Id,
             string.Join(", ", attentionInfo.Reasons));
 
+        var session = new ProjectThinkSession
+        {
+            BeingId = _being.Id,
+            ProjectId = project.Id,
+            State = ProjectThinkState.Started,
+            CurrentRound = 0,
+        };
+        _projectThinkSession = session;
+
+        project.ThinkSessions[_being.Id] = session;
+
+        Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+
         string scenarioContext = BuildProjectScenarioContext(project, attentionInfo);
+
+        _messages.Add(new ChatMessage
+        {
+            Role = MessageRole.User,
+            Content = $"You are the curator of project \"{project.Name}\". Please review the project status and take action.",
+        });
+
+        ChatHistoryCycle cycle = session.GetCurrentCycle();
+        cycle.Messages.AddRange(_messages);
+
+        AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project, projectId: project.Id);
+        session.CurrentRound++;
+
+        if (!response.Success)
+        {
+            session.Complete(ProjectThinkState.Failed);
+            SaveProjectThinkSession(project);
+            RecordToMemory(loc.FormatMemoryEventTask($"ThinkOnProject failed: {response.ErrorMessage ?? "AI call failed"}"));
+        }
+        else if (response.HasToolCalls)
+        {
+            session.State = ProjectThinkState.Executing;
+            string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
+            RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
+        }
+        else
+        {
+            session.Complete(ProjectThinkState.Completed);
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                RecordToMemory(loc.FormatMemoryEventTask($"ThinkOnProject: {response.Content}"));
+            }
+        }
+
+        SaveProjectThinkSession(project);
+        return response;
+    }
+
+    public AIResponse ThinkOnProjectContinue(ProjectThinkSession session)
+    {
+        var projectManager = ServiceLocator.Instance.ProjectManager;
+        if (projectManager == null)
+        {
+            return AIResponse.Failed("ProjectManager not available");
+        }
+
+        var project = projectManager.GetProject(session.ProjectId);
+        if (project == null)
+        {
+            session.Complete(ProjectThinkState.Failed);
+            return AIResponse.Failed("Project not found");
+        }
+
+        _projectThinkSession = session;
+
+        session.CurrentRound++;
+        if (session.CurrentRound > session.MaxRounds)
+        {
+            _logger.Warn(_being.Id, "Project think session {0}: Max rounds ({1}) reached", session.Id, session.MaxRounds);
+            session.Complete(ProjectThinkState.Failed);
+            SaveProjectThinkSession(project);
+            return AIResponse.Failed("Max rounds reached");
+        }
+
+        _logger.Info(_being.Id, "ThinkOnProjectContinue: being={0}, session={1}, round={2}, project={3}",
+            _being.Name, session.Id, session.CurrentRound, project.Name);
+
+        Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
+
+        if (session.ChatHistory.Count > 0 && session.ChatHistory[^1].EndStatus == null)
+        {
+            session.SealCurrentCycle(ProjectThinkState.Started);
+        }
+        session.AppendNewCycle();
+
+        string scenarioContext = BuildProjectScenarioContext(project);
         AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project, projectId: project.Id);
 
-        if (response.Success && !string.IsNullOrEmpty(response.Content))
+        ChatHistoryCycle currentCycle = session.GetCurrentCycle();
+        currentCycle.Messages.AddRange(_messages.Skip(currentCycle.Messages.Count).ToList());
+
+        if (!response.Success)
         {
-            Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
-            LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
-            RecordToMemory(loc.FormatMemoryEventTask($"ThinkOnProject: {response.Content}"));
+            session.Complete(ProjectThinkState.Failed);
+            SaveProjectThinkSession(project);
+            RecordToMemory(loc.FormatMemoryEventTask($"ThinkOnProject failed: {response.ErrorMessage ?? "AI call failed"}"));
+        }
+        else if (response.HasToolCalls)
+        {
+            session.State = ProjectThinkState.Executing;
+            _logger.Info(_being.Id, "Project think session {0}: Tool calls returned, will continue on next tick", session.Id);
+            string toolNames = string.Join(", ", response.ToolCalls!.Select(t => t.Name));
+            RecordToMemory(loc.FormatMemoryEventToolCall(toolNames));
+            SaveProjectThinkSession(project);
+        }
+        else
+        {
+            session.Complete(ProjectThinkState.Completed);
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                RecordToMemory(loc.FormatMemoryEventTask($"ThinkOnProject: {response.Content}"));
+            }
+            SaveProjectThinkSession(project);
         }
 
         return response;
+    }
+
+    private void SaveProjectThinkSession(ProjectSpace project)
+    {
+        var projectManager = ServiceLocator.Instance.ProjectManager;
+        if (projectManager == null) return;
+
+        var session = _projectThinkSession;
+        if (session == null) return;
+
+        if (session.State == ProjectThinkState.Completed || session.State == ProjectThinkState.Failed)
+        {
+            project.ThinkSessions.Remove(session.BeingId);
+        }
+
+        project.UpdatedAt = DateTime.UtcNow;
+        projectManager.SaveProject(project);
     }
 
     private ProjectAttentionInfo? FindProjectNeedingAttention()

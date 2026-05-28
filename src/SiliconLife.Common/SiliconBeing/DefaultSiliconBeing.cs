@@ -276,13 +276,28 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
-            if (IsCurator && HasProjectsNeedingAttention())
+            if (IsCurator)
             {
-                _activityRaw = (int)BeingActivity.Project;
-                _logger.Info(Id, "Being {0}: checking projects needing attention", Name);
-                if (!ExecuteBrain("ThinkOnProject", null, brain => brain.ThinkOnProject()))
-                    errorOccurred = true;
-                return;
+                var executingSession = GetExecutingProjectThinkSession();
+                if (executingSession != null)
+                {
+                    _activityRaw = (int)BeingActivity.Project;
+                    _logger.Info(Id, "Being {0}: continuing project think session {1} (round={2})",
+                        Name, executingSession.Id, executingSession.CurrentRound);
+                    if (!ExecuteBrain("ThinkOnProjectContinue", null,
+                        _ => new ContextManager(this, executingSession).ThinkOnProjectContinue(executingSession)))
+                        errorOccurred = true;
+                    return;
+                }
+
+                if (HasProjectsNeedingAttention())
+                {
+                    _activityRaw = (int)BeingActivity.Project;
+                    _logger.Info(Id, "Being {0}: checking projects needing attention", Name);
+                    if (!ExecuteBrain("ThinkOnProject", null, brain => brain.ThinkOnProject()))
+                        errorOccurred = true;
+                    return;
+                }
             }
 
             if (Memory != null && Memory.ShouldCompress(out var compressData))
@@ -842,6 +857,29 @@ public class DefaultSiliconBeing : SiliconBeingBase
         }
 
         return result;
+    }
+
+    private ProjectThinkSession? GetExecutingProjectThinkSession()
+    {
+        var projectManager = ServiceLocator.Instance.ProjectManager;
+        if (projectManager == null) return null;
+
+        var projects = projectManager.ListProjects(includeArchived: false);
+        foreach (var project in projects)
+        {
+            if (project.CreatedBy != Id || project.Status != ProjectStatus.Active)
+                continue;
+
+            if (project.ThinkSessions.TryGetValue(Id, out var session))
+            {
+                if (session.State == ProjectThinkState.Started || session.State == ProjectThinkState.Executing)
+                {
+                    if (session.NeedsContinuation())
+                        return session;
+                }
+            }
+        }
+        return null;
     }
 
     private bool HasProjectsNeedingAttention()
