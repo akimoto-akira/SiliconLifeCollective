@@ -3497,6 +3497,15 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     // ===== Project Role Context Localization =====
 
+    /// <summary>Header for project affiliation info in AI context</summary>
+    public abstract string ProjectCtx_ProjectInfoHeader { get; }
+
+    /// <summary>Label for the being's role within a project</summary>
+    public abstract string ProjectCtx_ProjectInfoRoleLabel { get; }
+
+    /// <summary>Label for the project goal/description</summary>
+    public abstract string ProjectCtx_ProjectInfoGoalLabel { get; }
+
     /// <summary>Role Definitions header in project scenario context</summary>
     public abstract string ProjectCtx_RoleDefinitionsHeader { get; }
 
@@ -3565,6 +3574,15 @@ public abstract class DefaultLocalizationBase : LocalizationBase
 
     /// <summary>Reason: some roles in the project's template are not satisfied</summary>
     public abstract string ProjectAttention_UnsatisfiedRoles { get; }
+
+    /// <inheritdoc/>
+    public override string ProjectInfoHeader => ProjectCtx_ProjectInfoHeader;
+
+    /// <inheritdoc/>
+    public override string ProjectInfoRoleLabel => ProjectCtx_ProjectInfoRoleLabel;
+
+    /// <inheritdoc/>
+    public override string ProjectInfoGoalLabel => ProjectCtx_ProjectInfoGoalLabel;
 
     /// <inheritdoc/>
     public override string ProjectRoleDefinitionsHeader => ProjectCtx_RoleDefinitionsHeader;

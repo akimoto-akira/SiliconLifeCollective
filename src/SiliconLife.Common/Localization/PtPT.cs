@@ -1834,6 +1834,11 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
     private readonly ChineseHistoricalPtPT _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "Afiliação ao projeto";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "Função";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "Objetivo";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "Definições de funções";
     public override string ProjectCtx_RoleAssignmentsHeader => "Atribuições de funções";

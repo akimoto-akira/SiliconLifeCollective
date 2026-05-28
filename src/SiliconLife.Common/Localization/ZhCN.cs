@@ -2041,6 +2041,11 @@ _ => permissionType.ToString()
     public override string Help_Previous => "上一篇";
     public override string Help_Next => "下一篇";
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "项目归属";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "角色";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "目标";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "角色定义";
     public override string ProjectCtx_RoleAssignmentsHeader => "角色分配";

@@ -2036,6 +2036,11 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string Help_Previous => "Anterior";
     public override string Help_Next => "Siguiente";
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "Afiliación al proyecto";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "Rol";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "Objetivo";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "Definiciones de roles";
     public override string ProjectCtx_RoleAssignmentsHeader => "Asignaciones de roles";

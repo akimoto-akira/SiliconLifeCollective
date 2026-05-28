@@ -381,6 +381,19 @@ public class ContextManager
             Content = $"Your name: {_being.Name}\nYour GUID: {_being.Id}\nCurrent time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\nSystem language: {language}",
         });
 
+        // Project affiliation context (placed after IdentityInfo, before ScenarioContext).
+        // Provides the AI with awareness of which projects it belongs to and its roles,
+        // enabling project-aware behavior and decision-making.
+        string? projectInfoContext = BuildProjectInfoContext(loc);
+        if (!string.IsNullOrEmpty(projectInfoContext))
+        {
+            request.Messages.Add(new ChatMessage
+            {
+                Role = MessageRole.System,
+                Content = projectInfoContext,
+            });
+        }
+
         if (!string.IsNullOrEmpty(scenarioContext))
         {
             request.Messages.Add(new ChatMessage
@@ -581,6 +594,58 @@ public class ContextManager
         foreach (MemoryEntry memory in memories)
         {
             sb.AppendLine($"- [{memory.Timestamp}] {memory.Content}");
+        }
+
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Builds a project-affiliation context block listing the projects
+    /// the current silicon being is assigned to, along with its role(s)
+    /// and each project's goal. Returns null when the being is not
+    /// assigned to any active project.
+    /// </summary>
+    private string? BuildProjectInfoContext(LocalizationBase loc)
+    {
+        var projectManager = ServiceLocator.Instance.ProjectManager;
+        if (projectManager == null) return null;
+
+        List<ProjectSpace> allProjects;
+        try
+        {
+            allProjects = projectManager.ListProjects(includeArchived: false);
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn(_being.Id, "Failed to list projects for ProjectInfo context: {0}", ex.Message);
+            return null;
+        }
+
+        var assignedProjects = allProjects
+            .Where(p => p.AssignedBeings.Contains(_being.Id))
+            .ToList();
+
+        if (assignedProjects.Count == 0) return null;
+
+        StringBuilder sb = new();
+        sb.AppendLine(loc.ProjectInfoHeader + ":");
+
+        foreach (var project in assignedProjects)
+        {
+            var roles = project.RoleAssignments
+                .Where(kvp => kvp.Value.Contains(_being.Id))
+                .Select(kvp => kvp.Key)
+                .ToList();
+
+            sb.AppendLine($"- {project.Name}");
+            if (!string.IsNullOrEmpty(project.Description))
+            {
+                sb.AppendLine($"  {loc.ProjectInfoGoalLabel}: {project.Description}");
+            }
+            if (roles.Count > 0)
+            {
+                sb.AppendLine($"  {loc.ProjectInfoRoleLabel}: {string.Join(", ", roles)}");
+            }
         }
 
         return sb.ToString();

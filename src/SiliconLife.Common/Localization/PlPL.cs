@@ -1134,6 +1134,11 @@ Użycie: wywołaj narzędzie chat, ustaw action=""mark_read"", target_id=GUID ro
 
     public override string GetTranslation(string key) => key;
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "Przynależność do projektu";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "Rola";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "Cel";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "Definicje ról";
     public override string ProjectCtx_RoleAssignmentsHeader => "Przypisania ról";

@@ -1996,6 +1996,11 @@ Utilisation : Appelle l'outil chat, définis action=""mark_read"", target_id=GUI
     private readonly ChineseHistoricalFrFR _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "Affiliation au projet";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "Rôle";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "Objectif";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "Définitions des rôles";
     public override string ProjectCtx_RoleAssignmentsHeader => "Attributions des rôles";

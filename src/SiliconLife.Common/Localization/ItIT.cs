@@ -1992,6 +1992,11 @@ Uso: Chiama lo strumento chat, imposta action=""mark_read"", target_id=GUID dell
     private readonly ChineseHistoricalItIT _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "Appartenenza al progetto";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "Ruolo";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "Obiettivo";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "Definizioni dei ruoli";
     public override string ProjectCtx_RoleAssignmentsHeader => "Assegnazioni dei ruoli";

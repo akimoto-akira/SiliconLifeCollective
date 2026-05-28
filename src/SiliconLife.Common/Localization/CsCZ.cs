@@ -1095,6 +1095,11 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
     public override string Help_Previous => "Předchozí";
     public override string Help_Next => "Další";
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "Příslušnost k projektu";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "Role";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "Cíl";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "Definice rolí";
     public override string ProjectCtx_RoleAssignmentsHeader => "Přiřazení rolí";

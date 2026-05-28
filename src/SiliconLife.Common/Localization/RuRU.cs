@@ -914,6 +914,11 @@ public class RuRU : DefaultLocalizationBase
     public override string Help_Previous => "Предыдущий";
     public override string Help_Next => "Следующий";
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "Принадлежность к проекту";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "Роль";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "Цель";
+
     public override string ProjectCtx_RoleDefinitionsHeader => "Определения ролей";
     public override string ProjectCtx_RoleAssignmentsHeader => "Назначения ролей";
     public override string ProjectCtx_NoWorkflowTemplate => "Шаблон рабочего процесса не назначен";

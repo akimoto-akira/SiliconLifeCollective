@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-29T11:00:00+08:00",
+  "lastUpdated": "2026-05-29T12:30:00+08:00",
   "lastCommitHash": null,
   "tasks": [
     {
@@ -29,7 +29,8 @@
       "createdAt": "2026-05-29T03:27:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-29T11:15:00+08:00"
+      "completedAt": "2026-05-29T11:15:00+08:00",
+      "relatedCommit": "f3d1794"
     },
     {
       "id": "task-394",
@@ -62,16 +63,17 @@
       "title": "BuildRequest动态注入硅基人项目归属信息",
       "description": "非Curator的硅基生命（如小类、小码）在执行任务时不知道自己被分配到哪个项目、担任什么角色，导致无法正确使用项目相关工具、无法自主决策。\n\n【问题】\n项目归属信息只在ThinkOnProject场景上下文中提供（仅Curator可见）。一般硅基人在ThinkOnTask/ThinkOnChat/ThinkOnTimer时完全不知道项目归属。Soul文件是静态文本，不会随项目状态变化而更新。\n\n【方案：在BuildRequest中动态注入ProjectInfo层】\n在系统提示词组装顺序中，IdentityInfo之后、ScenarioContext之前新增ProjectInfo层：\n\nSoulContent → CommonPrompt → IdentityInfo → **ProjectInfo(新增)** → ScenarioContext → KnowledgeContext → MemoryContext\n\nProjectInfo内容：\n- 如果硅基人被分配到一个或多个Active项目：\n  \"Project: 旅游编码计划\\nRole: POIClassifier\\nProject goal: 构建多语言旅游维基\"\n- 如果未分配到任何项目：不注入（避免冗余）\n- 多项目时逐行列出\n\n关键设计原则：\n- Soul文件保持纯人格定义，不被系统覆盖或追加\n- ProjectInfo动态生成，项目变更时自动更新\n- 人格(Soul)和职责(ProjectInfo)解耦：性格稳定，工作可变\n- 同一硅基人调到不同项目，Soul不变但ProjectInfo变化\n\n【实现要点】\n1. ContextManager.BuildRequest中，在IdentityInfo段之后注入ProjectInfo段\n2. 获取硅基人分配的项目：ProjectManager.ListProjects → 过滤Active项目 → 过滤members含当前beingId\n3. 获取角色信息：project.GetMemberRole(beingId)\n4. 新增13个语言本地化字符串（如ProjectInfoLabel、ProjectInfoRoleLabel等）\n5. ProjectInfo仅在硅基人被分配到至少一个Active项目时注入\n\n【排除方案】\n- ❌ 在Soul文件中自动追加项目信息：与用户手动编辑冲突，项目变更需同步更新易不一致，违反Soul\"人格定义\"语义\n- ❌ 仅在ScenarioContext中提供：只在ThinkOnProject场景注入，一般硅基人在其他场景仍不知道归属\n\n【关键代码位置】\n- ContextManager.cs L349-428：BuildRequest\n- ContextManager.cs L388-398：IdentityInfo段（ProjectInfo应插入其后）\n\n【依赖】无前置依赖，可独立完成。与task-394/395互补但不互阻",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-29T03:30:00+08:00",
-      "assignedTo": null,
-      "createdBy": "coze-agent"
+      "assignedTo": "trae-glm5",
+      "createdBy": "coze-agent",
+      "completedAt": "2026-05-29T12:30:00+08:00"
     }
   ],
   "taskIndex": {
-    "pending": ["task-394", "task-395", "task-396"],
+    "pending": ["task-394", "task-395"],
     "inProgress": [],
-    "completed": ["task-392", "task-393"],
+    "completed": ["task-392", "task-393", "task-396"],
     "cancelled": []
   },
   "metadata": {

@@ -2034,6 +2034,11 @@ _ => permissionType.ToString()
     public override string Help_Previous => "이전";
     public override string Help_Next => "다음";
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "프로젝트 소속";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "역할";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "목표";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "역할 정의";
     public override string ProjectCtx_RoleAssignmentsHeader => "역할 할당";

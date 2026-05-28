@@ -2033,6 +2033,11 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=GegenÃ
     private readonly ChineseHistoricalDeDE _chineseHistorical = new();
     public override ChineseHistoricalLocalizationBase GetChineseHistoricalLocalization() => _chineseHistorical;
 
+    // Project Info Context
+    public override string ProjectCtx_ProjectInfoHeader => "ProjektzugehÃ¶rigkeit";
+    public override string ProjectCtx_ProjectInfoRoleLabel => "Rolle";
+    public override string ProjectCtx_ProjectInfoGoalLabel => "Ziel";
+
     // Project Role Context
     public override string ProjectCtx_RoleDefinitionsHeader => "Rollendefinitionen";
     public override string ProjectCtx_RoleAssignmentsHeader => "Rollenzuweisungen";

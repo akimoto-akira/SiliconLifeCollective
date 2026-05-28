@@ -151,6 +151,23 @@ public abstract class LocalizationBase
     /// <param name="error">The error message</param>
     public abstract string FormatTimerErrorNotification(string timerName, string error);
 
+    // ===== Project Info Context Localization =====
+
+    /// <summary>
+    /// Gets the localized header for the project affiliation info section injected into AI context.
+    /// </summary>
+    public abstract string ProjectInfoHeader { get; }
+
+    /// <summary>
+    /// Gets the localized label for the role of a being within a project.
+    /// </summary>
+    public abstract string ProjectInfoRoleLabel { get; }
+
+    /// <summary>
+    /// Gets the localized label for the goal/description of a project.
+    /// </summary>
+    public abstract string ProjectInfoGoalLabel { get; }
+
     // ===== Project Role Context Localization =====
 
     /// <summary>
