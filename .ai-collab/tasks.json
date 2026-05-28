@@ -412,6 +412,7 @@
       "createdAt": "2026-05-28T16:30:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
+      "relatedCommit": "ae8b673",
       "completedAt": "2026-05-28T17:30:00+08:00"
     }
   ],
