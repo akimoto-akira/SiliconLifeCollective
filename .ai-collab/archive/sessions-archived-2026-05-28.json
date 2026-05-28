@@ -1,214 +1,35 @@
 {
-  "archivedDate": "2026-05-28",
-  "count": 8,
+  "archiveDate": "2026-05-28",
+  "type": "sessions",
+  "count": 1,
+  "archivedAt": "2026-05-29T00:51:51.384120",
   "sessions": [
     {
-      "sessionId": "catpaw-20260528-001",
+      "sessionId": "catpaw-20260528-005",
       "actorId": "catpaw",
-      "startTime": "2026-05-28T10:00:00+08:00",
-      "endTime": "2026-05-28T10:30:00+08:00",
+      "startTime": "2026-05-28T18:00:00+08:00",
+      "endTime": "2026-05-28T21:00:00+08:00",
       "status": "completed",
-      "selectedTask": "task-386,task-387",
+      "selectedTask": "task-392",
       "modifiedFiles": [
-        "PluginDemo/19-TickObject/README.zh-CN.md",
-        "PluginDemo/19-TickObject/README.zh-HK.md",
-        "PluginDemo/19-TickObject/README.ja-JP.md",
-        "PluginDemo/19-TickObject/README.ko-KR.md",
-        "PluginDemo/19-TickObject/README.de-DE.md",
-        "PluginDemo/19-TickObject/README.fr-FR.md",
-        "PluginDemo/19-TickObject/README.es-ES.md",
-        "PluginDemo/19-TickObject/README.it-IT.md",
-        "PluginDemo/19-TickObject/README.ru-RU.md",
-        "PluginDemo/19-TickObject/README.pt-PT.md",
-        "PluginDemo/19-TickObject/README.pl-PL.md",
-        "PluginDemo/19-TickObject/README.cs-CZ.md",
-        "PluginDemo/20-SpeedyPack/README.zh-CN.md",
-        "PluginDemo/20-SpeedyPack/README.zh-HK.md",
-        "PluginDemo/20-SpeedyPack/README.ja-JP.md",
-        "PluginDemo/20-SpeedyPack/README.ko-KR.md",
-        "PluginDemo/20-SpeedyPack/README.de-DE.md",
-        "PluginDemo/20-SpeedyPack/README.fr-FR.md",
-        "PluginDemo/20-SpeedyPack/README.es-ES.md",
-        "PluginDemo/20-SpeedyPack/README.it-IT.md",
-        "PluginDemo/20-SpeedyPack/README.ru-RU.md",
-        "PluginDemo/20-SpeedyPack/README.pt-PT.md",
-        "PluginDemo/20-SpeedyPack/README.pl-PL.md",
-        "PluginDemo/20-SpeedyPack/README.cs-CZ.md"
-      ]
-    },
-    {
-      "sessionId": "catpaw-20260528-002",
-      "actorId": "catpaw",
-      "startTime": "2026-05-28T15:00:00+08:00",
-      "endTime": "2026-05-28T15:30:00+08:00",
-      "status": "completed",
-      "selectedTask": "task-389",
-      "modifiedFiles": [
-        "src/SiliconLife.Core/Plugins/PluginLoader.cs",
-        ".ai-collab/tasks.json",
-        ".ai-collab/state.json",
-        ".ai-collab/sessions/catpaw-20260528-002.json",
-        ".ai-collab/activity.log"
-      ]
-    },
-    {
-      "sessionId": "catpaw-20260528-003",
-      "actorId": "catpaw",
-      "startTime": "2026-05-28T16:00:00+08:00",
-      "endTime": "2026-05-28T16:30:00+08:00",
-      "status": "completed",
-      "selectedTask": "task-390",
-      "modifiedFiles": [
-        "PluginDemo/22-CSSourceMode/Plugin.cs",
-        "PluginDemo/22-CSSourceMode/Helpers.cs",
-        "PluginDemo/22-CSSourceMode/cs.txt",
-        "PluginDemo/22-CSSourceMode/README.md",
-        "PluginDemo/22-CSSourceMode/README.zh-CN.md",
-        "PluginDemo/22-CSSourceMode/README.zh-HK.md",
-        "PluginDemo/22-CSSourceMode/README.ja-JP.md",
-        "PluginDemo/22-CSSourceMode/README.ko-KR.md",
-        "PluginDemo/22-CSSourceMode/README.de-DE.md",
-        "PluginDemo/22-CSSourceMode/README.fr-FR.md",
-        "PluginDemo/22-CSSourceMode/README.es-ES.md",
-        "PluginDemo/22-CSSourceMode/README.it-IT.md",
-        "PluginDemo/22-CSSourceMode/README.ru-RU.md",
-        "PluginDemo/22-CSSourceMode/README.pt-PT.md",
-        "PluginDemo/22-CSSourceMode/README.pl-PL.md",
-        "PluginDemo/22-CSSourceMode/README.cs-CZ.md"
-      ]
-    },
-    {
-      "sessionId": "catpaw-20260528-004",
-      "actorId": "catpaw",
-      "startTime": "2026-05-28T16:30:00+08:00",
-      "endTime": "2026-05-28T17:30:00+08:00",
-      "status": "completed",
-      "selectedTask": "task-391",
-      "modifiedFiles": [
-        "src/SiliconLife.Core/Config/ConfigDataBase.cs",
-        "src/SiliconLife.App/Data/AppConfigData.cs",
-        "src/SiliconLife.Core/Runtime/CoreHostBuilder.cs",
-        "src/SiliconLife.Core/Runtime/CoreHost.cs",
-        "src/SiliconLife.Default/Program.cs",
-        "src/SiliconLife.Default/Config/DefaultConfigData.cs",
-        "src/SiliconLife.Fast/Program.cs",
-        "src/SiliconLife.Fast/Config/DefaultConfigData.cs",
-        "src/SiliconLife.App/Web/Controllers/ConfigController.cs",
         "src/SiliconLife.App/Web/Views/ConfigView.cs",
-        "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
-        "src/SiliconLife.Common/Localization/ZhCN.cs",
-        "src/SiliconLife.Common/Localization/EnUS.cs",
-        "src/SiliconLife.Common/Localization/ZhHK.cs",
-        "src/SiliconLife.Common/Localization/JaJP.cs",
-        "src/SiliconLife.Common/Localization/KoKR.cs",
-        "src/SiliconLife.Common/Localization/DeDE.cs",
-        "src/SiliconLife.Common/Localization/FrFR.cs",
-        "src/SiliconLife.Common/Localization/EsES.cs",
-        "src/SiliconLife.Common/Localization/ItIT.cs",
-        "src/SiliconLife.Common/Localization/PtPT.cs",
-        "src/SiliconLife.Common/Localization/PlPL.cs",
-        "src/SiliconLife.Common/Localization/RuRU.cs",
-        "src/SiliconLife.Common/Localization/CsCZ.cs",
-        ".ai-collab/tasks.json"
+        "src/SiliconLife.App/Web/Controllers/ConfigController.cs",
+        "src/SiliconLife.App/Web/Controllers/InitController.cs",
+        "src/SiliconLife.App/Web/Router.cs"
       ],
-      "changeRecord": "changes/catpaw-20260528-004.json"
-    },
-    {
-      "sessionId": "qoder-20260528-001",
-      "actorId": "qoder",
-      "startTime": "2026-05-28T00:00:00+08:00",
-      "endTime": "2026-05-28T00:30:00+08:00",
-      "status": "completed",
-      "selectedTask": "task-372",
-      "modifiedFiles": [
-        "PluginDemo/06-TrustedDependency/Plugin.cs",
-        "PluginDemo/06-TrustedDependency/README.md",
-        "PluginDemo/06-TrustedDependency/README.zh-CN.md",
-        "PluginDemo/06-TrustedDependency/README.zh-HK.md",
-        "PluginDemo/06-TrustedDependency/README.cs-CZ.md",
-        "PluginDemo/06-TrustedDependency/README.de-DE.md",
-        "PluginDemo/06-TrustedDependency/README.es-ES.md",
-        "PluginDemo/06-TrustedDependency/README.fr-FR.md",
-        "PluginDemo/06-TrustedDependency/README.it-IT.md",
-        "PluginDemo/06-TrustedDependency/README.ja-JP.md",
-        "PluginDemo/06-TrustedDependency/README.ko-KR.md",
-        "PluginDemo/06-TrustedDependency/README.pl-PL.md",
-        "PluginDemo/06-TrustedDependency/README.pt-PT.md",
-        "PluginDemo/06-TrustedDependency/README.ru-RU.md"
-      ],
-      "changeRecord": "changes/qoder-20260528-001.json"
-    },
-    {
-      "sessionId": "qoder-20260528-002",
-      "actorId": "qoder",
-      "startTime": "2026-05-28T00:35:00+08:00",
-      "endTime": "2026-05-28T00:45:00+08:00",
-      "status": "completed",
-      "selectedTask": "task-373",
-      "modifiedFiles": [
-        "PluginDemo/07-ForbiddenFileIO/Plugin.cs",
-        "PluginDemo/07-ForbiddenFileIO/README.md",
-        "PluginDemo/07-ForbiddenFileIO/README.zh-CN.md",
-        "PluginDemo/07-ForbiddenFileIO/README.zh-HK.md",
-        "PluginDemo/07-ForbiddenFileIO/README.ja-JP.md",
-        "PluginDemo/07-ForbiddenFileIO/README.ko-KR.md",
-        "PluginDemo/07-ForbiddenFileIO/README.de-DE.md",
-        "PluginDemo/07-ForbiddenFileIO/README.fr-FR.md",
-        "PluginDemo/07-ForbiddenFileIO/README.es-ES.md",
-        "PluginDemo/07-ForbiddenFileIO/README.it-IT.md",
-        "PluginDemo/07-ForbiddenFileIO/README.ru-RU.md",
-        "PluginDemo/07-ForbiddenFileIO/README.pt-PT.md",
-        "PluginDemo/07-ForbiddenFileIO/README.pl-PL.md",
-        "PluginDemo/07-ForbiddenFileIO/README.cs-CZ.md"
+      "changeRecord": "changes/catpaw-20260528-005.json"
+    }
+  ],
+  "index": {
+    "byActor": {
+      "catpaw": [
+        "catpaw-20260528-005"
       ]
     },
-    {
-      "sessionId": "qoder-20260528-003",
-      "actorId": "qoder",
-      "startTime": "2026-05-28T01:00:00+08:00",
-      "endTime": "2026-05-28T01:30:00+08:00",
-      "status": "completed",
-      "selectedTask": "task-375",
-      "modifiedFiles": [
-        "PluginDemo/09-ForbiddenProcess/Plugin.cs",
-        "PluginDemo/09-ForbiddenProcess/README.md",
-        "PluginDemo/09-ForbiddenProcess/README.zh-CN.md",
-        "PluginDemo/09-ForbiddenProcess/README.zh-HK.md",
-        "PluginDemo/09-ForbiddenProcess/README.ja-JP.md",
-        "PluginDemo/09-ForbiddenProcess/README.ko-KR.md",
-        "PluginDemo/09-ForbiddenProcess/README.de-DE.md",
-        "PluginDemo/09-ForbiddenProcess/README.fr-FR.md",
-        "PluginDemo/09-ForbiddenProcess/README.es-ES.md",
-        "PluginDemo/09-ForbiddenProcess/README.it-IT.md",
-        "PluginDemo/09-ForbiddenProcess/README.ru-RU.md",
-        "PluginDemo/09-ForbiddenProcess/README.pt-PT.md",
-        "PluginDemo/09-ForbiddenProcess/README.pl-PL.md",
-        "PluginDemo/09-ForbiddenProcess/README.cs-CZ.md"
-      ]
-    },
-    {
-      "sessionId": "qoder-20260528-004",
-      "actorId": "qoder",
-      "startTime": "2026-05-28T02:00:00+08:00",
-      "endTime": "2026-05-28T02:30:00+08:00",
-      "status": "completed",
-      "selectedTask": "task-377",
-      "modifiedFiles": [
-        "PluginDemo/11-ForbiddenPInvoke/Plugin.cs",
-        "PluginDemo/11-ForbiddenPInvoke/README.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.zh-CN.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.zh-HK.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.ja-JP.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.ko-KR.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.de-DE.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.fr-FR.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.es-ES.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.it-IT.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.ru-RU.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.pt-PT.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.pl-PL.md",
-        "PluginDemo/11-ForbiddenPInvoke/README.cs-CZ.md"
+    "byTask": {
+      "task-392": [
+        "catpaw-20260528-005"
       ]
     }
-  ]
+  }
 }
