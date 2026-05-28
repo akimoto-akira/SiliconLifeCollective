@@ -90,6 +90,7 @@ public class Router
         RegisterController(() => new ConfigController(), "/config");
         RegisterController(() => new ConfigController(), "/config/save", "POST");
         RegisterController(() => new ConfigController(), "/config/aioptions", "GET");
+        RegisterController(() => new ConfigController(), "/config/browse", "GET");
         RegisterController(() => new MemoryController(), "/memory");
         RegisterController(() => new MemoryController(), "/api/memory/list");
         RegisterController(() => new MemoryController(), "/api/memory/detail/{id}");

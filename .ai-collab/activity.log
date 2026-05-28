@@ -1026,3 +1026,9 @@
 2026-05-28T16:30:00+08:00 | catpaw | task_claim | task=task-391
 2026-05-28T17:30:00+08:00 | catpaw | task_complete | task=task-391 | summary=插件目录从单路径升级为多目录列表，涉及25个文件修改
 2026-05-28T17:30:00+08:00 | catpaw | session_end | sessionId=catpaw-20260528-004 | completed=task-391
+2026-05-28T18:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260528-005 | task=task-392
+2026-05-28T18:00:00+08:00 | catpaw | task_claim | task=task-392
+2026-05-28T18:30:00+08:00 | catpaw | task_complete | task=task-392 | summary=首次修复：添加后端API+前端URL修正（已撤回，交互设计有误）
+2026-05-28T19:54:00+08:00 | catpaw | task_reopen | task=task-392 | reason=弹窗点击子目录不导航不回填
+2026-05-28T21:00:00+08:00 | catpaw | task_complete | task=task-392 | summary=重写交互：data-path+事件委托替代onclick，增加确认/取消按钮，添加后端browse API
+2026-05-28T21:00:00+08:00 | catpaw | session_end | sessionId=catpaw-20260528-005 | completed=task-392

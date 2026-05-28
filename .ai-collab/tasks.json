@@ -1,12 +1,28 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-28T16:59:00+08:00",
-  "lastCommitHash": "48f6702",
-  "tasks": [],
+  "lastUpdated": "2026-05-28T20:00:00+08:00",
+  "lastCommitHash": null,
+  "tasks": [
+    {
+      "id": "task-392",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Views/ConfigView.cs",
+      "title": "修复 directoryList 编辑器中\"浏览\"按钮无反应的 bug",
+      "description": "task-391 引入的 directoryList 编辑器（插件目录多文件夹配置）中，每行的\"浏览\"按钮点击后没有反应。根因：1) 后端缺少 /config/browse API；2) 前端 onclick 事件中子目录项调用 selectDirListDirPath 直接回填但 currentDirListPathInput 未设置导致报错；3) 缺少确认/取消按钮。修复方式：重写前端交互逻辑为点击目录导航进入子目录，增加确认按钮回填路径、取消按钮关闭弹窗；添加 ConfigController.HandleBrowse 和 InitController.HandleBrowse 后端 API；注册 /config/browse 路由。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-28T18:00:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "relatedTask": "task-391",
+      "relatedCommit": null,
+      "completedAt": "2026-05-28T20:00:00+08:00"
+    }
+  ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": [],
+    "completed": ["task-392"],
     "cancelled": []
   },
   "metadata": {

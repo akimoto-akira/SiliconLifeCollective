@@ -449,8 +449,42 @@ public class ConfigView : ViewBase
                 .Property("border", "1px solid var(--border-color)")
                 .Property("border-radius", "4px")
                 .Property("background", "var(--bg-tertiary)")
-                .Property("max-height", "180px")
+                .Property("max-height", "240px")
                 .Property("overflow-y", "auto")
+            .EndSelector()
+            .Selector(".dir-list-footer")
+                .Property("display", "flex")
+                .Property("gap", "8px")
+                .Property("padding", "8px 12px")
+                .Property("border-top", "1px solid var(--border-color)")
+                .Property("justify-content", "flex-end")
+            .EndSelector()
+            .Selector(".btn-dir-list-confirm")
+                .Property("padding", "4px 12px")
+                .Property("background", "var(--accent-primary)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "4px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "12px")
+            .EndSelector()
+            .Selector(".btn-dir-list-confirm:hover")
+                .Property("opacity", "0.9")
+            .EndSelector()
+            .Selector(".btn-dir-list-cancel")
+                .Property("padding", "4px 12px")
+                .Property("background", "var(--bg-secondary)")
+                .Property("color", "var(--text-secondary)")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "12px")
+            .EndSelector()
+            .Selector(".dir-loading")
+                .Property("padding", "12px")
+                .Property("text-align", "center")
+                .Property("color", "var(--text-muted)")
+                .Property("font-size", "13px")
             .EndSelector();
     }
 
@@ -640,59 +674,95 @@ public class ConfigView : ViewBase
         getDirListJsonBlock.Add(() => Js.Return(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "dirs"))));
         js.Add(() => Js.Func(() => "getDirListJson", () => new List<string> { }, () => getDirListJsonBlock));
 
-        var browseDirListDirBlock = Js.Block()
-            .Add(() => Js.Const(() => "currentPath", () => Js.Id(() => "pathInput").Prop(() => "value").Op(() => "||", () => Js.Str(() => "/"))))
-            .Add(() => Js.Const(() => "url", () => Js.Str(() => "/init/browse?dir=").Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "currentPath")))));
-        var dirListEscapeHtml = Js.Id(() => "s")
+        // --- Directory list browser state ---
+        js.Add(() => Js.Let(() => "currentDirListPathInput", () => Js.Null()));
+        js.Add(() => Js.Let(() => "dirListCurrentPath", () => Js.Str(() => "/")));
+
+        // escapeHtml helper (reused)
+        var dlEscapeHtml = Js.Id(() => "s")
             .Call(() => "replace", () => Js.Regex(() => @"\&", () => "g"), () => Js.Str(() => "&amp;"))
             .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
             .Call(() => "replace", () => Js.Regex(() => "<", () => "g"), () => Js.Str(() => "&lt;"))
             .Call(() => "replace", () => Js.Regex(() => ">", () => "g"), () => Js.Str(() => "&gt;"));
-        browseDirListDirBlock.Add(() => Js.Const(() => "h", () => Js.Arrow(() => new List<string> { "s" }, () => dirListEscapeHtml)));
-        var dirListForEachBlock = Js.Block()
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "<div class=\"dir-item")).Call(() => "concat", () => Js.Ternary(() => Js.Id(() => "d").Prop(() => "isParent"), () => Js.Str(() => " dir-parent"), () => Js.Str(() => ""))).Call(() => "concat", () => Js.Str(() => "\" onclick=\"")).Call(() => "concat", () => Js.Ternary(() => Js.Id(() => "d").Prop(() => "isParent"), () => Js.Str(() => "browseDirListDirPath('"), () => Js.Str(() => "selectDirListDirPath('"))).Call(() => "concat", () => Js.Id(() => "d").Prop(() => "path")).Call(() => "concat", () => Js.Str(() => "')\">"))))
+
+        // navigateDirList(path) — fetch directory listing and render into popup
+        var navDirListForEachBlock = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "<div class=\"dir-item")).Call(() => "concat", () => Js.Ternary(() => Js.Id(() => "d").Prop(() => "isParent"), () => Js.Str(() => " dir-parent"), () => Js.Str(() => ""))).Call(() => "concat", () => Js.Str(() => "\" data-path=\"")).Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "d").Prop(() => "path"))).Call(() => "concat", () => Js.Str(() => "\">"))))
             .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "<span class=\"dir-icon\">")).Call(() => "concat", () => Js.Ternary(() => Js.Id(() => "d").Prop(() => "isParent"), () => Js.Str(() => "📁"), () => Js.Str(() => "📂"))).Call(() => "concat", () => Js.Str(() => "</span>"))))
             .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "d").Prop(() => "name"))).Call(() => "concat", () => Js.Str(() => "</div>"))));
-        var dirListInnerBlock = Js.Block()
+        var navDirListInnerBlock = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "dirListCurrentPath"), () => Js.Id(() => "data").Prop(() => "currentPath")))
+            .Add(() => Js.Const(() => "h", () => Js.Arrow(() => new List<string> { "s" }, () => dlEscapeHtml)))
             .Add(() => Js.Let(() => "html", () => Js.Str(() => "<div class=\"dir-header\"><span class=\"dir-current\">")))
             .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "data").Prop(() => "currentPath")))))
             .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</span></div><div class=\"dir-list\">"))))
-            .Add(() => Js.Id(() => "data").Prop(() => "directories").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "d" }, () => dirListForEachBlock)))
-            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</div>"))));
-        var dirListPopupHtml = Js.Str(() => "<div class=\"dir-list-popup\" id=\"dirListPopup\">").Op(() => "+", () => Js.Id(() => "html")).Op(() => "+", () => Js.Str(() => "</div>"));
-        dirListInnerBlock.Add(() => Js.Id(() => "pathInput").Prop(() => "parentElement").Call(() => "insertAdjacentHTML", () => Js.Str(() => "afterend"), () => dirListPopupHtml));
-        var dirListDataArrow = Js.Arrow(() => new List<string> { "data" }, () => dirListInnerBlock);
-        browseDirListDirBlock.Add(() => Js.Id(() => "fetch").Invoke(() => Js.Id(() => "url")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => dirListDataArrow));
+            .Add(() => Js.Id(() => "data").Prop(() => "directories").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "d" }, () => navDirListForEachBlock)))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</div>"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "<div class=\"dir-list-footer\"><button class=\"btn btn-sm btn-dir-list-confirm\">")).Call(() => "concat", () => Js.Str(() => loc.ConfigSaveButton)).Call(() => "concat", () => Js.Str(() => "</button><button class=\"btn btn-sm btn-dir-list-cancel\">")).Call(() => "concat", () => Js.Str(() => loc.ConfigCancelButton)).Call(() => "concat", () => Js.Str(() => "</button></div>"))))
+            .Add(() => Js.Id(() => "popup").Prop(() => "innerHTML").Assign(() => Js.Id(() => "html")));
+        var navDirListBlock = Js.Block()
+            .Add(() => Js.Const(() => "popup", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup"))));
+        navDirListBlock.Add(() => Js.Const(() => "url", () => Js.Str(() => "/config/browse?dir=").Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "path")))));
+        navDirListBlock.Add(() => Js.Id(() => "fetch").Invoke(() => Js.Id(() => "url")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => Js.Arrow(() => new List<string> { "data" }, () => navDirListInnerBlock)));
+        js.Add(() => Js.Func(() => "navigateDirList", () => new List<string> { "path" }, () => navDirListBlock));
+
+        // browseDirListDir(pathInput) — open popup and navigate to initial path
+        var browseDirListDirBlock = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "currentDirListPathInput"), () => Js.Id(() => "pathInput")))
+            .Add(() => Js.Const(() => "popup", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup"))));
+        browseDirListDirBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "popup"), new List<JsSyntax> { Js.Id(() => "popup").Prop(() => "remove").Invoke().Stmt() }) }
+        }));
+        browseDirListDirBlock.Add(() => Js.Id(() => "pathInput").Prop(() => "parentElement").Call(() => "insertAdjacentHTML", () => Js.Str(() => "afterend"), () => Js.Str(() => "<div class=\"dir-list-popup\" id=\"dirListPopup\"><div class=\"dir-loading\">...</div></div>")));
+        browseDirListDirBlock.Add(() => Js.Id(() => "navigateDirList").Invoke(() => Js.Id(() => "pathInput").Prop(() => "value").Op(() => "||", () => Js.Str(() => "/"))).Stmt());
+        // Attach click event delegation on the popup after it's created
+        browseDirListDirBlock.Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { "e" }, () => Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "e").Prop(() => "target").Call(() => "closest", () => Js.Str(() => ".dir-item")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "navigateDirList").Invoke(() => Js.Id(() => "e").Prop(() => "target").Call(() => "closest", () => Js.Str(() => ".dir-item")).Prop(() => "dataset").Prop(() => "path")).Stmt()
+                    })
+                },
+                { (Js.Id(() => "e").Prop(() => "target").Call(() => "closest", () => Js.Str(() => ".btn-dir-list-confirm")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "confirmDirListDir").Invoke().Stmt()
+                    })
+                },
+                { (Js.Id(() => "e").Prop(() => "target").Call(() => "closest", () => Js.Str(() => ".btn-dir-list-cancel")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "closeDirListPopup").Invoke().Stmt()
+                    })
+                }
+            })))));
         js.Add(() => Js.Func(() => "browseDirListDir", () => new List<string> { "pathInput" }, () => browseDirListDirBlock));
 
-        var selectDirListDirPathBlock = Js.Block()
+        // confirmDirListDir() — confirm selection: fill pathInput and close popup
+        var confirmDirListDirBlock = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "currentDirListPathInput"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "currentDirListPathInput").Prop(() => "value").Assign(() => Js.Id(() => "dirListCurrentPath")).Stmt()
+                    })
+                }
+            }))
             .Add(() => Js.Const(() => "popup", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (Js.Id(() => "popup"), new List<JsSyntax> { Js.Id(() => "popup").Prop(() => "remove").Invoke().Stmt() }) }
-            }))
-            .Add(() => Js.Id(() => "currentDirListPathInput").Prop(() => "value").Assign(() => Js.Id(() => "path")));
-        js.Add(() => Js.Func(() => "selectDirListDirPath", () => new List<string> { "path" }, () => selectDirListDirPathBlock));
+            }));
+        js.Add(() => Js.Func(() => "confirmDirListDir", () => new List<string> { }, () => confirmDirListDirBlock));
 
-        var browseDirListDirPathBlock = Js.Block()
+        // closeDirListPopup() — cancel: close popup without changing pathInput
+        var closeDirListPopupBlock = Js.Block()
             .Add(() => Js.Const(() => "popup", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (Js.Id(() => "popup"), new List<JsSyntax> { Js.Id(() => "popup").Prop(() => "remove").Invoke().Stmt() }) }
-            }))
-            .Add(() => Js.Id(() => "browseDirListDir").Invoke(() => Js.Id(() => "currentDirListPathInput")));
-        js.Add(() => Js.Func(() => "browseDirListDirPath", () => new List<string> { "path" }, () => browseDirListDirPathBlock));
-
-        js.Add(() => Js.Let(() => "currentDirListPathInput", () => Js.Null()));
-        var browseDirListDirWrapperBlock = Js.Block()
-            .Add(() => Js.Assign(() => Js.Id(() => "currentDirListPathInput"), () => Js.Id(() => "pathInput")))
-            .Add(() => Js.Const(() => "popup", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup"))))
-            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-            {
-                { (Js.Id(() => "popup"), new List<JsSyntax> { Js.Id(() => "popup").Prop(() => "remove").Invoke().Stmt() }) }
-            }))
-            .Add(() => Js.Id(() => "browseDirListDir").Invoke(() => Js.Id(() => "pathInput")));
-        js.Add(() => Js.Func(() => "browseDirListDirWrapper", () => new List<string>(), () => browseDirListDirWrapperBlock));
+            }));
+        js.Add(() => Js.Func(() => "closeDirListPopup", () => new List<string> { }, () => closeDirListPopupBlock));
 
         var parseTimespanBlock = Js.Block()
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueTimespanDays")).Prop(() => "value").Assign(() => Js.Str(() => "0")))

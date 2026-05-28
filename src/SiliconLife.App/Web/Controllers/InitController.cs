@@ -49,6 +49,10 @@ public class InitController : Controller
         {
             HandlePost();
         }
+        else if (Request.Url?.AbsolutePath == "/init/browse" || Request.Url?.AbsolutePath == "/init/browse/")
+        {
+            HandleBrowse();
+        }
         else if (Request.Url?.AbsolutePath == "/init/ai-config-metadata" || Request.Url?.AbsolutePath == "/init/ai-config-metadata/")
         {
             HandleGetAIConfigMetadata();
@@ -1440,5 +1444,73 @@ public class InitController : Controller
             .EndMedia()
             
             .Build();
+    }
+
+    private void HandleBrowse()
+    {
+        try
+        {
+            var dir = GetQueryValue("dir", "/");
+
+            if (string.IsNullOrEmpty(dir) || dir == "/")
+            {
+                var directories = new List<object>();
+                if (System.IO.Path.DirectorySeparatorChar == '\\')
+                {
+                    foreach (var drive in System.IO.DriveInfo.GetDrives())
+                    {
+                        if (drive.IsReady)
+                            directories.Add(new { name = $"{drive.Name} ({drive.DriveType})", path = drive.RootDirectory.FullName, isParent = false });
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        foreach (var d in System.IO.Directory.GetDirectories("/"))
+                        {
+                            var info = new System.IO.DirectoryInfo(d);
+                            directories.Add(new { name = info.Name, path = info.FullName, isParent = false });
+                        }
+                    }
+                    catch { }
+                }
+                RenderJson(new { currentPath = "/", directories });
+                return;
+            }
+
+            var dirInfo = new System.IO.DirectoryInfo(dir);
+            if (!dirInfo.Exists)
+            {
+                RenderJson(new { success = false, message = $"Directory not found: {dir}" });
+                return;
+            }
+
+            var dirs = new List<object>();
+            if (dirInfo.Parent != null)
+                dirs.Add(new { name = "..", path = dirInfo.Parent.FullName, isParent = true });
+            else if (System.IO.Path.DirectorySeparatorChar == '\\' && dir.Length > 3)
+            {
+                var root = System.IO.Path.GetPathRoot(dir);
+                if (root != null && root != dir)
+                    dirs.Add(new { name = "..", path = root, isParent = true });
+            }
+
+            try
+            {
+                foreach (var subDir in dirInfo.GetDirectories())
+                {
+                    try { dirs.Add(new { name = subDir.Name, path = subDir.FullName, isParent = false }); }
+                    catch (System.UnauthorizedAccessException) { }
+                }
+            }
+            catch (System.UnauthorizedAccessException) { }
+
+            RenderJson(new { currentPath = dir, directories = dirs });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, message = ex.Message });
+        }
     }
 }
