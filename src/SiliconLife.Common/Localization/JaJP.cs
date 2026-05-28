@@ -781,6 +781,9 @@ _ => permissionType.ToString()
     public override string ConfigDictValueLabel => "値：";
     public override string ConfigDictAddButton => "追加";
     public override string ConfigDictDeleteButton => "削除";
+
+    public override string ConfigPluginDirectoriesLabel => "プラグインディレクトリ";
+    public override string ConfigPluginDirAddButton => "ディレクトリ追加";
     public override string ConfigDictEmptyMessage => "辞書が空";
     public override string SelectSearchHint => "入力欄をクリアすると全オプションが表示されます";
 
@@ -906,7 +909,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "推論エンドポイントID",
         ["WebPort"] = "Webポート",
         ["WebSkin"] = "Webスキン",
-        ["UserNickname"] = "ユーザーニックネーム"
+        ["UserNickname"] = "ユーザーニックネーム",
+        ["PluginDirectories"] = "プラグインディレクトリ"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -927,7 +931,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "Volcengine Ark推論エンドポイントID",
         ["WebPort"] = "Webサーバーポート",
         ["WebSkin"] = "Webスキン名",
-        ["UserNickname"] = "人間ユーザーのニックネーム"
+        ["UserNickname"] = "人間ユーザーのニックネーム",
+        ["PluginDirectories"] = "プラグインの自動検出ディレクトリリスト、相対パスまたは絶対パスに対応"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

@@ -95,6 +95,14 @@ public abstract class ConfigDataBase
     public abstract Dictionary<string, object> AIConfig { get; set; }
 
     /// <summary>
+    /// Gets or sets the list of plugin directories for auto-discovery.
+    /// Each entry can be an absolute path or a relative path (relative to the application base directory).
+    /// If empty upon load, defaults to ["plugins"] (relative to the application base directory).
+    /// </summary>
+    [ConfigGroup("Basic", Order = 5, DisplayNameKey = "PluginDirectories", DescriptionKey = "PluginDirectories")]
+    public abstract List<string> PluginDirectories { get; set; }
+
+    /// <summary>
     /// Gets the configuration file path
     /// </summary>
     /// <returns>The full path to the configuration file</returns>

@@ -58,8 +58,8 @@ public class CoreHostBuilder
     /// <summary>Gets the stream cancellation manager attached to this builder.</summary>
     public StreamCancellationManager? StreamCancellationManager { get; private set; }
 
-    /// <summary>Gets the plugin directory path, or <c>null</c> if not configured.</summary>
-    public string? PluginDirectory { get; private set; }
+    /// <summary>Gets the list of plugin directory paths for auto-discovery.</summary>
+    public List<string> PluginDirectories { get; private set; } = new();
 
     /// <summary>Sets the configuration data.</summary>
     public CoreHostBuilder SetConfig(ConfigDataBase config)
@@ -157,11 +157,11 @@ public class CoreHostBuilder
         return this;
     }
 
-    /// <summary>Sets the plugin directory path for auto-discovery.</summary>
-    public CoreHostBuilder SetPluginDirectory(string path)
+    /// <summary>Sets the plugin directory paths for auto-discovery.</summary>
+    public CoreHostBuilder SetPluginDirectories(List<string> paths)
     {
-        PluginDirectory = path;
-        _logger.Debug(null, "Set PluginDirectory: {0}", path);
+        PluginDirectories = paths;
+        _logger.Debug(null, "Set PluginDirectories: {0}", string.Join(", ", paths));
         return this;
     }
 
@@ -183,7 +183,7 @@ public class CoreHostBuilder
         if (DynamicBeingLoader != null) componentCount++;
         if (TokenUsageAuditManager != null) componentCount++;
         if (StreamCancellationManager != null) componentCount++;
-        if (PluginDirectory != null) componentCount++;
+        if (PluginDirectories.Count > 0) componentCount++;
 
         _logger.Info(null, "Building CoreHost with {0} components", componentCount);
         return new CoreHost(this);

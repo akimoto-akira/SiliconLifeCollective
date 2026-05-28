@@ -946,6 +946,9 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
     public override string ConfigEditPropertyLabel => "Vlastnost";
     public override string ConfigDictAddButton => "Přidat";
     public override string ConfigDictDeleteButton => "Smazat";
+
+    public override string ConfigPluginDirectoriesLabel => "Adresáře zásuvných modulů";
+    public override string ConfigPluginDirAddButton => "Přidat adresář";
     public override string ConfigDictEmptyMessage => "Žádné položky";
     public override string SelectSearchHint => "Vymažte pole pro zobrazení všech možností";
     public override string ConfigNullValue => "Null";

@@ -25,7 +25,7 @@ public class CoreHost
     private readonly CoreHostBuilder _builder;
     private CancellationTokenSource _shutdownCts = new();
     private Task? _imManagerTask;
-    private PluginLoader? _pluginLoader;
+    private readonly List<PluginLoader> _pluginLoaders = new();
 
     /// <summary>
     /// Initializes a new <see cref="CoreHost"/> from the given builder configuration.
@@ -131,12 +131,22 @@ public class CoreHost
             _logger.Debug(null, "Service already registered: {0}", nameof(IObjectFactory));
         }
 
-        if (_builder.PluginDirectory != null)
+        if (_builder.PluginDirectories.Count > 0)
         {
-            _pluginLoader = new PluginLoader(_builder.PluginDirectory);
-            _pluginLoader.LoadAll();
-            ServiceLocator.Instance.Register(_pluginLoader);
-            _logger.Debug(null, "Registered service: {0}", nameof(PluginLoader));
+            foreach (var pluginDir in _builder.PluginDirectories)
+            {
+                var loader = new PluginLoader(pluginDir);
+                loader.LoadAll();
+                if (loader.Plugins.Count > 0)
+                {
+                    _pluginLoaders.Add(loader);
+                }
+            }
+            if (_pluginLoaders.Count > 0)
+            {
+                ServiceLocator.Instance.Register(_pluginLoaders[0]);
+                _logger.Debug(null, "Registered service: {0}", nameof(PluginLoader));
+            }
         }
 
         MainLoop.SetConfig(_builder.Config!);
@@ -146,7 +156,8 @@ public class CoreHost
         MainLoop.Register(MemoryFadeService.Instance);
         _logger.Info(null, "MemoryFadeService registered to MainLoop");
 
-        _pluginLoader?.NotifyAllStarted();
+        foreach (var loader in _pluginLoaders)
+            loader.NotifyAllStarted();
 
         if (_builder.IMManager != null)
         {
@@ -169,7 +180,8 @@ public class CoreHost
 
         _shutdownCts.Cancel();
 
-        _pluginLoader?.NotifyAllStopping();
+        foreach (var loader in _pluginLoaders)
+            loader.NotifyAllStopping();
 
         MainLoop.Stop();
         _logger.Debug(null, "Stopped: MainLoop");
@@ -183,8 +195,9 @@ public class CoreHost
         ServiceLocator.Instance.Clear();
         _logger.Debug(null, "Stopped: ServiceLocator");
 
-        _pluginLoader?.UnloadAll();
-        _pluginLoader = null;
+        foreach (var loader in _pluginLoaders)
+            loader.UnloadAll();
+        _pluginLoaders.Clear();
 
         _logger.Info(null, "CoreHost stopped");
     }

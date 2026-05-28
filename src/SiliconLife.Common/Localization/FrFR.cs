@@ -750,6 +750,9 @@ _ => permissionType.ToString()
     public override string ConfigDictValueLabel => "Valeur : ";
     public override string ConfigDictAddButton => "Ajouter";
     public override string ConfigDictDeleteButton => "Supprimer";
+
+    public override string ConfigPluginDirectoriesLabel => "Répertoires de plugins";
+    public override string ConfigPluginDirAddButton => "Ajouter un répertoire";
     public override string ConfigDictEmptyMessage => "Le dictionnaire est vide";
     public override string SelectSearchHint => "Effacez la saisie pour afficher toutes les options";
 
@@ -1020,7 +1023,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "ID du point de terminaison d'inférence",
         ["WebPort"] = "Port Web",
         ["WebSkin"] = "Thème Web",
-        ["UserNickname"] = "Nom d'utilisateur"
+        ["UserNickname"] = "Nom d'utilisateur",
+        ["PluginDirectories"] = "Répertoires de plugins"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1041,7 +1045,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "ID du point de terminaison d'inférence Volcengine Ark",
         ["WebPort"] = "Port du serveur Web",
         ["WebSkin"] = "Nom du thème Web",
-        ["UserNickname"] = "Pseudonyme de l'utilisateur humain"
+        ["UserNickname"] = "Pseudonyme de l'utilisateur humain",
+        ["PluginDirectories"] = "Liste des répertoires de plugins pour la découverte automatique, prend en charge les chemins relatifs ou absolus"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

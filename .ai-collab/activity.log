@@ -1022,3 +1022,7 @@
 2026-05-28T16:00:00+08:00 | catpaw | task_claim | task=task-390
 2026-05-28T16:30:00+08:00 | catpaw | task_complete | task=task-390
 2026-05-28T16:30:00+08:00 | catpaw | session_end | sessionId=catpaw-20260528-003
+2026-05-28T16:30:00+08:00 | catpaw | session_start | sessionId=catpaw-20260528-004 | task=task-391
+2026-05-28T16:30:00+08:00 | catpaw | task_claim | task=task-391
+2026-05-28T17:30:00+08:00 | catpaw | task_complete | task=task-391 | summary=插件目录从单路径升级为多目录列表，涉及25个文件修改
+2026-05-28T17:30:00+08:00 | catpaw | session_end | sessionId=catpaw-20260528-004 | completed=task-391

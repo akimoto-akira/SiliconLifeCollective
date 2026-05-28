@@ -781,6 +781,9 @@ _ => permissionType.ToString()
     public override string ConfigDictValueLabel => "值：";
     public override string ConfigDictAddButton => "添加";
     public override string ConfigDictDeleteButton => "删除";
+
+    public override string ConfigPluginDirectoriesLabel => "插件目录";
+    public override string ConfigPluginDirAddButton => "添加目录";
     public override string ConfigDictEmptyMessage => "字典为空";
     public override string SelectSearchHint => "若想显示全部菜单内容，请清空输入框";
 
@@ -906,7 +909,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "推理接入点 ID",
         ["WebPort"] = "Web 端口",
         ["WebSkin"] = "Web 皮肤",
-        ["UserNickname"] = "用户昵称"
+        ["UserNickname"] = "用户昵称",
+        ["PluginDirectories"] = "插件目录"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -927,7 +931,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "火山方舟引擎推理接入点 ID",
         ["WebPort"] = "Web 服务器端口",
         ["WebSkin"] = "Web 皮肤名称",
-        ["UserNickname"] = "人类用户的昵称"
+        ["UserNickname"] = "人类用户的昵称",
+        ["PluginDirectories"] = "插件加载目录列表，支持相对路径（基于程序目录）或绝对路径"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

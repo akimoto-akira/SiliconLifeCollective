@@ -966,6 +966,9 @@ public class PlPL : DefaultLocalizationBase
     public override string ConfigErrorUnsupportedType => "Nieobsługiwany typ";
     public override string ConfigDictAddButton => "Dodaj";
     public override string ConfigDictDeleteButton => "Usuń";
+
+    public override string ConfigPluginDirectoriesLabel => "Katalogi wtyczek";
+    public override string ConfigPluginDirAddButton => "Dodaj katalog";
     public override string ConfigDictEmptyMessage => "Słownik jest pusty";
     public override string SelectSearchHint => "Wyczyść pole, aby wyświetlić wszystkie opcje";
 

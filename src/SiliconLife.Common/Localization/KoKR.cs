@@ -781,6 +781,9 @@ _ => permissionType.ToString()
     public override string ConfigDictValueLabel => "값:";
     public override string ConfigDictAddButton => "추가";
     public override string ConfigDictDeleteButton => "삭제";
+
+    public override string ConfigPluginDirectoriesLabel => "플러그인 디렉터리";
+    public override string ConfigPluginDirAddButton => "디렉터리 추가";
     public override string ConfigDictEmptyMessage => "사전이 비어 있습니다";
     public override string SelectSearchHint => "입력란을 비우면 모든 옵션이 표시됩니다";
 
@@ -906,7 +909,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "추론 엔드포인트 ID",
         ["WebPort"] = "Web 포트",
         ["WebSkin"] = "Web 스킨",
-        ["UserNickname"] = "사용자 닉네임"
+        ["UserNickname"] = "사용자 닉네임",
+        ["PluginDirectories"] = "플러그인 디렉터리"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -927,7 +931,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "Volcengine Ark 추론 엔드포인트 ID",
         ["WebPort"] = "Web 서버 포트",
         ["WebSkin"] = "Web 스킨 이름",
-        ["UserNickname"] = "사용자 닉네임"
+        ["UserNickname"] = "사용자 닉네임",
+        ["PluginDirectories"] = "플러그인 자동 감지 디렉터리 목록, 상대 경로 또는 절대 경로 지원"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

@@ -41,7 +41,7 @@ public class Program
     private static CoreHost? _host;
     private static WebHost? _webHost;
     private static TrayStatusWindow? _trayWindow;
-    private static PluginLoader? _pluginLoader;
+    private static List<PluginLoader> _pluginLoaders = new();
 
     static Program()
     {
@@ -85,13 +85,34 @@ public class Program
         ServiceLocator.Instance.Register<IObjectFactory>(new ObjectFactory());
         _logger.Info(null, "Registered: TypeRegistry, ObjectFactory");
 
-        // Load plugins after SpeedyPack and logging are initialized
-        string pluginDir = Path.Combine(AppContext.BaseDirectory, "plugins");
-        _pluginLoader = new PluginLoader(pluginDir);
-        _pluginLoader.LoadAll();
-        ServiceLocator.Instance.Register(_pluginLoader);
+        // Resolve plugin directories: if empty, default to ["plugins"] relative to base directory
+        if (configData.PluginDirectories.Count == 0)
+        {
+            configData.PluginDirectories = new List<string> { "plugins" };
+        }
+        // Resolve relative paths to absolute paths based on application base directory
+        for (int i = 0; i < configData.PluginDirectories.Count; i++)
+        {
+            string dir = configData.PluginDirectories[i];
+            if (!Path.IsPathRooted(dir))
+            {
+                configData.PluginDirectories[i] = Path.Combine(AppContext.BaseDirectory, dir);
+            }
+        }
+
+        // Load plugins from all configured directories
+        foreach (string pluginDir in configData.PluginDirectories)
+        {
+            var loader = new PluginLoader(pluginDir);
+            loader.LoadAll();
+            _pluginLoaders.Add(loader);
+            _logger.Info(null, "Plugins loaded from {0}", pluginDir);
+        }
+        if (_pluginLoaders.Count > 0)
+        {
+            ServiceLocator.Instance.Register(_pluginLoaders[0]);
+        }
         ServiceLocator.Instance.RegisterToolAssembly(typeof(SiliconLife.App.Web.Router).Assembly);
-        _logger.Info(null, "Plugins loaded from {0}", pluginDir);
 
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
         configData.AIConfig.TryGetValue("model", out var modelValue);
@@ -208,7 +229,8 @@ public class Program
         _logger.Info(null, "CoreHost started");
 
         // Notify all plugins that the host is fully started
-        _pluginLoader?.NotifyAllStarted();
+        foreach (var loader in _pluginLoaders)
+            loader.NotifyAllStarted();
 
         // Only create curator if it was previously initialized (CuratorGuid is set)
         if (configData.CuratorGuid != Guid.Empty)
@@ -320,8 +342,11 @@ public class Program
         }
 
         // Unload all plugins before disposing core resources
-        _pluginLoader?.NotifyAllStopping();
-        _pluginLoader?.UnloadAll();
+        foreach (var loader in _pluginLoaders)
+        {
+            loader.NotifyAllStopping();
+            loader.UnloadAll();
+        }
         _logger.Info(null, "Plugins unloaded");
 
         // Flush and close the single SpeedyPack file handle

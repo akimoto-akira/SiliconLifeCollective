@@ -53,6 +53,7 @@ public class DefaultConfigData : AppConfigData
             AIConfig = loaded.AIConfig ?? new Dictionary<string, object>();
             WebPort = loaded.WebPort;
             WebSkin = loaded.WebSkin;
+            PluginDirectories = loaded.PluginDirectories ?? new List<string>();
             UserNickname = loaded.UserNickname;
         }
         catch (Exception)

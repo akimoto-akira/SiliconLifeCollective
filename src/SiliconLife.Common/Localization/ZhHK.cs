@@ -636,6 +636,9 @@ _ => permissionType.ToString()
     public override string ConfigDictValueLabel => "值：";
     public override string ConfigDictAddButton => "添加";
     public override string ConfigDictDeleteButton => "刪除";
+
+    public override string ConfigPluginDirectoriesLabel => "插件目錄";
+    public override string ConfigPluginDirAddButton => "新增目錄";
     public override string ConfigDictEmptyMessage => "字典為空";
     public override string SelectSearchHint => "若想顯示全部選單內容，請清空輸入框";
 
@@ -763,7 +766,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "推理接入點 ID",
         ["WebPort"] = "Web 連接埠",
         ["WebSkin"] = "Web 主題",
-        ["UserNickname"] = "用戶暱稱"
+        ["UserNickname"] = "用戶暱稱",
+        ["PluginDirectories"] = "插件目錄"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -784,7 +788,8 @@ _ => permissionType.ToString()
         ["VolcengineArkEndpointId"] = "火山方舟引擎推理接入點 ID",
         ["WebPort"] = "Web 伺服器連接埠",
         ["WebSkin"] = "Web 主題名稱",
-        ["UserNickname"] = "人類用戶的暱稱"
+        ["UserNickname"] = "人類用戶的暱稱",
+        ["PluginDirectories"] = "插件載入目錄清單，支持相對路徑（基於程式目錄）或絕對路徑"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

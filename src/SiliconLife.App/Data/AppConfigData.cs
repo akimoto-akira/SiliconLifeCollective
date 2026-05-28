@@ -62,6 +62,9 @@ public abstract class AppConfigData : ConfigDataBase
     [ConfigGroup("Web", Order = 4, DisplayNameKey = "WebSkin", DescriptionKey = "WebSkin")]
     public string WebSkin { get; set; } = null!;
 
+    [ConfigGroup("Basic", Order = 5, DisplayNameKey = "PluginDirectories", DescriptionKey = "PluginDirectories")]
+    public override List<string> PluginDirectories { get; set; } = new List<string>();
+
     [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]
     public override string UserNickname { get; set; } = "User";
 

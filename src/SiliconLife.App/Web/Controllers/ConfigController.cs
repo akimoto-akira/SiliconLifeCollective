@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -182,6 +182,25 @@ public class ConfigController : Controller
             {
                 value = new System.IO.DirectoryInfo(data.value);
             }
+            else if (propType == typeof(List<string>))
+            {
+                // Handle List<string> type - value should be JSON array string
+                try
+                {
+                    var list = System.Text.Json.JsonSerializer.Deserialize<List<string>>(data.value);
+                    if (list == null)
+                    {
+                        RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });
+                        return;
+                    }
+                    value = list;
+                }
+                catch (Exception ex)
+                {
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorSaveFailed, $"JSON parse error: {ex.Message}") });
+                    return;
+                }
+            }
             else if (propType.IsEnum)
             {
                 if (Enum.TryParse(propType, data.value, out var enumVal))
@@ -323,6 +342,10 @@ public class ConfigController : Controller
                 {
                     displayValue = System.Text.Json.JsonSerializer.Serialize(dict);
                 }
+            }
+            else if (value is System.Collections.IList list)
+            {
+                displayValue = System.Text.Json.JsonSerializer.Serialize(list);
             }
             else
             {
@@ -583,6 +606,7 @@ public class ConfigController : Controller
         if (type == typeof(TimeSpan)) return "timespan";
         if (type == typeof(DateTime)) return "datetime";
         if (type == typeof(System.IO.DirectoryInfo)) return "directory";
+        if (type == typeof(List<string>)) return "directoryList";
         if (type.IsEnum) return "enum";
         
         // Check for Dictionary type (any generic parameters)

@@ -781,6 +781,9 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string ConfigDictValueLabel => "Valor: ";
     public override string ConfigDictAddButton => "Agregar";
     public override string ConfigDictDeleteButton => "Eliminar";
+
+    public override string ConfigPluginDirectoriesLabel => "Directorios de plugins";
+    public override string ConfigPluginDirAddButton => "Añadir directorio";
     public override string ConfigDictEmptyMessage => "El diccionario está vacío";
     public override string SelectSearchHint => "Borre el campo para mostrar todas las opciones";
 
@@ -906,7 +909,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["VolcengineArkEndpointId"] = "ID de endpoint de inferencia",
         ["WebPort"] = "Puerto web",
         ["WebSkin"] = "Tema web",
-        ["UserNickname"] = "Apodo del usuario"
+        ["UserNickname"] = "Apodo del usuario",
+        ["PluginDirectories"] = "Directorios de plugins"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -927,7 +931,8 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
         ["VolcengineArkEndpointId"] = "ID de endpoint de inferencia de Volcengine Ark",
         ["WebPort"] = "Puerto del servidor web",
         ["WebSkin"] = "Nombre del tema web",
-        ["UserNickname"] = "Apodo del usuario humano"
+        ["UserNickname"] = "Apodo del usuario humano",
+        ["PluginDirectories"] = "Lista de directorios de plugins para descubrimiento automático, admite rutas relativas o absolutas"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

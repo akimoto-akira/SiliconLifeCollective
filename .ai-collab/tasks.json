@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-28T16:30:00+08:00",
+  "lastUpdated": "2026-05-28T17:30:00+08:00",
   "lastCommitHash": "48f6702",
   "tasks": [
     {
@@ -398,7 +398,21 @@
       "createdAt": "2026-05-28T14:38:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "catpaw",
+      "relatedCommit": "e6d3037",
       "completedAt": "2026-05-28T16:30:00+08:00"
+    },
+    {
+      "id": "task-391",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/Config/ConfigDataBase.cs",
+      "title": "插件目录配置从单一路径升级为多目录列表",
+      "description": "将插件目录配置从单一字符串路径升级为支持多个目录的列表，并使其可配置。具体修改：1) ConfigDataBase 增加 List<string> PluginDirectories 抽象属性；2) AppConfigData 实现 PluginDirectories 属性；3) CoreHostBuilder 将 PluginDirectory 改为 PluginDirectories (List<string>)；4) CoreHost 使用 List<PluginLoader> 支持多目录加载；5) SiliconLife.Default 和 SiliconLife.Fast 的 Program.cs 支持多目录插件加载（空时默认 [\"plugins\"]）；6) DefaultConfigData 加载 PluginDirectories；7) ConfigController 支持 List<string> 类型的序列化/反序列化，类型名映射为 directoryList；8) ConfigView 添加 directoryList 编辑器（多文件夹选择）；9) 所有13个语言文件添加 PluginDirectories 本地化字符串。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-28T16:30:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-28T17:30:00+08:00"
     }
   ],
   "taskIndex": {
@@ -433,7 +447,8 @@
       "task-386",
       "task-387",
       "task-388",
-      "task-390"
+      "task-390",
+      "task-391"
     ],
     "cancelled": []
   },

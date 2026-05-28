@@ -1,0 +1,133 @@
+{
+  "sessionId": "catpaw-20260528-004",
+  "actorId": "catpaw",
+  "taskId": "task-391",
+  "timestamp": "2026-05-28T17:30:00+08:00",
+  "changes": [
+    {
+      "file": "src/SiliconLife.Core/Config/ConfigDataBase.cs",
+      "action": "modify",
+      "description": "添加 List<string> PluginDirectories 抽象属性，带 ConfigGroup 属性"
+    },
+    {
+      "file": "src/SiliconLife.App/Data/AppConfigData.cs",
+      "action": "modify",
+      "description": "实现 PluginDirectories 属性，初始化为空列表"
+    },
+    {
+      "file": "src/SiliconLife.Core/Runtime/CoreHostBuilder.cs",
+      "action": "modify",
+      "description": "PluginDirectory 单字符串改为 PluginDirectories (List<string>)，SetPluginDirectory 改为 SetPluginDirectories"
+    },
+    {
+      "file": "src/SiliconLife.Core/Runtime/CoreHost.cs",
+      "action": "modify",
+      "description": "_pluginLoader 改为 _pluginLoaders 列表，遍历多目录创建 PluginLoader，第一个注册到 ServiceLocator"
+    },
+    {
+      "file": "src/SiliconLife.Default/Program.cs",
+      "action": "modify",
+      "description": "使用 _pluginLoaders 列表，空时默认 [plugins]，相对路径转绝对路径，多目录加载"
+    },
+    {
+      "file": "src/SiliconLife.Default/Config/DefaultConfigData.cs",
+      "action": "modify",
+      "description": "加载 PluginDirectories 属性，空时初始化为空列表"
+    },
+    {
+      "file": "src/SiliconLife.Fast/Program.cs",
+      "action": "modify",
+      "description": "使用 _pluginLoaders 列表，空时默认 [plugins]，相对路径转绝对路径，多目录加载"
+    },
+    {
+      "file": "src/SiliconLife.Fast/Config/DefaultConfigData.cs",
+      "action": "modify",
+      "description": "加载 PluginDirectories 属性，空时初始化为空列表"
+    },
+    {
+      "file": "src/SiliconLife.App/Web/Controllers/ConfigController.cs",
+      "action": "modify",
+      "description": "Save 方法支持 List<string> JSON 反序列化，GetSimpleTypeName 映射 directoryList，GetConfigGroups 序列化目录列表"
+    },
+    {
+      "file": "src/SiliconLife.App/Web/Views/ConfigView.cs",
+      "action": "modify",
+      "description": "添加 directoryList 编辑器：多文件夹选择 UI、JS 函数（initDirListEditor/addDirListRow/getDirListJson/browseDirListDir 等）、CSS 样式"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/DefaultLocalizationBase.cs",
+      "action": "modify",
+      "description": "添加 ConfigPluginDirectoriesLabel 和 ConfigPluginDirAddButton 抽象属性"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/ZhCN.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/EnUS.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/ZhHK.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/JaJP.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/KoKR.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/DeDE.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/FrFR.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/EsES.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/ItIT.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/PtPT.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton，添加 ConfigDisplayNames/ConfigDescriptions 的 PluginDirectories 条目"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/PlPL.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton 属性"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/RuRU.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton 属性"
+    },
+    {
+      "file": "src/SiliconLife.Common/Localization/CsCZ.cs",
+      "action": "modify",
+      "description": "实现 ConfigPluginDirectoriesLabel/ConfigPluginDirAddButton 属性"
+    },
+    {
+      "file": ".ai-collab/tasks.json",
+      "action": "modify",
+      "description": "添加 task-391 任务记录"
+    }
+  ]
+}

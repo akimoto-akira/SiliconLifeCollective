@@ -2107,6 +2107,16 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string ConfigDictDeleteButton { get; }
 
     /// <summary>
+    /// Gets the label for plugin directories editor
+    /// </summary>
+    public abstract string ConfigPluginDirectoriesLabel { get; }
+
+    /// <summary>
+    /// Gets the text for add directory button in plugin directories editor
+    /// </summary>
+    public abstract string ConfigPluginDirAddButton { get; }
+
+    /// <summary>
     /// Gets the message when dictionary is empty
     /// </summary>
     public abstract string ConfigDictEmptyMessage { get; }

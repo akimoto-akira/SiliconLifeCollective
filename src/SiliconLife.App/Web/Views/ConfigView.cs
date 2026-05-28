@@ -152,6 +152,13 @@ public class ConfigView : ViewBase
                             ).Class("dict-actions")
                         ).Class("form-group").Id("inputDictionary").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
+                            H.Label(loc.ConfigPluginDirectoriesLabel),
+                            H.Div().Id("dirListEditorContainer").Class("dir-list-editor"),
+                            H.Div(
+                                H.Button(loc.ConfigPluginDirAddButton).Class("btn btn-add").Id("btnAddDirListRow")
+                            ).Class("dir-list-actions")
+                        ).Class("form-group").Id("inputDirectoryList").Style(new CssBuilder().InlineProperty("display", "none")),
+                        H.Div(
                             H.Button(loc.ConfigSaveButton).Class("btn btn-primary").Id("btnSave"),
                             H.Button(loc.ConfigCancelButton).Class("btn btn-secondary").Id("btnCancel")
                         ).Class("form-actions")
@@ -401,6 +408,49 @@ public class ConfigView : ViewBase
             .EndSelector()
             .Selector(".dict-actions .btn-add:hover")
                 .Property("opacity", "0.9")
+            .EndSelector()
+            .Selector(".dir-list-editor")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("padding", "12px")
+                .Property("background", "var(--bg-primary)")
+                .Property("max-height", "250px")
+                .Property("overflow-y", "auto")
+            .EndSelector()
+            .Selector(".dir-list-row")
+                .Property("display", "flex")
+                .Property("gap", "8px")
+                .Property("align-items", "center")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector(".dir-list-path")
+                .Property("flex", "1")
+                .Property("padding", "6px 10px")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("background", "var(--bg-tertiary)")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".btn-dir-list-browse")
+                .Property("padding", "6px 12px")
+                .Property("background", "var(--bg-tertiary)")
+                .Property("color", "var(--text-primary)")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("cursor", "pointer")
+            .EndSelector()
+            .Selector(".dir-list-actions")
+                .Property("margin-top", "8px")
+                .Property("display", "flex")
+                .Property("justify-content", "flex-end")
+            .EndSelector()
+            .Selector(".dir-list-popup")
+                .Property("margin-top", "4px")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("background", "var(--bg-tertiary)")
+                .Property("max-height", "180px")
+                .Property("overflow-y", "auto")
             .EndSelector();
     }
 
@@ -419,7 +469,8 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDatetime")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputTimespan")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputEnum")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDictionary")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")));
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDictionary")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDirectoryList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")));
         js.Add(() => Js.Func(() => "hideAllInputs", () => new List<string> { }, () => hideAllInputsBlock));
 
         // Dictionary editor functions
@@ -538,6 +589,110 @@ public class ConfigView : ViewBase
         getDictJsonBlock.Add(() => Js.Return(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "dict"))));
         
         js.Add(() => Js.Func(() => "getDictJson", () => new List<string> { }, () => getDictJsonBlock));
+
+        // Directory list editor functions (for PluginDirectories)
+        var initDirListEditorBlock = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListEditorContainer")).Prop(() => "innerHTML").Assign(() => Js.Str(() => "")))
+            .Add(() => Js.Let(() => "dirs", () => Js.Ternary(() => Js.Id(() => "jsonStr"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "jsonStr")), () => Js.Array())));
+        var initDirListForEachBlock = Js.Block()
+            .Add(() => Js.Id(() => "addDirListRow").Invoke(() => Js.Id(() => "d")));
+        initDirListEditorBlock.Add(() => Js.Id(() => "dirs").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "d" }, () => initDirListForEachBlock)));
+        js.Add(() => Js.Func(() => "initDirListEditor", () => new List<string> { "jsonStr" }, () => initDirListEditorBlock));
+
+        var addDirListRowBlock = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListEditorContainer"))))
+            .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))));
+        addDirListRowBlock.Add(() => Js.Id(() => "row").Prop(() => "className").Assign(() => Js.Str(() => "dir-list-row")));
+        addDirListRowBlock.Add(() => Js.Const(() => "pathInput", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
+            .Add(() => Js.Id(() => "pathInput").Prop(() => "type").Assign(() => Js.Str(() => "text")))
+            .Add(() => Js.Id(() => "pathInput").Prop(() => "value").Assign(() => Js.Id(() => "path")))
+            .Add(() => Js.Id(() => "pathInput").Prop(() => "readonly").Assign(() => Js.Str(() => "true")))
+            .Add(() => Js.Id(() => "pathInput").Prop(() => "className").Assign(() => Js.Str(() => "dir-list-path")));
+        addDirListRowBlock.Add(() => Js.Const(() => "browseBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
+            .Add(() => Js.Id(() => "browseBtn").Prop(() => "textContent").Assign(() => Js.Str(() => loc.ConfigBrowseButton)))
+            .Add(() => Js.Id(() => "browseBtn").Prop(() => "className").Assign(() => Js.Str(() => "btn btn-sm btn-dir-list-browse")))
+            .Add(() => Js.Id(() => "browseBtn").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "browseDirListDir").Invoke(() => Js.Id(() => "pathInput")).Stmt())));
+        addDirListRowBlock.Add(() => Js.Const(() => "deleteBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "textContent").Assign(() => Js.Str(() => loc.ConfigDictDeleteButton)))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "className").Assign(() => Js.Str(() => "btn-delete")))
+            .Add(() => Js.Id(() => "deleteBtn").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "row").Prop(() => "remove").Invoke().Stmt())));
+        addDirListRowBlock.Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "pathInput")))
+            .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "browseBtn")))
+            .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "deleteBtn")))
+            .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "row")));
+        js.Add(() => Js.Func(() => "addDirListRow", () => new List<string> { "path" }, () => addDirListRowBlock));
+
+        var getDirListJsonBlock = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListEditorContainer"))))
+            .Add(() => Js.Const(() => "rows", () => Js.Id(() => "container").Call(() => "querySelectorAll", () => Js.Str(() => ".dir-list-row"))))
+            .Add(() => Js.Const(() => "dirs", () => Js.Array()));
+        var processDirListRowBlock = Js.Block()
+            .Add(() => Js.Const(() => "input", () => Js.Id(() => "row").Call(() => "querySelector", () => Js.Str(() => ".dir-list-path"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "input").Prop(() => "value"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "dirs").Call(() => "push", () => Js.Id(() => "input").Prop(() => "value"))
+                    })
+                }
+            }));
+        getDirListJsonBlock.Add(() => Js.Id(() => "rows").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "row" }, () => processDirListRowBlock)));
+        getDirListJsonBlock.Add(() => Js.Return(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "dirs"))));
+        js.Add(() => Js.Func(() => "getDirListJson", () => new List<string> { }, () => getDirListJsonBlock));
+
+        var browseDirListDirBlock = Js.Block()
+            .Add(() => Js.Const(() => "currentPath", () => Js.Id(() => "pathInput").Prop(() => "value").Op(() => "||", () => Js.Str(() => "/"))))
+            .Add(() => Js.Const(() => "url", () => Js.Str(() => "/init/browse?dir=").Op(() => "+", () => (JsSyntax)Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "currentPath")))));
+        var dirListEscapeHtml = Js.Id(() => "s")
+            .Call(() => "replace", () => Js.Regex(() => @"\&", () => "g"), () => Js.Str(() => "&amp;"))
+            .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
+            .Call(() => "replace", () => Js.Regex(() => "<", () => "g"), () => Js.Str(() => "&lt;"))
+            .Call(() => "replace", () => Js.Regex(() => ">", () => "g"), () => Js.Str(() => "&gt;"));
+        browseDirListDirBlock.Add(() => Js.Const(() => "h", () => Js.Arrow(() => new List<string> { "s" }, () => dirListEscapeHtml)));
+        var dirListForEachBlock = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "<div class=\"dir-item")).Call(() => "concat", () => Js.Ternary(() => Js.Id(() => "d").Prop(() => "isParent"), () => Js.Str(() => " dir-parent"), () => Js.Str(() => ""))).Call(() => "concat", () => Js.Str(() => "\" onclick=\"")).Call(() => "concat", () => Js.Ternary(() => Js.Id(() => "d").Prop(() => "isParent"), () => Js.Str(() => "browseDirListDirPath('"), () => Js.Str(() => "selectDirListDirPath('"))).Call(() => "concat", () => Js.Id(() => "d").Prop(() => "path")).Call(() => "concat", () => Js.Str(() => "')\">"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "<span class=\"dir-icon\">")).Call(() => "concat", () => Js.Ternary(() => Js.Id(() => "d").Prop(() => "isParent"), () => Js.Str(() => "📁"), () => Js.Str(() => "📂"))).Call(() => "concat", () => Js.Str(() => "</span>"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "d").Prop(() => "name"))).Call(() => "concat", () => Js.Str(() => "</div>"))));
+        var dirListInnerBlock = Js.Block()
+            .Add(() => Js.Let(() => "html", () => Js.Str(() => "<div class=\"dir-header\"><span class=\"dir-current\">")))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Id(() => "h").Invoke(() => Js.Id(() => "data").Prop(() => "currentPath")))))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</span></div><div class=\"dir-list\">"))))
+            .Add(() => Js.Id(() => "data").Prop(() => "directories").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "d" }, () => dirListForEachBlock)))
+            .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Call(() => "concat", () => Js.Str(() => "</div>"))));
+        var dirListPopupHtml = Js.Str(() => "<div class=\"dir-list-popup\" id=\"dirListPopup\">").Op(() => "+", () => Js.Id(() => "html")).Op(() => "+", () => Js.Str(() => "</div>"));
+        dirListInnerBlock.Add(() => Js.Id(() => "pathInput").Prop(() => "parentElement").Call(() => "insertAdjacentHTML", () => Js.Str(() => "afterend"), () => dirListPopupHtml));
+        var dirListDataArrow = Js.Arrow(() => new List<string> { "data" }, () => dirListInnerBlock);
+        browseDirListDirBlock.Add(() => Js.Id(() => "fetch").Invoke(() => Js.Id(() => "url")).Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json"))).Call(() => "then", () => dirListDataArrow));
+        js.Add(() => Js.Func(() => "browseDirListDir", () => new List<string> { "pathInput" }, () => browseDirListDirBlock));
+
+        var selectDirListDirPathBlock = Js.Block()
+            .Add(() => Js.Const(() => "popup", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "popup"), new List<JsSyntax> { Js.Id(() => "popup").Prop(() => "remove").Invoke().Stmt() }) }
+            }))
+            .Add(() => Js.Id(() => "currentDirListPathInput").Prop(() => "value").Assign(() => Js.Id(() => "path")));
+        js.Add(() => Js.Func(() => "selectDirListDirPath", () => new List<string> { "path" }, () => selectDirListDirPathBlock));
+
+        var browseDirListDirPathBlock = Js.Block()
+            .Add(() => Js.Const(() => "popup", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "popup"), new List<JsSyntax> { Js.Id(() => "popup").Prop(() => "remove").Invoke().Stmt() }) }
+            }))
+            .Add(() => Js.Id(() => "browseDirListDir").Invoke(() => Js.Id(() => "currentDirListPathInput")));
+        js.Add(() => Js.Func(() => "browseDirListDirPath", () => new List<string> { "path" }, () => browseDirListDirPathBlock));
+
+        js.Add(() => Js.Let(() => "currentDirListPathInput", () => Js.Null()));
+        var browseDirListDirWrapperBlock = Js.Block()
+            .Add(() => Js.Assign(() => Js.Id(() => "currentDirListPathInput"), () => Js.Id(() => "pathInput")))
+            .Add(() => Js.Const(() => "popup", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "dirListPopup"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "popup"), new List<JsSyntax> { Js.Id(() => "popup").Prop(() => "remove").Invoke().Stmt() }) }
+            }))
+            .Add(() => Js.Id(() => "browseDirListDir").Invoke(() => Js.Id(() => "pathInput")));
+        js.Add(() => Js.Func(() => "browseDirListDirWrapper", () => new List<string>(), () => browseDirListDirWrapperBlock));
 
         var parseTimespanBlock = Js.Block()
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueTimespanDays")).Prop(() => "value").Assign(() => Js.Str(() => "0")))
@@ -674,6 +829,13 @@ public class ConfigView : ViewBase
                         Js.Break()
                     })
                 },
+                { (Js.Str(() => "directoryList"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDirectoryList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
+                        Js.Id(() => "initDirListEditor").Invoke(() => Js.Id(() => "value")),
+                        Js.Break()
+                    })
+                },
                 { (Js.Str(() => "guid"), new List<JsSyntax>
                     {
                         Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputString")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
@@ -763,6 +925,12 @@ public class ConfigView : ViewBase
                         Js.Break()
                     })
                 },
+                { (Js.Str(() => "directoryList"), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "value"), () => Js.Id(() => "getDirListJson").Invoke()),
+                        Js.Break()
+                    })
+                },
                 { (Js.Str(() => "guid"), new List<JsSyntax>
                     {
                         Js.Assign(() => Js.Id(() => "value"), () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValue")).Prop(() => "value").Call(() => "trim")),
@@ -835,7 +1003,8 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".btn-edit")).Call(() => "forEach", () => forEachArrow))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnSave")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "saveConfig").Invoke().Stmt())))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnCancel")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "closeModal").Invoke().Stmt())))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDictRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDictRow").Invoke(() => Js.Str(() => ""), () => Js.Str(() => "")).Stmt())));
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDictRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDictRow").Invoke(() => Js.Str(() => ""), () => Js.Str(() => "")).Stmt())))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDirListRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDirListRow").Invoke(() => Js.Str(() => "")).Stmt())));
         
         var modalClickBlock = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>

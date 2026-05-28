@@ -93,6 +93,7 @@ public class DefaultConfigData : AppConfigData
                     AIConfig = loadedData.AIConfig ?? new Dictionary<string, object>();
                     WebPort = loadedData.WebPort;
                     WebSkin = loadedData.WebSkin;
+                    PluginDirectories = loadedData.PluginDirectories ?? new List<string>();
                     UserNickname = loadedData.UserNickname;
                 }
             }

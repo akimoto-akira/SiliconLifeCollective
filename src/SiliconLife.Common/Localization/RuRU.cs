@@ -454,6 +454,9 @@ public class RuRU : DefaultLocalizationBase
     public override string ConfigDictValueLabel => "Значение";
     public override string ConfigDictAddButton => "Добавить";
     public override string ConfigDictDeleteButton => "Удалить";
+
+    public override string ConfigPluginDirectoriesLabel => "Каталоги плагинов";
+    public override string ConfigPluginDirAddButton => "Добавить каталог";
     public override string ConfigDictEmptyMessage => "Словарь пуст";
     public override string SelectSearchHint => "Поиск...";
 
