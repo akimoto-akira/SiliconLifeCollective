@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-28T14:35:00+08:00",
+  "lastUpdated": "2026-05-28T15:30:00+08:00",
   "lastCommitHash": "48f6702",
   "tasks": [
     {
@@ -380,10 +380,11 @@
       "title": "PluginLoader增加CS源码模式：无DLL时编译加载插件",
       "description": "为PluginLoader增加CS源码编译加载模式，与现有DLL加载模式并存。当插件目录没有DLL时自动进入CS源码模式。\n\n【核心逻辑】\n1. LoadPluginFromDirectory中，先找DLL\n2. 有DLL → 走现有流程（扫描DLL → 实例化IPlugin）\n3. 没有DLL → 进入CS源码模式：\n   a. 有cs.txt → 按行读取文件列表，只加载指定CS文件\n   b. 没有cs.txt → 加载目录下所有.cs文件\n   c. 收集插件目录下的同级DLL → 先对这些DLL做ScanForbiddenReferences安全扫描，通过的作为引用程序集\n   d. 使用CompilationCore（受限模式，与DynamicCompilationExecutor一致）编译CS文件为内存DLL\n   e. 编译产物走现有PluginLoader的ScanForbiddenReferences扫描流程\n   f. 通过后从编译产物中找IPlugin实现并实例化\n\n【编译配置】\n- 复用CompilationCore，传入项目核心程序集(SiliconLife.Core/SiliconLife.Common等) + 扫描通过的同级DLL作为additionalAssemblies\n- 编译选项与DynamicCompilationExecutor保持一致\n- 编译失败时记录详细错误并跳过该插件\n\n【日志规范】\n- CS源码模式加载时日志标注[CS-Source]区分DLL模式\n- 如：Plugin loaded [CS-Source]: {0} v{1} from {2}\n\n【代码修改范围】\n- PluginLoader.cs：LoadPluginFromDirectory方法增加CS源码分支，新增CompileFromSource私有方法\n- 不新增文件，不修改接口\n\n【测试场景】\n- 纯CS插件目录（无DLL无cs.txt）：加载所有cs\n- 纯CS插件目录（有cs.txt）：只加载指定文件\n- CS + 同级DLL：DLL扫描通过后作为引用\n- CS + 同级DLL扫描失败：记录错误，不引用该DLL\n- 编译错误：记录详细诊断信息\n- 编译通过但安全扫描失败：记录违规项",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-28T14:35:00+08:00",
       "createdBy": "coze-agent",
-      "assignedTo": null
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-28T15:30:00+08:00"
     },
     {
       "id": "task-390",
@@ -400,11 +401,11 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-389",
       "task-390"
     ],
     "inProgress": [],
     "completed": [
+      "task-389",
       "task-362",
       "task-363",
       "task-364",

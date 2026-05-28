@@ -16,6 +16,7 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.Loader;
+using Microsoft.CodeAnalysis;
 
 namespace SiliconLife.Collective;
 
@@ -57,7 +58,8 @@ public class PluginLoader
 
         if (dllPath == null)
         {
-            _logger.Warn(null, "No DLL found in plugin directory: {0}", pluginDir);
+            // No DLL found — enter CS source mode
+            LoadPluginFromSource(pluginDir, dirName);
             return;
         }
 
@@ -167,7 +169,292 @@ public class PluginLoader
         _logger.Info(null, "All plugins unloaded");
     }
 
-    private record LoadedPlugin(IPlugin Plugin, AssemblyLoadContext Context, string DllPath, HashSet<Capability> DeclaredCapabilities);
+    /// <summary>
+    /// Attempts to load a plugin from CS source files when no DLL is found in the plugin directory.
+    /// Flow:
+    ///   1. Collect CS files (cs.txt whitelist or all *.cs)
+    ///   2. Scan sibling DLLs for trusted references
+    ///   3. Compile via CompilationCore (restricted mode) to get assembly bytes
+    ///   4. Write bytes to temp DLL and scan with ScanForbiddenReferences
+    ///   5. Load assembly from bytes and find IPlugin implementation
+    /// </summary>
+    private void LoadPluginFromSource(string pluginDir, string dirName)
+    {
+        // 1. Collect CS source files
+        string[] sourceFiles = CollectSourceFiles(pluginDir);
+        if (sourceFiles.Length == 0)
+        {
+            _logger.Warn(null, "No DLL and no CS source files found in plugin directory: {0}", pluginDir);
+            return;
+        }
+
+        _logger.Info(null, "[CS-Source] Loading plugin from source in {0} ({1} file(s))", dirName, sourceFiles.Length);
+
+        // 2. Collect and scan sibling DLLs for trusted references
+        HashSet<(string Namespace, string Name)> trustedTypeRefs = CollectTrustedTypeRefs(pluginDir);
+        List<MetadataReference> additionalRefs = CollectScannedSiblingDllReferences(pluginDir, trustedTypeRefs);
+
+        // 3. Compile source code via Roslyn directly (one compilation, get both bytes and assembly)
+        string concatenatedSource = string.Join(Environment.NewLine, sourceFiles.Select(f => File.ReadAllText(f)));
+        var compilationCore = new CompilationCore(typeof(IPlugin).Assembly);
+        (byte[] assemblyBytes, Assembly? assembly, List<string> compileErrors) = CompileToBytesAndAssembly(
+            concatenatedSource, compilationCore, additionalRefs);
+
+        if (assembly == null || compileErrors.Count > 0)
+        {
+            _logger.Error(null,
+                "[CS-Source] Compilation failed for plugin {0}:\n  - {1}",
+                dirName,
+                string.Join("\n  - ", compileErrors));
+            return;
+        }
+
+        // 4. Write bytes to temp DLL for security scanning
+        string tempDllPath;
+        try
+        {
+            tempDllPath = Path.Combine(Path.GetTempPath(), $"SiliconLife_CSPlugin_{dirName}_{Guid.NewGuid():N}.dll");
+            File.WriteAllBytes(tempDllPath, assemblyBytes);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(null, "[CS-Source] Failed to write temp DLL for scanning: {0}", ex.Message);
+            return;
+        }
+
+        try
+        {
+            // 5. Scan compiled assembly with existing security scan
+            if (!ScanForbiddenReferences(tempDllPath, out List<string> violations, trustedTypeRefs, out HashSet<Capability> capabilities))
+            {
+                _logger.Error(null,
+                    "[CS-Source] Plugin rejected: {0} violated {1} security rule(s):\n  - {2}",
+                    dirName,
+                    violations.Count,
+                    string.Join("\n  - ", violations));
+                return;
+            }
+
+            // 6. Find IPlugin implementation and instantiate
+            Type[] pluginTypes = assembly.GetTypes()
+                .Where(t => typeof(IPlugin).IsAssignableFrom(t) && t != typeof(IPlugin) && !t.IsAbstract)
+                .ToArray();
+
+            if (pluginTypes.Length == 0)
+            {
+                _logger.Warn(null, "[CS-Source] No IPlugin implementation found in compiled source for {0}", dirName);
+                return;
+            }
+
+            if (pluginTypes.Length > 1)
+            {
+                string typeNames = string.Join(", ", pluginTypes.Select(t => t.Name));
+                _logger.Error(null, "[CS-Source] Multiple IPlugin implementations found in {0}: [{1}]. Only one is allowed.", dirName, typeNames);
+                return;
+            }
+
+            IPlugin plugin = (IPlugin)Activator.CreateInstance(pluginTypes[0])!;
+
+            // Security audit: log all capability declarations
+            AuditCapabilityDeclarations(pluginTypes[0], plugin.Id, capabilities);
+
+            plugin.OnLoad();
+
+            _loadedPlugins.Add(new LoadedPlugin(plugin, null, $"[CS-Source] {pluginDir}", capabilities));
+            _logger.Info(null, "Plugin loaded [CS-Source]: {0} v{1} from {2}", plugin.Id, plugin.Version, dirName);
+        }
+        finally
+        {
+            // Clean up temp DLL
+            try { if (File.Exists(tempDllPath)) File.Delete(tempDllPath); } catch { /* best effort */ }
+        }
+    }
+
+    /// <summary>
+    /// Compiles CS source code once using Roslyn, returning both the raw assembly bytes
+    /// (for security scanning via temp DLL) and the loaded Assembly (for type instantiation).
+    /// This avoids double-compilation.
+    /// </summary>
+    private static (byte[] Bytes, Assembly? Assembly, List<string> Errors) CompileToBytesAndAssembly(
+        string sourceCode,
+        CompilationCore compilationCore,
+        List<MetadataReference> additionalRefs)
+    {
+        var syntaxTree = Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(
+            sourceCode,
+            Microsoft.CodeAnalysis.CSharp.CSharpParseOptions.Default.WithLanguageVersion(
+                Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp13));
+
+        // Build references: base refs from CompilationCore + additional refs from sibling DLLs
+        // We need to reconstruct base refs since CompilationCore doesn't expose them
+        var allRefs = new List<MetadataReference>
+        {
+            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(List<>).Assembly.Location),
+        };
+
+        try
+        {
+            var runtimeRefAssembly = Assembly.Load("System.Runtime");
+            allRefs.Add(MetadataReference.CreateFromFile(runtimeRefAssembly.Location));
+        }
+        catch { /* best effort */ }
+
+        try
+        {
+            var uriAssembly = typeof(Uri).Assembly;
+            if (uriAssembly.GetName().Name != "System.Private.CoreLib")
+                allRefs.Add(MetadataReference.CreateFromFile(uriAssembly.Location));
+        }
+        catch { /* best effort */ }
+
+        try
+        {
+            allRefs.Add(MetadataReference.CreateFromFile(typeof(System.Linq.Enumerable).Assembly.Location));
+        }
+        catch { /* best effort */ }
+
+        var jsonType = Type.GetType("System.Text.Json.JsonSerializer, System.Text.Json");
+        if (jsonType != null)
+            allRefs.Add(MetadataReference.CreateFromFile(jsonType.Assembly.Location));
+
+        var regexType = Type.GetType("System.Text.RegularExpressions.Regex, System.Text.RegularExpressions");
+        if (regexType != null)
+            allRefs.Add(MetadataReference.CreateFromFile(regexType.Assembly.Location));
+
+        // Add IPlugin assembly reference (SiliconLife.Core)
+        allRefs.Add(MetadataReference.CreateFromFile(typeof(IPlugin).Assembly.Location));
+
+        // Add additional refs (scanned sibling DLLs)
+        allRefs.AddRange(additionalRefs);
+
+        string assemblyName = $"SiliconLife_CSPlugin_{Guid.NewGuid():N}";
+        var compilation = Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create(
+            assemblyName,
+            [syntaxTree],
+            allRefs,
+            new Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                .WithOptimizationLevel(OptimizationLevel.Release)
+                .WithAllowUnsafe(false));
+
+        using var ms = new System.IO.MemoryStream();
+        var emitResult = compilation.Emit(ms);
+
+        if (!emitResult.Success)
+        {
+            var errors = emitResult.Diagnostics
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+                .Select(d => d.ToString())
+                .ToList();
+            return ([], null, errors);
+        }
+
+        byte[] bytes = ms.ToArray();
+        Assembly assembly = Assembly.Load(bytes);
+        return (bytes, assembly, []);
+    }
+
+    /// <summary>
+    /// Collects CS source files from the plugin directory.
+    /// If cs.txt exists, only the files listed in it are loaded (whitelist mode).
+    /// Otherwise, all *.cs files in the directory are loaded.
+    /// </summary>
+    private static string[] CollectSourceFiles(string pluginDir)
+    {
+        string csTxtPath = Path.Combine(pluginDir, "cs.txt");
+
+        if (File.Exists(csTxtPath))
+        {
+            string[] listedFiles = File.ReadAllLines(csTxtPath)
+                .Select(line => line.Trim())
+                .Where(line => !string.IsNullOrEmpty(line) && !line.StartsWith('#'))
+                .ToArray();
+
+            var files = new List<string>();
+            foreach (string fileName in listedFiles)
+            {
+                string fullPath = Path.Combine(pluginDir, fileName);
+                if (File.Exists(fullPath) && fullPath.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
+                {
+                    files.Add(fullPath);
+                }
+                else
+                {
+                    _logger.Warn(null, "[CS-Source] cs.txt entry not found or not a .cs file: {0}", fileName);
+                }
+            }
+            return files.ToArray();
+        }
+
+        // No cs.txt — load all .cs files
+        return Directory.GetFiles(pluginDir, "*.cs");
+    }
+
+    /// <summary>
+    /// Scans sibling DLLs in the plugin directory and returns MetadataReferences
+    /// for those that pass the security scan (excluding trusted libraries which are auto-passed).
+    /// These references are used as additional assemblies during CS source compilation.
+    /// </summary>
+    private List<MetadataReference> CollectScannedSiblingDllReferences(
+        string pluginDir,
+        HashSet<(string Namespace, string Name)> trustedTypeRefs)
+    {
+        var references = new List<MetadataReference>();
+
+        foreach (string dllFile in Directory.GetFiles(pluginDir, "*.dll"))
+        {
+            try
+            {
+                // Check if this is a trusted assembly — if so, add reference directly
+                using var stream = File.OpenRead(dllFile);
+                using var peReader = new PEReader(stream);
+                if (!peReader.HasMetadata)
+                    continue;
+
+                MetadataReader reader = peReader.GetMetadataReader();
+                if (reader.IsAssembly)
+                {
+                    string asmName = reader.GetString(reader.GetAssemblyDefinition().Name);
+                    if (TrustedAssemblies.Contains(asmName))
+                    {
+                        references.Add(MetadataReference.CreateFromFile(dllFile));
+                        _logger.Debug(null, "[CS-Source] Added trusted DLL reference: {0}", asmName);
+                        continue;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(null, "[CS-Source] Failed to read DLL metadata for {0}: {1}", dllFile, ex.Message);
+                continue;
+            }
+
+            // Non-trusted DLL — must pass security scan to be used as reference
+            if (!ScanForbiddenReferences(dllFile, out List<string> violations, trustedTypeRefs, out _))
+            {
+                _logger.Warn(null,
+                    "[CS-Source] Sibling DLL rejected (security violations), not added as reference: {0}\n  - {1}",
+                    Path.GetFileName(dllFile),
+                    string.Join("\n  - ", violations));
+                continue;
+            }
+
+            try
+            {
+                references.Add(MetadataReference.CreateFromFile(dllFile));
+                _logger.Debug(null, "[CS-Source] Added scanned sibling DLL reference: {0}", Path.GetFileName(dllFile));
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(null, "[CS-Source] Failed to create reference for {0}: {1}", dllFile, ex.Message);
+            }
+        }
+
+        return references;
+    }
+
+    private record LoadedPlugin(IPlugin Plugin, AssemblyLoadContext? Context, string DllPath, HashSet<Capability> DeclaredCapabilities);
 
     /// <summary>
     /// Trusted open-source dependency assembly whitelist: the scanner passes these assemblies directly,
