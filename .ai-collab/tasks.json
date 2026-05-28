@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-29T15:00:00+08:00",
+  "lastUpdated": "2026-05-29T16:00:00+08:00",
   "lastCommitHash": null,
   "tasks": [
     {
@@ -57,7 +57,33 @@
       "createdAt": "2026-05-29T03:30:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": "trae-glm5",
-      "completedAt": "2026-05-29T15:00:00+08:00"
+      "completedAt": "2026-05-29T15:00:00+08:00",
+      "relatedCommit": "b4b633f"
+    },
+    {
+      "id": "task-398",
+      "type": "bugfix",
+      "target": "src/SiliconLife.Core/AI/ContextManager.cs + src/SiliconLife.Core/Project/ProjectThinkSession.cs + src/SiliconLife.Core/Project/ProjectSpace.cs",
+      "title": "修复ProjectThinkSession消息未写入Cycle及完成后历史被删除的问题",
+      "description": "task-395引入的ProjectThinkSession存在两个Bug，导致AI对话记录不完整且完成后丢失。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-29T16:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-29T17:30:00+08:00",
+      "relatedCommit": "d1b3ad2"
+    },
+    {
+      "id": "task-397",
+      "type": "feature",
+      "target": "src/SiliconLife.App/Web/Views/ProjectView.cs + src/SiliconLife.App/Web/Controllers/ProjectController.cs + src/SiliconLife.App/Web/Router.cs + src/SiliconLife.Common/Localization/",
+      "title": "项目处理记录前端展示：项目面板增加入口+专用历史页面",
+      "description": "task-395引入了ProjectThinkSession伪Session机制，Curator AI在ThinkOnProject时会产生多轮对话记录（ChatHistory），但前端无法查看这些处理记录，用户无法了解AI在项目上做了什么、执行到哪一步。\n\n【问题】\n1. ProjectView项目列表页：每个项目卡片有tasks/notes/workflow/tool-permissions等链接，但没有\"处理记录\"入口\n2. 没有专用页面展示ProjectThinkSession的历史记录\n3. 没有API端点返回项目的ThinkSession数据\n\n【方案：参照TimerExecutionHistoryView/TaskExecutionHistoryView模式】\n\n1. ProjectView项目卡片增加\"处理记录\"链接：\n   - 在project-links区域新增一条链接，样式参照broadcast-link（如think-link，橙色系）\n   - 链接地址：/project/{id}/think-history\n   - 仅当项目有ThinkSessions时显示（或始终显示，空态提示\"暂无记录\"）\n\n2. 新增ProjectThinkHistoryView（专用页面）：\n   - 参照TimerExecutionHistoryView的结构\n   - 页面头部：返回项目列表链接 + 标题 + 项目名称副标题\n   - 主体：think-session列表，每个session显示：\n     - 状态badge（Started/Executing/Completed/Failed，对应不同颜色）\n     - 创建时间、完成时间\n     - 当前轮次/最大轮次\n     - 消息数量\n   - 点击session进入详情页\n\n3. 新增ProjectThinkDetailView（详情页面）：\n   - 参照TimerExecutionDetailView/ChatHistoryDetailView\n   - 展示单个ThinkSession的完整ChatHistory消息\n   - 复用ChatHistoryDetailView的消息渲染逻辑\n\n4. ProjectController新增API端点：\n   - GET /api/projects/{id}/think-sessions/list：返回项目的ThinkSession列表（摘要信息，含活跃+历史）\n   - GET /api/projects/{id}/think-sessions/detail?sessionId={sid}：返回指定session的完整ChatHistory\n\n5. Router注册新路由：\n   - /project/{id}/think-history → ProjectThinkHistoryPage\n   - /project/{id}/think-session/{sessionId} → ProjectThinkDetailPage\n   - /api/projects/{id}/think-sessions/list\n   - /api/projects/{id}/think-sessions/detail\n\n6. 13个语言文件新增本地化字符串：\n   - ProjectThinkHistoryLinkLabel：\"处理记录\"/\"Think History\"\n   - ProjectThinkHistoryTitle：\"项目处理记录\"/\"Project Think History\"\n   - ProjectThinkHistoryHeader：同上\n   - ProjectThinkNoRecords：\"暂无处理记录\"/\"No think sessions yet\"\n   - ProjectThinkStateStarted/Executing/Completed/Failed\n   - ProjectThinkDetailTitle/Header\n   - ProjectThinkRoundLabel/MessageCountLabel等\n\n【关键代码位置】\n- ProjectView.cs L244-260：renderItem中的project-links区域（新增think-history链接）\n- ProjectController.cs：Handle方法中新增路由分支\n- Router.cs L115-140：ProjectController路由注册区\n- TimerExecutionHistoryView.cs：参照模板\n- TimerExecutionDetailView.cs：参照模板（复用ChatHistoryDetailView）\n- ProjectSpace.cs L115：ThinkSessions字典 + ThinkSessionHistory列表（task-398新增）\n- ProjectThinkSession.cs：数据模型（Id/State/CurrentRound/MaxRounds/ChatHistory/CreatedAt/CompletedAt）\n\n【依赖】task-398（修复消息写入和Session历史保留）必须先完成，否则前端展示的数据不完整且历史记录被删除",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-29T15:30:00+08:00",
+      "createdBy": "trae-glm5"
     },
     {
       "id": "task-396",
@@ -75,9 +101,9 @@
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": ["task-397"],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396"],
+    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-398"],
     "cancelled": []
   },
   "metadata": {

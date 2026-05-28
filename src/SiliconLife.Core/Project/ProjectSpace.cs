@@ -115,6 +115,13 @@ public sealed class ProjectSpace
     public Dictionary<Guid, ProjectThinkSession> ThinkSessions { get; set; } = new();
 
     /// <summary>
+    /// Gets or sets the completed/failed think sessions for this project.
+    /// When a think session reaches Completed or Failed state, it is moved here
+    /// from ThinkSessions for historical reference (instead of being deleted).
+    /// </summary>
+    public List<ProjectThinkSession> ThinkSessionHistory { get; set; } = new();
+
+    /// <summary>
     /// Creates a new project space with default values
     /// </summary>
     public ProjectSpace()

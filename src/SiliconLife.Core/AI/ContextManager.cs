@@ -336,6 +336,10 @@ public class ContextManager
             _taskForContext.GetCurrentCycle().Messages.Add(chatMsg);
             TaskCenter.Instance.UpdateTask(_taskForContext);
         }
+        else if (_projectThinkSession != null)
+        {
+            _projectThinkSession.GetCurrentCycle().Messages.Add(chatMsg);
+        }
         else if (_session != null)
         {
             ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
@@ -1487,6 +1491,7 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         if (session.State == ProjectThinkState.Completed || session.State == ProjectThinkState.Failed)
         {
             project.ThinkSessions.Remove(session.BeingId);
+            project.ThinkSessionHistory.Add(session);
         }
 
         project.UpdatedAt = DateTime.UtcNow;
@@ -2272,6 +2277,11 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
             _taskForContext.GetCurrentCycle().Messages.Add(assistantMsg);
             _taskForContext.GetCurrentCycle().Messages.AddRange(toolResultMessages);
             TaskCenter.Instance.UpdateTask(_taskForContext);
+        }
+        else if (_projectThinkSession != null)
+        {
+            _projectThinkSession.GetCurrentCycle().Messages.Add(assistantMsg);
+            _projectThinkSession.GetCurrentCycle().Messages.AddRange(toolResultMessages);
         }
         else if (_session != null)
         {
