@@ -29,10 +29,46 @@
       "createdAt": "2026-05-29T03:27:00+08:00",
       "createdBy": "coze-agent",
       "assignedTo": null
+    },
+    {
+      "id": "task-394",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/AI/ContextManager.cs",
+      "title": "ThinkOnProject场景上下文增强：增加可用硅基人信息",
+      "description": "ThinkOnProject执行时AI不知道系统中已有但未分配到项目的硅基人，导致重复创建而非分配已有人员。\n\n【问题】\nBuildProjectScenarioContext（ContextManager.cs L1362-1540）只显示项目内的Team members，不显示系统中存在但未分配到当前项目的硅基人。AI看到\"角色池为空\"就直接create_being，而不是assign已有的人。\n\n【修复方案】\n在BuildProjectScenarioContext中增加\"Available beings (not yet assigned to this project)\"区块：\n1. 遍历SiliconBeingManager中的所有活跃硅基人\n2. 排除已分配到当前项目的成员（通过project.GetMembers()对比）\n3. 列出可用硅基人的Name、ID、角色描述（如有）\n4. 此信息仅在ThinkOnProject首轮（ThinkSession.State=Idle→Started，或当前无session时）注入，后续轮次从ChatHistory可见\n5. 增加13个语言文件的本地化字符串（如ProjectCtx_AvailableBeings、ProjectCtx_AvailableBeingEntry等）\n\n【预期效果】\nAI在ThinkOnProject中看到\"角色池为空\"时，同时看到可用硅基人列表，优先使用assign而非create_being。\n\n【关键代码位置】\n- ContextManager.cs L1362-1540：BuildProjectScenarioContext\n- ContextManager.cs L1332-1361：GetProjectAttentionReasons\n- DefaultSiliconBeing.cs L847-870：HasProjectsNeedingAttention\n\n【依赖】无前置依赖，可独立完成",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-29T03:30:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-395",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/SiliconBeing/ + src/SiliconLife.Core/AI/ContextManager.cs",
+      "title": "ThinkOnProject伪Session多轮对话机制",
+      "description": "ThinkOnProject是单轮执行的，AI调用工具后无法在同一轮继续对话，导致多步操作（如创建硅基人→分配角色）被拆散到多个Tick，每个Tick AI重新看到\"角色池为空\"又创建新人。\n\n【问题根因】\n- ThinkOnProject只做一次AI调用，不像ThinkOnChat/ThinkOnTask/ThinkOnTimer那样有延续机制\n- 工具调用结果不触发新一轮ThinkOnProject\n- 下一个Tick时项目状态未变（只创建了人没分配角色），AI重复相同操作\n\n【方案：为ThinkOnProject引入伪Session】\n参照TimerItem的ExecutionState模式，为每个ProjectSpace维护伪Session：\n\n1. 新增ProjectThinkSession类：\n   - Id/BeingId/State(CurrentRound/MaxRounds=10)/ChatHistory(List<ChatHistoryCycle>)/CreatedAt/CompletedAt\n   - State枚举：Idle/Started/Executing/Completed/Failed\n\n2. ProjectSpace新增：\n   - Dictionary<Guid, ProjectThinkSession> ThinkSessions\n   - 存储路径：<StoragePath>/think_sessions/<being_id>/session_<guid>.json\n\n3. DefaultSiliconBeing.Tick修改：\n   - 优先级5改为：IsCurator && (HasExecutingThinkSession() || HasProjectsNeedingAttention())\n   - HasExecutingThinkSession()：检查所有Active项目的ThinkSessions是否有State=Executing且BeingId=自己的\n   - 有Executing session → ThinkOnProjectContinue(session)\n   - 无Executing session但有需要关注的项目 → ThinkOnProjectStart(project)\n\n4. ThinkOnProjectStart：\n   - 创建ProjectThinkSession，State=Started\n   - BuildProjectScenarioContext（含关注原因+可用人员信息）\n   - GetResponse → HasToolCalls则State=Executing并持久化，纯文本则State=Completed\n\n5. ThinkOnProjectContinue：\n   - 加载ThinkSession的ChatHistory\n   - CurrentRound++，超过MaxRounds则强制完成\n   - GetResponse（不再重复ScenarioContext）\n   - 同上判断HasToolCalls/纯文本\n\n6. ContextManager适配：\n   - 新增构造函数接收ProjectThinkSession\n   - 从ThinkSession.ChatHistory加载历史消息\n\n7. BeingActivity枚举已有Project值，Tick中设置Activity=Project即可在Web UI正确显示状态\n\n【关键代码位置】\n- DefaultSiliconBeing.cs L279-284：Tick中的项目分支\n- DefaultSiliconBeing.cs L847-870：HasProjectsNeedingAttention\n- ContextManager.cs L1242-1266：ThinkOnProject（单轮执行入口）\n- ContextManager.cs L349-428：BuildRequest\n- src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs：BeingActivity枚举\n\n【依赖】task-394（场景上下文增强）完成后，首轮注入的可用人员信息才能在多轮中生效，但本任务可并行开发，首轮暂不含可用人员信息",
+      "priority": "P1",
+      "status": "pending",
+      "createdAt": "2026-05-29T03:30:00+08:00",
+      "createdBy": "coze-agent",
+      "assignedTo": null
+    },
+    {
+      "id": "task-396",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/AI/ContextManager.cs",
+      "title": "BuildRequest动态注入硅基人项目归属信息",
+      "description": "非Curator的硅基生命（如小类、小码）在执行任务时不知道自己被分配到哪个项目、担任什么角色，导致无法正确使用项目相关工具、无法自主决策。\n\n【问题】\n项目归属信息只在ThinkOnProject场景上下文中提供（仅Curator可见）。一般硅基人在ThinkOnTask/ThinkOnChat/ThinkOnTimer时完全不知道项目归属。Soul文件是静态文本，不会随项目状态变化而更新。\n\n【方案：在BuildRequest中动态注入ProjectInfo层】\n在系统提示词组装顺序中，IdentityInfo之后、ScenarioContext之前新增ProjectInfo层：\n\nSoulContent → CommonPrompt → IdentityInfo → **ProjectInfo(新增)** → ScenarioContext → KnowledgeContext → MemoryContext\n\nProjectInfo内容：\n- 如果硅基人被分配到一个或多个Active项目：\n  \"Project: 旅游编码计划\\nRole: POIClassifier\\nProject goal: 构建多语言旅游维基\"\n- 如果未分配到任何项目：不注入（避免冗余）\n- 多项目时逐行列出\n\n关键设计原则：\n- Soul文件保持纯人格定义，不被系统覆盖或追加\n- ProjectInfo动态生成，项目变更时自动更新\n- 人格(Soul)和职责(ProjectInfo)解耦：性格稳定，工作可变\n- 同一硅基人调到不同项目，Soul不变但ProjectInfo变化\n\n【实现要点】\n1. ContextManager.BuildRequest中，在IdentityInfo段之后注入ProjectInfo段\n2. 获取硅基人分配的项目：ProjectManager.ListProjects → 过滤Active项目 → 过滤members含当前beingId\n3. 获取角色信息：project.GetMemberRole(beingId)\n4. 新增13个语言本地化字符串（如ProjectInfoLabel、ProjectInfoRoleLabel等）\n5. ProjectInfo仅在硅基人被分配到至少一个Active项目时注入\n\n【排除方案】\n- ❌ 在Soul文件中自动追加项目信息：与用户手动编辑冲突，项目变更需同步更新易不一致，违反Soul\"人格定义\"语义\n- ❌ 仅在ScenarioContext中提供：只在ThinkOnProject场景注入，一般硅基人在其他场景仍不知道归属\n\n【关键代码位置】\n- ContextManager.cs L349-428：BuildRequest\n- ContextManager.cs L388-398：IdentityInfo段（ProjectInfo应插入其后）\n\n【依赖】无前置依赖，可独立完成。与task-394/395互补但不互阻",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-29T03:30:00+08:00",
+      "assignedTo": null,
+      "createdBy": "coze-agent"
     }
   ],
   "taskIndex": {
-    "pending": ["task-393"],
+    "pending": ["task-393", "task-394", "task-395", "task-396"],
     "inProgress": [],
     "completed": ["task-392"],
     "cancelled": []
