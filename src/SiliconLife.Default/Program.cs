@@ -88,10 +88,10 @@ public class Program
             _pluginLoaders.Add(loader);
             _logger.Info(null, "Plugins loaded from {0}", pluginDir);
         }
-        if (_pluginLoaders.Count > 0)
-        {
-            ServiceLocator.Instance.Register(_pluginLoaders[0]);
-        }
+foreach (var loader in _pluginLoaders)
+{
+ServiceLocator.Instance.Register(loader);
+}
         ServiceLocator.Instance.RegisterToolAssembly(typeof(SiliconLife.App.Web.Router).Assembly);
 
         configData.AIConfig.TryGetValue("endpoint", out var endpointValue);
