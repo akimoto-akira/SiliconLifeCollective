@@ -1153,3 +1153,8 @@
 2026-05-30T00:20:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs | intent=renderToolMessage增加AI正文Content和Thinking渲染
 2026-05-30T00:45:00+08:00 | catpaw | task_complete | task=task-404 | fix=renderToolMessage中工具调用详情上方新增content和thinking渲染
 2026-05-30T00:45:00+08:00 | catpaw | session_end | completed=task-404
+2026-05-30T01:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260530-002 | task=task-405
+2026-05-30T01:00:00+08:00 | catpaw | task_claim | task=task-405 | type=bugfix | title=修复项目思考详情页加载提示文本硬编码英文及缺少本地化
+2026-05-30T01:05:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/ProjectThinkDetailView.cs | intent=将硬编码英文Loading提示替换为本地化字符串ChatLoading
+2026-05-30T01:10:00+08:00 | catpaw | task_complete | task=task-405 | fix=复用ChatLoading本地化字符串替换硬编码英文
+2026-05-30T01:10:00+08:00 | catpaw | session_end | completed=task-405

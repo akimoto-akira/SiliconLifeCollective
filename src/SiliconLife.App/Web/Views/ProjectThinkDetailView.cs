@@ -39,7 +39,7 @@ public class ProjectThinkDetailView : ViewBase
             H.Div().Id("message-list").Class("message-list"),
             H.Div(
                 H.Div("").Class("loading-spinner"),
-                H.Div("Loading messages...").Class("loading-text")
+                H.Div(vm.Localization.ChatLoading).Class("loading-text")
             ).Id("loading-indicator").Class("loading-indicator")
         ).Class("page-content");
     }

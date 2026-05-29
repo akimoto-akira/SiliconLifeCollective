@@ -1,7 +1,7 @@
 {
   "version": "1.0",
   "lastUpdated": "2026-05-30T00:45:00+08:00",
-  "lastCommitHash": "9a53d55",
+  "lastCommitHash": "90b60c5",
   "tasks": [
     {
       "id": "task-392",
@@ -182,19 +182,21 @@
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
       "completedAt": "2026-05-30T00:45:00+08:00",
-      "relatedTask": "task-397"
+      "relatedTask": "task-397",
+      "relatedCommit": "90b60c5"
     },
     {
       "id": "task-405",
       "type": "bugfix",
       "target": "src/SiliconLife.App/Web/Views/ProjectThinkDetailView.cs",
       "title": "修复项目思考详情页加载提示文本硬编码英文及缺少本地化",
-      "description": "ProjectThinkDetailView.RenderBody第42行使用硬编码英文字符串"Loading messages..."作为加载提示，而ChatHistoryDetailView使用本地化的vm.Localization.ChatLoading。修复方式：将硬编码文本替换为本地化字符串（需在DefaultLocalizationBase及所有语言文件中新增ProjectThinkLoading本地化条目，或复用已有的ChatLoading）。",
+      "description": "ProjectThinkDetailView.RenderBody第42行使用硬编码英文字符串\"Loading messages...\"作为加载提示，而ChatHistoryDetailView使用本地化的vm.Localization.ChatLoading。修复方式：将硬编码文本替换为本地化字符串（需在DefaultLocalizationBase及所有语言文件中新增ProjectThinkLoading本地化条目，或复用已有的ChatLoading）。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-30T00:15:00+08:00",
       "createdBy": "catpaw",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-30T01:10:00+08:00",
       "relatedTask": "task-397"
     },
     {
@@ -227,12 +229,11 @@
   "taskIndex": {
     "pending": [
       "task-402",
-      "task-405",
       "task-406",
       "task-407"
     ],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-403", "task-404"],
+    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-403", "task-404", "task-405"],
     "cancelled": []
   },
   "metadata": {
