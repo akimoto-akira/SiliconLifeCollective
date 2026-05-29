@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-29T23:30:00+08:00",
-  "lastCommitHash": null,
+  "lastUpdated": "2026-05-30T00:45:00+08:00",
+  "lastCommitHash": "9a53d55",
   "tasks": [
     {
       "id": "task-392",
@@ -141,7 +141,8 @@
       "createdAt": "2026-05-29T21:00:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-29T22:30:00+08:00"
+      "completedAt": "2026-05-29T22:30:00+08:00",
+      "relatedCommit": "9a53d55"
     },
     {
       "id": "task-402",
@@ -166,15 +167,72 @@
       "createdAt": "2026-05-29T23:00:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-29T23:30:00+08:00"
+      "completedAt": "2026-05-29T23:30:00+08:00",
+      "relatedCommit": "9a53d55"
+    },
+    {
+      "id": "task-404",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs",
+      "title": "修复工具调用轮次中AI正文Content和Thinking被隐藏的问题",
+      "description": "ChatHistoryDetailView.GetScriptsStatic中的renderMessageItem函数，当msg.toolCallsJson存在时直接走renderToolMessage分支，完全忽略msg.content和msg.thinking。而AI在工具调用轮次中可能同时返回正文文本（如"我来帮你创建一个硅基人"）和思考过程。修复方式：在renderToolMessage函数中，工具调用详情上方增加对msg.content（markdown渲染）和msg.thinking（折叠显示）的渲染，使AI的正文回复和思考过程不再丢失。影响范围：所有复用ChatHistoryDetailView.GetScriptsStatic的页面（聊天历史详情、项目思考详情、定时器执行详情、任务执行详情）均受益。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-30T00:15:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-30T00:45:00+08:00",
+      "relatedTask": "task-397"
+    },
+    {
+      "id": "task-405",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Views/ProjectThinkDetailView.cs",
+      "title": "修复项目思考详情页加载提示文本硬编码英文及缺少本地化",
+      "description": "ProjectThinkDetailView.RenderBody第42行使用硬编码英文字符串"Loading messages..."作为加载提示，而ChatHistoryDetailView使用本地化的vm.Localization.ChatLoading。修复方式：将硬编码文本替换为本地化字符串（需在DefaultLocalizationBase及所有语言文件中新增ProjectThinkLoading本地化条目，或复用已有的ChatLoading）。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-30T00:15:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": null,
+      "relatedTask": "task-397"
+    },
+    {
+      "id": "task-406",
+      "type": "feature",
+      "target": "src/SiliconLife.App/Web/Views/ProjectThinkDetailView.cs + src/SiliconLife.Common/Localization/",
+      "title": "项目思考详情页增加会话状态、创建时间、完成时间展示",
+      "description": "ProjectThinkDetailViewModel包含State/CreatedAt/CompletedAt等字段，但ProjectThinkDetailView.RenderBody仅展示项目名和轮次信息，缺少会话状态（Started/Executing/Completed/Failed）、创建时间和完成时间的展示。修复方式：1) RenderBody的page-header区域增加会话状态标签（根据State用不同颜色/图标区分）、创建时间和完成时间；2) DefaultLocalizationBase新增ProjectThinkStateLabel/ProjectThinkCreatedAt/ProjectThinkCompletedAt本地化条目；3) 所有语言文件补充翻译。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-30T00:15:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": null,
+      "relatedTask": "task-397"
+    },
+    {
+      "id": "task-407",
+      "type": "feature",
+      "target": "src/SiliconLife.App/Web/Views/ProjectThinkDetailView.cs + src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs + src/SiliconLife.Common/Localization/",
+      "title": "项目思考详情页按轮次(Cycle)分组展示消息并支持折叠",
+      "description": "当前ProjectThinkDetailView将所有ChatHistoryCycle中的消息扁平化展示，无法区分不同AI交互轮次的边界。ProjectThinkSession支持多轮对话（每轮是一个ChatHistoryCycle），前端应按轮次分组展示。改造方案：1) GetThinkSessionDetail API返回数据增加cycle边界信息（cycleIndex/startStatus/endStatus）；2) 前端renderMessageItem增加cycle分隔线/折叠组件，每个cycle显示轮次编号和状态，默认展开最后一轮、折叠历史轮次；3) 复用ChatHistoryDetailView.GetStylesInternal中的折叠样式(.msg-collapsible)；4) DefaultLocalizationBase新增ProjectThinkCycleLabel/ProjectThinkRoundN本地化条目。此改进同时适用于TimerExecutionDetailView和TaskExecutionDetailView等同样使用ChatHistoryCycle的页面。",
+      "priority": "P3",
+      "status": "pending",
+      "createdAt": "2026-05-30T00:15:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": null,
+      "relatedTask": "task-397"
     }
   ],
   "taskIndex": {
     "pending": [
-      "task-402"
+      "task-402",
+      "task-405",
+      "task-406",
+      "task-407"
     ],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-403"],
+    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-403", "task-404"],
     "cancelled": []
   },
   "metadata": {

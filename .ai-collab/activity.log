@@ -1148,3 +1148,8 @@
 2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/PtPT.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
 2026-05-29T23:30:00+08:00 | catpaw | task_complete | task=task-403 | completed=OllamaClient/HerdsmanClient的ContextWindowTokens改为工厂配置决定
 2026-05-29T23:30:00+08:00 | catpaw | session_end | completed=task-403
+2026-05-30T00:15:00+08:00 | catpaw | session_start | sessionId=catpaw-20260530-001 | task=task-404
+2026-05-30T00:15:00+08:00 | catpaw | task_claim | task=task-404 | type=bugfix | title=修复工具调用轮次中AI正文Content和Thinking被隐藏的问题
+2026-05-30T00:20:00+08:00 | catpaw | file_modified | src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs | intent=renderToolMessage增加AI正文Content和Thinking渲染
+2026-05-30T00:45:00+08:00 | catpaw | task_complete | task=task-404 | fix=renderToolMessage中工具调用详情上方新增content和thinking渲染
+2026-05-30T00:45:00+08:00 | catpaw | session_end | completed=task-404

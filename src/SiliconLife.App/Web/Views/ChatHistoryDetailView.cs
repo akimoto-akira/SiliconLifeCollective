@@ -485,6 +485,40 @@ public class ChatHistoryDetailView : ViewBase
                         .Op(() => "+", () => Js.Str(() => "</div>"))
                 );
             })
+            // Render AI thinking content before tool details (if present)
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "msg").Prop(() => "thinking"), new List<JsSyntax>
+                {
+                    Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                        .Op(() => "+", () => Js.Str(() => "<details class='msg-collapsible'><summary>💭 ")).Op(() => "+", () => Js.Str(() => "思考过程"))
+                        .Op(() => "+", () => Js.Str(() => "</summary><div class='message-thinking'>"))
+                        .Op(() => "+", () => Js.Id(() => "msg").Prop(() => "thinking"))
+                        .Op(() => "+", () => Js.Str(() => "</div></details>"))).Stmt()
+                })
+            }))
+            // Render AI text content before tool details (if present)
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (Js.Id(() => "msg").Prop(() => "content"), new List<JsSyntax>
+                {
+                    Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "msg").Prop(() => "content").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
+                        {
+                            Js.Let(() => "escapedToolContent", () => Js.Id(() => "msg").Prop(() => "content")
+                                .Call(() => "replace", () => Js.Regex(() => @"&", () => "g"), () => Js.Str(() => "&amp;"))
+                                .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
+                                .Call(() => "replace", () => Js.Regex(() => @"<", () => "g"), () => Js.Str(() => "&lt;"))
+                                .Call(() => "replace", () => Js.Regex(() => @">", () => "g"), () => Js.Str(() => "&gt;"))),
+                            Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
+                                .Op(() => "+", () => Js.Str(() => "<div class='message-content markdown-body' data-md-raw='"))
+                                .Op(() => "+", () => Js.Id(() => "escapedToolContent"))
+                                .Op(() => "+", () => Js.Str(() => "'></div>"))).Stmt()
+                        })
+                    })
+                })
+            }))
             .Add(() =>
             {
                 var summaryCall = Js.Id(() => "getToolSummary").Invoke(() => Js.Id(() => "msg"));
