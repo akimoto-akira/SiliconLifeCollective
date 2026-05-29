@@ -3748,6 +3748,16 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// </summary>
     public abstract string ProjectThinkCompletedAt { get; }
 
+    /// <summary>
+    /// Gets the label for the cycle/round separator header (e.g., "Cycle")
+    /// </summary>
+    public abstract string ProjectThinkCycleLabel { get; }
+
+    /// <summary>
+    /// Gets the format string for displaying a round number. {0}=round number
+    /// </summary>
+    public abstract string ProjectThinkRoundN { get; }
+
     /// <inheritdoc/>
     public override string FormatWorkflowRoleBlockedNotification(
         string projectName, string transitionName, string fromState, string toState, string missingRoles)

@@ -1011,4 +1011,6 @@ public class RuRU : DefaultLocalizationBase
     public override string ProjectThinkStateLabel => "Состояние: ";
     public override string ProjectThinkCreatedAt => "Создано: ";
     public override string ProjectThinkCompletedAt => "Завершено: ";
+    public override string ProjectThinkCycleLabel => "Цикл";
+    public override string ProjectThinkRoundN => "Раунд {0}";
 }

@@ -2108,4 +2108,6 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string ProjectThinkStateLabel => "Estado: ";
     public override string ProjectThinkCreatedAt => "Creado: ";
     public override string ProjectThinkCompletedAt => "Completado: ";
+    public override string ProjectThinkCycleLabel => "Ciclo";
+    public override string ProjectThinkRoundN => "Ronda {0}";
 }

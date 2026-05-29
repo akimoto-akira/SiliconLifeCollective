@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -2016,8 +2016,10 @@ public class ProjectController : Controller
                 var toolCallMap = new Dictionary<string, int>();
                 var result = new List<dynamic>();
 
+                int cycleIndex = 0;
                 foreach (var cycle in session.ChatHistory)
                 {
+                    bool isFirstInCycle = true;
                     foreach (var m in cycle.Messages)
                     {
                         var senderBeing = beingManager?.GetBeing(m.SenderId);
@@ -2049,7 +2051,11 @@ public class ProjectController : Controller
                                     timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
                                     toolCallsJson = (string?)null,
                                     toolCallId = m.ToolCallId,
-                                    toolResults = new List<dynamic>()
+                                    toolResults = new List<dynamic>(),
+                                    cycleIndex,
+                                    cycleStartStatus = cycle.StartStatus,
+                                    cycleEndStatus = cycle.EndStatus,
+                                    isFirstInCycle
                                 });
                             }
                         }
@@ -2066,7 +2072,11 @@ public class ProjectController : Controller
                                 timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
                                 toolCallsJson = m.ToolCallsJson,
                                 toolCallId = (string?)null,
-                                toolResults = new List<dynamic>()
+                                toolResults = new List<dynamic>(),
+                                cycleIndex,
+                                cycleStartStatus = cycle.StartStatus,
+                                cycleEndStatus = cycle.EndStatus,
+                                isFirstInCycle
                             } as dynamic;
 
                             try
@@ -2108,10 +2118,16 @@ public class ProjectController : Controller
                                 timestamp = m.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"),
                                 toolCallsJson = (string?)null,
                                 toolCallId = (string?)null,
-                                toolResults = new List<dynamic>()
+                                toolResults = new List<dynamic>(),
+                                cycleIndex,
+                                cycleStartStatus = cycle.StartStatus,
+                                cycleEndStatus = cycle.EndStatus,
+                                isFirstInCycle
                             });
                         }
+                        isFirstInCycle = false;
                     }
+                    cycleIndex++;
                 }
 
                 RenderJson(new { messages = result });

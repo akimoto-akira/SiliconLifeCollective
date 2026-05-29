@@ -1197,4 +1197,6 @@ Użycie: wywołaj narzędzie chat, ustaw action=""mark_read"", target_id=GUID ro
     public override string ProjectThinkStateLabel => "Stan: ";
     public override string ProjectThinkCreatedAt => "Utworzono: ";
     public override string ProjectThinkCompletedAt => "Ukończono: ";
+    public override string ProjectThinkCycleLabel => "Cykl";
+    public override string ProjectThinkRoundN => "Runda {0}";
 }

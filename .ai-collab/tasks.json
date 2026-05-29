@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-30T02:00:00+08:00",
-  "lastCommitHash": "ebe6a49",
+  "lastUpdated": "2026-05-30T03:00:00+08:00",
+  "lastCommitHash": "28d893d",
   "tasks": [
     {
       "id": "task-392",
@@ -155,7 +155,8 @@
       "createdAt": "2026-05-29T21:30:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-30T02:45:00+08:00"
+      "completedAt": "2026-05-30T02:45:00+08:00",
+      "relatedCommit": "28d893d"
     },
     {
       "id": "task-403",
@@ -223,19 +224,18 @@
       "title": "项目思考详情页按轮次(Cycle)分组展示消息并支持折叠",
       "description": "当前ProjectThinkDetailView将所有ChatHistoryCycle中的消息扁平化展示，无法区分不同AI交互轮次的边界。ProjectThinkSession支持多轮对话（每轮是一个ChatHistoryCycle），前端应按轮次分组展示。改造方案：1) GetThinkSessionDetail API返回数据增加cycle边界信息（cycleIndex/startStatus/endStatus）；2) 前端renderMessageItem增加cycle分隔线/折叠组件，每个cycle显示轮次编号和状态，默认展开最后一轮、折叠历史轮次；3) 复用ChatHistoryDetailView.GetStylesInternal中的折叠样式(.msg-collapsible)；4) DefaultLocalizationBase新增ProjectThinkCycleLabel/ProjectThinkRoundN本地化条目。此改进同时适用于TimerExecutionDetailView和TaskExecutionDetailView等同样使用ChatHistoryCycle的页面。",
       "priority": "P3",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-30T00:15:00+08:00",
       "createdBy": "catpaw",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-30T04:30:00+08:00",
       "relatedTask": "task-397"
     }
   ],
   "taskIndex": {
-    "pending": [
-      "task-407"
-    ],
+    "pending": [],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-402", "task-403", "task-404", "task-405", "task-406"],
+    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-402", "task-403", "task-404", "task-405", "task-406", "task-407"],
     "cancelled": []
   },
   "metadata": {

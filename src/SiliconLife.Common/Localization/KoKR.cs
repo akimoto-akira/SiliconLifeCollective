@@ -2106,4 +2106,6 @@ _ => permissionType.ToString()
     public override string ProjectThinkStateLabel => "상태: ";
     public override string ProjectThinkCreatedAt => "생성 시간: ";
     public override string ProjectThinkCompletedAt => "완료 시간: ";
+    public override string ProjectThinkCycleLabel => "사이클";
+    public override string ProjectThinkRoundN => "제{0}라운드";
 }

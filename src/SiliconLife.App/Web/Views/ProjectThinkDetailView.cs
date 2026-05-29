@@ -44,7 +44,7 @@ public class ProjectThinkDetailView : ViewBase
                 H.Div(
                     H.Span(stateText).Class($"execution-state {stateCssClass}"),
                     H.Span(createdAtText).Class("session-meta"),
-                    H.Span(completedAtText ?? "").When(completedAtText != null).Class("session-meta")
+                    H.Span(completedAtText ?? "").When(completedAtText != null, H.Span(completedAtText!)).Class("session-meta")
                 ).Class("session-info")
             ).Class("page-header"),
             H.Div().Id("message-list").Class("message-list"),
@@ -103,12 +103,62 @@ public class ProjectThinkDetailView : ViewBase
             .Selector(".execution-state.failed")
                 .Property("background", "rgba(255,82,82,0.15)")
                 .Property("color", "var(--accent-error, #ff5252)")
+            .EndSelector()
+            // Cycle collapsible styles
+            .Selector(".cycle-collapsible")
+                .Property("margin", "8px 0")
+                .Property("border", "1px solid var(--border-color, rgba(255,255,255,0.1))")
+                .Property("border-radius", "8px")
+                .Property("overflow", "hidden")
+            .EndSelector()
+            .Selector(".cycle-collapsible summary")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "8px")
+                .Property("padding", "8px 12px")
+                .Property("background", "rgba(77,150,255,0.08)")
+                .Property("font-size", "13px")
+                .Property("font-weight", "600")
+                .Property("color", "var(--accent-primary)")
+                .Property("cursor", "pointer")
+                .Property("user-select", "none")
+                .Property("list-style", "none")
+            .EndSelector()
+            .Selector(".cycle-collapsible summary:hover")
+                .Property("background", "rgba(77,150,255,0.15)")
+            .EndSelector()
+            .Selector(".cycle-collapsible summary::-webkit-details-marker")
+                .Property("display", "none")
+            .EndSelector()
+            .Selector(".cycle-collapsible summary::marker")
+                .Property("display", "none")
+                .Property("content", "")
+            .EndSelector()
+            .Selector(".cycle-collapsible summary .cycle-arrow")
+                .Property("transition", "transform 0.2s ease")
+                .Property("font-size", "10px")
+            .EndSelector()
+            .Selector(".cycle-collapsible[open] summary .cycle-arrow")
+                .Property("transform", "none")
+            .EndSelector()
+            .Selector(".cycle-collapsible:not([open]) summary .cycle-arrow")
+                .Property("transform", "rotate(-90deg)")
+            .EndSelector()
+            .Selector(".cycle-status")
+                .Property("font-size", "11px")
+                .Property("font-weight", "normal")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin-left", "4px")
             .EndSelector();
     }
 
     private static JsSyntax GetScripts(ProjectThinkDetailViewModel vm)
     {
         var apiUrl = $"/api/projects/{vm.ProjectId}/think-sessions/detail?sessionId={vm.SessionId}";
-        return ChatHistoryDetailView.GetScriptsStatic(vm.ToolDisplayNames, apiUrl, vm.Localization.ProjectThinkNoRecords);
+        return ChatHistoryDetailView.GetScriptsStatic(
+            vm.ToolDisplayNames, apiUrl, vm.Localization.ProjectThinkNoRecords,
+            includeCycleData: true,
+            cycleLabel: vm.Localization.ProjectThinkCycleLabel,
+            cycleRoundFormat: vm.Localization.ProjectThinkRoundN);
     }
 }

@@ -2108,4 +2108,6 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ProjectThinkStateLabel => "State: ";
     public override string ProjectThinkCreatedAt => "Created: ";
     public override string ProjectThinkCompletedAt => "Completed: ";
+    public override string ProjectThinkCycleLabel => "Cycle";
+    public override string ProjectThinkRoundN => "Round {0}";
 }

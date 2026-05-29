@@ -402,7 +402,7 @@ public class ChatHistoryDetailView : ViewBase
         return GetScriptsStatic(vm.ToolDisplayNames, $"/api/chat-history/messages?sessionId={vm.SessionId}", vm.Localization.ChatDetailNoMessages);
     }
 
-    internal static JsSyntax GetScriptsStatic(Dictionary<string, string> toolDisplayNames, string apiUrl, string emptyMessage = "No messages found")
+    internal static JsSyntax GetScriptsStatic(Dictionary<string, string> toolDisplayNames, string apiUrl, string emptyMessage = "No messages found", bool includeCycleData = false, string? cycleLabel = null, string? cycleRoundFormat = null)
     {
         // Serialize the tool display name map as a JS object literal
         var toolDisplayNamesLiteral = "{" + string.Join(",",
@@ -473,7 +473,9 @@ public class ChatHistoryDetailView : ViewBase
 
         // renderToolMessage function - supports multiple tool calls with individual request/response pairs
         var renderToolMessageBody = Js.Block()
-            .Add(() => Js.Let(() => "html", () => Js.Str(() => "<div class='message-item tool-message'>")))
+            .Add(() => Js.Let(() => "html", () => includeCycleData
+                ? Js.Str(() => "<div class='message-item tool-message' data-cycle-index='").Op(() => "+", () => Js.Id(() => "msg").Prop(() => "cycleIndex")).Op(() => "+", () => Js.Str(() => "' data-cycle-start-status='")).Op(() => "+", () => Js.Id(() => "msg").Prop(() => "cycleStartStatus")).Op(() => "+", () => Js.Str(() => "' data-is-first-in-cycle='")).Op(() => "+", () => Js.Id(() => "msg").Prop(() => "isFirstInCycle")).Op(() => "+", () => Js.Str(() => "'>"))
+                : Js.Str(() => "<div class='message-item tool-message'>")))
             .Add(() =>
             {
                 var timestampPart = Js.Id(() => "msg").Prop(() => "timestamp");
@@ -615,7 +617,9 @@ public class ChatHistoryDetailView : ViewBase
                     Js.Return(() => Js.Str(() => ""))
                 })
             }))
-            .Add(() => Js.Let(() => "html", () => Js.Str(() => "<div class='message-item'>")))
+            .Add(() => Js.Let(() => "html", () => includeCycleData
+                ? Js.Str(() => "<div class='message-item' data-cycle-index='").Op(() => "+", () => Js.Id(() => "msg").Prop(() => "cycleIndex")).Op(() => "+", () => Js.Str(() => "' data-cycle-start-status='")).Op(() => "+", () => Js.Id(() => "msg").Prop(() => "cycleStartStatus")).Op(() => "+", () => Js.Str(() => "' data-is-first-in-cycle='")).Op(() => "+", () => Js.Id(() => "msg").Prop(() => "isFirstInCycle")).Op(() => "+", () => Js.Str(() => "'>"))
+                : Js.Str(() => "<div class='message-item'>")))
             .Add(() =>
             {
                 var timestampPart = Js.Id(() => "msg").Prop(() => "timestamp");
@@ -680,6 +684,75 @@ public class ChatHistoryDetailView : ViewBase
             .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "</div></div>"))))
             .Add(() => Js.Return(() => Js.Id(() => "html")));
         var renderMessageItemFunc = Js.Func(() => "renderMessageItem", () => new List<string> { "msg" }, () => renderMessageItemBody);
+        
+        // renderMessagesWithCycles function (only when cycle grouping is enabled)
+        JsFuncDecl? renderMessagesWithCyclesFunc = null;
+        if (includeCycleData && cycleLabel != null && cycleRoundFormat != null)
+        {
+            // Compute the round label JS expression: cycleRoundFormat with {0} replaced by dynamic (cycleIndex+1)
+            var roundParts = cycleRoundFormat.Split("{0}");
+            JsSyntax roundLabelExpr = roundParts.Length == 2
+                ? Js.Str(() => roundParts[0]).Op(() => "+", () => Js.Id(() => "ci").Op(() => "+", () => Js.Num(() => "1"))).Op(() => "+", () => Js.Str(() => roundParts[1]))
+                : Js.Str(() => cycleRoundFormat);
+
+            var renderMessagesWithCyclesBody = Js.Block()
+                .Add(() => Js.Let(() => "html", () => Js.Str(() => "")))
+                .Add(() => Js.Let(() => "lastCycleIndex", () => Js.Num(() => "-1")))
+                .Add(() => Js.Let(() => "maxCycleIdx", () => Js.Num(() => "0")))
+                .Add(() => Js.Id(() => "messages").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Block()
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (Js.Id(() => "m").Prop(() => "cycleIndex").Op(() => ">", () => Js.Id(() => "maxCycleIdx")), new List<JsSyntax>
+                        {
+                            Js.Assign(() => Js.Id(() => "maxCycleIdx"), () => Js.Id(() => "m").Prop(() => "cycleIndex"))
+                        })
+                    }))
+                )).Stmt())
+                .Add(() => Js.Id(() => "messages").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Block()
+                    .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (
+                            Js.Id(() => "m").Prop(() => "isFirstInCycle").Op(() => "&&", () => Js.Id(() => "m").Prop(() => "cycleIndex").Op(() => "!==", () => Js.Id(() => "lastCycleIndex"))),
+                            new List<JsSyntax>
+                        {
+                            // Close previous details if any
+                            Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                            {
+                                (Js.Id(() => "lastCycleIndex").Op(() => ">=", () => Js.Num(() => "0")), new List<JsSyntax>
+                                {
+                                    Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "</details>")))
+                                })
+                            }),
+                            // Open new cycle details
+                            Js.Let(() => "ci", () => Js.Id(() => "m").Prop(() => "cycleIndex")),
+                            Js.Let(() => "isOpen", () => Js.Id(() => "ci").Op(() => "===", () => Js.Id(() => "maxCycleIdx"))),
+                            Js.Assign(
+                                () => Js.Id(() => "html"),
+                                () => Js.Id(() => "html")
+                                    .Op(() => "+", () => Js.Str(() => "<details class='cycle-collapsible' "))
+                                    .Op(() => "+", () => Js.Ternary(() => Js.Id(() => "isOpen"), () => Js.Str(() => "open"), () => Js.Str(() => "")))
+                                    .Op(() => "+", () => Js.Str(() => "><summary><span class='cycle-arrow'>&#9660;</span> "))
+                                    .Op(() => "+", () => Js.Str(() => cycleLabel + " "))
+                                    .Op(() => "+", () => roundLabelExpr)
+                                    .Op(() => "+", () => Js.Str(() => " <span class='cycle-status'>"))
+                                    .Op(() => "+", () => Js.Id(() => "m").Prop(() => "cycleStartStatus"))
+                                    .Op(() => "+", () => Js.Str(() => "</span></summary>"))
+                            )
+                        })
+                    }))
+                    .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Id(() => "renderMessageItem").Invoke(() => Js.Id(() => "m")))))
+                    .Add(() => Js.Assign(() => Js.Id(() => "lastCycleIndex"), () => Js.Id(() => "m").Prop(() => "cycleIndex")))
+                )).Stmt())
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    (Js.Id(() => "lastCycleIndex").Op(() => ">=", () => Js.Num(() => "0")), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html").Op(() => "+", () => Js.Str(() => "</details>")))
+                    })
+                }))
+                .Add(() => Js.Return(() => Js.Id(() => "html")));
+            renderMessagesWithCyclesFunc = Js.Func(() => "renderMessagesWithCycles", () => new List<string> { "messages" }, () => renderMessagesWithCyclesBody);
+        }
         
         // Markdown rendering functions
         var renderMdElementBody = Js.Block()
@@ -754,7 +827,9 @@ public class ChatHistoryDetailView : ViewBase
                             Js.Return(() => Js.Null())
                         })
                     }))
-                    .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => Js.Id(() => "data").Prop(() => "messages").Call(() => "filter", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "m").Prop(() => "role").Op(() => "===", () => Js.Str(() => "User")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "toolCallsJson")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "content")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "thinking")))).Call(() => "map", () => Js.Id(() => "renderMessageItem")).Call(() => "join", () => Js.Str(() => ""))))
+                    .Add(() => Js.Assign(() => Js.Id(() => "container").Prop(() => "innerHTML"), () => renderMessagesWithCyclesFunc != null
+                        ? Js.Id(() => "renderMessagesWithCycles").Invoke(() => Js.Id(() => "data").Prop(() => "messages").Call(() => "filter", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "m").Prop(() => "role").Op(() => "===", () => Js.Str(() => "User")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "toolCallsJson")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "content")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "thinking")))))
+                        : Js.Id(() => "data").Prop(() => "messages").Call(() => "filter", () => Js.Arrow(() => new List<string> { "m" }, () => Js.Id(() => "m").Prop(() => "role").Op(() => "===", () => Js.Str(() => "User")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "toolCallsJson")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "content")).Op(() => "||", () => Js.Id(() => "m").Prop(() => "thinking")))).Call(() => "map", () => Js.Id(() => "renderMessageItem")).Call(() => "join", () => Js.Str(() => ""))))
                     .Add(() => Js.Id(() => "renderMarkdownBody").Invoke(() => Js.Id(() => "container")).Stmt())
                     .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                     {
@@ -771,12 +846,15 @@ public class ChatHistoryDetailView : ViewBase
             () => Js.Arrow(() => new List<string>(), () => onloadBody)
         );
         
-        return Js.Block()
+        var result = Js.Block()
             .Add(() => toolDisplayNamesDecl)
             .Add(() => decodeUnicodeFunc)
             .Add(() => getToolSummaryFunc)
             .Add(() => renderToolMessageFunc)
-            .Add(() => renderMessageItemFunc)
+            .Add(() => renderMessageItemFunc);
+        if (renderMessagesWithCyclesFunc != null)
+            result = result.Add(() => renderMessagesWithCyclesFunc);
+        return result
             .Add(() => renderMarkdownBodyFunc)
             .Add(() => markedLoadCheck)
             .Add(() => onloadAssign);

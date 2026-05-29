@@ -2106,4 +2106,6 @@ _ => permissionType.ToString()
     public override string ProjectThinkStateLabel => "状態：";
     public override string ProjectThinkCreatedAt => "作成日時：";
     public override string ProjectThinkCompletedAt => "完了日時：";
+    public override string ProjectThinkCycleLabel => "サイクル";
+    public override string ProjectThinkRoundN => "第{0}ラウンド";
 }

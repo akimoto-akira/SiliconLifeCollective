@@ -1158,4 +1158,6 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
     public override string ProjectThinkStateLabel => "Stav: ";
     public override string ProjectThinkCreatedAt => "Vytvořeno: ";
     public override string ProjectThinkCompletedAt => "Dokončeno: ";
+    public override string ProjectThinkCycleLabel => "Cyklus";
+    public override string ProjectThinkRoundN => "Kolo {0}";
 }

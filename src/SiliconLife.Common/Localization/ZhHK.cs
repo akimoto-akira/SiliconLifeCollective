@@ -1960,4 +1960,6 @@ _ => permissionType.ToString()
     public override string ProjectThinkStateLabel => "狀態：";
     public override string ProjectThinkCreatedAt => "建立時間：";
     public override string ProjectThinkCompletedAt => "完成時間：";
+    public override string ProjectThinkCycleLabel => "輪次";
+    public override string ProjectThinkRoundN => "第 {0} 輪";
 }

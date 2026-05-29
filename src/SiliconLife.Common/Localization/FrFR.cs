@@ -2068,4 +2068,6 @@ Utilisation : Appelle l'outil chat, définis action=""mark_read"", target_id=GUI
     public override string ProjectThinkStateLabel => "État : ";
     public override string ProjectThinkCreatedAt => "Créé : ";
     public override string ProjectThinkCompletedAt => "Terminé : ";
+    public override string ProjectThinkCycleLabel => "Cycle";
+    public override string ProjectThinkRoundN => "Tour {0}";
 }

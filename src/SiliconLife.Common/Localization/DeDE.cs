@@ -2105,4 +2105,6 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=GegenÃ
     public override string ProjectThinkStateLabel => "Status: ";
     public override string ProjectThinkCreatedAt => "Erstellt: ";
     public override string ProjectThinkCompletedAt => "Abgeschlossen: ";
+    public override string ProjectThinkCycleLabel => "Zyklus";
+    public override string ProjectThinkRoundN => "Runde {0}";
 }
