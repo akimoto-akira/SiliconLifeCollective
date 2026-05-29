@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -1861,7 +1861,7 @@ public class ProjectController : Controller
                     return;
                 }
 
-                var session = project.ThinkSessions.Values.FirstOrDefault(s => s.Id.ToString() == sessionId)
+                var session = project.ThinkSessions.FirstOrDefault(s => s.Id.ToString() == sessionId)
                     ?? project.ThinkSessionHistory.FirstOrDefault(s => s.Id.ToString() == sessionId);
 
                 if (session == null)
@@ -1925,7 +1925,7 @@ public class ProjectController : Controller
                 var beingManager = ServiceLocator.Instance.BeingManager;
                 var result = new List<object>();
 
-                foreach (var session in project.ThinkSessions.Values)
+                foreach (var session in project.ThinkSessions)
                 {
                     var being = beingManager?.GetBeing(session.BeingId);
                     result.Add(new
@@ -2000,7 +2000,7 @@ public class ProjectController : Controller
                     return;
                 }
 
-                var session = project.ThinkSessions.Values.FirstOrDefault(s => s.Id.ToString() == sessionIdStr)
+                var session = project.ThinkSessions.FirstOrDefault(s => s.Id.ToString() == sessionIdStr)
                     ?? project.ThinkSessionHistory.FirstOrDefault(s => s.Id.ToString() == sessionIdStr);
 
                 if (session == null)

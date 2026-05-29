@@ -1343,6 +1343,25 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         return lastMsg.Role == MessageRole.Tool || lastMsg.Role == MessageRole.Assistant;
     }
 
+    public static bool NeedsContinuation(SiliconBeingBase being, ProjectThinkSession session)
+    {
+        if (session.State != ProjectThinkState.Started && session.State != ProjectThinkState.Executing)
+            return false;
+
+        if (session.ChatHistory.Count == 0)
+            return false;
+
+        ChatHistoryCycle lastCycle = session.ChatHistory[^1];
+        if (lastCycle.EndStatus != null)
+            return false;
+
+        if (lastCycle.Messages.Count == 0)
+            return false;
+
+        ChatMessage lastMsg = lastCycle.Messages[^1];
+        return lastMsg.Role == MessageRole.Tool || lastMsg.Role == MessageRole.Assistant;
+    }
+
     public AIResponse ThinkOnProject()
     {
         var attentionInfo = FindProjectNeedingAttention();
@@ -1365,7 +1384,7 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         };
         _projectThinkSession = session;
 
-        project.ThinkSessions[_being.Id] = session;
+        project.ThinkSessions.Add(session);
 
         Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
         LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
@@ -1441,13 +1460,21 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
         LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
 
-        if (session.ChatHistory.Count > 0 && session.ChatHistory[^1].EndStatus == null)
+        var attentionReasons = GetProjectAttentionReasons(project, projectManager);
+        ProjectAttentionInfo? attentionInfo = null;
+        if (attentionReasons.Count > 0)
         {
-            session.SealCurrentCycle(ProjectThinkState.Started);
+            attentionInfo = new ProjectAttentionInfo
+            {
+                Project = project,
+                Reasons = attentionReasons.Select(r => r.reason).ToList(),
+                UnsatisfiedRoleDetails = attentionReasons
+                    .Where(r => r.details != null)
+                    .SelectMany(r => r.details!)
+                    .ToList()
+            };
         }
-        session.AppendNewCycle();
-
-        string scenarioContext = BuildProjectScenarioContext(project);
+        string scenarioContext = BuildProjectScenarioContext(project, attentionInfo);
         AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project, projectId: project.Id);
 
         ChatHistoryCycle currentCycle = session.GetCurrentCycle();
@@ -1490,7 +1517,7 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
 
         if (session.State == ProjectThinkState.Completed || session.State == ProjectThinkState.Failed)
         {
-            project.ThinkSessions.Remove(session.BeingId);
+            project.ThinkSessions.Remove(session);
             project.ThinkSessionHistory.Add(session);
         }
 

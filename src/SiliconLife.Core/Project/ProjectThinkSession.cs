@@ -152,7 +152,10 @@ public sealed class ProjectThinkSession
         var lastCycle = ChatHistory[^1];
         if (lastCycle.EndStatus != null) return false;
         if (lastCycle.Messages.Count == 0) return false;
-        return lastCycle.Messages[^1].Role == MessageRole.Tool;
+        var lastMsg = lastCycle.Messages[^1];
+        if (lastMsg.SenderId != BeingId)
+            return true;
+        return lastMsg.Role == MessageRole.Tool;
     }
 
     /// <summary>

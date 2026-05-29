@@ -108,11 +108,11 @@ public sealed class ProjectSpace
 
     /// <summary>
     /// Gets or sets the active think sessions for this project.
-    /// Key: curator being GUID, Value: the think session for that curator.
-    /// Each curator can have at most one active think session per project.
+    /// A being can have multiple active think sessions in the same project
+    /// (e.g., different tasks or conversation branches).
     /// Sessions are persisted as part of the project data and cleaned up after completion.
     /// </summary>
-    public Dictionary<Guid, ProjectThinkSession> ThinkSessions { get; set; } = new();
+    public List<ProjectThinkSession> ThinkSessions { get; set; } = new();
 
     /// <summary>
     /// Gets or sets the completed/failed think sessions for this project.

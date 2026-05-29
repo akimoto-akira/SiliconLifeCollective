@@ -251,6 +251,21 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 }
             }
 
+            if (IsCurator)
+            {
+                var executingSession = GetExecutingProjectThinkSession();
+                if (executingSession != null)
+                {
+                    _activityRaw = (int)BeingActivity.Project;
+                    _logger.Info(Id, "Being {0}: continuing project think session {1} (round={2})",
+                        Name, executingSession.Id, executingSession.CurrentRound);
+                    if (!ExecuteBrain("ThinkOnProjectContinue", null,
+                        _ => new ContextManager(this, executingSession).ThinkOnProjectContinue(executingSession)))
+                        errorOccurred = true;
+                    return;
+                }
+            }
+
             List<TaskItem> continuationTasks = TaskCenter.Instance.GetContinuationTasks(Id);
             if (continuationTasks.Count > 0)
             {
@@ -278,18 +293,6 @@ public class DefaultSiliconBeing : SiliconBeingBase
 
             if (IsCurator)
             {
-                var executingSession = GetExecutingProjectThinkSession();
-                if (executingSession != null)
-                {
-                    _activityRaw = (int)BeingActivity.Project;
-                    _logger.Info(Id, "Being {0}: continuing project think session {1} (round={2})",
-                        Name, executingSession.Id, executingSession.CurrentRound);
-                    if (!ExecuteBrain("ThinkOnProjectContinue", null,
-                        _ => new ContextManager(this, executingSession).ThinkOnProjectContinue(executingSession)))
-                        errorOccurred = true;
-                    return;
-                }
-
                 if (HasProjectsNeedingAttention())
                 {
                     _activityRaw = (int)BeingActivity.Project;
@@ -867,11 +870,14 @@ public class DefaultSiliconBeing : SiliconBeingBase
         var projects = projectManager.ListProjects(includeArchived: false);
         foreach (var project in projects)
         {
-            if (project.CreatedBy != Id || project.Status != ProjectStatus.Active)
+            if (project.Status != ProjectStatus.Active)
                 continue;
 
-            if (project.ThinkSessions.TryGetValue(Id, out var session))
+            foreach (var session in project.ThinkSessions)
             {
+                if (session.BeingId != Id)
+                    continue;
+
                 if (session.State == ProjectThinkState.Started || session.State == ProjectThinkState.Executing)
                 {
                     if (session.NeedsContinuation())
