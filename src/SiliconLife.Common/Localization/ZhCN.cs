@@ -2110,4 +2110,7 @@ _ => permissionType.ToString()
     public override string ProjectThinkDetailHeader => "处理详情";
     public override string ProjectThinkRoundLabel => "轮次：";
     public override string ProjectThinkMessageCountLabel => "消息数：";
+    public override string ProjectThinkStateLabel => "状态：";
+    public override string ProjectThinkCreatedAt => "创建时间：";
+    public override string ProjectThinkCompletedAt => "完成时间：";
 }

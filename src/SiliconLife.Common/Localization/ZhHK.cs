@@ -1957,4 +1957,7 @@ _ => permissionType.ToString()
     public override string ProjectThinkDetailHeader => "處理詳情";
     public override string ProjectThinkRoundLabel => "輪次：";
     public override string ProjectThinkMessageCountLabel => "訊息數：";
+    public override string ProjectThinkStateLabel => "狀態：";
+    public override string ProjectThinkCreatedAt => "建立時間：";
+    public override string ProjectThinkCompletedAt => "完成時間：";
 }

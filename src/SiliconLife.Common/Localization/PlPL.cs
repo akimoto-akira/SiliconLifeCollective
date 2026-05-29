@@ -1194,4 +1194,7 @@ Użycie: wywołaj narzędzie chat, ustaw action=""mark_read"", target_id=GUID ro
     public override string ProjectThinkDetailHeader => "Szczegóły sesji";
     public override string ProjectThinkRoundLabel => "Runda: ";
     public override string ProjectThinkMessageCountLabel => "Wiadomości: ";
+    public override string ProjectThinkStateLabel => "Stan: ";
+    public override string ProjectThinkCreatedAt => "Utworzono: ";
+    public override string ProjectThinkCompletedAt => "Ukończono: ";
 }

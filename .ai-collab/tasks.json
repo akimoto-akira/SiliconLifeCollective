@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-30T00:45:00+08:00",
-  "lastCommitHash": "90b60c5",
+  "lastUpdated": "2026-05-30T01:15:00+08:00",
+  "lastCommitHash": "b80a33b",
   "tasks": [
     {
       "id": "task-392",
@@ -197,7 +197,8 @@
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
       "completedAt": "2026-05-30T01:10:00+08:00",
-      "relatedTask": "task-397"
+      "relatedTask": "task-397",
+      "relatedCommit": "b80a33b"
     },
     {
       "id": "task-406",
@@ -206,10 +207,11 @@
       "title": "项目思考详情页增加会话状态、创建时间、完成时间展示",
       "description": "ProjectThinkDetailViewModel包含State/CreatedAt/CompletedAt等字段，但ProjectThinkDetailView.RenderBody仅展示项目名和轮次信息，缺少会话状态（Started/Executing/Completed/Failed）、创建时间和完成时间的展示。修复方式：1) RenderBody的page-header区域增加会话状态标签（根据State用不同颜色/图标区分）、创建时间和完成时间；2) DefaultLocalizationBase新增ProjectThinkStateLabel/ProjectThinkCreatedAt/ProjectThinkCompletedAt本地化条目；3) 所有语言文件补充翻译。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-30T00:15:00+08:00",
       "createdBy": "catpaw",
-      "assignedTo": null,
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-30T01:45:00+08:00",
       "relatedTask": "task-397"
     },
     {
@@ -229,11 +231,10 @@
   "taskIndex": {
     "pending": [
       "task-402",
-      "task-406",
       "task-407"
     ],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-403", "task-404", "task-405"],
+    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-403", "task-404", "task-405", "task-406"],
     "cancelled": []
   },
   "metadata": {

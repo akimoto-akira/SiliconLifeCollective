@@ -3733,6 +3733,21 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     public abstract string ProjectThinkRoundLabel { get; }
     public abstract string ProjectThinkMessageCountLabel { get; }
 
+    /// <summary>
+    /// Gets the label for the session state field
+    /// </summary>
+    public abstract string ProjectThinkStateLabel { get; }
+
+    /// <summary>
+    /// Gets the label for the session creation time
+    /// </summary>
+    public abstract string ProjectThinkCreatedAt { get; }
+
+    /// <summary>
+    /// Gets the label for the session completion time
+    /// </summary>
+    public abstract string ProjectThinkCompletedAt { get; }
+
     /// <inheritdoc/>
     public override string FormatWorkflowRoleBlockedNotification(
         string projectName, string transitionName, string fromState, string toState, string missingRoles)

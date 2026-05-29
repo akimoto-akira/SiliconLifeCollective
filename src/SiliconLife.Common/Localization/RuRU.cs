@@ -1008,4 +1008,7 @@ public class RuRU : DefaultLocalizationBase
     public override string ProjectThinkDetailHeader => "Детали сеанса";
     public override string ProjectThinkRoundLabel => "Раунд: ";
     public override string ProjectThinkMessageCountLabel => "Сообщений: ";
+    public override string ProjectThinkStateLabel => "Состояние: ";
+    public override string ProjectThinkCreatedAt => "Создано: ";
+    public override string ProjectThinkCompletedAt => "Завершено: ";
 }

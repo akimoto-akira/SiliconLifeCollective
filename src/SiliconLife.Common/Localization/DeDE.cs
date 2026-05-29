@@ -2102,4 +2102,7 @@ Verwendung: Rufe das chat-Tool auf, setze action=""mark_read"", target_id=GegenÃ
     public override string ProjectThinkDetailHeader => "Denksitzungsdetail";
     public override string ProjectThinkRoundLabel => "Runde: ";
     public override string ProjectThinkMessageCountLabel => "Nachrichten: ";
+    public override string ProjectThinkStateLabel => "Status: ";
+    public override string ProjectThinkCreatedAt => "Erstellt: ";
+    public override string ProjectThinkCompletedAt => "Abgeschlossen: ";
 }

@@ -2103,4 +2103,7 @@ _ => permissionType.ToString()
     public override string ProjectThinkDetailHeader => "처리 상세";
     public override string ProjectThinkRoundLabel => "라운드: ";
     public override string ProjectThinkMessageCountLabel => "메시지 수: ";
+    public override string ProjectThinkStateLabel => "상태: ";
+    public override string ProjectThinkCreatedAt => "생성 시간: ";
+    public override string ProjectThinkCompletedAt => "완료 시간: ";
 }

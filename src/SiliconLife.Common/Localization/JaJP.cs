@@ -2103,4 +2103,7 @@ _ => permissionType.ToString()
     public override string ProjectThinkDetailHeader => "処理詳細";
     public override string ProjectThinkRoundLabel => "ラウンド：";
     public override string ProjectThinkMessageCountLabel => "メッセージ数：";
+    public override string ProjectThinkStateLabel => "状態：";
+    public override string ProjectThinkCreatedAt => "作成日時：";
+    public override string ProjectThinkCompletedAt => "完了日時：";
 }

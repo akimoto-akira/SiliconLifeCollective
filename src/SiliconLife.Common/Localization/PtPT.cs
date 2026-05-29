@@ -1903,4 +1903,7 @@ Uso: Chama a ferramenta chat, define action=""mark_read"", target_id=GUID do int
     public override string ProjectThinkDetailHeader => "Detalhe da sessão";
     public override string ProjectThinkRoundLabel => "Ronda: ";
     public override string ProjectThinkMessageCountLabel => "Mensagens: ";
+    public override string ProjectThinkStateLabel => "Estado: ";
+    public override string ProjectThinkCreatedAt => "Criado: ";
+    public override string ProjectThinkCompletedAt => "Concluído: ";
 }

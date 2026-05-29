@@ -2105,4 +2105,7 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ProjectThinkDetailHeader => "Think Session Detail";
     public override string ProjectThinkRoundLabel => "Round: ";
     public override string ProjectThinkMessageCountLabel => "Messages: ";
+    public override string ProjectThinkStateLabel => "State: ";
+    public override string ProjectThinkCreatedAt => "Created: ";
+    public override string ProjectThinkCompletedAt => "Completed: ";
 }

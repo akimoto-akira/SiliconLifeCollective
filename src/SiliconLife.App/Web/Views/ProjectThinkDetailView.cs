@@ -30,11 +30,22 @@ public class ProjectThinkDetailView : ViewBase
 
     private static H RenderBody(ProjectThinkDetailViewModel vm)
     {
+        var (stateText, stateCssClass) = GetStateDisplay(vm);
+        var createdAtText = $"{vm.Localization.ProjectThinkCreatedAt}{vm.CreatedAt}";
+        var completedAtText = vm.CompletedAt != null ? $"{vm.Localization.ProjectThinkCompletedAt}{vm.CompletedAt}" : null;
+
         return H.Div(
             H.Div(
                 H.A(vm.Localization.ProjectThinkBackToProjects).Href($"/project/{vm.ProjectId}/think-history").Class("back-link"),
                 H.H1(vm.Localization.ProjectThinkDetailHeader),
-                H.P($"{string.Format(vm.Localization.ProjectThinkProjectName, vm.ProjectName)} | {vm.Localization.ProjectThinkRoundLabel}{vm.CurrentRound}/{vm.MaxRounds}").Class("page-subtitle")
+                H.P(
+                    $"{string.Format(vm.Localization.ProjectThinkProjectName, vm.ProjectName)} | {vm.Localization.ProjectThinkRoundLabel}{vm.CurrentRound}/{vm.MaxRounds}"
+                ).Class("page-subtitle"),
+                H.Div(
+                    H.Span(stateText).Class($"execution-state {stateCssClass}"),
+                    H.Span(createdAtText).Class("session-meta"),
+                    H.Span(completedAtText ?? "").When(completedAtText != null).Class("session-meta")
+                ).Class("session-info")
             ).Class("page-header"),
             H.Div().Id("message-list").Class("message-list"),
             H.Div(
@@ -44,9 +55,55 @@ public class ProjectThinkDetailView : ViewBase
         ).Class("page-content");
     }
 
+    private static (string text, string cssClass) GetStateDisplay(ProjectThinkDetailViewModel vm)
+    {
+        return vm.State?.ToLowerInvariant() switch
+        {
+            "started" => (vm.Localization.ProjectThinkStateStarted, "started"),
+            "executing" => (vm.Localization.ProjectThinkStateExecuting, "executing"),
+            "completed" => (vm.Localization.ProjectThinkStateCompleted, "completed"),
+            "failed" => (vm.Localization.ProjectThinkStateFailed, "failed"),
+            _ => (vm.State ?? "", "started")
+        };
+    }
+
     private static CssBuilder GetStyles()
     {
-        return ChatHistoryDetailView.GetStylesInternal();
+        return ChatHistoryDetailView.GetStylesInternal()
+            .Selector(".session-info")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "16px")
+                .Property("margin-top", "8px")
+                .Property("flex-wrap", "wrap")
+            .EndSelector()
+            .Selector(".session-meta")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".execution-state")
+                .Property("display", "inline-block")
+                .Property("padding", "4px 12px")
+                .Property("border-radius", "12px")
+                .Property("font-size", "12px")
+                .Property("font-weight", "bold")
+            .EndSelector()
+            .Selector(".execution-state.started")
+                .Property("background", "rgba(77,150,255,0.15)")
+                .Property("color", "var(--accent-primary)")
+            .EndSelector()
+            .Selector(".execution-state.executing")
+                .Property("background", "rgba(255,193,7,0.15)")
+                .Property("color", "#ffc107")
+            .EndSelector()
+            .Selector(".execution-state.completed")
+                .Property("background", "rgba(107,203,119,0.15)")
+                .Property("color", "var(--accent-success)")
+            .EndSelector()
+            .Selector(".execution-state.failed")
+                .Property("background", "rgba(255,82,82,0.15)")
+                .Property("color", "var(--accent-error, #ff5252)")
+            .EndSelector();
     }
 
     private static JsSyntax GetScripts(ProjectThinkDetailViewModel vm)
