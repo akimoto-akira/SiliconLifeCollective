@@ -128,6 +128,11 @@ public class OllamaClient : IAIClient
     private readonly JsonSerializerOptions _jsonOptions;
 
     /// <summary>
+    /// Maximum allowed context window token capacity for Ollama models (256K)
+    /// </summary>
+    public const int MaxContextWindowTokens = 262144; // 256K
+
+    /// <summary>
     /// Gets the endpoint URL of the Ollama service
     /// </summary>
     public string Endpoint { get; }
@@ -136,6 +141,12 @@ public class OllamaClient : IAIClient
     /// Gets the default model name
     /// </summary>
     public string DefaultModel { get; }
+
+    /// <summary>
+    /// User-configured context window token capacity.
+    /// When set, overrides the auto-detected value from model name mapping.
+    /// </summary>
+    private readonly int? _contextWindowTokens;
 
     /// <summary>
     /// Ollama supports both streaming and non-streaming modes.
@@ -149,12 +160,28 @@ public class OllamaClient : IAIClient
     public bool? SupportsToolCalls => true;
 
     /// <summary>
+    /// Gets the context window token capacity for the current model.
+    /// Returns the user-configured value if provided, otherwise falls back to
+    /// auto-detection from known model name mapping.
+    /// Returns null for unknown models without explicit configuration
+    /// (ContextManager will fall back to MaxContextMessages).
+    /// </summary>
+    public int? ContextWindowTokens => _contextWindowTokens ?? GetContextWindowForModel(DefaultModel);
+
+    /// <summary>
     /// Creates a new Ollama client with the specified endpoint
     /// </summary>
-    public OllamaClient(string endpoint = "http://localhost:11434", string defaultModel = "llama3.2")
+    /// <param name="endpoint">Ollama API endpoint URL</param>
+    /// <param name="defaultModel">Default model name</param>
+    /// <param name="contextWindowTokens">Optional context window token capacity override.
+    /// When provided, overrides auto-detected model mapping. Clamped to MaxContextWindowTokens (256K).</param>
+    public OllamaClient(string endpoint = "http://localhost:11434", string defaultModel = "llama3.2", int? contextWindowTokens = null)
     {
         Endpoint = endpoint.TrimEnd('/');
         DefaultModel = defaultModel;
+        _contextWindowTokens = contextWindowTokens.HasValue
+            ? Math.Min(contextWindowTokens.Value, MaxContextWindowTokens)
+            : null;
         _httpClient = new HttpClient
         {
             Timeout = TimeSpan.FromMinutes(5)
@@ -571,6 +598,66 @@ public class OllamaClient : IAIClient
         request.AddMessage(MessageRole.System, systemPrompt);
         request.AddMessage(MessageRole.User, userMessage);
         return await ChatAsync(request);
+    }
+
+    /// <summary>
+    /// Maps known Ollama model names (case-insensitive prefix match) to their
+    /// default context window sizes in tokens. Ollama's default num_ctx is 2048
+    /// for most models, but many models support larger contexts.
+    /// </summary>
+    private static int? GetContextWindowForModel(string modelName)
+    {
+        if (string.IsNullOrEmpty(modelName)) return null;
+
+        string m = modelName.ToLowerInvariant();
+
+        // DeepSeek models
+        if (m.StartsWith("deepseek-r1")) return 131072;   // 128K
+        if (m.StartsWith("deepseek-coder")) return 16384; // 16K
+        if (m.StartsWith("deepseek")) return 4096;
+
+        // Qwen models
+        if (m.Contains("qwen2.5") && m.Contains("coder")) return 131072; // 128K
+        if (m.Contains("qwen2.5")) return 131072;  // 128K
+        if (m.Contains("qwen2")) return 32768;      // 32K
+        if (m.Contains("qwen1.5")) return 32768;    // 32K
+        if (m.Contains("qwen")) return 8192;
+
+        // Llama models
+        if (m.StartsWith("llama3.3")) return 131072;  // 128K
+        if (m.StartsWith("llama3.2-vision")) return 131072; // 128K
+        if (m.StartsWith("llama3.2")) return 131072; // 128K
+        if (m.StartsWith("llama3.1")) return 131072; // 128K
+        if (m.StartsWith("llama3")) return 8192;
+        if (m.StartsWith("llama2")) return 4096;
+
+        // Mistral/Mixtral models
+        if (m.Contains("mixtral")) return 32768;    // 32K
+        if (m.Contains("mistral")) return 32768;    // 32K
+        if (m.Contains("codestral")) return 32768;  // 32K
+
+        // Gemma models
+        if (m.Contains("gemma2")) return 8192;
+        if (m.Contains("gemma")) return 8192;
+
+        // Phi models
+        if (m.Contains("phi4")) return 16384;      // 16K
+        if (m.Contains("phi3")) return 131072;      // 128K (medium)
+        if (m.Contains("phi")) return 4096;
+
+        // Command R models
+        if (m.Contains("command-r")) return 131072; // 128K
+
+        // Yi models
+        if (m.Contains("yi-coder")) return 131072;  // 128K
+        if (m.Contains("yi")) return 4096;
+
+        // StarCoder
+        if (m.Contains("starcoder")) return 16384; // 16K
+
+        // Default for unknown models: Ollama default is 2048, but we use a
+        // conservative default of 4096 as most modern models support at least 4K
+        return 4096;
     }
 
     /// <summary>

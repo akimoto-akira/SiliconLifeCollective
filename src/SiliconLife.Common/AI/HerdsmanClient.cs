@@ -83,18 +83,48 @@ public class HerdsmanClient : IAIClient
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
 
+    /// <summary>
+    /// Maximum allowed context window token capacity for Herdsman models (128K)
+    /// </summary>
+    public const int MaxContextWindowTokens = 131072; // 128K
+
     public string Endpoint { get; }
 
     public string DefaultModel { get; }
+
+    /// <summary>
+    /// User-configured context window token capacity.
+    /// When set, overrides the default null (unknown) behavior.
+    /// </summary>
+    private readonly int? _contextWindowTokens;
 
     public bool? StreamingMode => null;
 
     public bool? SupportsToolCalls => true;
 
-    public HerdsmanClient(string endpoint, string defaultModel = "llama3-8b")
+    /// <summary>
+    /// Gets the context window token capacity for the current model.
+    /// Returns the user-configured value if provided, otherwise null
+    /// (ContextManager will fall back to MaxContextMessages behavior).
+    /// Herdsman uses OpenAI-compatible API with user-provided models,
+    /// so context window size must be explicitly configured.
+    /// </summary>
+    public int? ContextWindowTokens => _contextWindowTokens;
+
+    /// <summary>
+    /// Creates a new Herdsman client with the specified endpoint
+    /// </summary>
+    /// <param name="endpoint">Herdsman API endpoint URL</param>
+    /// <param name="defaultModel">Default model name</param>
+    /// <param name="contextWindowTokens">Optional context window token capacity override.
+    /// When provided, enables token-budget-based context trimming. Clamped to MaxContextWindowTokens (128K).</param>
+    public HerdsmanClient(string endpoint, string defaultModel = "llama3-8b", int? contextWindowTokens = null)
     {
         Endpoint = endpoint.TrimEnd('/');
         DefaultModel = defaultModel;
+        _contextWindowTokens = contextWindowTokens.HasValue
+            ? Math.Min(contextWindowTokens.Value, MaxContextWindowTokens)
+            : null;
         _httpClient = new HttpClient
         {
             Timeout = TimeSpan.FromMinutes(5)

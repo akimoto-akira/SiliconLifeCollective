@@ -35,11 +35,31 @@ public class ContextManager
 
     /// <summary>
     /// Maximum number of recent chat messages loaded into context per AI request.
-    /// Limits the context window to avoid unbounded token consumption during
-    /// long-running sessions. Older messages are still preserved in storage and
-    /// summarized into long-term memory via the compression pipeline.
+    /// Used as fallback when IAIClient.ContextWindowTokens is null (unknown model).
+    /// When ContextWindowTokens is available, token-budget-based trimming is used instead.
+    /// Older messages are still preserved in storage and summarized into long-term
+    /// memory via the compression pipeline.
     /// </summary>
     private const int MaxContextMessages = 20;
+
+    /// <summary>
+    /// Default context window token capacity used when ContextWindowTokens is null
+    /// but token-budget mode is desired. Conservative 8K assumption.
+    /// </summary>
+    private const int DefaultFallbackContextTokens = 8192;
+
+    /// <summary>
+    /// Percentage of the context window reserved for AI output (completion tokens).
+    /// 20% of the total context window is reserved so the model has room to respond.
+    /// </summary>
+    private const double OutputReservationRatio = 0.20;
+
+    /// <summary>
+    /// Rough estimate of how many characters correspond to one token.
+    /// For mixed Chinese/English text, ~3.5 characters per token is a reasonable
+    /// approximation. Used for budget estimation without a real tokenizer.
+    /// </summary>
+    private const double CharsPerToken = 3.5;
 
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ContextManager>();
     private IAIClient _aiClient;
@@ -386,7 +406,18 @@ public class ContextManager
     }
 
     /// <summary>
-    /// Builds an AIRequest from the current context
+    /// Builds an AIRequest from the current context.
+    /// When IAIClient.ContextWindowTokens is available, uses token-budget-based trimming
+    /// to fit within the model's context window. Otherwise falls back to the legacy
+    /// MaxContextMessages behavior.
+    /// Token budget priority (highest to lowest):
+    ///   1. SystemCore (soul + common prompt + identity) - always preserved
+    ///   2. ScenarioContext - always preserved
+    ///   3. ToolDefinitions - preserved when possible (also consumes tokens in API)
+    ///   4. RecentMessages - sliding window, trimmed from oldest
+    ///   5. MemoryContext - can be truncated or dropped
+    ///   6. KnowledgeContext - can be dropped
+    ///   7. ProjectInfoContext - can be dropped
     /// </summary>
     /// <param name="scenarioContext">Optional scenario-specific context from caller</param>
     private AIRequest BuildRequest(string? scenarioContext = null, TaskItem? task = null, ToolScenarioFlag scenario = ToolScenarioFlag.All, Guid? projectId = null)
@@ -396,6 +427,10 @@ public class ContextManager
 
         AIRequest request = new AIRequest(_aiClient.DefaultModel);
 
+        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        LocalizationBase loc = LocalizationManager.Instance.GetLocalization(language);
+
+        // ===== Layer 1: SystemCore (always preserved) =====
         if (!string.IsNullOrEmpty(_being.SoulContent))
         {
             request.Messages.Add(new ChatMessage
@@ -406,8 +441,6 @@ public class ContextManager
         }
 
         // Add common prompt (behavior guidelines shared by all silicon beings)
-        Language language = Config.Instance?.Data?.Language ?? Language.ZhCN;
-        LocalizationBase loc = LocalizationManager.Instance.GetLocalization(language);
         request.Messages.Add(new ChatMessage
         {
             Role = MessageRole.System,
@@ -420,19 +453,10 @@ public class ContextManager
             Content = $"Your name: {_being.Name}\nYour GUID: {_being.Id}\nCurrent time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\nSystem language: {language}",
         });
 
-        // Project affiliation context (placed after IdentityInfo, before ScenarioContext).
-        // Provides the AI with awareness of which projects it belongs to and its roles,
-        // enabling project-aware behavior and decision-making.
+        // ===== Layer 7: ProjectInfoContext (can be dropped when budget is tight) =====
         string? projectInfoContext = BuildProjectInfoContext(loc);
-        if (!string.IsNullOrEmpty(projectInfoContext))
-        {
-            request.Messages.Add(new ChatMessage
-            {
-                Role = MessageRole.System,
-                Content = projectInfoContext,
-            });
-        }
 
+        // ===== Layer 2: ScenarioContext (always preserved) =====
         if (!string.IsNullOrEmpty(scenarioContext))
         {
             request.Messages.Add(new ChatMessage
@@ -442,59 +466,313 @@ public class ContextManager
             });
         }
 
-        // Knowledge network context (placed after scenario, before memory).
-        // Provides the AI with awareness of what knowledge is available in the graph,
-        // enabling it to query and use knowledge for decision-making.
+        // ===== Layer 6: KnowledgeContext (can be dropped) =====
         string? knowledgeContext = BuildKnowledgeContext();
-        if (!string.IsNullOrEmpty(knowledgeContext))
-        {
-            request.Messages.Add(new ChatMessage
-            {
-                Role = MessageRole.System,
-                Content = knowledgeContext,
-            });
-        }
 
-        // Memory context (placed at the end of system prompts, immediately before the
-        // conversation). Rationale:
-        // - Closest to the dialog, so the model's attention is strongest here.
-        // - Semantic layering: earlier system messages = instructions, last one = context.
-        // - Aligns with RAG best practice (retrieved info at end of system prompt).
+        // ===== Layer 5: MemoryContext (can be truncated or dropped) =====
         string? memoryContext = BuildMemoryContext();
-        if (!string.IsNullOrEmpty(memoryContext))
+
+        // ===== Determine if token-budget mode should be used =====
+        int? contextWindowTokens = _aiClient.ContextWindowTokens;
+        bool useTokenBudget = contextWindowTokens.HasValue && contextWindowTokens.Value > 0;
+
+        if (useTokenBudget)
         {
-            request.Messages.Add(new ChatMessage
+            // Token-budget-based context assembly
+            int totalBudget = contextWindowTokens!.Value;
+            int outputBudget = (int)(totalBudget * OutputReservationRatio);
+            int inputBudget = totalBudget - outputBudget;
+
+            // Calculate tokens already consumed by SystemCore + ScenarioContext
+            int systemTokensUsed = EstimateTokens(request.Messages);
+
+            // Estimate tool definition tokens
+            ToolManager? toolManager = _being.ToolManager;
+            List<ToolDefinition>? toolDefs = null;
+            int toolDefTokens = 0;
+            if (toolManager != null && toolManager.ToolCount > 0 && _aiClient.SupportsToolCalls != false)
             {
-                Role = MessageRole.System,
-                Content = memoryContext,
-            });
+                var effectivePermissions = ToolActionPermissionHelper.GetEffectivePermissions(_being, projectId);
+                if (task?.RequiredTools != null && task.RequiredTools.Count > 0)
+                {
+                    toolDefs = (effectivePermissions.GetRestrictedToolNames().Count > 0)
+                        ? toolManager.GetToolDefinitions(task.RequiredTools, _being.Id, effectivePermissions)
+                        : toolManager.GetToolDefinitions(task.RequiredTools);
+                }
+                else
+                {
+                    toolDefs = (effectivePermissions.GetRestrictedToolNames().Count > 0)
+                        ? toolManager.GetToolDefinitions(scenario, _being.Id, effectivePermissions)
+                        : toolManager.GetToolDefinitions(scenario);
+                }
+                toolDefTokens = EstimateToolDefinitionTokens(toolDefs);
+            }
+
+            int remainingAfterCoreAndTools = inputBudget - systemTokensUsed - toolDefTokens;
+
+            // Add ProjectInfoContext if budget allows (Layer 7 - lowest priority)
+            if (!string.IsNullOrEmpty(projectInfoContext) && remainingAfterCoreAndTools > 0)
+            {
+                int projectInfoTokens = EstimateTokenCount(projectInfoContext);
+                if (projectInfoTokens <= remainingAfterCoreAndTools * 0.15) // Don't let it exceed 15% of remaining
+                {
+                    request.Messages.Add(new ChatMessage
+                    {
+                        Role = MessageRole.System,
+                        Content = projectInfoContext,
+                    });
+                    remainingAfterCoreAndTools -= projectInfoTokens;
+                }
+                else
+                {
+                    _logger.Debug(_being.Id, "Token budget: skipping ProjectInfoContext ({0} tokens, {1} remaining)",
+                        projectInfoTokens, remainingAfterCoreAndTools);
+                    projectInfoContext = null;
+                }
+            }
+
+            // Add KnowledgeContext if budget allows (Layer 6)
+            if (!string.IsNullOrEmpty(knowledgeContext) && remainingAfterCoreAndTools > 0)
+            {
+                int knowledgeTokens = EstimateTokenCount(knowledgeContext);
+                if (knowledgeTokens <= remainingAfterCoreAndTools * 0.20) // Don't let it exceed 20% of remaining
+                {
+                    request.Messages.Add(new ChatMessage
+                    {
+                        Role = MessageRole.System,
+                        Content = knowledgeContext,
+                    });
+                    remainingAfterCoreAndTools -= knowledgeTokens;
+                }
+                else
+                {
+                    _logger.Debug(_being.Id, "Token budget: skipping KnowledgeContext ({0} tokens, {1} remaining)",
+                        knowledgeTokens, remainingAfterCoreAndTools);
+                    knowledgeContext = null;
+                }
+            }
+
+            // Add MemoryContext, possibly truncated (Layer 5)
+            if (!string.IsNullOrEmpty(memoryContext) && remainingAfterCoreAndTools > 0)
+            {
+                int memoryTokens = EstimateTokenCount(memoryContext);
+                if (memoryTokens <= remainingAfterCoreAndTools * 0.30) // Don't let it exceed 30% of remaining
+                {
+                    request.Messages.Add(new ChatMessage
+                    {
+                        Role = MessageRole.System,
+                        Content = memoryContext,
+                    });
+                    remainingAfterCoreAndTools -= memoryTokens;
+                }
+                else
+                {
+                    // Truncate memory context to fit within budget
+                    int maxMemoryChars = (int)(remainingAfterCoreAndTools * 0.30 * CharsPerToken);
+                    string truncatedMemory = TruncateString(memoryContext, maxMemoryChars);
+                    if (!string.IsNullOrEmpty(truncatedMemory))
+                    {
+                        request.Messages.Add(new ChatMessage
+                        {
+                            Role = MessageRole.System,
+                            Content = truncatedMemory,
+                        });
+                        remainingAfterCoreAndTools -= EstimateTokenCount(truncatedMemory);
+                    }
+                    _logger.Debug(_being.Id, "Token budget: truncated MemoryContext from {0} to {1} chars",
+                        memoryContext.Length, truncatedMemory?.Length ?? 0);
+                    memoryContext = truncatedMemory;
+                }
+            }
+
+            // Add recent messages with token-budget sliding window (Layer 4)
+            // Add messages from newest to oldest, stopping when budget is exhausted
+            int messagesAdded = AddMessagesWithinBudget(request, remainingAfterCoreAndTools);
+
+            // Add tool definitions
+            if (toolDefs != null && toolDefs.Count > 0)
+            {
+                request.Tools = toolDefs;
+            }
+
+            _logger.Debug(_being.Id, "Building AI request (token-budget): contextWindow={0}, inputBudget={1}, " +
+                "systemTokens={2}, toolDefTokens={3}, messagesAdded={4}/{5}, " +
+                "memory={6}, knowledge={7}, projectInfo={8}",
+                totalBudget, inputBudget, systemTokensUsed, toolDefTokens,
+                messagesAdded, _messages.Count,
+                !string.IsNullOrEmpty(memoryContext), !string.IsNullOrEmpty(knowledgeContext), !string.IsNullOrEmpty(projectInfoContext));
+        }
+        else
+        {
+            // Legacy mode: no ContextWindowTokens available, use old behavior
+            // Project affiliation context (placed after IdentityInfo, before ScenarioContext).
+            if (!string.IsNullOrEmpty(projectInfoContext))
+            {
+                request.Messages.Add(new ChatMessage
+                {
+                    Role = MessageRole.System,
+                    Content = projectInfoContext,
+                });
+            }
+
+            // Knowledge network context
+            if (!string.IsNullOrEmpty(knowledgeContext))
+            {
+                request.Messages.Add(new ChatMessage
+                {
+                    Role = MessageRole.System,
+                    Content = knowledgeContext,
+                });
+            }
+
+            // Memory context
+            if (!string.IsNullOrEmpty(memoryContext))
+            {
+                request.Messages.Add(new ChatMessage
+                {
+                    Role = MessageRole.System,
+                    Content = memoryContext,
+                });
+            }
+
+            // All conversation messages (legacy: no token trimming)
+            request.Messages.AddRange(_messages);
+
+            ToolManager? toolManager = _being.ToolManager;
+            if (toolManager != null && toolManager.ToolCount > 0 && _aiClient.SupportsToolCalls != false)
+            {
+                var effectivePermissions = ToolActionPermissionHelper.GetEffectivePermissions(_being, projectId);
+                if (task?.RequiredTools != null && task.RequiredTools.Count > 0)
+                {
+                    request.Tools = (effectivePermissions.GetRestrictedToolNames().Count > 0)
+                        ? toolManager.GetToolDefinitions(task.RequiredTools, _being.Id, effectivePermissions)
+                        : toolManager.GetToolDefinitions(task.RequiredTools);
+                }
+                else
+                {
+                    request.Tools = (effectivePermissions.GetRestrictedToolNames().Count > 0)
+                        ? toolManager.GetToolDefinitions(scenario, _being.Id, effectivePermissions)
+                        : toolManager.GetToolDefinitions(scenario);
+                }
+            }
+
+            _logger.Debug(_being.Id, "Building AI request (legacy): {0} messages, {1} tools, memory={2}",
+                request.Messages.Count, request.Tools?.Count ?? 0, !string.IsNullOrEmpty(memoryContext));
         }
 
-        request.Messages.AddRange(_messages);
+        return request;
+    }
 
-        ToolManager? toolManager = _being.ToolManager;
-        if (toolManager != null && toolManager.ToolCount > 0 && _aiClient.SupportsToolCalls != false)
+    /// <summary>
+    /// Adds conversation messages (_messages) to the request within the token budget.
+    /// Messages are added from newest to oldest (reverse chronological) so that
+    /// the most recent and relevant messages are preserved when the budget is exhausted.
+    /// Returns the number of messages added.
+    /// </summary>
+    private int AddMessagesWithinBudget(AIRequest request, int tokenBudget)
+    {
+        if (_messages.Count == 0 || tokenBudget <= 0) return 0;
+
+        // Estimate tokens for each message
+        List<(ChatMessage Msg, int Tokens)> messageTokens = new();
+        foreach (var msg in _messages)
         {
-            // Use ToolActionPermissionHelper to merge global + project-level permissions
-            var effectivePermissions = ToolActionPermissionHelper.GetEffectivePermissions(_being, projectId);
-            if (task?.RequiredTools != null && task.RequiredTools.Count > 0)
+            int tokens = EstimateTokenCount(msg.Content ?? "");
+            if (!string.IsNullOrEmpty(msg.Thinking))
+                tokens += EstimateTokenCount(msg.Thinking);
+            if (!string.IsNullOrEmpty(msg.ToolCallsJson))
+                tokens += EstimateTokenCount(msg.ToolCallsJson);
+            messageTokens.Add((msg, tokens));
+        }
+
+        // Add messages from newest to oldest within budget
+        var selectedMessages = new List<ChatMessage>();
+        int usedTokens = 0;
+
+        for (int i = messageTokens.Count - 1; i >= 0; i--)
+        {
+            var (msg, tokens) = messageTokens[i];
+            if (usedTokens + tokens <= tokenBudget)
             {
-                request.Tools = (effectivePermissions.GetRestrictedToolNames().Count > 0)
-                    ? toolManager.GetToolDefinitions(task.RequiredTools, _being.Id, effectivePermissions)
-                    : toolManager.GetToolDefinitions(task.RequiredTools);
+                selectedMessages.Insert(0, msg); // Insert at beginning to maintain order
+                usedTokens += tokens;
             }
             else
             {
-                request.Tools = (effectivePermissions.GetRestrictedToolNames().Count > 0)
-                    ? toolManager.GetToolDefinitions(scenario, _being.Id, effectivePermissions)
-                    : toolManager.GetToolDefinitions(scenario);
+                // Budget exhausted - stop adding older messages
+                break;
             }
         }
 
-        _logger.Debug(_being.Id, "Building AI request: {0} messages, {1} tools, memory={2}",
-            request.Messages.Count, request.Tools?.Count ?? 0, !string.IsNullOrEmpty(memoryContext));
+        // Add selected messages to request
+        request.Messages.AddRange(selectedMessages);
 
-        return request;
+        if (selectedMessages.Count < _messages.Count)
+        {
+            _logger.Info(_being.Id, "Token budget: trimmed messages from {0} to {1} ({2}/{3} tokens used)",
+                _messages.Count, selectedMessages.Count, usedTokens, tokenBudget);
+        }
+
+        return selectedMessages.Count;
+    }
+
+    /// <summary>
+    /// Estimates the total token count for a list of chat messages.
+    /// Uses character count / CharsPerToken as a rough approximation.
+    /// </summary>
+    private static int EstimateTokens(List<ChatMessage> messages)
+    {
+        int totalChars = 0;
+        foreach (var msg in messages)
+        {
+            totalChars += msg.Content?.Length ?? 0;
+            totalChars += msg.Thinking?.Length ?? 0;
+            totalChars += msg.ToolCallsJson?.Length ?? 0;
+        }
+        return (int)(totalChars / CharsPerToken);
+    }
+
+    /// <summary>
+    /// Estimates the token count for a single text string.
+    /// Uses character count / CharsPerToken as a rough approximation.
+    /// </summary>
+    private static int EstimateTokenCount(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return 0;
+        return (int)(text.Length / CharsPerToken);
+    }
+
+    /// <summary>
+    /// Estimates the token count consumed by tool definitions in the API request.
+    /// Tool definitions are serialized as JSON and sent alongside messages,
+    /// consuming part of the context window.
+    /// </summary>
+    private static int EstimateToolDefinitionTokens(List<ToolDefinition> tools)
+    {
+        if (tools == null || tools.Count == 0) return 0;
+        // Rough estimate: each tool definition ~200-500 tokens depending on complexity
+        // Use 300 as average, plus overhead for the JSON schema structure
+        return tools.Count * 300 + 50;
+    }
+
+    /// <summary>
+    /// Truncates a string to approximately maxChars characters,
+    /// trying to break at the last newline before the limit.
+    /// Appends an ellipsis indicator when truncated.
+    /// </summary>
+    private static string? TruncateString(string? text, int maxChars)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length <= maxChars) return text;
+        if (maxChars <= 20) return null; // Too short to be useful
+
+        // Try to break at the last newline before the limit
+        int breakPoint = text.LastIndexOf('\n', Math.Min(maxChars - 3, text.Length - 1));
+        if (breakPoint <= 0 || breakPoint > maxChars)
+        {
+            breakPoint = maxChars - 3;
+        }
+
+        return text.Substring(0, breakPoint) + "\n[...]";
     }
 
     /// <summary>

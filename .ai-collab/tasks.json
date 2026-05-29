@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-29T20:30:00+08:00",
+  "lastUpdated": "2026-05-29T23:30:00+08:00",
   "lastCommitHash": null,
   "tasks": [
     {
@@ -114,7 +114,7 @@
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
       "completedAt": "2026-05-29T20:30:00+08:00",
-      "relatedCommit": null
+      "relatedCommit": "202b99c"
     },
     {
       "id": "task-400",
@@ -128,13 +128,53 @@
       "createdBy": "trae-glm5",
       "assignedTo": "trae-glm5",
       "completedAt": "2026-05-29T20:30:00+08:00",
-      "relatedCommit": null
+      "relatedCommit": "202b99c"
+    },
+    {
+      "id": "task-401",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/AI/IAIClient.cs + src/SiliconLife.Core/AI/ContextManager.cs + src/SiliconLife.Common/AI/",
+      "title": "IAIClient增加ContextWindowTokens属性，ContextManager引入Token预算制替代硬编码MaxContextMessages",
+      "description": "当前ContextManager使用硬编码MaxContextMessages=20限制上下文消息条数，不考虑不同AI模型的上下文窗口大小差异（Ollama本地模型4K-8K、DashScope Qwen-Max 32K、GPT-4级128K+），导致小窗口模型超限报错、大窗口模型浪费上下文空间。改造方案：1) IAIClient接口增加int? ContextWindowTokens属性，各实现类按模型返回上下文窗口容量（null表示未知，回退保守默认值）；2) OllamaClient通过/api/show查询num_ctx或按模型映射；DashScopeClient/VolcengineArkClient/HerdsmanClient按模型名映射已知窗口大小；3) ContextManager.BuildRequest()重构为Token预算制：总预算=ContextWindowTokens，预留输出空间后按优先级分配（SystemCore必保留→ScenarioContext必保留→ToolDefinitions→RecentMessages滑动窗口按Token裁剪→MemoryContext可截断→KnowledgeContext可省略→ProjectInfoContext可省略）；4) Token计数使用字符数/3.5粗估或引入Microsoft.ML.Tokenizers；5) 向后兼容：ContextWindowTokens返回null时回退到当前MaxContextMessages行为。",
+      "priority": "P2",
+      "status": "completed",
+      "createdAt": "2026-05-29T21:00:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-29T22:30:00+08:00"
+    },
+    {
+      "id": "task-402",
+      "type": "feature",
+      "target": "src/SiliconLife.Core/AI/IAIClient.cs + src/SiliconLife.Core/Chat/ChatMessage.cs + src/SiliconLife.Common/AI/",
+      "title": "IAIClient增加多模态理解能力声明接口（SupportsVision/SupportsAudio），ChatMessage增加多模态内容字段",
+      "description": "为硅基生命体增加图片理解和语音识别能力的基础设施。当前IAIClient只能处理纯文本对话，无法告知上层当前模型是否支持多模态输入，导致ContextManager无法决定图片/音频消息的处理路径（原生vision vs 降级为文本描述）。改造方案：1) IAIClient接口增加bool? SupportsVision属性（true=支持图片输入，false=不支持需降级，null=未知假设不支持），参照已有的SupportsToolCalls/StreamingMode声明模式；2) IAIClient接口增加bool? SupportsAudio属性（true=支持音频输入如GPT-4o-audio，false=不支持需先ASR转文本，null=未知假设不支持）；3) ChatMessage增加ImageUrl字段（string?，支持URL或base64 data URI），用于vision-capable模型的原生图片输入；4) ChatMessage增加ImageData字段（string?，base64编码的音频数据），用于audio-capable模型的原生音频输入；5) 各AI Client实现类按模型名映射能力声明：DashScopeClient（qwen-vl系列SupportsVision=true，其余=false），OllamaClient（llava/minicpm-v等SupportsVision=true，其余按模型映射或null），VolcengineArkClient/HerdsmanClient（默认null）；6) ContextManager.BuildRequest()中根据SupportsVision决定图片消息的处理策略：支持vision时构造image_url内容块，不支持时跳过或调用独立VLM API提取描述；7) 向后兼容：新字段默认null，不影响现有纯文本对话流程。注意：本任务仅做接口声明和数据结构准备，不实现具体的vision/audio API调用逻辑（由后续任务完成）。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-29T21:30:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": null
+    },
+    {
+      "id": "task-403",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/AI/ + src/SiliconLife.Common/Localization/",
+      "title": "OllamaClient/HerdsmanClient的ContextWindowTokens改为由工厂配置决定",
+      "description": "task-401引入的ContextWindowTokens属性在OllamaClient和HerdsmanClient中分别为硬编码模型名映射和固定返回null，无法通过Web配置界面调整。改造方案：1) OllamaClient增加MaxContextWindowTokens常量(256K)和_contextWindowTokens字段，构造函数新增int? contextWindowTokens参数，ContextWindowTokens属性改为配置优先+自动检测回退；2) HerdsmanClient增加MaxContextWindowTokens常量(128K)和_contextWindowTokens字段，构造函数新增参数，ContextWindowTokens改为可配置；3) OllamaClientFactory.CreateClient()新增contextWindowTokens配置读取（支持int和字符串解析，钳制到256K），GetConfigKeysMetadata()新增contextWindowTokens键；4) HerdsmanClientFactory.CreateClient()新增contextWindowTokens配置读取（钳制到128K），GetConfigKeysMetadata()新增contextWindowTokens键；5) 添加10个语言文件的OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目（显示名+描述）。",
+      "priority": "P2",
+      "status": "completed",
+      "createdAt": "2026-05-29T23:00:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-29T23:30:00+08:00"
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": [
+      "task-402"
+    ],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400"],
+    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-403"],
     "cancelled": []
   },
   "metadata": {

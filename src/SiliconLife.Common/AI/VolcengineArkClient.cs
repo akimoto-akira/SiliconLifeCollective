@@ -126,6 +126,13 @@ public class VolcengineArkClient : IAIClient
     public bool? SupportsToolCalls => true;
 
     /// <summary>
+    /// Gets the context window token capacity for the current Volcengine Ark model.
+    /// Uses a mapping of known Doubao model names to their context window sizes.
+    /// Returns null for unknown models (ContextManager will fall back to MaxContextMessages).
+    /// </summary>
+    public int? ContextWindowTokens => GetContextWindowForModel(DefaultModel);
+
+    /// <summary>
     /// Creates a new Volcengine Ark client with the specified configuration
     /// </summary>
     /// <param name="apiKey">Volcengine Ark API key for authentication</param>
@@ -737,6 +744,51 @@ public class VolcengineArkClient : IAIClient
         }
 
         return toolCalls;
+    }
+
+    /// <summary>
+    /// Maps known Volcengine Ark / Doubao model names to their context window sizes in tokens.
+    /// Volcengine Ark uses inference endpoint IDs (ep-xxx), so model name matching
+    /// may not apply. For endpoint IDs, returns null to use the fallback behavior.
+    /// Reference: https://www.volcengine.com/docs/82379/1356615
+    /// </summary>
+    private static int? GetContextWindowForModel(string modelName)
+    {
+        if (string.IsNullOrEmpty(modelName)) return null;
+
+        string m = modelName.ToLowerInvariant();
+
+        // Inference endpoint IDs (ep-xxx) cannot be mapped to known context sizes
+        if (m.StartsWith("ep-")) return null;
+
+        // Doubao Seed 2.0 series
+        if (m.Contains("doubao-seed-2.0") || m.Contains("doubao-seed-2")) return 131072; // 128K
+
+        // Doubao Pro series
+        if (m.Contains("doubao-pro-256k")) return 262144; // 256K
+        if (m.Contains("doubao-pro-vision")) return 32768;  // 32K
+        if (m.Contains("doubao-pro")) return 32768;          // 32K
+
+        // Doubao Lite series
+        if (m.Contains("doubao-lite")) return 32768;  // 32K
+
+        // Doubao Vision series
+        if (m.Contains("doubao-vision")) return 32768; // 32K
+
+        // Doubao 1.8 (Seed)
+        if (m.Contains("doubao-seed-1.8") || m.Contains("doubao-seed-1-8")) return 131072; // 128K
+
+        // Doubao general
+        if (m.Contains("doubao")) return 32768; // 32K default
+
+        // DeepSeek on Volcengine
+        if (m.Contains("deepseek-r1")) return 65536;  // 64K
+        if (m.Contains("deepseek-v3")) return 65536;  // 64K
+
+        // Ark Code
+        if (m.Contains("ark-code")) return 131072; // 128K
+
+        return null;
     }
 
     #region Rate Control

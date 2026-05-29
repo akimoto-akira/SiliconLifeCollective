@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -38,8 +38,17 @@ public class OllamaClientFactory : IAIClientFactory, IAIClientFactoryHelp
         string model = config.TryGetValue("model", out var m) 
             ? m.ToString() ?? "llama3.2"
             : "llama3.2";
+
+        int? contextWindowTokens = null;
+        if (config.TryGetValue("contextWindowTokens", out var cwt))
+        {
+            if (cwt is int intValue)
+                contextWindowTokens = Math.Min(intValue, OllamaClient.MaxContextWindowTokens);
+            else if (int.TryParse(cwt.ToString(), out int parsedValue))
+                contextWindowTokens = Math.Min(parsedValue, OllamaClient.MaxContextWindowTokens);
+        }
         
-        return new OllamaClient(endpoint, model);
+        return new OllamaClient(endpoint, model, contextWindowTokens);
     }
     
     /// <summary>
@@ -58,6 +67,7 @@ public class OllamaClientFactory : IAIClientFactory, IAIClientFactoryHelp
             {
                 ["endpoint"] = "Ollama Endpoint",
                 ["model"] = "Default Model",
+                ["contextWindowTokens"] = "Context Window Tokens",
                 ["temperature"] = "Temperature",
                 ["maxTokens"] = "Max Tokens"
             };
@@ -68,6 +78,7 @@ public class OllamaClientFactory : IAIClientFactory, IAIClientFactoryHelp
         {
             ["endpoint"] = localization.GetConfigDisplayName("OllamaEndpoint", out _),
             ["model"] = localization.GetConfigDisplayName("DefaultModel", out _),
+            ["contextWindowTokens"] = localization.GetConfigDisplayName("OllamaContextWindowTokens", out _),
             ["temperature"] = localization.GetConfigDisplayName("Temperature", out _),
             ["maxTokens"] = localization.GetConfigDisplayName("MaxTokens", out _)
         };

@@ -130,6 +130,13 @@ public class DashScopeClient : IAIClient
     public bool? SupportsToolCalls => true;
 
     /// <summary>
+    /// Gets the context window token capacity for the current DashScope model.
+    /// Uses a mapping of known Qwen model names to their context window sizes.
+    /// Returns null for unknown models (ContextManager will fall back to MaxContextMessages).
+    /// </summary>
+    public int? ContextWindowTokens => GetContextWindowForModel(DefaultModel);
+
+    /// <summary>
     /// Creates a new DashScope client with the specified configuration
     /// </summary>
     /// <param name="apiKey">DashScope API key for authentication</param>
@@ -747,6 +754,57 @@ public class DashScopeClient : IAIClient
         }
 
         return toolCalls;
+    }
+
+    /// <summary>
+    /// Maps known DashScope/Qwen model names to their context window sizes in tokens.
+    /// Reference: https://help.aliyun.com/zh/model-studio/getting-started/models
+    /// </summary>
+    private static int? GetContextWindowForModel(string modelName)
+    {
+        if (string.IsNullOrEmpty(modelName)) return null;
+
+        string m = modelName.ToLowerInvariant();
+
+        // Qwen Long series - 1M context
+        if (m.Contains("qwen-long")) return 1000000;
+
+        // Qwen Turbo series - 1M context (qwen-turbo-latest, qwen-turbo-2024-11-01+)
+        if (m.Contains("qwen-turbo")) return 1000000;
+
+        // Qwen Plus series - 128K context
+        if (m.Contains("qwen-plus")) return 131072;
+
+        // Qwen Max series - 32K context
+        if (m.Contains("qwen-max")) return 32768;
+
+        // Qwen3 series
+        if (m.Contains("qwen3")) return 131072;       // 128K
+
+        // Qwen2.5 series
+        if (m.Contains("qwen2.5-coder")) return 131072; // 128K
+        if (m.Contains("qwen2.5")) return 131072;      // 128K
+
+        // Qwen2 series
+        if (m.Contains("qwen2-vl")) return 32768;      // 32K
+        if (m.Contains("qwen2")) return 131072;        // 128K
+
+        // Qwen1.5 series
+        if (m.Contains("qwen1.5")) return 32768;       // 32K
+
+        // Qwen VL series
+        if (m.Contains("qwen-vl") || m.Contains("qwen2.5-vl")) return 32768; // 32K
+        if (m.Contains("qwen-omni")) return 32768;     // 32K
+
+        // QWQ series
+        if (m.Contains("qwq")) return 131072;           // 128K
+
+        // DeepSeek models on DashScope
+        if (m.Contains("deepseek-r1")) return 65536;  // 64K
+        if (m.Contains("deepseek-v3")) return 65536;  // 64K
+
+        // Default: DashScope models typically support at least 8K
+        return null;
     }
 
     #region 速率控制

@@ -47,6 +47,15 @@ public interface IAIClient
     bool? SupportsToolCalls { get; }
 
     /// <summary>
+    /// Gets the context window token capacity of the current AI model.
+    /// Returns the maximum number of tokens the model can process in a single request
+    /// (input + output combined). Used by ContextManager to implement token-budget-based
+    /// context trimming instead of the hardcoded MaxContextMessages limit.
+    /// null  = unknown, ContextManager will fall back to MaxContextMessages behavior.
+    /// </summary>
+    int? ContextWindowTokens { get; }
+
+    /// <summary>
     /// Sends a chat request to the AI service and returns the response
     /// </summary>
     /// <param name="request">The AI request to send</param>

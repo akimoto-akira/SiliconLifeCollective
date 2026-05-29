@@ -33,7 +33,16 @@ public class HerdsmanClientFactory : IAIClientFactory, IAIClientFactoryHelp
             ? m.ToString() ?? "llama3-8b"
             : "llama3-8b";
 
-        return new HerdsmanClient(endpoint, model);
+        int? contextWindowTokens = null;
+        if (config.TryGetValue("contextWindowTokens", out var cwt))
+        {
+            if (cwt is int intValue)
+                contextWindowTokens = Math.Min(intValue, HerdsmanClient.MaxContextWindowTokens);
+            else if (int.TryParse(cwt.ToString(), out int parsedValue))
+                contextWindowTokens = Math.Min(parsedValue, HerdsmanClient.MaxContextWindowTokens);
+        }
+
+        return new HerdsmanClient(endpoint, model, contextWindowTokens);
     }
 
     public Dictionary<string, string> GetConfigKeysMetadata(Language language)
@@ -45,14 +54,16 @@ public class HerdsmanClientFactory : IAIClientFactory, IAIClientFactoryHelp
             return new Dictionary<string, string>
             {
                 ["endpoint"] = "Herdsman Endpoint",
-                ["model"] = "Default Model"
+                ["model"] = "Default Model",
+                ["contextWindowTokens"] = "Context Window Tokens"
             };
         }
 
         return new Dictionary<string, string>
         {
             ["endpoint"] = localization.GetConfigDisplayName("HerdsmanEndpoint", out _),
-            ["model"] = localization.GetConfigDisplayName("HerdsmanModel", out _)
+            ["model"] = localization.GetConfigDisplayName("HerdsmanModel", out _),
+            ["contextWindowTokens"] = localization.GetConfigDisplayName("HerdsmanContextWindowTokens", out _)
         };
     }
 

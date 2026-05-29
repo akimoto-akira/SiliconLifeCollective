@@ -1109,14 +1109,42 @@
 2026-05-29T18:00:00+08:00 | trae-glm5 | task_claim | task=task-397 | type=feature | fix=项目处理记录前端展示
 2026-05-29T19:30:00+08:00 | trae-glm5 | session_end | completed=task-397
 2026-05-29T20:00:00+08:00 | trae-glm5 | session_start | sessionId=trae-glm5-20260529-007 | task=task-399,task-400
-2026-05-29T20:00:00+08:00 | trae-glm5 | task_claim | task=task-399 | type=feature | desc=����HerdsmanClient AI�ͻ���
-2026-05-29T20:00:00+08:00 | trae-glm5 | task_claim | task=task-400 | type=bugfix | desc=�޸���ʼ�����������˵���ˢ��
-2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/AI/HerdsmanClient.cs | intent=����HerdsmanClient AI�ͻ���
-2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/AI/HerdsmanClientFactory.cs | intent=����HerdsmanClientFactory������
-2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs | intent=ע��HerdsmanClient������ӳ��
-2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeingFactory.cs | intent=ע��HerdsmanClient������ӳ��
-2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/*.cs | intent=����HerdsmanClient���ػ��ַ���(11������)
-2026-05-29T20:20:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Controllers/InitController.cs | intent=��text input���ӷ���input�¼�����
+2026-05-29T20:00:00+08:00 | trae-glm5 | task_claim | task=task-399 | type=feature | desc=����HerdsmanClient AI�ͻ���
+2026-05-29T20:00:00+08:00 | trae-glm5 | task_claim | task=task-400 | type=bugfix | desc=�޸���ʼ�����������˵���ˢ��
+2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/AI/HerdsmanClient.cs | intent=����HerdsmanClient AI�ͻ���
+2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/AI/HerdsmanClientFactory.cs | intent=����HerdsmanClientFactory������
+2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeing.cs | intent=ע��HerdsmanClient������ӳ��
+2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/SiliconBeing/DefaultSiliconBeingFactory.cs | intent=ע��HerdsmanClient������ӳ��
+2026-05-29T20:15:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.Common/Localization/*.cs | intent=����HerdsmanClient���ػ��ַ���(11������)
+2026-05-29T20:20:00+08:00 | trae-glm5 | file_modified | src/SiliconLife.App/Web/Controllers/InitController.cs | intent=��text input���ӷ���input�¼�����
 2026-05-29T20:30:00+08:00 | trae-glm5 | task_complete | task=task-399
 2026-05-29T20:30:00+08:00 | trae-glm5 | task_complete | task=task-400
 2026-05-29T20:30:00+08:00 | trae-glm5 | session_end | completed=task-399,task-400
+2026-05-29T22:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260529-001 | task=task-401
+2026-05-29T22:00:00+08:00 | catpaw | task_claim | task=task-401 | type=feature | title=IAIClient增加ContextWindowTokens属性，ContextManager引入Token预算制
+2026-05-29T22:00:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/AI/IAIClient.cs
+2026-05-29T22:05:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/AI/OllamaClient.cs
+2026-05-29T22:10:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/AI/DashScopeClient.cs
+2026-05-29T22:15:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/AI/VolcengineArkClient.cs
+2026-05-29T22:15:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/AI/HerdsmanClient.cs
+2026-05-29T22:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Core/AI/ContextManager.cs
+2026-05-29T22:30:00+08:00 | catpaw | task_complete | task=task-401 | completed=IAIClient增加ContextWindowTokens+Token预算制重构
+2026-05-29T22:30:00+08:00 | catpaw | session_end | completed=task-401
+2026-05-29T23:00:00+08:00 | catpaw | session_start | sessionId=catpaw-20260529-002 | task=task-403
+2026-05-29T23:00:00+08:00 | catpaw | task_claim | task=task-403 | type=feature | title=OllamaClient/HerdsmanClient的ContextWindowTokens改为工厂配置决定
+2026-05-29T23:05:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/AI/OllamaClient.cs | intent=增加MaxContextWindowTokens常量(256K)和_contextWindowTokens字段，构造函数新增参数
+2026-05-29T23:10:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/AI/HerdsmanClient.cs | intent=增加MaxContextWindowTokens常量(128K)和_contextWindowTokens字段，构造函数新增参数
+2026-05-29T23:15:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/AI/OllamaClientFactory.cs | intent=CreateClient新增contextWindowTokens配置读取，GetConfigKeysMetadata新增配置键
+2026-05-29T23:15:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/AI/HerdsmanClientFactory.cs | intent=CreateClient新增contextWindowTokens配置读取，GetConfigKeysMetadata新增配置键
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/ZhCN.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/EnUS.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/ZhHK.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/JaJP.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/KoKR.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/DeDE.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/FrFR.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/EsES.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/ItIT.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:20:00+08:00 | catpaw | file_modified | src/SiliconLife.Common/Localization/PtPT.cs | intent=添加OllamaContextWindowTokens和HerdsmanContextWindowTokens本地化条目
+2026-05-29T23:30:00+08:00 | catpaw | task_complete | task=task-403 | completed=OllamaClient/HerdsmanClient的ContextWindowTokens改为工厂配置决定
+2026-05-29T23:30:00+08:00 | catpaw | session_end | completed=task-403
