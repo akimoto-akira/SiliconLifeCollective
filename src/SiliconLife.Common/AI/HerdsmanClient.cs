@@ -112,6 +112,16 @@ public class HerdsmanClient : IAIClient
     public int? ContextWindowTokens => _contextWindowTokens;
 
     /// <summary>
+    /// Herdsman vision support is not yet mapped; returns null (unknown).
+    /// </summary>
+    public bool? SupportsVision => null;
+
+    /// <summary>
+    /// Herdsman audio support is not yet mapped; returns null (unknown).
+    /// </summary>
+    public bool? SupportsAudio => null;
+
+    /// <summary>
     /// Creates a new Herdsman client with the specified endpoint
     /// </summary>
     /// <param name="endpoint">Herdsman API endpoint URL</param>

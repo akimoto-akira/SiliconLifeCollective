@@ -95,6 +95,19 @@ public class ChatMessage
     public string? Thinking { get; set; }
 
     /// <summary>
+    /// Image URL for vision-capable model input.
+    /// Supports HTTP/HTTPS URLs or base64 data URIs (e.g., "data:image/png;base64,...").
+    /// Only used when the AI client SupportsVision is true.
+    /// </summary>
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// Base64-encoded audio data for audio-capable model input.
+    /// Only used when the AI client SupportsAudio is true.
+    /// </summary>
+    public string? ImageData { get; set; }
+
+    /// <summary>
     /// Number of tokens in the prompt (input). Only set for AI-generated assistant messages.
     /// </summary>
     public int? PromptTokens { get; set; }

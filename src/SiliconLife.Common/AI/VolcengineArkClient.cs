@@ -133,6 +133,16 @@ public class VolcengineArkClient : IAIClient
     public int? ContextWindowTokens => GetContextWindowForModel(DefaultModel);
 
     /// <summary>
+    /// Volcengine Ark vision support is not yet mapped; returns null (unknown).
+    /// </summary>
+    public bool? SupportsVision => null;
+
+    /// <summary>
+    /// Volcengine Ark audio support is not yet mapped; returns null (unknown).
+    /// </summary>
+    public bool? SupportsAudio => null;
+
+    /// <summary>
     /// Creates a new Volcengine Ark client with the specified configuration
     /// </summary>
     /// <param name="apiKey">Volcengine Ark API key for authentication</param>

@@ -636,7 +636,33 @@ public class ContextManager
             }
 
             // All conversation messages (legacy: no token trimming)
-            request.Messages.AddRange(_messages);
+            // Handle multimodal content based on model capabilities
+            bool? supportsVision = _aiClient.SupportsVision;
+            foreach (var msg in _messages)
+            {
+                if (msg.ImageUrl != null && supportsVision != true)
+                {
+                    request.Messages.Add(new ChatMessage
+                    {
+                        Id = msg.Id,
+                        SenderId = msg.SenderId,
+                        ChannelId = msg.ChannelId,
+                        Content = msg.Content,
+                        Timestamp = msg.Timestamp,
+                        Type = msg.Type,
+                        ReadBy = msg.ReadBy,
+                        MentionedIds = msg.MentionedIds,
+                        Role = msg.Role,
+                        ToolCallId = msg.ToolCallId,
+                        ToolCallsJson = msg.ToolCallsJson,
+                        Thinking = msg.Thinking,
+                    });
+                }
+                else
+                {
+                    request.Messages.Add(msg);
+                }
+            }
 
             ToolManager? toolManager = _being.ToolManager;
             if (toolManager != null && toolManager.ToolCount > 0 && _aiClient.SupportsToolCalls != false)
@@ -704,8 +730,36 @@ public class ContextManager
             }
         }
 
-        // Add selected messages to request
-        request.Messages.AddRange(selectedMessages);
+        // Add selected messages to request, handling multimodal content based on model capabilities
+        bool? supportsVision = _aiClient.SupportsVision;
+        foreach (var msg in selectedMessages)
+        {
+            if (msg.ImageUrl != null && supportsVision != true)
+            {
+                // Model does not support vision: strip image data and keep only text content.
+                // Create a copy without image fields to avoid modifying the original message.
+                request.Messages.Add(new ChatMessage
+                {
+                    Id = msg.Id,
+                    SenderId = msg.SenderId,
+                    ChannelId = msg.ChannelId,
+                    Content = msg.Content,
+                    Timestamp = msg.Timestamp,
+                    Type = msg.Type,
+                    ReadBy = msg.ReadBy,
+                    MentionedIds = msg.MentionedIds,
+                    Role = msg.Role,
+                    ToolCallId = msg.ToolCallId,
+                    ToolCallsJson = msg.ToolCallsJson,
+                    Thinking = msg.Thinking,
+                    // ImageUrl and ImageData are intentionally omitted
+                });
+            }
+            else
+            {
+                request.Messages.Add(msg);
+            }
+        }
 
         if (selectedMessages.Count < _messages.Count)
         {

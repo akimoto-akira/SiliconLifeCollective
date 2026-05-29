@@ -137,6 +137,16 @@ public class DashScopeClient : IAIClient
     public int? ContextWindowTokens => GetContextWindowForModel(DefaultModel);
 
     /// <summary>
+    /// DashScope supports vision input for qwen-vl series models.
+    /// </summary>
+    public bool? SupportsVision => GetSupportsVisionForModel(DefaultModel);
+
+    /// <summary>
+    /// DashScope audio support is not yet mapped; returns null (unknown).
+    /// </summary>
+    public bool? SupportsAudio => null;
+
+    /// <summary>
     /// Creates a new DashScope client with the specified configuration
     /// </summary>
     /// <param name="apiKey">DashScope API key for authentication</param>
@@ -804,6 +814,29 @@ public class DashScopeClient : IAIClient
         if (m.Contains("deepseek-v3")) return 65536;  // 64K
 
         // Default: DashScope models typically support at least 8K
+        return null;
+    }
+
+    /// <summary>
+    /// Determines whether the specified model supports vision (image understanding).
+    /// </summary>
+    private static bool? GetSupportsVisionForModel(string modelName)
+    {
+        if (string.IsNullOrEmpty(modelName)) return null;
+
+        string m = modelName.ToLowerInvariant();
+
+        // Qwen VL series support vision
+        if (m.Contains("qwen-vl") || m.Contains("qwen2-vl") || m.Contains("qwen2.5-vl")) return true;
+        // Qwen Omni series support vision
+        if (m.Contains("qwen-omni")) return true;
+        // Qwen3 VL series
+        if (m.Contains("qwen3-vl") || m.Contains("qwen3.5-vl")) return true;
+
+        // Other Qwen models do not support vision
+        if (m.Contains("qwen")) return false;
+
+        // Unknown models: assume not supported
         return null;
     }
 

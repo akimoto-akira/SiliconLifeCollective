@@ -56,6 +56,23 @@ public interface IAIClient
     int? ContextWindowTokens { get; }
 
     /// <summary>
+    /// Gets whether this AI client supports vision (image understanding) input.
+    /// true  = supports image input (e.g., GPT-4o, qwen-vl, llava);
+    /// false = does not support image input, images should be degraded to text descriptions;
+    /// null  = unknown, assume not supported (conservative default).
+    /// When true, ContextManager will construct native image_url content blocks for vision-capable models.
+    /// </summary>
+    bool? SupportsVision { get; }
+
+    /// <summary>
+    /// Gets whether this AI client supports audio input.
+    /// true  = supports audio input (e.g., GPT-4o-audio);
+    /// false = does not support audio input, audio must be transcribed to text first;
+    /// null  = unknown, assume not supported (conservative default).
+    /// </summary>
+    bool? SupportsAudio { get; }
+
+    /// <summary>
     /// Sends a chat request to the AI service and returns the response
     /// </summary>
     /// <param name="request">The AI request to send</param>

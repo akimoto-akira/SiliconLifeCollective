@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-30T01:15:00+08:00",
-  "lastCommitHash": "b80a33b",
+  "lastUpdated": "2026-05-30T02:00:00+08:00",
+  "lastCommitHash": "ebe6a49",
   "tasks": [
     {
       "id": "task-392",
@@ -151,10 +151,11 @@
       "title": "IAIClient增加多模态理解能力声明接口（SupportsVision/SupportsAudio），ChatMessage增加多模态内容字段",
       "description": "为硅基生命体增加图片理解和语音识别能力的基础设施。当前IAIClient只能处理纯文本对话，无法告知上层当前模型是否支持多模态输入，导致ContextManager无法决定图片/音频消息的处理路径（原生vision vs 降级为文本描述）。改造方案：1) IAIClient接口增加bool? SupportsVision属性（true=支持图片输入，false=不支持需降级，null=未知假设不支持），参照已有的SupportsToolCalls/StreamingMode声明模式；2) IAIClient接口增加bool? SupportsAudio属性（true=支持音频输入如GPT-4o-audio，false=不支持需先ASR转文本，null=未知假设不支持）；3) ChatMessage增加ImageUrl字段（string?，支持URL或base64 data URI），用于vision-capable模型的原生图片输入；4) ChatMessage增加ImageData字段（string?，base64编码的音频数据），用于audio-capable模型的原生音频输入；5) 各AI Client实现类按模型名映射能力声明：DashScopeClient（qwen-vl系列SupportsVision=true，其余=false），OllamaClient（llava/minicpm-v等SupportsVision=true，其余按模型映射或null），VolcengineArkClient/HerdsmanClient（默认null）；6) ContextManager.BuildRequest()中根据SupportsVision决定图片消息的处理策略：支持vision时构造image_url内容块，不支持时跳过或调用独立VLM API提取描述；7) 向后兼容：新字段默认null，不影响现有纯文本对话流程。注意：本任务仅做接口声明和数据结构准备，不实现具体的vision/audio API调用逻辑（由后续任务完成）。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-29T21:30:00+08:00",
       "createdBy": "catpaw",
-      "assignedTo": null
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-30T02:45:00+08:00"
     },
     {
       "id": "task-403",
@@ -212,7 +213,8 @@
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
       "completedAt": "2026-05-30T01:45:00+08:00",
-      "relatedTask": "task-397"
+      "relatedTask": "task-397",
+      "relatedCommit": "ebe6a49"
     },
     {
       "id": "task-407",
@@ -230,11 +232,10 @@
   ],
   "taskIndex": {
     "pending": [
-      "task-402",
       "task-407"
     ],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-403", "task-404", "task-405", "task-406"],
+    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-402", "task-403", "task-404", "task-405", "task-406"],
     "cancelled": []
   },
   "metadata": {

@@ -169,6 +169,17 @@ public class OllamaClient : IAIClient
     public int? ContextWindowTokens => _contextWindowTokens ?? GetContextWindowForModel(DefaultModel);
 
     /// <summary>
+    /// Ollama supports vision input for multimodal models (llava, minicpm-v, etc.).
+    /// Determined by model name mapping.
+    /// </summary>
+    public bool? SupportsVision => GetSupportsVisionForModel(DefaultModel);
+
+    /// <summary>
+    /// Ollama audio support is not yet mapped; returns null (unknown).
+    /// </summary>
+    public bool? SupportsAudio => null;
+
+    /// <summary>
     /// Creates a new Ollama client with the specified endpoint
     /// </summary>
     /// <param name="endpoint">Ollama API endpoint URL</param>
@@ -658,6 +669,42 @@ public class OllamaClient : IAIClient
         // Default for unknown models: Ollama default is 2048, but we use a
         // conservative default of 4096 as most modern models support at least 4K
         return 4096;
+    }
+
+    /// <summary>
+    /// Determines whether the specified Ollama model supports vision (image understanding).
+    /// </summary>
+    private static bool? GetSupportsVisionForModel(string modelName)
+    {
+        if (string.IsNullOrEmpty(modelName)) return null;
+
+        string m = modelName.ToLowerInvariant();
+
+        // Known multimodal (vision) models on Ollama
+        if (m.Contains("llava")) return true;
+        if (m.Contains("minicpm-v")) return true;
+        if (m.Contains("llama3.2-vision")) return true;
+        if (m.Contains("qwen2-vl") || m.Contains("qwen2.5-vl")) return true;
+        if (m.Contains("qwen-vl")) return true;
+        if (m.Contains("gemma3")) return true;        // Gemma 3 has vision
+        if (m.Contains("phi3-vision") || m.Contains("phi-3-vision")) return true;
+        if (m.Contains("llama3.3-vision") || m.Contains("llama4")) return true;
+        if (m.Contains("moondream")) return true;
+        if (m.Contains("bakllava")) return true;
+        if (m.Contains("llama3.2-vision")) return true;
+
+        // Known text-only models
+        if (m.Contains("llama3") && !m.Contains("vision")) return false;
+        if (m.Contains("mistral") && !m.Contains("pixtral")) return false;
+        if (m.Contains("qwen") && !m.Contains("vl") && !m.Contains("vision")) return false;
+        if (m.Contains("deepseek")) return false;
+        if (m.Contains("phi") && !m.Contains("vision")) return false;
+        if (m.Contains("gemma2")) return false;
+        if (m.Contains("gemma") && !m.Contains("3")) return false;
+        if (m.Contains("codestral")) return false;
+
+        // Unknown models: assume not supported (conservative)
+        return null;
     }
 
     /// <summary>
