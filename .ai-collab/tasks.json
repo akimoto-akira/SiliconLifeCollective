@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-29T19:30:00+08:00",
+  "lastUpdated": "2026-05-29T20:30:00+08:00",
   "lastCommitHash": null,
   "tasks": [
     {
@@ -23,7 +23,7 @@
       "type": "bugfix",
       "target": "src/SiliconLife.App/Web/ + src/SiliconLife.Common/Localization/",
       "title": "修复硅基人Project/Broadcast/Stopped状态本地化缺失及展示异常",
-      "description": "BeingActivity枚举有8个值(Idle/SingleChat/GroupChat/Task/Timer/Broadcast/Project/MemoryCompression/Stopped)，但本地化和前端展示存在多处缺失：\n\n【问题清单】\n1. 本地化层（13个语言文件）：GetBeingActivityName缺少BeingActivity.Broadcast和BeingActivity.Project的显式映射，回退到activity.ToString()显示英文枚举名\n2. BeingView硅基人详情页：\n   - JS activityNameMap硬编码只映射5个值，缺Broadcast/Project/Stopped\n   - statusClass只有idle/active两类，Stopped应显示为停止状态(灰色)而非活跃(绿色)\n   - 缺少.being-status.stopped CSS样式\n3. ChatView聊天界面：\n   - activityNameMap从后端序列化不缺key，但Broadcast/Project显示为英文枚举名(因本地化层缺映射)\n   - statusClass同样只有idle/active两类，Stopped应有独立样式\n   - 缺少.being-status-badge.stopped CSS样式\n\n【修复范围】\n1. 13个语言文件的GetBeingActivityName增加Broadcast和Project映射：\n   - EnUS: \"Processing Broadcast\" / \"Working on Project\"\n   - ZhCN: \"处理广播\" / \"项目工作中\"\n   - ZhHK: \"處理廣播\" / \"項目工作中\"\n   - JaJP: \"ブロードキャスト処理中\" / \"プロジェクト作業中\"\n   - KoKR: \"브로드캐스트 처리 중\" / \"프로젝트 작업 중\"\n   - DeDE: \"Broadcast verarbeiten\" / \"Projektarbeit\"\n   - FrFR: \"Traitement broadcast\" / \"Travail sur projet\"\n   - EsES: \"Procesando broadcast\" / \"Trabajando en proyecto\"\n   - ItIT: \"Elaborazione broadcast\" / \"Lavoro su progetto\"\n   - RuRU: \"Обработка вещания\" / \"Работа над проектом\"\n   - PtPT: \"Processando broadcast\" / \"Trabalhando no projeto\"\n   - PlPL: \"Przetwarzanie broadcast\" / \"Praca nad projektem\"\n   - CsCZ: \"Zpracování broadcastu\" / \"Práce na projektu\"\n2. BeingView.cs：\n   - activityNameMap增加Broadcast/Project/Stopped三个映射\n   - statusClass逻辑改为三分类：Idle→idle, Stopped→stopped, 其余→active\n   - 增加.being-status.stopped CSS（灰色背景+灰色文字）\n   - 增加.being-status-badge.stopped CSS（同上）\n3. ChatView.cs：\n   - statusClass逻辑改为三分类（同BeingView）\n   - 增加.being-status-badge.stopped CSS样式",
+      "description": "BeingActivity枚举有8个值(Idle/SingleChat/GroupChat/Task/Timer/Broadcast/Project/MemoryCompression/Stopped)，但本地化和前端展示存在多处缺失",
       "priority": "P1",
       "status": "completed",
       "createdAt": "2026-05-29T03:27:00+08:00",
@@ -37,7 +37,7 @@
       "type": "feature",
       "target": "src/SiliconLife.Core/AI/ContextManager.cs",
       "title": "ThinkOnProject场景上下文增强：增加可用硅基人信息",
-      "description": "ThinkOnProject执行时AI不知道系统中已有但未分配到项目的硅基人，导致重复创建而非分配已有人员。\n\n【问题】\nBuildProjectScenarioContext（ContextManager.cs L1362-1540）只显示项目内的Team members，不显示系统中存在但未分配到当前项目的硅基人。AI看到\"角色池为空\"就直接create_being，而不是assign已有的人。\n\n【修复方案】\n在BuildProjectScenarioContext中增加\"Available beings (not yet assigned to this project)\"区块：\n1. 遍历SiliconBeingManager中的所有活跃硅基人\n2. 排除已分配到当前项目的成员（通过project.GetMembers()对比）\n3. 列出可用硅基人的Name、ID、角色描述（如有）\n4. 此信息仅在ThinkOnProject首轮（ThinkSession.State=Idle→Started，或当前无session时）注入，后续轮次从ChatHistory可见\n5. 增加13个语言文件的本地化字符串（如ProjectCtx_AvailableBeings、ProjectCtx_AvailableBeingEntry等）\n\n【预期效果】\nAI在ThinkOnProject中看到\"角色池为空\"时，同时看到可用硅基人列表，优先使用assign而非create_being。\n\n【关键代码位置】\n- ContextManager.cs L1362-1540：BuildProjectScenarioContext\n- ContextManager.cs L1332-1361：GetProjectAttentionReasons\n- DefaultSiliconBeing.cs L847-870：HasProjectsNeedingAttention\n\n【依赖】无前置依赖，可独立完成",
+      "description": "ThinkOnProject执行时AI不知道系统中已有但未分配到项目的硅基人，导致重复创建而非分配已有人员。",
       "priority": "P1",
       "status": "completed",
       "createdAt": "2026-05-29T03:30:00+08:00",
@@ -51,7 +51,7 @@
       "type": "feature",
       "target": "src/SiliconLife.Core/SiliconBeing/ + src/SiliconLife.Core/AI/ContextManager.cs",
       "title": "ThinkOnProject伪Session多轮对话机制",
-      "description": "ThinkOnProject是单轮执行的，AI调用工具后无法在同一轮继续对话，导致多步操作（如创建硅基人→分配角色）被拆散到多个Tick，每个Tick AI重新看到\"角色池为空\"又创建新人。\n\n【问题根因】\n- ThinkOnProject只做一次AI调用，不像ThinkOnChat/ThinkOnTask/ThinkOnTimer那样有延续机制\n- 工具调用结果不触发新一轮ThinkOnProject\n- 下一个Tick时项目状态未变（只创建了人没分配角色），AI重复相同操作\n\n【方案：为ThinkOnProject引入伪Session】\n参照TimerItem的ExecutionState模式，为每个ProjectSpace维护伪Session：\n\n1. 新增ProjectThinkSession类：\n   - Id/BeingId/State(CurrentRound/MaxRounds=10)/ChatHistory(List<ChatHistoryCycle>)/CreatedAt/CompletedAt\n   - State枚举：Idle/Started/Executing/Completed/Failed\n\n2. ProjectSpace新增：\n   - Dictionary<Guid, ProjectThinkSession> ThinkSessions\n   - 存储路径：<StoragePath>/think_sessions/<being_id>/session_<guid>.json\n\n3. DefaultSiliconBeing.Tick修改：\n   - 优先级5改为：IsCurator && (HasExecutingThinkSession() || HasProjectsNeedingAttention())\n   - HasExecutingThinkSession()：检查所有Active项目的ThinkSessions是否有State=Executing且BeingId=自己的\n   - 有Executing session → ThinkOnProjectContinue(session)\n   - 无Executing session但有需要关注的项目 → ThinkOnProjectStart(project)\n\n4. ThinkOnProjectStart：\n   - 创建ProjectThinkSession，State=Started\n   - BuildProjectScenarioContext（含关注原因+可用人员信息）\n   - GetResponse → HasToolCalls则State=Executing并持久化，纯文本则State=Completed\n\n5. ThinkOnProjectContinue：\n   - 加载ThinkSession的ChatHistory\n   - CurrentRound++，超过MaxRounds则强制完成\n   - GetResponse（不再重复ScenarioContext）\n   - 同上判断HasToolCalls/纯文本\n\n6. ContextManager适配：\n   - 新增构造函数接收ProjectThinkSession\n   - 从ThinkSession.ChatHistory加载历史消息\n\n7. BeingActivity枚举已有Project值，Tick中设置Activity=Project即可在Web UI正确显示状态\n\n【关键代码位置】\n- DefaultSiliconBeing.cs L279-284：Tick中的项目分支\n- DefaultSiliconBeing.cs L847-870：HasProjectsNeedingAttention\n- ContextManager.cs L1242-1266：ThinkOnProject（单轮执行入口）\n- ContextManager.cs L349-428：BuildRequest\n- src/SiliconLife.Core/SiliconBeing/SiliconBeingBase.cs：BeingActivity枚举\n\n【依赖】task-394（场景上下文增强）完成后，首轮注入的可用人员信息才能在多轮中生效，但本任务可并行开发，首轮暂不含可用人员信息",
+      "description": "为ThinkOnProject引入伪Session，参照TimerItem的ExecutionState模式，为每个ProjectSpace维护多轮对话。",
       "priority": "P1",
       "status": "completed",
       "createdAt": "2026-05-29T03:30:00+08:00",
@@ -79,7 +79,7 @@
       "type": "feature",
       "target": "src/SiliconLife.App/Web/Views/ProjectView.cs + src/SiliconLife.App/Web/Controllers/ProjectController.cs + src/SiliconLife.App/Web/Router.cs + src/SiliconLife.Common/Localization/",
       "title": "项目处理记录前端展示：项目面板增加入口+专用历史页面",
-      "description": "task-395引入了ProjectThinkSession伪Session机制，Curator AI在ThinkOnProject时会产生多轮对话记录（ChatHistory），但前端无法查看这些处理记录，用户无法了解AI在项目上做了什么、执行到哪一步。\n\n【问题】\n1. ProjectView项目列表页：每个项目卡片有tasks/notes/workflow/tool-permissions等链接，但没有\"处理记录\"入口\n2. 没有专用页面展示ProjectThinkSession的历史记录\n3. 没有API端点返回项目的ThinkSession数据\n\n【方案：参照TimerExecutionHistoryView/TaskExecutionHistoryView模式】\n\n1. ProjectView项目卡片增加\"处理记录\"链接：\n   - 在project-links区域新增一条链接，样式参照broadcast-link（如think-link，橙色系）\n   - 链接地址：/project/{id}/think-history\n   - 仅当项目有ThinkSessions时显示（或始终显示，空态提示\"暂无记录\"）\n\n2. 新增ProjectThinkHistoryView（专用页面）：\n   - 参照TimerExecutionHistoryView的结构\n   - 页面头部：返回项目列表链接 + 标题 + 项目名称副标题\n   - 主体：think-session列表，每个session显示：\n     - 状态badge（Started/Executing/Completed/Failed，对应不同颜色）\n     - 创建时间、完成时间\n     - 当前轮次/最大轮次\n     - 消息数量\n   - 点击session进入详情页\n\n3. 新增ProjectThinkDetailView（详情页面）：\n   - 参照TimerExecutionDetailView/ChatHistoryDetailView\n   - 展示单个ThinkSession的完整ChatHistory消息\n   - 复用ChatHistoryDetailView的消息渲染逻辑\n\n4. ProjectController新增API端点：\n   - GET /api/projects/{id}/think-sessions/list：返回项目的ThinkSession列表（摘要信息，含活跃+历史）\n   - GET /api/projects/{id}/think-sessions/detail?sessionId={sid}：返回指定session的完整ChatHistory\n\n5. Router注册新路由：\n   - /project/{id}/think-history → ProjectThinkHistoryPage\n   - /project/{id}/think-session/{sessionId} → ProjectThinkDetailPage\n   - /api/projects/{id}/think-sessions/list\n   - /api/projects/{id}/think-sessions/detail\n\n6. 13个语言文件新增本地化字符串：\n   - ProjectThinkHistoryLinkLabel：\"处理记录\"/\"Think History\"\n   - ProjectThinkHistoryTitle：\"项目处理记录\"/\"Project Think History\"\n   - ProjectThinkHistoryHeader：同上\n   - ProjectThinkNoRecords：\"暂无处理记录\"/\"No think sessions yet\"\n   - ProjectThinkStateStarted/Executing/Completed/Failed\n   - ProjectThinkDetailTitle/Header\n   - ProjectThinkRoundLabel/MessageCountLabel等\n\n【关键代码位置】\n- ProjectView.cs L244-260：renderItem中的project-links区域（新增think-history链接）\n- ProjectController.cs：Handle方法中新增路由分支\n- Router.cs L115-140：ProjectController路由注册区\n- TimerExecutionHistoryView.cs：参照模板\n- TimerExecutionDetailView.cs：参照模板（复用ChatHistoryDetailView）\n- ProjectSpace.cs L115：ThinkSessions字典 + ThinkSessionHistory列表（task-398新增）\n- ProjectThinkSession.cs：数据模型（Id/State/CurrentRound/MaxRounds/ChatHistory/CreatedAt/CompletedAt）\n\n【依赖】task-398（修复消息写入和Session历史保留）必须先完成，否则前端展示的数据不完整且历史记录被删除",
+      "description": "task-395引入了ProjectThinkSession伪Session机制，前端无法查看这些处理记录。新增项目面板入口和专用历史页面。",
       "priority": "P2",
       "status": "completed",
       "createdAt": "2026-05-29T15:30:00+08:00",
@@ -93,7 +93,7 @@
       "type": "feature",
       "target": "src/SiliconLife.Core/AI/ContextManager.cs",
       "title": "BuildRequest动态注入硅基人项目归属信息",
-      "description": "非Curator的硅基生命（如小类、小码）在执行任务时不知道自己被分配到哪个项目、担任什么角色，导致无法正确使用项目相关工具、无法自主决策。\n\n【问题】\n项目归属信息只在ThinkOnProject场景上下文中提供（仅Curator可见）。一般硅基人在ThinkOnTask/ThinkOnChat/ThinkOnTimer时完全不知道项目归属。Soul文件是静态文本，不会随项目状态变化而更新。\n\n【方案：在BuildRequest中动态注入ProjectInfo层】\n在系统提示词组装顺序中，IdentityInfo之后、ScenarioContext之前新增ProjectInfo层：\n\nSoulContent → CommonPrompt → IdentityInfo → **ProjectInfo(新增)** → ScenarioContext → KnowledgeContext → MemoryContext\n\nProjectInfo内容：\n- 如果硅基人被分配到一个或多个Active项目：\n  \"Project: 旅游编码计划\\nRole: POIClassifier\\nProject goal: 构建多语言旅游维基\"\n- 如果未分配到任何项目：不注入（避免冗余）\n- 多项目时逐行列出\n\n关键设计原则：\n- Soul文件保持纯人格定义，不被系统覆盖或追加\n- ProjectInfo动态生成，项目变更时自动更新\n- 人格(Soul)和职责(ProjectInfo)解耦：性格稳定，工作可变\n- 同一硅基人调到不同项目，Soul不变但ProjectInfo变化\n\n【实现要点】\n1. ContextManager.BuildRequest中，在IdentityInfo段之后注入ProjectInfo段\n2. 获取硅基人分配的项目：ProjectManager.ListProjects → 过滤Active项目 → 过滤members含当前beingId\n3. 获取角色信息：project.GetMemberRole(beingId)\n4. 新增13个语言本地化字符串（如ProjectInfoLabel、ProjectInfoRoleLabel等）\n5. ProjectInfo仅在硅基人被分配到至少一个Active项目时注入\n\n【排除方案】\n- ❌ 在Soul文件中自动追加项目信息：与用户手动编辑冲突，项目变更需同步更新易不一致，违反Soul\"人格定义\"语义\n- ❌ 仅在ScenarioContext中提供：只在ThinkOnProject场景注入，一般硅基人在其他场景仍不知道归属\n\n【关键代码位置】\n- ContextManager.cs L349-428：BuildRequest\n- ContextManager.cs L388-398：IdentityInfo段（ProjectInfo应插入其后）\n\n【依赖】无前置依赖，可独立完成。与task-394/395互补但不互阻",
+      "description": "在BuildRequest中动态注入ProjectInfo层，使非Curator硅基人知道自己的项目归属和角色。",
       "priority": "P2",
       "status": "completed",
       "createdAt": "2026-05-29T03:30:00+08:00",
@@ -101,12 +101,40 @@
       "createdBy": "coze-agent",
       "completedAt": "2026-05-29T12:30:00+08:00",
       "relatedCommit": "07eb628"
+    },
+    {
+      "id": "task-399",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/AI/ + src/SiliconLife.Common/SiliconBeing/ + src/SiliconLife.Common/Localization/",
+      "title": "新增 HerdsmanClient AI 客户端（牧马人推理引擎）",
+      "description": "新增 HerdsmanClient 和 HerdsmanClientFactory，实现 OpenAI 兼容 API 的 AI 客户端。HerdsmanClientFactory 实现 IAIClientFactory 接口，支持动态获取模型列表（通过 /v1/models 端点），endpoint 不硬编码端口，从配置动态获取。注册到 DefaultSiliconBeing 和 DefaultSiliconBeingFactory 的客户端工厂映射。添加 11 个语言文件的本地化字符串（HerdsmanClient/HerdsmanEndpoint/HerdsmanModel）。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-29T20:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-29T20:30:00+08:00",
+      "relatedCommit": null
+    },
+    {
+      "id": "task-400",
+      "type": "bugfix",
+      "target": "src/SiliconLife.App/Web/Controllers/InitController.cs",
+      "title": "修复初始化界面 text input 修改后下拉菜单不刷新的问题",
+      "description": "初始化界面中 text input 仅绑定 change 事件（失去焦点时触发），导致用户输入 endpoint 后 model 下拉菜单不实时刷新。修复方式：给 text input 额外绑定 input 事件（800ms 防抖），用户输入时实时触发 refreshAIConfigFields()，使 model 字段从文本输入框自动变为下拉选择框。参考 OllamaClientFactory 的做法：Ollama 有默认 endpoint 所以首次加载即可获取模型列表，而 Herdsman 无默认值需用户输入后触发刷新。",
+      "priority": "P1",
+      "status": "completed",
+      "createdAt": "2026-05-29T20:00:00+08:00",
+      "createdBy": "trae-glm5",
+      "assignedTo": "trae-glm5",
+      "completedAt": "2026-05-29T20:30:00+08:00",
+      "relatedCommit": null
     }
   ],
   "taskIndex": {
     "pending": [],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398"],
+    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400"],
     "cancelled": []
   },
   "metadata": {

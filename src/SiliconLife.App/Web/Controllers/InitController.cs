@@ -839,9 +839,14 @@ public class InitController : Controller
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "id"), () => Js.Str(() => "ai_").Op(() => "+", () => (JsSyntax)Js.Id(() => "key"))))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "placeholder"), () => Js.Id(() => "label")))
             .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "value"), () => Js.Id(() => "value")))
-            // Bind onchange event to trigger refresh with current values
             .Add(() => Js.Id(() => "input").Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
                 .Add(() => Js.Id(() => "refreshAIConfigFields").Invoke().Stmt())
+            )))
+            .Add(() => Js.Id(() => "input").Call(() => "addEventListener", () => Js.Str(() => "input"), () => Js.Arrow(() => new List<string>(), () => Js.Block()
+                .Add(() => Js.Id(() => "clearTimeout").Invoke(() => Js.Id(() => "input").Prop(() => "_debounceTimer")).Stmt())
+                .Add(() => Js.Assign(() => Js.Id(() => "input").Prop(() => "_debounceTimer"), () => Js.Id(() => "setTimeout").Invoke(() => Js.Arrow(() => new List<string>(), () => Js.Block()
+                    .Add(() => Js.Id(() => "refreshAIConfigFields").Invoke().Stmt())
+                ), () => Js.Num(() => "800"))).Stmt())
             )))
             .Add(() => Js.Id(() => "div").Call(() => "appendChild", () => Js.Id(() => "input")));
         

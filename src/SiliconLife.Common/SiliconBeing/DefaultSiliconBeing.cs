@@ -600,6 +600,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             "OllamaClient" => new OllamaClientFactory(),
             "DashScopeClient" => new DashScopeClientFactory(),
             "VolcengineArkClient" => new VolcengineArkClientFactory(),
+            "HerdsmanClient" => new HerdsmanClientFactory(),
             _ => new OllamaClientFactory()
         };
     }
