@@ -254,6 +254,7 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             "VolcengineArkClient" => new VolcengineArkClientFactory(),
             "HerdsmanClient" => new HerdsmanClientFactory(),
             "LongCatClient" => new LongCatClientFactory(),
+            "QiniuAI" => new QiniuAIClientFactory(),
             _ => throw new NotSupportedException($"AI client type '{clientType}' is not supported")
         };
     }

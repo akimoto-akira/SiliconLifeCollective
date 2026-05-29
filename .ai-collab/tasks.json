@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-30T05:15:00+08:00",
+  "lastUpdated": "2026-05-30T06:00:00+08:00",
   "lastCommitHash": "28d893d",
   "tasks": [
     {
@@ -243,7 +243,8 @@
       "createdAt": "2026-05-30T04:45:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-30T05:45:00+08:00"
+      "completedAt": "2026-05-30T05:45:00+08:00",
+      "relatedCommit": "b886965"
     },
     {
       "id": "task-409",
@@ -252,16 +253,17 @@
       "title": "新增 QiniuAIClient AI 客户端（七牛云AI大模型推理服务）",
       "description": "七牛云AI大模型推理服务（https://apidocs.qnaigc.com/）提供OpenAI兼容API格式，端点为https://api.qnaigc.com/v1，需API Key认证（基于七牛云AK生成），支持模型包括deepseek-r1、deepseek-v3、qwen-max-2025-01-25、qwen2.5-72b-instruct、qwen2-72b-instruct、qwen2-vl-72b-instruct（视觉模型）等，上下文窗口最大128K，新注册用户赠送1000万免费Token。参照已有的HerdsmanClient（task-399）模式实现。改造方案：1) 新增QiniuAIClient类，实现IAIClient接口，基于OpenAI兼容API格式，需Authorization: Bearer {apiKey}认证头，支持tool calling/function calling、streaming、reasoning_content；ContextWindowTokens按模型名映射（deepseek-r1/v3=128K，qwen-max-2025-01-25=128K，qwen2.5-72b-instruct/qwen2-72b-instruct=128K，其余=null回退）；SupportsVision按模型映射（qwen2-vl-72b-instruct=true，其余=false）；SupportsToolCalls=true；2) 新增QiniuAIClientFactory类，实现IAIClientFactory和IAIClientFactoryHelp接口，配置键包括：apiKey（string，必填，基于七牛云AK生成）、endpoint（string，默认https://api.qnaigc.com/v1）、model（string，默认deepseek-v3）、contextWindowTokens（int?，可选），GetConfigKeyOptions对model键通过endpoint/models动态获取模型列表；3) DefaultSiliconBeing和DefaultSiliconBeingFactory的客户端工厂映射中注册\"QiniuAI\" => new QiniuAIClientFactory()；4) 添加所有语言文件（zh-CN/en-US/ja-JP/ko-KR/fr-FR/de-DE/es-ES/it-IT/pt-PT/ru-RU/cs-CZ/pl-PL/zh-HK）的本地化字符串：QiniuAI/QiniuAIApiKey/QiniuAIEndpoint/QiniuAIModel/QiniuAIContextWindowTokens（显示名+描述）。",
       "priority": "P2",
-      "status": "pending",
+      "status": "completed",
       "createdAt": "2026-05-30T05:00:00+08:00",
       "createdBy": "catpaw",
-      "assignedTo": "catpaw"
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-30T06:30:00+08:00"
     }
   ],
   "taskIndex": {
-    "pending": ["task-409"],
+    "pending": [],
     "inProgress": [],
-    "completed": ["task-408", "task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-402", "task-403", "task-404", "task-405", "task-406", "task-407"],
+    "completed": ["task-409", "task-408", "task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-402", "task-403", "task-404", "task-405", "task-406", "task-407"],
     "cancelled": []
   },
   "metadata": {
