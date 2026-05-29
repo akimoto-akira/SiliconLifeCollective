@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "lastUpdated": "2026-05-30T03:00:00+08:00",
+  "lastUpdated": "2026-05-30T05:15:00+08:00",
   "lastCommitHash": "28d893d",
   "tasks": [
     {
@@ -177,7 +177,7 @@
       "type": "bugfix",
       "target": "src/SiliconLife.App/Web/Views/ChatHistoryDetailView.cs",
       "title": "修复工具调用轮次中AI正文Content和Thinking被隐藏的问题",
-      "description": "ChatHistoryDetailView.GetScriptsStatic中的renderMessageItem函数，当msg.toolCallsJson存在时直接走renderToolMessage分支，完全忽略msg.content和msg.thinking。而AI在工具调用轮次中可能同时返回正文文本（如"我来帮你创建一个硅基人"）和思考过程。修复方式：在renderToolMessage函数中，工具调用详情上方增加对msg.content（markdown渲染）和msg.thinking（折叠显示）的渲染，使AI的正文回复和思考过程不再丢失。影响范围：所有复用ChatHistoryDetailView.GetScriptsStatic的页面（聊天历史详情、项目思考详情、定时器执行详情、任务执行详情）均受益。",
+      "description": "ChatHistoryDetailView.GetScriptsStatic中的renderMessageItem函数，当msg.toolCallsJson存在时直接走renderToolMessage分支，完全忽略msg.content和msg.thinking。而AI在工具调用轮次中可能同时返回正文文本（如《我来帮你创建一个硅基人》）和思考过程。修复方式：在renderToolMessage函数中，工具调用详情上方增加对msg.content（markdown渲染）和msg.thinking（折叠显示）的渲染，使AI的正文回复和思考过程不再丢失。影响范围：所有复用ChatHistoryDetailView.GetScriptsStatic的页面（聊天历史详情、项目思考详情、定时器执行详情、任务执行详情）均受益。",
       "priority": "P1",
       "status": "completed",
       "createdAt": "2026-05-30T00:15:00+08:00",
@@ -229,13 +229,39 @@
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
       "completedAt": "2026-05-30T04:30:00+08:00",
-      "relatedTask": "task-397"
+      "relatedTask": "task-397",
+      "relatedCommit": "d548e48"
+    },
+    {
+      "id": "task-408",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/AI/ + src/SiliconLife.Common/SiliconBeing/ + src/SiliconLife.Common/Localization/",
+      "title": "新增 LongCatClient AI 客户端（美团LongCat大模型）",
+      "description": "美团LongCat大模型（https://longcat.chat/platform/docs/zh/）提供OpenAI兼容API格式，端点为https://api.longcat.chat/openai，需API Key认证，支持模型包括LongCat-Flash-Chat、LongCat-Pro-Chat、LongCat-Max-Chat等，上下文窗口最大128K。参照已有的HerdsmanClient（task-399）模式实现。改造方案：1) 新增LongCatClient类，实现IAIClient接口，基于OpenAI兼容API格式，需Authorization: Bearer {apiKey}认证头，支持tool calling/function calling、streaming、reasoning_content；ContextWindowTokens按模型名映射（LongCat-Flash-Chat=128K，LongCat-Pro-Chat=128K，LongCat-Max-Chat=128K，其余=null回退）；SupportsVision按模型映射（含vl/vision关键词的模型=true，其余=false）；SupportsToolCalls=true；2) 新增LongCatClientFactory类，实现IAIClientFactory和IAIClientFactoryHelp接口，配置键包括：apiKey（string，必填）、endpoint（string，默认https://api.longcat.chat/openai）、model（string，默认LongCat-Flash-Chat）、contextWindowTokens（int?，可选），GetConfigKeyOptions对model键通过endpoint/v1/models动态获取模型列表；3) DefaultSiliconBeing和DefaultSiliconBeingFactory的客户端工厂映射中注册\"LongCatClient\" => new LongCatClientFactory()；4) 添加所有语言文件（zh-CN/en-US/ja-JP/ko-KR/fr-FR/de-DE/es-ES/it-IT/pt-PT/ru-RU/cs-CZ/pl-PL/zh-HK）的本地化字符串：LongCatClient/LongCatApiKey/LongCatEndpoint/LongCatModel/LongCatContextWindowTokens（显示名+描述）。",
+      "priority": "P2",
+      "status": "completed",
+      "createdAt": "2026-05-30T04:45:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw",
+      "completedAt": "2026-05-30T05:45:00+08:00"
+    },
+    {
+      "id": "task-409",
+      "type": "feature",
+      "target": "src/SiliconLife.Common/AI/ + src/SiliconLife.Common/SiliconBeing/ + src/SiliconLife.Common/Localization/",
+      "title": "新增 QiniuAIClient AI 客户端（七牛云AI大模型推理服务）",
+      "description": "七牛云AI大模型推理服务（https://apidocs.qnaigc.com/）提供OpenAI兼容API格式，端点为https://api.qnaigc.com/v1，需API Key认证（基于七牛云AK生成），支持模型包括deepseek-r1、deepseek-v3、qwen-max-2025-01-25、qwen2.5-72b-instruct、qwen2-72b-instruct、qwen2-vl-72b-instruct（视觉模型）等，上下文窗口最大128K，新注册用户赠送1000万免费Token。参照已有的HerdsmanClient（task-399）模式实现。改造方案：1) 新增QiniuAIClient类，实现IAIClient接口，基于OpenAI兼容API格式，需Authorization: Bearer {apiKey}认证头，支持tool calling/function calling、streaming、reasoning_content；ContextWindowTokens按模型名映射（deepseek-r1/v3=128K，qwen-max-2025-01-25=128K，qwen2.5-72b-instruct/qwen2-72b-instruct=128K，其余=null回退）；SupportsVision按模型映射（qwen2-vl-72b-instruct=true，其余=false）；SupportsToolCalls=true；2) 新增QiniuAIClientFactory类，实现IAIClientFactory和IAIClientFactoryHelp接口，配置键包括：apiKey（string，必填，基于七牛云AK生成）、endpoint（string，默认https://api.qnaigc.com/v1）、model（string，默认deepseek-v3）、contextWindowTokens（int?，可选），GetConfigKeyOptions对model键通过endpoint/models动态获取模型列表；3) DefaultSiliconBeing和DefaultSiliconBeingFactory的客户端工厂映射中注册\"QiniuAI\" => new QiniuAIClientFactory()；4) 添加所有语言文件（zh-CN/en-US/ja-JP/ko-KR/fr-FR/de-DE/es-ES/it-IT/pt-PT/ru-RU/cs-CZ/pl-PL/zh-HK）的本地化字符串：QiniuAI/QiniuAIApiKey/QiniuAIEndpoint/QiniuAIModel/QiniuAIContextWindowTokens（显示名+描述）。",
+      "priority": "P2",
+      "status": "pending",
+      "createdAt": "2026-05-30T05:00:00+08:00",
+      "createdBy": "catpaw",
+      "assignedTo": "catpaw"
     }
   ],
   "taskIndex": {
-    "pending": [],
+    "pending": ["task-409"],
     "inProgress": [],
-    "completed": ["task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-402", "task-403", "task-404", "task-405", "task-406", "task-407"],
+    "completed": ["task-408", "task-392", "task-393", "task-394", "task-395", "task-396", "task-397", "task-398", "task-399", "task-400", "task-401", "task-402", "task-403", "task-404", "task-405", "task-406", "task-407"],
     "cancelled": []
   },
   "metadata": {
