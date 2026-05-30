@@ -124,6 +124,9 @@ AI 백엔드 설정:
 - Ollama (로컬)
 - 백련 (클라우드)
 - 화산엔진 Ark (클라우드)
+- Herdsman (로컬/클라우드, 인증 없음)
+- Meituan LongCat (클라우드)
+- Qiniu Cloud AI (클라우드)
 - 커스텀 클라이언트
 
 ### 스토리지 설정

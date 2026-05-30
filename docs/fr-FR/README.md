@@ -13,18 +13,18 @@
 - **Piloté par Fichier d'Âme** — Chaque Être de Silicium est piloté par un fichier d'invite principal (`soul.md`), définissant sa personnalité unique et ses schémas comportementaux
 - **Architecture Corps-Cerveau** — Le *Corps* (SiliconBeing) maintient les signes vitaux et détecte les scénarios de déclenchement ; le *Cerveau* (ContextManager) charge l'historique, appelle l'IA, exécute les outils et persiste les réponses
 - **Capacité d'auto-évolution** — Grâce à la compilation dynamique Roslyn, les Êtres de Silicium peuvent réécrire leur propre code pour évoluer
-- **Gestion des états d'activité** — Prend en charge quatre états d'activité : Idle (inactif), Working (en travail), Error (erreur), Stopped (arrêté) ; après 10 erreurs consécutives, passage automatique à l'état Stopped
+- **Gestion des états d'activité** — Prend en charge neuf états d'activité : Idle (inactif), SingleChat (chat 1:1), GroupChat (chat de groupe), Task (tâche), Timer (minuteur), Broadcast (diffusion), Project (projet), MemoryCompression (compression mémoire), Stopped (arrêté) ; après 10 erreurs consécutives, passage automatique à l'état Stopped
 
 ### Système de plugins
 - **Architecture d'extension par plugins** — Extension des fonctionnalités via l'interface IPlugin, avec chargement dynamique des DLL de plugins depuis un répertoire
-- **Sandbox de sécurité** — Le chargeur de plugins effectue des analyses de sécurité strictes, interdisant l'accès aux espaces de noms System.IO, System.Net, etc.
+- **Déclaration des capacités des plugins** — Les plugins déclarent les capacités nécessaires (Network, FileIO, Process, AI) via l'attribut `[PluginCapability]`, et le chargeur assouplit les règles d'analyse de sécurité en conséquence ; les capacités non déclarables (P/Invoke, Unsafe, Reflection Emit, etc.) sont toujours bloquées
 - **Chargement isolé** — Utilisation d'un AssemblyLoadContext personnalisé pour le chargement isolé, empêchant les plugins d'affecter la stabilité du programme principal
 - **Intégration d'outils** — Les plugins peuvent enregistrer des outils personnalisés via l'interface ITool, automatiquement intégrés dans la boucle d'appel d'outils
 
 ### Outils et exécution
-- **24 outils intégrés** — Couvrant le calendrier, le chat, la configuration, le disque, le réseau, la mémoire, les tâches, les minuteurs, la base de connaissances, les notes de travail, l'espace projet, le navigateur WebView, le rechargement à chaud, etc.
+- **24 outils intégrés** — Couvrant le calendrier, le chat, la configuration, le disque, le réseau, la mémoire, les tâches, les minuteurs, la base de connaissances, les notes de travail, l'espace projet, le navigateur WebView, etc.
 - **Isolation des scénarios d'outils** — Chaque outil déclare ses scénarios disponibles via l'attribut `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project) ; l'attribut `ChatOnly` restreint l'outil au seul scénario de chat
-- **Outil de rechargement à chaud** — Prend en charge la compilation automatique, la mise à jour des fichiers et le redémarrage de SiliconLife.Fast en cours d'exécution, sans intervention manuelle
+  - **Interface des capacités IAIClient** — Les clients IA déclarent les capacités de mode flux, appels d'outils, fenêtre de contexte, vision et audio, et le ContextManager adapte le comportement en conséquence
 - **Boucle d'appel d'outils** — L'IA retourne un appel d'outil → exécution de l'outil → résultat renvoyé à l'IA → boucle continue jusqu'à l'obtention d'une réponse en texte brut
 - **Sécurité Exécuteur-Autorisation** — Toutes les opérations d'E/S passent par des exécuteurs avec vérification stricte des autorisations
   - Chaîne de vérification des autorisations à 3 niveaux : UserFrequencyCache → IPermissionCallback → (IsCurator : IPermissionAskHandler | Non-curateur : GlobalACL → refus par défaut)
@@ -35,6 +35,9 @@
   - **Ollama** — Déploiement de modèles locaux, utilisation de l'API HTTP native
   - **Alibaba Cloud Bailian (DashScope)** — Service IA cloud, compatible API OpenAI, prenant en charge plus de 13 modèles, déploiement multi-régions
   - **Volcengine Ark** — Service IA cloud de ByteDance, prenant en charge les modes flux et non-flux, avec contrôle de débit intégré
+  - **Herdsman** — Moteur d'inférence sans authentification, compatible avec le format API OpenAI
+  - **Meituan LongCat** — Grand modèle développé en interne par Meituan, compatible avec le format API OpenAI, authentification par clé API
+  - **Qiniu Cloud AI** — Service IA cloud de Qiniu, authentification par clé API
 - **32 systèmes calendaires** — Couverture complète des principaux calendriers du monde, incluant grégorien, lunaire chinois, islamique, hébraïque, japonais, persan, maya, calendriers historiques chinois, etc.
 - **Système de Réseau de Connaissances** — Graphe de connaissances basé sur des triplets (sujet-relation-objet), prenant en charge le stockage, la recherche et la découverte de chemins
 - **Espace de projet** — Gestion d'espaces projet, prenant en charge la création/archivage/destruction de projets, l'attribution de rôles, les notes de travail, le suivi des tâches et l'isolation des autorisations d'outils
@@ -90,7 +93,7 @@ Ce projet propose deux versions d'implémentation, répondant à différents sc�
   - Moteur SpeedyPack + compression automatique garantissant la sécurité des données
   - Architecture Component UI, 27 composants déclaratifs
   - 7 thèmes d'apparence, avec découverte automatique et changement
-  - Prise en charge du rechargement à chaud pour les mises à jour et redémarrages en ligne
+  - Prise en charge du rechargement à chaud pour les mises à jour et redémarrages en ligne → Linux ouvre automatiquement le navigateur pour accéder à la Web UI, prend en charge le paramètre `--no-tray`
 - **Amélioration des performances** : Latence de lecture réduite de 1000 fois, latence d'écriture réduite de 15000 fois, capacité de traitement concurrent améliorée de 50 fois
 - **Rôle** : Implémentation de niveau production profondément optimisée, choix recommandé pour l'exécution à long terme et les environnements de production réels
 - **Commande de lancement** : `dotnet run --project src/SiliconLife.Fast`
@@ -119,7 +122,7 @@ Ce projet propose deux versions d'implémentation, répondant à différents sc�
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Langage de programmation | C# | C# |
 | Type d'application | Application console | Application de bureau (barre d'état système Windows/macOS / fenêtre d'état Linux) |
-| Intégration IA | Ollama (local), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud) | Ollama (local), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud) |
+| Intégration IA | Ollama (local), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (local), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
 | Stockage de données | Système de fichiers (JSON + répertoires d'index temporel) | SpeedyPack (format .spk, cartographie en mémoire + persistance asynchrone) |
 | Serveur Web | HttpListener (intégré .NET) | HttpListener (intégré .NET) |
 | Compilation dynamique | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -157,7 +160,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Localisateur de services global
 │   │
 │   ├── SiliconLife.Common/                # Implémentations partagées (communes aux deux versions)
-│   │   ├── AI/                            # Clients IA et fabriques (Ollama, DashScope, VolcengineArk)
+│   │   ├── AI/                            # Clients IA et fabriques (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32 implémentations de calendriers
 │   │   ├── Localization/                  # Classe de base de localisation et 34 variantes linguistiques/régionales
 │   │   ├── Resources/                     # Fichiers de ressources partagées
@@ -260,6 +263,9 @@ Appel d'outil → Exécuteur → Gestionnaire d'Autorisations → [Cache de fré
   - **Ollama** : [Installer Ollama](https://ollama.com) et tirer un modèle (par exemple `ollama pull llama3`)
   - **Alibaba Cloud Bailian** : Obtenir une clé API depuis la [console Bailian](https://bailian.console.aliyun.com/)
   - **Volcengine Ark** : Obtenir une clé API depuis la [console Volcengine](https://console.volcengine.com/ark)
+  - **Herdsman** : Sans authentification, compatible avec le format API OpenAI
+  - **Meituan LongCat** : Obtenir une clé API depuis la plateforme Meituan
+  - **Qiniu Cloud AI** : Obtenir une clé API depuis la [console Qiniu](https://portal.qiniu.com/)
 
 ### Construire le projet
 
@@ -342,7 +348,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Phase 10.5 : Améliorations incrémentales (Canal de Diffusion, Audit de Tokens, 32 calendriers, amélioration des outils, localisation en 34 variantes linguistiques)
 - [x] Phase 10.6 : Perfectionnement et optimisation (WebView, système d'aide, espace projet, Réseau de Connaissances, moteur de flux de travail)
 - [x] Phase 11 : Moteur de stockage SpeedyPack (remplacement de LiteDB, cartographie en mémoire, file d'écriture asynchrone, compression automatique)
-- [x] Phase 12 : Système de plugins (interface IPlugin, Sandbox de sécurité PluginLoader, chargement isolé, intégration d'outils)
+- [x] Phase 12 : Système de plugins (interface IPlugin, déclaration des capacités PluginLoader, chargement isolé, intégration d'outils)
 
 ### 🚧 Planifié
 - [ ] Phase 13 : Intégration de messagerie instantanée externe (Feishu / WhatsApp / Telegram)

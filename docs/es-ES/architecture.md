@@ -26,8 +26,7 @@ Este proyecto proporciona dos versiones de implementación que comparten el mism
   - Motor SpeedyPack + compactación automática para garantizar la seguridad de los datos
   - Arquitectura Component UI, 27 componentes declarativos
   - 7 temas de piel, con soporte para descubrimiento y cambio automático
-  - Herramienta de recarga en caliente para actualización y reinicio en línea
-  - Linux abre automáticamente el navegador para acceder a la Web UI, soporta el parámetro `--no-tray`
+  - Soporte para actualización y reinicio en línea → Linux abre automáticamente el navegador para acceder a la Web UI, soporta el parámetro `--no-tray`
 - **Mejora de rendimiento**: Latencia de lectura de almacenamiento reducida 1000 veces, latencia de escritura reducida 15000 veces
 - **Descripción del rol**: Implementación de grado de producción profundamente optimizada, con características como ejecución en segundo plano en la bandeja del sistema, motor SpeedyPack + compactación automática, es la opción preferida para ejecución a largo plazo y entornos de producción reales
 
@@ -292,6 +291,42 @@ El sistema soporta múltiples backends de IA a través de la interfaz `IAIClient
 - **Configuración**: `apiKey`, `endpoint`, `model`
 - **Características**: Servicio de IA de ByteDance, soporta múltiples modelos Doubao
 
+### HerdsmanClient
+
+- **Tipo**: Motor de inferencia local/nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Sin autenticación
+- **Funcionalidades**: Streaming, llamadas a herramientas, contenido de razonamiento
+- **Configuración**: `endpoint`, `model`
+
+### LongCatClient (Meituan LongCat)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas
+- **Configuración**: `apiKey`, `endpoint`, `model`
+
+### QiniuAIClient (Qiniu Cloud AI)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas
+- **Configuración**: `apiKey`, `endpoint`, `model`
+
+### Interfaz de capacidades IAIClient
+
+La interfaz `IAIClient` define las capacidades de cada cliente de IA, permitiendo al `ContextManager` adaptar su comportamiento:
+
+| Capacidad | Tipo de retorno | Descripción |
+|-----------|----------------|-------------|
+| `StreamingMode` | `StreamingMode` | Modo de streaming soportado (None/Streaming/Reasoning) |
+| `SupportsToolCalls` | `bool` | Soporte para llamadas a herramientas |
+| `ContextWindowTokens` | `int` | Tamaño de la ventana de contexto en tokens |
+| `SupportsVision` | `bool` | Soporte para visión (imágenes) |
+| `SupportsAudio` | `bool` | Soporte para audio |
+
 ### Patrón de Fábrica de Clientes
 
 Cada tipo de cliente de IA tiene una implementación de fábrica correspondiente `IAIClientFactory`:
@@ -299,6 +334,9 @@ Cada tipo de cliente de IA tiene una implementación de fábrica correspondiente
 - `OllamaClientFactory` — Crea instancias de OllamaClient
 - `DashScopeClientFactory` — Crea instancias de DashScopeClient
 - `VolcengineArkClientFactory` — Crea instancias de VolcengineArkClient
+- `HerdsmanClientFactory` — Crea instancias de HerdsmanClient
+- `LongCatClientFactory` — Crea instancias de LongCatClient
+- `QiniuAIClientFactory` — Crea instancias de QiniuAIClient
 
 Las fábricas proporcionan:
 - `CreateClient(Dictionary<string, object> config)` — Instancia un cliente desde la configuración
@@ -325,6 +363,9 @@ Las fábricas proporcionan:
 | Zhipu AI (GLM) | 📋 | Nube | Servicio de IA Zhipu Qingyan |
 | Moonshot (Kimi) | 📋 | Nube | Servicio de IA Kimi de Moonshot |
 | Volcengine Ark Doubao | ✅ | Nube | Servicio de IA Doubao de ByteDance |
+| Herdsman | ✅ | Local/Nube | Motor de inferencia sin autenticación, compatible con el formato API OpenAI |
+| Meituan LongCat | ✅ | Nube | Gran modelo de desarrollo propio de Meituan, compatible con el formato API OpenAI, autenticación por clave API |
+| Qiniu Cloud AI | ✅ | Nube | Servicio de IA en la nube de Qiniu, autenticación por clave API |
 | DeepSeek (conexión directa) | 📋 | Nube | Servicio de IA DeepSeek |
 | 01.AI (Yi) | 📋 | Nube | Servicio de IA 01.AI |
 | Tencent Hunyuan | 📋 | Nube | Servicio de IA Hunyuan de Tencent |

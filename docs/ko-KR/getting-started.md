@@ -33,6 +33,9 @@
 - **Ollama** (선택, 로컬 AI용) - [다운로드](https://ollama.com/)
 - **바이리안 API 키** (선택, 클라우드 AI용) - [신청](https://bailian.console.aliyun.com/)
 - **Volcano Engine Ark API 키** (선택, 클라우드 AI용) - [신청](https://console.volcengine.com/ark)
+- **Herdsman** (선택, 로컬/클라우드 추론 엔진) - 인증 없음, OpenAI API 형식 호환
+- **Meituan LongCat API 키** (선택, 클라우드 AI용) - API 키 인증
+- **Qiniu Cloud AI API 키** (선택, 클라우드 AI용) - API 키 인증
 
 ## 빠른 시작
 
@@ -97,6 +100,49 @@ dotnet build
 ```
 
 > **참고**: Volcano Engine Ark의 Model 매개변수는 모델 이름이 아닌 추론 엔드포인트 ID(예: `ep-20241212123456-abcde`)를 받습니다.
+
+#### 옵션 D: Herdsman (로컬/클라우드)
+
+```json
+{
+  "AIClients": {
+    "Herdsman": {
+      "Endpoint": "http://localhost:8000",
+      "Model": "모델-이름"
+    }
+  }
+}
+```
+
+> **특징**: 인증 없음, OpenAI API 형식 호환, 툴 콜 및 추론 콘텐츠 지원.
+
+#### 옵션 E: Meituan LongCat (클라우드)
+
+```json
+{
+  "AIClients": {
+    "LongCat": {
+      "ApiKey": "API-키",
+      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
+      "Model": "모델-이름"
+    }
+  }
+}
+```
+
+#### 옵션 F: Qiniu Cloud AI (클라우드)
+
+```json
+{
+  "AIClients": {
+    "QiniuAI": {
+      "ApiKey": "API-키",
+      "Endpoint": "https://api.qiniu.com/v1/chat/completions",
+      "Model": "모델-이름"
+    }
+  }
+}
+```
 
 ### 4. 애플리케이션 실행
 

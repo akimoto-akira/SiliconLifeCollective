@@ -105,11 +105,14 @@ Ein Silicon Being hat folgende aktive Zustände:
 
 | Zustand | Beschreibung |
 |---------|--------------|
-| `Idle` | Ruhezustand, wartet auf Clock-Trigger |
+| `Idle` | Ruhezustand, wartet auf Aktivierung |
 | `SingleChat` | Einzelchat läuft |
 | `GroupChat` | Gruppenchat läuft |
 | `Task` | Aufgabe wird ausgeführt |
 | `Timer` | Timer wird ausgeführt |
+| `Broadcast` | Broadcast-Nachricht wird verarbeitet |
+| `Project` | Projektarbeit |
+| `MemoryCompression` | Speicherkompression |
 | `Stopped` | Gestoppt, aufgrund aufeinanderfolgender Fehler oder manuellem Stopp |
 
 **Stopped-Zustandsmechanismus**:

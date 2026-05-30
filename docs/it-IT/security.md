@@ -321,25 +321,30 @@ I log vengono persistiti nell'archivio e possono essere consultati tramite la We
 
 Il sistema di plugin introduce rischi di sicurezza legati all'esecuzione di codice di terze parti, mitigati attraverso i seguenti meccanismi:
 
-### Sandbox di Sicurezza
+### Sandbox di Sicurezza e Dichiarazione delle Capacità
 
-`PluginLoader` esegue scansioni di sicurezza rigorose durante il caricamento dei plugin:
+`PluginLoader` esegue scansioni di sicurezza durante il caricamento dei plugin e supporta contemporaneamente il meccanismo di dichiarazione delle capacità:
 
-1. **Controllo dei namespace proibiti** — I plugin non possono fare riferimento ai seguenti namespace:
-   - `System.IO` — Accesso al file system
-   - `System.Net.Http` — Richieste HTTP
-   - `System.Net.WebSockets` — Connessioni WebSocket
-   - `System.Net.Sockets` — Socket raw
-   - `Microsoft.CodeAnalysis` — API del compilatore
+1. **Capacità dichiarabili** — I plugin dichiarano le capacità necessarie tramite l'attributo `[PluginCapability]`:
+   - `Network` — Accesso alla rete (consente riferimenti a `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`)
+   - `FileIO` — Lettura/scrittura file (consente riferimenti a `System.IO`)
+   - `Process` — Gestione dei processi
+   - `AI` — Chiamate AI
 
-2. **Whelist degli assembly attendibili** — I riferimenti ai seguenti assembly sono consentiti:
+2. **Capacità non dichiarabili** — Le seguenti capacità sono sempre bloccate:
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Codice Unsafe (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - API del compilatore (`Microsoft.CodeAnalysis`)
+
+3. **Whelist degli assembly attendibili** — I riferimenti ai seguenti assembly sono consentiti:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Controllo dei tipi proibiti** — Scansione dei tipi pericolosi referenziati nel plugin
+4. **Controllo dei tipi proibiti** — Scansione dei tipi pericolosi referenziati nel plugin
 
-4. **Controllo dei membri proibiti** — Scansione dei metodi pericolosi richiamati nel plugin
+5. **Controllo dei membri proibiti** — Scansione dei metodi pericolosi richiamati nel plugin
 
 ### Caricamento Isolato
 

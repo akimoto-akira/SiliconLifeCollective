@@ -25,7 +25,7 @@ Le **Corps** maintient les signes vitaux et détecte les scénarios de déclench
 - **Détection de messages** — Vérifie les nouveaux messages de chat à chaque cycle d'horloge
 - **Détection de tâches** — Vérifie les tâches assignées
 - **Détection de minuteurs** — Vérifie les minuteurs expirés
-- **Gestion d'état** — Maintient l'état d'activité (Idle, Working, Error, Stopped)
+- **Gestion d'état** — Maintient l'état d'activité (Idle, SingleChat, GroupChat, Task, Timer, Broadcast, Project, MemoryCompression, Stopped)
 - **Compteur d'erreurs** — Passe à l'état Stopped après 10 erreurs consécutives
 
 ### Cerveau (ContextManager)

@@ -30,7 +30,7 @@
 #### Kiro（Amazon AWS）
 - 專案最初由 Kiro 維護，並使用 Spec 模式啟動。
 - Kiro 是 Amazon AWS 建構的 agentic AI 開發環境。
-- 基於 Code OSS（VS Code），支援 VS Code 設定和 Open VSX 相容插件。
+- 基於 Code OSS（VS Code），支援 VS Code 設定和 Open VSX 相容外掛程式。
 - 具有規格驅動的開發工作流程，用於結構化 AI 編碼。
 
 #### Comate AI IDE / 文心快碼（百度）
@@ -358,7 +358,7 @@
   - 9 個檔案變更
 
 #### 修復
-- `ec07118` - 修復 ITypeRegistry/IObjectFactory 未在插件載入前註冊的問題 (ref task-205)
+- `ec07118` - 修復 ITypeRegistry/IObjectFactory 未在外掛程式載入前註冊的問題 (ref task-205)
   - 8 個檔案變更
 
 - `9e749db` - 修復建立專案時 Creator ID is required 錯誤 (ref task-204)
@@ -811,7 +811,7 @@
   - 新增 PermissionRequestQueue 權限請求佇列（Default 和 Fast 版本）
   - 新增 DebugLoggerProvider 偵錯日誌提供者
   - ConfigDataBase 設定基底類別增強
-  - ToolManager 新增插件工具掃描功能（ScanAllPluginAssemblies）
+  - ToolManager 新增外掛程式工具掃描功能（ScanAllPluginAssemblies）
   - SiliconBeingManager 生命週期管理增強
   - DashScopeClient 阿里雲 AI 用戶端大幅增強（227 行新增）
   - DefaultSiliconBeingFactory 工廠增強
@@ -828,12 +828,12 @@
   - Web 檢視基底類別和 BeingView 改進
   - 6 個檔案變更，240 行新增，81 行刪除
 
-#### 插件系統
-- `242dc98` - 在關於頁面新增插件清單
-  - AboutController 新增插件資訊展示
-  - AboutViewModel 新增插件資料模型
-  - AboutView 新增插件清單渲染
-  - 9 種語言在地化新增插件相關鍵值
+#### 外掛程式系統
+- `242dc98` - 在關於頁面新增外掛程式清單
+  - AboutController 新增外掛程式資訊展示
+  - AboutViewModel 新增外掛程式資料模型
+  - AboutView 新增外掛程式清單渲染
+  - 9 種語言在地化新增外掛程式相關鍵值
   - 14 個檔案變更，160 行新增，1 行刪除
 
 #### AI 最佳化
@@ -873,7 +873,7 @@
   - WriteOperation、WriteQueue 寫入佇列增強
   - SpeedyPackOptions 設定選項擴充
   - IncompleteDate 新增比較方法
-  - PluginLoader 插件載入器改進
+  - PluginLoader 外掛程式載入器改進
   - Default 和 Fast 版本 Program.cs 初始化流程更新
   - DefaultConfigData 設定資料簡化
   - KnowledgeNetwork 知識網絡精簡
@@ -887,7 +887,7 @@
 ### 2026-05-01
 
 #### 架構重構：Speedy 儲存取代 LiteDB
-- `6600972` - 用 Speedy 儲存取代 LiteDB，新增插件系統和 Speedy 專案
+- `6600972` - 用 Speedy 儲存取代 LiteDB，新增外掛程式系統和 Speedy 專案
   - **新增 SiliconLife.Speedy 專案**：高效能 .spk 儲存引擎
     - SpeedyPack 核心類別（489 行）：記憶體目錄映射 + 條目快取 + 非同步寫入佇列
     - SpeedyPackOptions 設定類別：快取 TTL、最大快取條目數、唯讀模式
@@ -909,15 +909,15 @@
     - 新增 SpeedyPackAutoCompactor（自動壓縮定時器）
     - 移除 LiteDB 相關儲存實作（LiteDBStorage、LiteDBTimeStorage、LiteDBWorkNoteStorage、LiteDBLoggerProvider、LiteDBManager、LiteDBModels）
     - 移除 LiteDB 管理視窗相關程式碼
-  - **插件系統**：
+  - **外掛程式系統**：
     - 新增 IPlugin 介面（Core/Plugins/IPlugin.cs）
-    - 新增 PluginLoader 插件載入器（Core/Plugins/PluginLoader.cs）
-    - 支援從目錄載入插件 DLL
+    - 新增 PluginLoader 外掛程式載入器（Core/Plugins/PluginLoader.cs）
+    - 支援從目錄載入外掛程式 DLL
     - 安全掃描：禁止命名空間檢查（System.IO、System.Net、Microsoft.CodeAnalysis 等）
     - 可信組件白名單（Google.Protobuf、Newtonsoft.Json、MessagePack 等）
     - 自訂 AssemblyLoadContext 隔離載入
     - ToolManager 新增 ScanAllPluginAssemblies 方法
-    - CoreHost 整合插件載入器
+    - CoreHost 整合外掛程式載入器
   - 119 個檔案變更，6926 行新增，3066 行刪除
 
 #### 矽基生命體增強

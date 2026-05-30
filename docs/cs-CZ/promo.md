@@ -119,7 +119,7 @@ Začněte s jednoduchým asistentem. Jakmile objevíte, co je možné, vytvořte
 
 ### Rozšiřitelný systém zásuvných modulů
 
-Rozšiřte funkce pomocí zásuvných modulů — nástroje a schopnosti vytvořené komunitou lze snadno přidat. Každý zásuvný modul běží v bezpečném sandboxu, což zaručuje bezpečnost systému.
+Rozšiřte funkce pomocí zásuvných modulů — nástroje a schopnosti vytvořené komunitou lze snadno přidat. Každý zásuvný modul deklaruje požadované schopnosti pomocí atributu `[PluginCapability]`, což zaručuje bezpečnost systému.
 
 ### Výběr duálních verzí
 

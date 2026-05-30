@@ -321,25 +321,30 @@ Le `TokenUsageAuditManager` fournit le suivi de la consommation de tokens IA li�
 
 Le système de plugins introduit des risques de sécurité liés à l'exécution de code tiers, atténués par les mécanismes suivants :
 
-### Sandbox de sécurité
+### Sandbox de sécurité et déclaration des capacités
 
-Le `PluginLoader` effectue une analyse de sécurité stricte lors du chargement des plugins :
+Le `PluginLoader` effectue des analyses de sécurité lors du chargement des plugins et prend en charge simultanément le mécanisme de déclaration des capacités :
 
-1. **Vérification des espaces de noms interdits** — Les plugins ne peuvent pas référencer les espaces de noms suivants :
-   - `System.IO` — Accès au système de fichiers
-   - `System.Net.Http` — Requêtes HTTP
-   - `System.Net.WebSockets` — Connexions WebSocket
-   - `System.Net.Sockets` — Sockets bruts
-   - `Microsoft.CodeAnalysis` — API du compilateur
+1. **Capacités déclarables** — Les plugins déclarent les capacités nécessaires via l'attribut `[PluginCapability]` :
+   - `Network` — Accès réseau (autorise les références à `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`)
+   - `FileIO` — Lecture/écriture de fichiers (autorise les références à `System.IO`)
+   - `Process` — Gestion des processus
+   - `AI` — Appels IA
 
-2. **Liste blanche d'assemblys de confiance** — Les références aux assemblys suivants sont autorisées :
+2. **Capacités non déclarables** — Les capacités suivantes sont toujours bloquées :
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Code Unsafe (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - API du compilateur (`Microsoft.CodeAnalysis`)
+
+3. **Liste blanche d'assemblys de confiance** — Les références aux assemblys suivants sont autorisées :
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Vérification des types interdits** — Analyse des types dangereux référencés dans le plugin
+4. **Vérification des types interdits** — Analyse des types dangereux référencés dans le plugin
 
-4. **Vérification des membres interdits** — Analyse des méthodes dangereuses appelées dans le plugin
+5. **Vérification des membres interdits** — Analyse des méthodes dangereuses appelées dans le plugin
 
 ### Chargement isolé
 

@@ -13,18 +13,17 @@
 - **灵魂文件驱动** — 每个硅基生命体由核心提示文件（`soul.md`）驱动，定义独特个性和行为模式
 - **身体-大脑架构** — *身体*（SiliconBeing）维持生命体征并检测触发场景；*大脑*（ContextManager）负责加载历史、调用 AI、执行工具和持久化响应
 - **自我进化能力** — 通过 Roslyn 动态编译技术，硅基生命体可以重写自己的代码实现进化
-- **活动状态管理** — 支持 Idle（空闲）、Working（工作）、Error（错误）、Stopped（已停止）四种活动状态，连续 10 次错误自动进入 Stopped 状态
+- **活动状态管理** — 支持 Idle（空闲）、SingleChat（一对一聊天）、GroupChat（群聊）、Task（任务）、Timer（定时器）、Broadcast（广播）、Project（项目）、MemoryCompression（记忆压缩）、Stopped（已停止）九种活动状态，连续 10 次错误自动进入 Stopped 状态
 
 ### 插件系统
 - **插件扩展架构** — 通过 IPlugin 接口实现功能扩展，支持从目录动态加载插件 DLL
-- **安全沙箱** — 插件加载器执行严格的安全扫描，禁止访问 System.IO、System.Net 等命名空间
+- **插件能力声明** — 插件通过 `[PluginCapability]` 属性声明所需能力（Network、FileIO、Process、AI），加载器据此放宽安全扫描规则；不可声明的能力（P/Invoke、Unsafe、反射发射等）始终被阻止
 - **隔离加载** — 使用自定义 AssemblyLoadContext 隔离加载，防止插件影响主程序稳定性
 - **工具集成** — 插件可通过 ITool 接口注册自定义工具，自动集成到工具调用循环
 
 ### 工具与执行
-- **24 个内置工具** — 涵盖日历、聊天、配置、磁盘、网络、记忆、任务、定时器、知识库、工作笔记、项目工作区、WebView 浏览器、热重载等
-- **工具场景隔离** — 每个工具通过 `ToolScenario` 属性声明可用场景（Chat、Task、Timer、MemoryCompression、Project），`ChatOnly` 属性限制工具仅在聊天场景使用
-- **热重载工具** — 支持 SiliconLife.Fast 在运行中自动编译、更新文件并重启，无需手动干预
+- **24 个内置工具** — 涵盖日历、聊天、配置、磁盘、网络、记忆、任务、定时器、知识库、工作笔记、项目工作区、项目任务、项目工作笔记、项目工作、WebView 浏览器、动态编译、代码执行、权限管理、Token 审计、日志查询、数据库、系统信息、帮助文档等
+- **工具场景隔离** — 每个工具通过 `ToolScenario` 属性声明可用场景（Chat、Task、Timer、MemoryCompression、Project），`ChatOnly` 属性限制工具仅在聊天场景使用，`SiliconManagerOnly` 属性限制工具仅主理人使用
 - **工具调用循环** — AI 返回工具调用 → 执行工具 → 结果反馈给 AI → 持续循环直到返回纯文本响应
 - **执行器-权限安全** — 所有 I/O 操作通过执行器进行严格的权限验证
   - 3 级权限验证链：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → 默认拒绝)
@@ -35,6 +34,10 @@
   - **Ollama** — 本地模型部署，使用原生 HTTP API
   - **阿里云百炼（DashScope）** — 云端 AI 服务，兼容 OpenAI API，支持 13+ 模型，多区域部署
   - **火山引擎 Ark（VolcengineArk）** — 字节跳动云端 AI 服务，支持流式和非流式模式，内置速率控制
+  - **牧马人推理引擎（Herdsman）** — 无需认证的推理引擎，兼容 OpenAI API 格式
+  - **美团 LongCat** — 美团自研大模型，兼容 OpenAI API 格式，API Key 认证
+  - **七牛云 AI** — 七牛云大模型推理服务，兼容 OpenAI API 格式，API Key 认证
+- **AI 客户端能力发现** — IAIClient 接口支持声明流式模式、工具调用、视觉输入、音频输入、上下文窗口大小等能力，ContextManager 据此自适应调整行为
 - **32 种日历系统** — 全球主要历法全覆盖，包括公历、农历、伊斯兰历、希伯来历、日本历、波斯历、玛雅历、中国历史历法等
 - **知识网络系统** — 基于三元组（主体-关系-客体）的知识图谱，支持存储、查询和路径发现
 - **项目工作区** — 项目空间管理，支持项目创建/归档/销毁、角色分配、工作笔记、任务追踪和工具权限隔离
@@ -90,7 +93,6 @@
   - SpeedyPack 引擎 + 自动压缩保证数据安全
   - Component UI 架构，27 个声明式组件
   - 7 种皮肤主题，支持自动发现和切换
-  - 热重载工具支持在线更新和重启
 - **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍，并发处理能力提升 50 倍
 - **角色说明**：经过深度优化的生产级实现，是长期运行和实际生产环境的首选
 - **启动命令**：`dotnet run --project src/SiliconLife.Fast`
@@ -119,7 +121,7 @@
 | 运行时 | .NET 9 | .NET 9（Windows/macOS/Linux） |
 | 编程语言 | C# | C# |
 | 应用类型 | 控制台应用程序 | 桌面应用程序（Windows/macOS 系统托盘 / Linux 状态窗口） |
-| AI 集成 | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端） | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端） |
+| AI 集成 | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端）、牧马人推理引擎、美团LongCat、七牛云AI | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端）、牧马人推理引擎、美团LongCat、七牛云AI |
 | 数据存储 | 文件系统（JSON + 时间索引目录） | SpeedyPack（.spk 格式，内存映射 + 异步持久化） |
 | Web 服务器 | HttpListener（.NET 内置） | HttpListener（.NET 内置） |
 | 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -157,7 +159,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # 全局服务定位器
 │   │
 │   ├── SiliconLife.Common/                # 共享实现（两个版本共用）
-│   │   ├── AI/                            # AI 客户端与工厂（Ollama、DashScope、VolcengineArk）
+│   │   ├── AI/                            # AI 客户端与工厂（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI）
 │   │   ├── Calendar/                      # 32 种日历实现
 │   │   ├── Localization/                  # 本地化基类与 34 种语言/地区变体实现
 │   │   ├── Resources/                     # 共享资源文件
@@ -342,7 +344,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] 阶段 10.5：增量增强（广播频道、Token 审计、32 种日历、工具增强、34 种语言变体本地化）
 - [x] 阶段 10.6：完善与优化（WebView、帮助系统、项目工作区、知识网络、工作流引擎）
 - [x] 阶段 11：SpeedyPack 存储引擎（替换 LiteDB、内存映射、异步写入队列、自动压缩）
-- [x] 阶段 12：插件系统（IPlugin 接口、PluginLoader 安全沙箱、隔离加载、工具集成）
+- [x] 阶段 12：插件系统（IPlugin 接口、PluginLoader 安全沙箱、隔离加载、工具集成、能力声明系统）
 
 ### 🚧 计划中
 - [ ] 阶段 13：外部即时通讯集成（飞书 / WhatsApp / Telegram）

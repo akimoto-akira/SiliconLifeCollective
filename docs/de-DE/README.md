@@ -13,18 +13,18 @@
 - **Soul-Datei-gesteuert** — Jedes Silicon Being wird durch eine Kern-Prompt-Datei (`soul.md`) gesteuert, die einzigartige Persönlichkeit und Verhaltensmuster definiert
 - **Körper-Gehirn-Architektur** — Der *Körper* (SiliconBeing) erhält Vitalfunktionen und erkennt Triggerszenarien; das *Gehirn* (ContextManager) lädt Historie, ruft KI auf, führt Werkzeuge aus und persistiert Antworten
 - **Selbstevolutionsfähigkeit** — Durch Roslyn-Dynamische Kompilierung können Silicon Beings ihren eigenen Code umschreiben und sich weiterentwickeln
-- **Aktivitätszustandsverwaltung** — Unterstützt vier Aktivitätszustände: Idle (Leerlauf), Working (Arbeitend), Error (Fehler), Stopped (Angehalten); bei 10 aufeinanderfolgenden Fehlern automatischer Übergang in den Stopped-Zustand
+- **Aktivitätszustandsverwaltung** — Unterstützt neun Aktivitätszustände: Idle (Leerlauf), SingleChat, GroupChat, Task, Timer, Broadcast, Project, MemoryCompression, Stopped (Angehalten); bei 10 aufeinanderfolgenden Fehlern automatischer Übergang in den Stopped-Zustand
 
 ### Plugin-System
 - **Plugin-Erweiterungsarchitektur** — Funktionserweiterung über die IPlugin-Schnittstelle, dynamisches Laden von Plugin-DLLs aus Verzeichnissen
-- **Sicherer Sandkasten** — Der Plugin-Lader führt strenge Sicherheitsscans durch und verbietet den Zugriff auf Namespaces wie System.IO, System.Net usw.
+- **Plugin-Fähigkeitsdeklaration** — Plugins deklarieren erforderliche Fähigkeiten (Network, FileIO, Process, AI) über das `[PluginCapability]`-Attribut; der Lader lockert die Sicherheitsprüfregeln entsprechend; nicht deklarierbare Fähigkeiten (P/Invoke, Unsafe, Reflection Emit usw.) werden immer blockiert
 - **Isoliertes Laden** — Isoliertes Laden über benutzerdefinierten AssemblyLoadContext, um zu verhindern, dass Plugins die Stabilität des Hauptprogramms beeinträchtigen
 - **Werkzeugintegration** — Plugins können über die ITool-Schnittstelle benutzerdefinierte Werkzeuge registrieren, die automatisch in den Werkzeugaufruf-Zyklus integriert werden
 
 ### Werkzeuge und Ausführung
-- **24 integrierte Werkzeuge** — Umfassen Kalender, Chat, Konfiguration, Festplatte, Netzwerk, Speicher, Aufgaben, Timer, Wissensnetzwerk, Arbeitsnotizen, Projektarbeitsbereich, WebView-Browser, Hot Reload usw.
+- **24 integrierte Werkzeuge** — Umfassen Kalender, Chat, Konfiguration, Festplatte, Netzwerk, Speicher, Aufgaben, Timer, Wissensnetzwerk, Arbeitsnotizen, Projektarbeitsbereich, WebView-Browser und mehr
 - **Werkzeugszenario-Isolierung** — Jedes Werkzeug deklariert über die `ToolScenario`-Eigenschaft verfügbare Szenarien (Chat, Task, Timer, MemoryCompression, Project); die `ChatOnly`-Eigenschaft beschränkt Werkzeuge auf Chat-Szenarien
-- **Hot-Reload-Werkzeug** — Unterstützt automatische Kompilierung, Dateiaktualisierung und Neustart während der Laufzeit von SiliconLife.Fast ohne manuellen Eingriff
+- **IAIClient-Fähigkeitsschnittstelle** — KI-Clients deklarieren Fähigkeiten für Streaming-Modus, Werkzeugaufrufe, Kontextfenster, Vision und Audio; der ContextManager passt sein Verhalten entsprechend an
 - **Werkzeugaufruf-Zyklus** — KI gibt Werkzeugaufruf zurück → Werkzeug wird ausgeführt → Ergebnis wird an KI zurückgemeldet → Zyklus wird fortgesetzt, bis eine reine Textantwort zurückgegeben wird
 - **Executor-Berechtigungssicherheit** — Alle I/O-Operationen durchlaufen über den Executor eine strenge Berechtigungsprüfung
   - 3-stufige Berechtigungsprüfungskette: Benutzerfrequenz-Cache → Berechtigungs-Callback-Schnittstelle → (IsCurator: Berechtigungsanfrage-Handler | Non-curator: Globale ACL → Standardablehnung)
@@ -35,6 +35,9 @@
   - **Ollama** — Lokale Modellbereitstellung mit nativer HTTP-API
   - **Alibaba Cloud Bailian (DashScope)** — Cloud-KI-Service, kompatibel mit OpenAI-API, unterstützt 13+ Modelle, Multi-Region-Bereitstellung
   - **Volcengine Ark (VolcengineArk)** — ByteDance Cloud-KI-Service, unterstützt Streaming- und Non-Streaming-Modi, integrierte Ratensteuerung
+  - **Herdsman** — Authentifizierungsfreie Inferenz-Engine, kompatibel mit OpenAI-API-Format
+  - **Meituan LongCat** — Meituans eigenes Großmodell, kompatibel mit OpenAI-API-Format, API-Schlüssel-Authentifizierung
+  - **Qiniu Cloud AI** — Qiniu Cloud-KI-Service, API-Schlüssel-Authentifizierung
 - **32 Kalendersysteme** — Vollständige Abdeckung der wichtigsten weltweiten Kalendersysteme, einschließlich Gregorianisch, Chinesisch, Islamisch, Hebräisch, Japanisch, Persisch, Maya, historische chinesische Kalender usw.
 - **Wissensnetzwerk-System** — Auf Tripeln (Subjekt-Relation-Objekt) basierendes Wissensnetzwerk mit Speicherung, Abfrage und Pfadfindung
 - **Projektarbeitsbereich** — Projektraumverwaltung mit Projekterstellung/-archivierung/-zerstörung, Rollenzuweisung, Arbeitsnotizen, Aufgabenverfolgung und Werkzeugberechtigungsisolierung
@@ -90,7 +93,7 @@ Dieses Projekt bietet zwei Implementierungsversionen für unterschiedliche Anwen
   - SpeedyPack-Engine + automatische Komprimierung gewährleisten Datensicherheit
   - Component-UI-Architektur, 27 deklarative Komponenten
   - 7 Skin-Themes mit automatischer Erkennung und Umschaltung
-  - Hot-Reload-Werkzeug unterstützt Online-Aktualisierung und Neustart
+  - Hot-Reload-Werkzeug unterstützt Online-Aktualisierung und Neustart → Linux öffnet automatisch den Browser für den Zugriff auf die Web-UI, unterstützt `--no-tray`-Parameter
 - **Leistungssteigerung**: Speicherlese-Latenz um das 1000-fache reduziert, Schreib-Latenz um das 15000-fache reduziert, Parallelverarbeitungsleistung um das 50-fache gesteigert
 - **Rollenbeschreibung**: Tief optimierte Produktivimplementierung, erste Wahl für langfristigen Betrieb und echte Produktionsumgebungen
 - **Startbefehl**: `dotnet run --project src/SiliconLife.Fast`
@@ -119,7 +122,7 @@ Dieses Projekt bietet zwei Implementierungsversionen für unterschiedliche Anwen
 | Laufzeit | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programmiersprache | C# | C# |
 | Anwendungstyp | Konsolenanwendung | Desktop-Anwendung (Windows/macOS-System-Tray / Linux-Statusfenster) |
-| KI-Integration | Ollama (lokal), Alibaba Cloud Bailian (Cloud), Volcengine Ark (Cloud) | Ollama (lokal), Alibaba Cloud Bailian (Cloud), Volcengine Ark (Cloud) |
+| KI-Integration | Ollama (lokal), Alibaba Cloud Bailian (Cloud), Volcengine Ark (Cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (lokal), Alibaba Cloud Bailian (Cloud), Volcengine Ark (Cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
 | Datenspeicher | Dateisystem (JSON + Zeitindex-Verzeichnisse) | SpeedyPack (.spk-Format, Speicherabbildung + asynchrone Persistierung) |
 | Web-Server | HttpListener (.NET-integriert) | HttpListener (.NET-integriert) |
 | Dynamische Kompilierung | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -157,7 +160,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Globaler Service-Locator
 │   │
 │   ├── SiliconLife.Common/                # Gemeinsame Implementierung (von beiden Versionen genutzt)
-│   │   ├── AI/                            # KI-Clients und Fabriken (Ollama, DashScope, VolcengineArk)
+│   │   ├── AI/                            # KI-Clients und Fabriken (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32 Kalenderimplementierungen
 │   │   ├── Localization/                  # Lokalisierungsbasis und 34 Sprach-/Regionalvarianten
 │   │   ├── Resources/                     # Gemeinsame Ressourcendateien
@@ -260,6 +263,9 @@ Werkzeugaufruf → Executor → Berechtigungsmanager → [Benutzerfrequenz-Cache
   - **Ollama**: [Ollama installieren](https://ollama.com) und Modell laden (z. B. `ollama pull llama3`)
   - **Alibaba Cloud Bailian**: API-Schlüssel aus der [Bailian-Konsole](https://bailian.console.aliyun.com/) abrufen
   - **Volcengine Ark**: API-Schlüssel aus der [Volcengine-Konsole](https://console.volcengine.com/ark) abrufen
+  - **Herdsman**: Keine Authentifizierung erforderlich, kompatibel mit OpenAI-API-Format
+  - **Meituan LongCat**: API-Schlüssel von der Meituan-Plattform abrufen
+  - **Qiniu Cloud AI**: API-Schlüssel von der [Qiniu-Konsole](https://portal.qiniu.com/) abrufen
 
 ### Projekt erstellen
 
@@ -342,7 +348,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Phase 10.5: Inkrementelle Erweiterungen (Broadcast-Kanal, Token-Audit, 32 Kalender, Werkzeugverbesserungen, 34 Sprachvarianten-Lokalisierung)
 - [x] Phase 10.6: Verbesserung und Optimierung (WebView, Hilfesystem, Projektarbeitsbereich, Wissensnetzwerk, Workflow-Engine)
 - [x] Phase 11: SpeedyPack-Speicher-Engine (ersetzt LiteDB, Speicherabbildung, asynchrone Schreibwarteschlange, automatische Komprimierung)
-- [x] Phase 12: Plugin-System (IPlugin-Schnittstelle, PluginLoader Sicherer Sandkasten, isoliertes Laden, Werkzeugintegration)
+- [x] Phase 12: Plugin-System (IPlugin-Schnittstelle, PluginLoader Fähigkeitsdeklaration, isoliertes Laden, Werkzeugintegration)
 
 ### 🚧 Geplant
 - [ ] Phase 13: Externe IM-Integration (Feishu / WhatsApp / Telegram)

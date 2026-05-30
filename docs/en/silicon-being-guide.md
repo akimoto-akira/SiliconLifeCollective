@@ -102,11 +102,14 @@ Silicon Beings have the following activity states:
 
 | State | Description |
 |------|------|
-| `Idle` | Idle state, waiting for clock trigger |
-| `SingleChat` | Engaged in a one-on-one chat |
-| `GroupChat` | Engaged in a group chat |
-| `Task` | Executing a task |
-| `Timer` | Executing a timer |
+| `Idle` | Idle state, waiting for activation |
+| `SingleChat` | In one-on-one chat |
+| `GroupChat` | In group chat |
+| `Task` | Executing task |
+| `Timer` | Executing timer |
+| `Broadcast` | Processing broadcast message |
+| `Project` | Working on project |
+| `MemoryCompression` | Memory compression |
 | `Stopped` | Stopped, due to consecutive errors or manual stop |
 
 **Stopped State Mechanism**:

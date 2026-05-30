@@ -107,6 +107,9 @@ curl -X POST http://localhost:8080/api/beings \
 | `GroupChat` | グループチャット中 |
 | `Task` | タスク実行中 |
 | `Timer` | タイマー実行中 |
+| `Broadcast` | ブロードキャストメッセージ処理中 |
+| `Project` | プロジェクト作業中 |
+| `MemoryCompression` | メモリ圧縮中 |
 | `Stopped` | 停止済み、連続エラーまたは手動停止による |
 
 **Stopped 状態のメカニズム**：
@@ -122,6 +125,9 @@ Idle → SingleChat → Idle（チャット完了）
 Idle → GroupChat → Idle（グループチャット完了）
 Idle → Task → Idle（タスク完了）
 Idle → Timer → Idle（タイマー完了）
+Idle → Broadcast → Idle（ブロードキャスト処理完了）
+Idle → Project → Idle（プロジェクト作業完了）
+Idle → MemoryCompression → Idle（メモリ圧縮完了）
 任意 → Stopped（連続10回エラー）
 Stopped → Idle（新しいチャットメッセージ到達または手動再起動）
 ```

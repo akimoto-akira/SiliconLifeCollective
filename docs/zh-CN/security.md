@@ -315,25 +315,30 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 
 插件系统引入了第三方代码执行的安全风险，通过以下机制缓解：
 
-### 安全沙箱
+### 安全沙箱与能力声明
 
-`PluginLoader` 在加载插件时执行严格的安全扫描：
+`PluginLoader` 在加载插件时执行安全扫描，同时支持能力声明机制：
 
-1. **禁止命名空间检查** — 插件不能引用以下命名空间：
-   - `System.IO` — 文件系统访问
-   - `System.Net.Http` — HTTP 请求
-   - `System.Net.WebSockets` — WebSocket 连接
-   - `System.Net.Sockets` — 原始套接字
-   - `Microsoft.CodeAnalysis` — 编译器 API
+1. **可声明能力** — 插件通过 `[PluginCapability]` 属性声明所需能力：
+   - `Network` — 网络访问（允许引用 `System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`）
+   - `FileIO` — 文件读写（允许引用 `System.IO`）
+   - `Process` — 进程管理
+   - `AI` — AI 调用
 
-2. **可信程序集白名单** — 以下程序集的引用被允许：
+2. **不可声明能力** — 以下能力始终被阻止：
+   - P/Invoke（`System.Runtime.InteropServices`）
+   - Unsafe 代码（`System.Runtime.CompilerServices.Unsafe`）
+   - 反射发射（`System.Reflection.Emit`）
+   - 编译器 API（`Microsoft.CodeAnalysis`）
+
+3. **可信程序集白名单** — 以下程序集的引用被允许：
    - `Google.Protobuf`、`Newtonsoft.Json`、`MessagePack`
    - `Serilog`、`Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **禁止类型检查** — 扫描插件中引用的危险类型
+4. **禁止类型检查** — 扫描插件中引用的危险类型
 
-4. **禁止成员检查** — 扫描插件中调用的危险方法
+5. **禁止成员检查** — 扫描插件中调用的危险方法
 
 ### 隔离加载
 

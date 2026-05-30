@@ -719,53 +719,6 @@
 
 ---
 
-### 25. ホットリロードツール (HotReloadTool)
-
-**ツール名**: `hot_reload`
-
-**機能説明**: SiliconLife.Fast が実行中に自動的にコンパイル、ファイル更新および再起動をサポート。手動介入不要。
-
-**サポートされる操作**:
-- `execute` — 全体のビルド、コピーおよび再起動プロセスを実行
-- `build_only` — プロジェクトのビルドのみ実行、コピーおよび再起動は行わない
-
-**ワークフロー**:
-1. SiliconLife.Fast プロジェクトをコンパイル
-2. 現在実行中の Fast インスタンスを正常に終了（HTTP API 経由）
-3. プロセスの終了とポートの解放を待機
-4. ビルド出力を対象ディレクトリにコピー（HotReload 自身のファイルは除外）
-5. Fast インスタンスを再起動
-
-**特徴**:
-- 旧プロセスの自動検出と終了
-- 安全なファイルコピー（HotReload.exe を上書きしない）
-- ポート解放待機メカニズム
-- カスタムポート設定をサポート
-
-**使用例**:
-```json
-{
-  "action": "execute",
-  "project_path": "src/SiliconLife.Fast",
-  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
-  "configuration": "Debug",
-  "port": 8080
-}
-```
-
-**パラメータ説明**:
-- `project_path`: プロジェクトパス（ソリューションルートディレクトリ基準）
-- `source_path`: ビルド出力ディレクトリ
-- `configuration`: ビルド構成（Debug/Release）
-- `port`: Fast インスタンスの Web ポート（デフォルト 8080）
-
-**注意事項**:
-- SiliconLife.Fast バージョンのみ対応
-- tools/HotReload ディレクトリに HotReload.exe が必要
-- 再起動中に短いサービス中断が発生する（約 3-5 秒）
-
----
-
 ## ツール呼び出しフロー
 
 ```

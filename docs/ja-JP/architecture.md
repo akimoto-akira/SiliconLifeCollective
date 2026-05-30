@@ -26,7 +26,7 @@
   - SpeedyPack エンジン + 自動圧縮によるデータセキュリティ保証
   - Component UI アーキテクチャ、27 の宣言型コンポーネント
   - 7 種類のスキンテーマ、自動検出と切り替えをサポート
-  - ホットリロードツールによるオンライン更新と再起動をサポート
+  - ホットリロードツールによるオンライン更新と再起動をサポート → Linux で自動的にブラウザを開き Web UI にアクセス、`--no-tray` パラメータをサポート
   - Linux でのブラウザ自動起動による Web UI アクセス、`--no-tray` パラメータをサポート
 - **パフォーマンス向上**：ストレージ読み取り遅延 1000 倍低下、書き込み遅延 15000 倍低下
 - **役割説明**：深く最適化された本番級実装であり、システムトレイバックグラウンド実行、SpeedyPack エンジン + 自動圧縮などの機能を備え、長期運用と実際の本番環境における首选です
@@ -294,13 +294,28 @@
 - `OllamaClientFactory` —— OllamaClient インスタンスを作成
 - `DashScopeClientFactory` —— DashScopeClient インスタンスを作成
 - `VolcengineArkClientFactory` —— VolcengineArkClient インスタンスを作成
+- `HerdsmanClientFactory` —— HerdsmanClient インスタンスを作成
+- `LongCatClientFactory` —— LongCatClient インスタンスを作成
+- `QiniuAIClientFactory` —— QiniuAIClient インスタンスを作成
 
 ファクトリーが提供する機能：
 - `CreateClient(Dictionary<string, object> config)` —— 設定からクライアントをインスタンス化
 - `GetConfigKeyOptions(string key, ...)` —— 設定キーの動的オプション（利用可能なモデル、リージョンなど）を返す
 - `GetDisplayName()` —— クライアントタイプのローカライズ表示名
 
-### AI プラットフォームサポート一覧
+### IAIClient 能力インターフェース
+
+`IAIClient` インターフェースは AI クライアントの能力宣言属性を定義し、`ContextManager` はこれに基づいて適応的に動作を調整します：
+
+| 属性 | 型 | 説明 |
+|------|------|------|
+| `StreamingMode` | `bool?` | ストリーミングモード対応: true=ストリーミング専用, false=非ストリーミング専用, null=両対応(デフォルト: ストリーミング) |
+| `SupportsToolCalls` | `bool?` | ツールコール対応: true=対応, false=非対応(ツール注入を無視), null=不明(デフォルト: 対応) |
+| `ContextWindowTokens` | `int?` | コンテキストウィンドウサイズ(トークン数)、固定 MaxContextMessages の代わりにトークン予算カットに使用 |
+| `SupportsVision` | `bool?` | ビジョン入力対応: true=画像対応, false=非対応, null=不明(デフォルト: 非対応) |
+| `SupportsAudio` | `bool?` | オーディオ入力対応: true=オーディオ対応, false=非対応, null=不明(デフォルト: 非対応) |
+
+### AI プラットフォーム対応一覧
 
 #### ステータス説明
 - ✅ 実装済み
@@ -320,6 +335,9 @@
 | 智谱AI（GLM） | 📋 | クラウド | 智谱清言 AI サービス |
 | 月之暗面（Kimi） | 📋 | クラウド | 月之暗面 Kimi AI サービス |
 | 火山方舟引擎.豆包 | ✅ | クラウド | ByteDance 豆包 AI サービス |
+| Herdsman | ✅ | ローカル/クラウド | 認証不要の推論エンジン、OpenAI API 形式互換 |
+| Meituan LongCat | ✅ | クラウド | 美団独自開発大規模モデル、OpenAI API 形式互換、API キー認証 |
+| Qiniu Cloud AI | ✅ | クラウド | 七牛クラウド大規模モデル推論サービス、OpenAI API 形式互換、API キー認証 |
 | DeepSeek（直結） | 📋 | クラウド | DeepSeek AI サービス |
 | 零一万物 | 📋 | クラウド | 零一万物 AI サービス |
 | 腾讯混元 | 📋 | クラウド | Tencent 混元 AI サービス |

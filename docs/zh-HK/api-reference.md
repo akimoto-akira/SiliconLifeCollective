@@ -574,6 +574,25 @@ data: {"type": "complete", "sessionId": "uuid"}
       "apiKey": "...",
       "region": "beijing",
       "model": "qwen3.6-plus"
+    },
+    "VolcengineArk": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
+    },
+    "Herdsman": {
+      "endpoint": "http://localhost:8000",
+      "model": "..."
+    },
+    "LongCat": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
+    },
+    "QiniuAI": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
     }
   }
 }
@@ -1323,13 +1342,27 @@ eventSource.onmessage = (event) => {
 ```csharp
 public interface IAIClient
 {
-    string Name { get; }
+    string Endpoint { get; }
+    string DefaultModel { get; }
+    bool? StreamingMode { get; }
+    bool? SupportsToolCalls { get; }
+    int? ContextWindowTokens { get; }
+    bool? SupportsVision { get; }
+    bool? SupportsAudio { get; }
 
-    Task<AIResponse> ChatAsync(AIRequest request);
-
-    IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
+    AIResponse Chat(AIRequest request);
 }
 ```
+
+| 屬性 | 類型 | 描述 |
+|------|------|------|
+| `Endpoint` | `string` | AI 服務端點 URL |
+| `DefaultModel` | `string` | 預設模型名稱 |
+| `StreamingMode` | `bool?` | 串流模式：true=僅串流、false=僅非串流、null=兩種均支援 |
+| `SupportsToolCalls` | `bool?` | 工具呼叫支援：true=支援、false=不支援（跳過工具注入）、null=未知 |
+| `ContextWindowTokens` | `int?` | 上下文視窗大小（token 數），用於 token 預算裁剪 |
+| `SupportsVision` | `bool?` | 視覺輸入支援：true=支援圖片、false=不支援、null=未知 |
+| `SupportsAudio` | `bool?` | 音訊輸入支援：true=支援音訊、false=不支援、null=未知 |
 
 ### AIRequest 結構
 

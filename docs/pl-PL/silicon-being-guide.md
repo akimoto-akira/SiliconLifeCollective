@@ -107,6 +107,9 @@ Istoty Krzemowe posiadają następujące stany aktywności:
 | `GroupChat` | Trwa czat grupowy |
 | `Task` | Wykonywanie zadania |
 | `Timer` | Wykonywanie czasomierza |
+| `Broadcast` | Przetwarzanie wiadomości transmisji |
+| `Project` | Praca nad projektem |
+| `MemoryCompression` | Kompresja pamięci |
 | `Stopped` | Zatrzymana, z powodu kolejnych błędów lub ręcznego zatrzymania |
 
 **Mechanizm stanu Stopped**:
@@ -122,6 +125,9 @@ Idle → SingleChat → Idle (czat zakończony)
 Idle → GroupChat → Idle (czat grupowy zakończony)
 Idle → Task → Idle (zadanie zakończone)
 Idle → Timer → Idle (czasomierz zakończony)
+Idle → Broadcast → Idle (transmisja przetworzona)
+Idle → Project → Idle (praca nad projektem zakończona)
+Idle → MemoryCompression → Idle (kompresja pamięci zakończona)
 Dowolny → Stopped (10 kolejnych błędów)
 Stopped → Idle (nowa wiadomość czatu lub ręczny restart)
 ```

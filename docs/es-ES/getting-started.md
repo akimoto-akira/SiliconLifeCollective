@@ -33,6 +33,9 @@ Este proyecto proporciona dos versiones de implementación:
 - **Ollama** (opcional, para IA local) - [Descargar](https://ollama.com/)
 - **Clave API de Bailian** (opcional, para IA en la nube) - [Solicitar](https://bailian.console.aliyun.com/)
 - **Clave API de Volcengine Ark** (opcional, para IA en la nube) - [Solicitar](https://console.volcengine.com/ark)
+- **Herdsman** (opcional, motor de inferencia local/nube) - Sin autenticación, compatible con el formato API OpenAI
+- **Clave API de Meituan LongCat** (opcional, para IA en la nube) - Autenticación por clave API
+- **Clave API de Qiniu Cloud AI** (opcional, para IA en la nube) - Autenticación por clave API
 
 ## Inicio Rápido
 
@@ -98,7 +101,50 @@ Edite `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modifique la confi
 
 > **Nota**: El parámetro Model de Volcengine Ark acepta un ID de punto de acceso de inferencia (por ejemplo, `ep-20241212123456-abcde`), no un nombre de modelo.
 
-### 4. Ejecutar la Aplicación
+#### Opción D: Herdsman (Local/Nube)
+
+```json
+{
+  "AIClients": {
+    "Herdsman": {
+      "Endpoint": "http://localhost:8000",
+      "Model": "nombre-del-modelo"
+    }
+  }
+}
+```
+
+> **Características**: Sin autenticación, compatible con el formato API OpenAI, soporta llamadas a herramientas y contenido de razonamiento.
+
+#### Opción E: Meituan LongCat (Nube)
+
+```json
+{
+  "AIClients": {
+    "LongCat": {
+      "ApiKey": "clave-api",
+      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
+      "Model": "nombre-del-modelo"
+    }
+  }
+}
+```
+
+#### Opción F: Qiniu Cloud AI (Nube)
+
+```json
+{
+  "AIClients": {
+    "QiniuAI": {
+      "ApiKey": "clave-api",
+      "Endpoint": "https://api.qiniu.com/v1/chat/completions",
+      "Model": "nombre-del-modelo"
+    }
+  }
+}
+```
+
+### 4. Ejecutar la aplicación
 
 #### Ejecutar la versión Default
 

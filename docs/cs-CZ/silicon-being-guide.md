@@ -102,11 +102,14 @@ Křemíková Bytost má následující aktivní stavy:
 
 | Stav | Popis |
 |------|------|
-| `Idle` | Nečinný stav, čeká na hodinové spuštění |
+| `Idle` | Nečinný stav, čeká na aktivaci |
 | `SingleChat` | Probíhá individuální chat |
 | `GroupChat` | Probíhá skupinový chat |
 | `Task` | Provádění úkolu |
 | `Timer` | Provádění časovače |
+| `Broadcast` | Zpracování broadcast zprávy |
+| `Project` | Práce na projektu |
+| `MemoryCompression` | Komprese paměti |
 | `Stopped` | Zastaveno, z důvodu po sobě jdoucích chyb nebo ručního zastavení |
 
 **Mechanismus stavu Stopped**:

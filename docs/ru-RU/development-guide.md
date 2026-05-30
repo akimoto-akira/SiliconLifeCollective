@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. Поместите скомпилированную DLL в каталог плагинов, `PluginLoader` загрузит её автоматически.
 
-> **Ограничения безопасности**: плагины не могут ссылаться на пространства имён `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` и др. Плагины загружаются изолированно через `AssemblyLoadContext`.
+> **Ограничения безопасности**: плагины по умолчанию не могут ссылаться на пространства имён `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` и др. Однако плагины могут объявить необходимые возможности через атрибут `[PluginCapability]` (Network, FileIO, Process, AI), и загрузчик на этом основании ослабляет соответствующие правила безопасности пространств имён. Необъявляемые возможности (P/Invoke, Unsafe, Reflection Emit и т.д.) всегда блокируются. Плагины загружаются изолированно через `AssemblyLoadContext`.
 
 ### Добавление новой темы
 

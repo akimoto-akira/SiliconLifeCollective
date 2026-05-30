@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. Posiziona la DLL compilata nella directory dei plugin; `PluginLoader` la caricherà automaticamente.
 
-> **Limitazioni di sicurezza**: I plugin non possono fare riferimento ai namespace `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`, ecc. I plugin vengono caricati in isolamento tramite `AssemblyLoadContext`.
+> **Limitazioni di sicurezza**: Per impostazione predefinita, i plugin non possono fare riferimento ai namespace `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`, ecc. Tuttavia, se un plugin dichiara le capacità necessarie (Network, FileIO, Process, AI) tramite l'attributo `[PluginCapability]`, il caricatore riduce le regole di scansione di sicurezza di conseguenza. Le capacità non dichiarabili (P/Invoke, Unsafe, Reflection Emit, ecc.) sono sempre bloccate. I plugin vengono caricati in isolamento tramite `AssemblyLoadContext`.
 
 ### Aggiungere una Nuova Skin
 

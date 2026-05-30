@@ -26,7 +26,6 @@
   - SpeedyPack 엔진 + 자동 압축으로 데이터 안전 보장
   - Component UI 아키텍처, 27개 선언형 컴포넌트
   - 7종 스킨 테마, 자동 발견 및 전환 지원
-  - 핫 리로드 도구로 온라인 업데이트 및 재시작 지원
   - Linux 자동 브라우저 열기로 Web UI 접속, `--no-tray` 매개변수 지원
 - **성능 향상**: 스토리지 읽기 지연 1000배 감소, 쓰기 지연 15000배 감소
 - **역할 설명**: 심도 있게 최적화된 프로덕션급 구현으로, 시스템 트레이 백그라운드 실행, SpeedyPack 엔진 + 자동 압축 등의 기능을 갖추고 있어 장기 실행 및 실제 프로덕션 환경의首选
@@ -294,11 +293,26 @@
 - `OllamaClientFactory` —— OllamaClient 인스턴스 생성
 - `DashScopeClientFactory` —— DashScopeClient 인스턴스 생성
 - `VolcengineArkClientFactory` —— VolcengineArkClient 인스턴스 생성
+- `HerdsmanClientFactory` —— HerdsmanClient 인스턴스 생성
+- `LongCatClientFactory` —— LongCatClient 인스턴스 생성
+- `QiniuAIClientFactory` —— QiniuAIClient 인스턴스 생성
 
 팩토리가 제공하는 기능:
 - `CreateClient(Dictionary<string, object> config)` —— 설정에서 클라이언트 인스턴스화
 - `GetConfigKeyOptions(string key, ...)` —— 설정 키의 동적 옵션 반환(예: 사용 가능한 모델, 리전)
 - `GetDisplayName()` —— 클라이언트 타입의 로컬라이제이션된 표시 이름
+
+### IAIClient 역량 인터페이스
+
+`IAIClient` 인터페이스는 AI 클라이언트의 역량 선언 속성을 정의하며, `ContextManager`는 이를 기반으로 동작을 적응적으로 조정합니다:
+
+| 속성 | 타입 | 설명 |
+|------|------|------|
+| `StreamingMode` | `bool?` | 스트리밍 모드 지원: true=스트리밍 전용, false=비스트리밍 전용, null=둘 다 지원(기본값: 스트리밍) |
+| `SupportsToolCalls` | `bool?` | 툴 콜 지원: true=지원, false=미지원(툴 주입 무시), null=알 수 없음(기본값: 지원) |
+| `ContextWindowTokens` | `int?` | 컨텍스트 윈도우 크기(토큰 수), 고정 MaxContextMessages 대신 토큰 예산 커팅에 사용 |
+| `SupportsVision` | `bool?` | 비전 입력 지원: true=이미지 지원, false=미지원, null=알 수 없음(기본값: 미지원) |
+| `SupportsAudio` | `bool?` | 오디오 입력 지원: true=오디오 지원, false=미지원, null=알 수 없음(기본값: 미지원) |
 
 ### AI 플랫폼 지원 목록
 
@@ -320,6 +334,9 @@
 | 즈푸 AI(GLM) | 📋 | 클라우드 | 즈푸칭옌 AI 서비스 |
 | 위즈덤 문(Dark Side)(Kimi) | 📋 | 클라우드 | 위즈덤 문(Dark Side) Kimi AI 서비스 |
 | 바이트댄스 Ark.더우바오 | ✅ | 클라우드 | 바이트댄스 더우바오 AI 서비스 |
+| Herdsman | ✅ | 로컬/클라우드 | 인증 없는 추론 엔진, OpenAI API 형식 호환 |
+| Meituan LongCat | ✅ | 클라우드 | 메이퇀 자체 개발 대형 모델, OpenAI API 형식 호환, API 키 인증 |
+| Qiniu Cloud AI | ✅ | 클라우드 | 치니우 클라우드 대형 모델 추론 서비스, OpenAI API 형식 호환, API 키 인증 |
 | DeepSeek(직접 연결) | 📋 | 클라우드 | DeepSeek AI 서비스 |
 | 링이완우 | 📋 | 클라우드 | 링이완우 AI 서비스 |
 | 텐센트 혼위안 | 📋 | 클라우드 | 텐센트 혼위안 AI 서비스 |

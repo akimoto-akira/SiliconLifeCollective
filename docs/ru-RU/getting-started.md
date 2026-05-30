@@ -33,6 +33,9 @@
 - **Ollama** (опционально, для локального AI) - [загрузка](https://ollama.com/)
 - **API-ключ Bailian** (опционально, для облачного AI) - [получить](https://bailian.console.aliyun.com/)
 - **API-ключ Volcengine Ark** (опционально, для облачного AI) - [получить](https://console.volcengine.com/ark)
+- **Herdsman** (опционально, локальный/облачный движок вывода) - без аутентификации, совместим с форматом OpenAI API
+- **API-ключ Meituan LongCat** (опционально, для облачного AI) - аутентификация по API Key
+- **API-ключ Qiniu Cloud AI** (опционально, для облачного AI) - аутентификация по API Key
 
 ## Быстрый старт
 
@@ -97,6 +100,49 @@ dotnet build
 ```
 
 > **Примечание**: параметр Model для Volcengine Ark принимает ID конечной точки вывода (например, `ep-20241212123456-abcde`), а не имя модели.
+
+#### Вариант D: Herdsman (локальный/облачный)
+
+```json
+{
+  "AIClients": {
+    "Herdsman": {
+      "Endpoint": "http://localhost:8000",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
+
+> **Особенности**: без аутентификации, совместим с форматом OpenAI API, поддержка вызова инструментов и содержимого рассуждений.
+
+#### Вариант E: Meituan LongCat (облачный)
+
+```json
+{
+  "AIClients": {
+    "LongCat": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
+
+#### Вариант F: Qiniu Cloud AI (облачный)
+
+```json
+{
+  "AIClients": {
+    "QiniuAI": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.qiniu.com/v1/chat/completions",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
 
 ### 4. Запуск приложения
 

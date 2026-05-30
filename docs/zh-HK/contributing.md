@@ -73,7 +73,7 @@ git checkout -b feature/your-feature-name
 - **Fast 版本特定** → 修改 `SiliconLife.Fast`
 - **儲存引擎** → 修改 `SiliconLife.Speedy`
 - **儲存管理工具** → 修改 `SiliconLife.Speedy.Manager`
-- **插件開發** → 修改 `SiliconLife.Core/Plugins`
+- **外掛程式開發** → 修改 `SiliconLife.Core/Plugins`
 - **多語系文件** → 修改 `docs/` 目錄
 
 ---

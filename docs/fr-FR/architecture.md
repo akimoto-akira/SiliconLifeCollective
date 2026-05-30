@@ -291,6 +291,42 @@ Le système prend en charge plusieurs backends IA via l'interface `IAIClient` :
 - **Configuration** : `apiKey`, `endpoint`, `model`
 - **Particularité** : Service IA de ByteDance, prenant en charge plusieurs modèles Doubao
 
+### HerdsmanClient
+
+- **Type** : Moteur d'inférence local/cloud
+- **Protocole** : API compatible OpenAI
+- **Authentification** : Aucune
+- **Fonctionnalités** : Streaming, appels d'outils, contenu de raisonnement
+- **Configuration** : `endpoint`, `model`
+
+### LongCatClient (Meituan LongCat)
+
+- **Type** : Service IA cloud
+- **Protocole** : API compatible OpenAI
+- **Authentification** : Bearer token (clé API)
+- **Fonctionnalités** : Streaming, appels d'outils
+- **Configuration** : `apiKey`, `endpoint`, `model`
+
+### QiniuAIClient (Qiniu Cloud AI)
+
+- **Type** : Service IA cloud
+- **Protocole** : API compatible OpenAI
+- **Authentification** : Bearer token (clé API)
+- **Fonctionnalités** : Streaming, appels d'outils
+- **Configuration** : `apiKey`, `endpoint`, `model`
+
+### Interface des capacités IAIClient
+
+L'interface `IAIClient` définit les capacités de chaque client IA, permettant au `ContextManager` d'adapter son comportement :
+
+| Capacité | Type de retour | Description |
+|----------|---------------|-------------|
+| `StreamingMode` | `StreamingMode` | Mode de streaming pris en charge (None/Streaming/Reasoning) |
+| `SupportsToolCalls` | `bool` | Prise en charge des appels d'outils |
+| `ContextWindowTokens` | `int` | Taille de la fenêtre de contexte en tokens |
+| `SupportsVision` | `bool` | Prise en charge de la vision (images) |
+| `SupportsAudio` | `bool` | Prise en charge de l'audio |
+
 ### Modèle de fabrique de clients
 
 Chaque type de client IA dispose d'une implémentation de fabrique correspondante `IAIClientFactory` :
@@ -298,6 +334,9 @@ Chaque type de client IA dispose d'une implémentation de fabrique correspondant
 - `OllamaClientFactory` — Crée des instances OllamaClient
 - `DashScopeClientFactory` — Crée des instances DashScopeClient
 - `VolcengineArkClientFactory` — Crée des instances VolcengineArkClient
+- `HerdsmanClientFactory` — Crée des instances HerdsmanClient
+- `LongCatClientFactory` — Crée des instances LongCatClient
+- `QiniuAIClientFactory` — Crée des instances QiniuAIClient
 
 Les fabriques fournissent :
 - `CreateClient(Dictionary<string, object> config)` — Instancie un client à partir de la configuration
@@ -324,6 +363,9 @@ Les fabriques fournissent :
 | Zhipu AI (GLM) | 📋 | Cloud | Service IA Zhipu Qingyan |
 | Moonshot (Kimi) | 📋 | Cloud | Service IA Kimi de Moonshot |
 | Volcengine Ark · Doubao | ✅ | Cloud | Service IA Doubao de ByteDance |
+| Herdsman | ✅ | Local/Cloud | Moteur d'inférence sans authentification, compatible avec le format API OpenAI |
+| Meituan LongCat | ✅ | Cloud | Grand modèle développé en interne par Meituan, compatible avec le format API OpenAI, authentification par clé API |
+| Qiniu Cloud AI | ✅ | Cloud | Service IA cloud de Qiniu, authentification par clé API |
 | DeepSeek (connexion directe) | 📋 | Cloud | Service IA DeepSeek |
 | 01.AI (Yi) | 📋 | Cloud | Service IA 01.AI |
 | Tencent Hunyuan | 📋 | Cloud | Service IA Tencent Hunyuan |

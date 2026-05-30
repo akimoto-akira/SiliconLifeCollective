@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. Die kompilierte DLL im Plugin-Verzeichnis ablegen. Der `PluginLoader` lädt sie automatisch.
 
-> **Sicherheitsbeschränkung**: Plugins dürfen nicht auf die Namespaces `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` usw. verweisen. Plugins werden durch `AssemblyLoadContext` isoliert geladen.
+> **Sicherheitsbeschränkung**: Standardmäßig dürfen Plugins nicht auf die Namespaces `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` usw. verweisen. Wenn ein Plugin jedoch erforderliche Fähigkeiten (Network, FileIO, Process, AI) über das `[PluginCapability]`-Attribut deklariert, lockert der Lader die Sicherheitsprüfregeln entsprechend. Nicht deklarierbare Fähigkeiten (P/Invoke, Unsafe, Reflection Emit usw.) werden immer blockiert. Plugins werden durch `AssemblyLoadContext` isoliert geladen.
 
 ### Neuen Skin hinzufügen
 

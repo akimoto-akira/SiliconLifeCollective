@@ -719,53 +719,6 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 25. Herramienta de Recarga en Caliente (HotReloadTool)
-
-**Nombre de herramienta**: `hot_reload`
-
-**Descripción**: Soporta la compilación automática, actualización de archivos y reinicio de SiliconLife.Fast en ejecución, sin intervención manual.
-
-**Operaciones soportadas**:
-- `execute` — Ejecutar el flujo completo de construcción, copia y reinicio
-- `build_only` — Solo construir el proyecto, sin copiar ni reiniciar
-
-**Flujo de trabajo**:
-1. Compilar el proyecto SiliconLife.Fast
-2. Apagar elegantemente la instancia Fast en ejecución (a través de API HTTP)
-3. Esperar a que el proceso termine y el puerto se libere
-4. Copiar la salida de la construcción al directorio destino (omitir los archivos de HotReload)
-5. Reiniciar la instancia Fast
-
-**Características**:
-- Detección automática y cierre de procesos antiguos
-- Copia segura de archivos (no sobrescribe HotReload.exe)
-- Mecanismo de espera de liberación de puerto
-- Soporta configuración de puerto personalizado
-
-**Ejemplo de uso**:
-```json
-{
-  "action": "execute",
-  "project_path": "src/SiliconLife.Fast",
-  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
-  "configuration": "Debug",
-  "port": 8080
-}
-```
-
-**Descripción de parámetros**:
-- `project_path`: Ruta del proyecto (relativa a la raíz de la solución)
-- `source_path`: Directorio de salida de la construcción
-- `configuration`: Configuración de construcción (Debug/Release)
-- `port`: Puerto Web de la instancia Fast (predeterminado 8080)
-
-**Precauciones**:
-- Solo aplica a la versión SiliconLife.Fast
-- Requiere que HotReload.exe esté en el directorio tools/HotReload
-- Habrá una breve interrupción del servicio durante el reinicio (aproximadamente 3-5 segundos)
-
----
-
 ## Flujo de Llamadas a Herramientas
 
 ```

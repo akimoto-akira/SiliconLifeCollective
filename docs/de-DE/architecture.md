@@ -292,6 +292,42 @@ Das System unterstützt mehrere KI-Backends über die `IAIClient`-Schnittstelle:
 - **Konfiguration**: `apiKey`, `endpoint`, `model`
 - **Besonderheit**: KI-Dienst von ByteDance, unterstützt verschiedene Doubao-Modelle
 
+### HerdsmanClient
+
+- **Typ**: Lokale/Cloud-Inferenz-Engine
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Keine
+- **Funktionen**: Streaming, Werkzeugaufrufe, Reasoning-Inhalte
+- **Konfiguration**: `endpoint`, `model`
+
+### LongCatClient (Meituan LongCat)
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Funktionen**: Streaming, Werkzeugaufrufe
+- **Konfiguration**: `apiKey`, `endpoint`, `model`
+
+### QiniuAIClient (Qiniu Cloud AI)
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Funktionen**: Streaming, Werkzeugaufrufe
+- **Konfiguration**: `apiKey`, `endpoint`, `model`
+
+### IAIClient-Fähigkeitsschnittstelle
+
+Die `IAIClient`-Schnittstelle definiert die Fähigkeiten jedes KI-Clients und ermöglicht es dem `ContextManager`, sein Verhalten anzupassen:
+
+| Fähigkeit | Rückgabetyp | Beschreibung |
+|-----------|------------|-------------|
+| `StreamingMode` | `StreamingMode` | Unterstützter Streaming-Modus (None/Streaming/Reasoning) |
+| `SupportsToolCalls` | `bool` | Werkzeugaufruf-Unterstützung |
+| `ContextWindowTokens` | `int` | Kontextfenstergröße in Tokens |
+| `SupportsVision` | `bool` | Vision- (Bild-)Unterstützung |
+| `SupportsAudio` | `bool` | Audio-Unterstützung |
+
 ### Client-Fabrikmuster
 
 Jeder KI-Client-Typ hat eine entsprechende Fabrikimplementierung von `IAIClientFactory`:
@@ -299,6 +335,9 @@ Jeder KI-Client-Typ hat eine entsprechende Fabrikimplementierung von `IAIClientF
 - `OllamaClientFactory` — Erstellt OllamaClient-Instanzen
 - `DashScopeClientFactory` — Erstellt DashScopeClient-Instanzen
 - `VolcengineArkClientFactory` — Erstellt VolcengineArkClient-Instanzen
+- `HerdsmanClientFactory` — Erstellt HerdsmanClient-Instanzen
+- `LongCatClientFactory` — Erstellt LongCatClient-Instanzen
+- `QiniuAIClientFactory` — Erstellt QiniuAIClient-Instanzen
 
 Die Fabriken bieten:
 - `CreateClient(Dictionary<string, object> config)` — Instanziiert einen Client aus der Konfiguration
@@ -325,6 +364,9 @@ Die Fabriken bieten:
 | Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan KI-Dienst |
 | Moonshot (Kimi) | 📋 | Cloud | Moonshot Kimi KI-Dienst |
 | Volcengine Ark Doubao | ✅ | Cloud | ByteDance Doubao KI-Dienst |
+| Herdsman | ✅ | Lokal/Cloud | Authentifizierungsfreie Inferenz-Engine, kompatibel mit OpenAI-API-Format |
+| Meituan LongCat | ✅ | Cloud | Meituans eigenes Großmodell, kompatibel mit OpenAI-API-Format, API-Schlüssel-Authentifizierung |
+| Qiniu Cloud AI | ✅ | Cloud | Qiniu Cloud-KI-Service, API-Schlüssel-Authentifizierung |
 | DeepSeek (Direktverbindung) | 📋 | Cloud | DeepSeek KI-Dienst |
 | 01.AI (Yi) | 📋 | Cloud | 01.AI KI-Dienst |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan KI-Dienst |
@@ -686,10 +728,10 @@ public interface IPlugin
 
 ### Plugin-Lader
 
-Der `PluginLoader` ist verantwortlich für das Laden von Plugin-DLLs aus einem angegebenen Verzeichnis und führt strenge Sicherheitsprüfungen durch:
+Der `PluginLoader` ist verantwortlich für das Laden von Plugin-DLLs aus einem angegebenen Verzeichnis und führt Sicherheitsprüfungen mit Fähigkeitsdeklaration durch:
 
 1. **Verzeichnisscan** — Scannt alle .dll-Dateien im Plugin-Verzeichnis
-2. **Sicherheits-Scan** — Prüft, ob das Plugin verbotene Namespaces referenziert
+2. **Fähigkeitsprüfung** — Prüft die über `[PluginCapability]` deklarierten Fähigkeiten und lockert die Sicherheitsregeln entsprechend
 3. **Isoliertes Laden** — Verwendet einen benutzerdefinierten `AssemblyLoadContext` zum isolierten Laden von Plugins
 4. **Lebenszyklusverwaltung** — Ruft die Methoden OnLoad, OnStart, OnStop, OnUnload des Plugins auf
 

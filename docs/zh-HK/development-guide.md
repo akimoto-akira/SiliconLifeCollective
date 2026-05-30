@@ -44,7 +44,7 @@ SiliconLifeCollective/
 工具透過反射自動發現和註冊：
 
 ```csharp
-// 所有工具实现 ITool 接口
+// 所有工具實作 ITool 介面
 public interface ITool
 {
     string Name { get; }
@@ -53,21 +53,21 @@ public interface ITool
 }
 ```
 
-### 3. 权限系统
+### 3. 權限系統
 
-3 级权限验证链：
+3 級權限驗證鏈：
 ```
-UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → 预设拒绝)
+UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → 預設拒絕)
 ```
 
-### 4. 服务定位器
+### 4. 服務定位器
 
-全局服务注册和检索：
+全域服務註冊和檢索：
 ```csharp
-// 注册
+// 註冊
 ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 
-// 获取
+// 取得
 var client = ServiceLocator.Instance.Get<IAIClient>();
 ```
 
@@ -87,13 +87,13 @@ public class MyCustomTool : ITool
 
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        // 解析参数
+        // 解析參數
         var param1 = call.Parameters["param1"]?.ToString();
 
-        // 执行逻辑
+        // 執行邏輯
         var result = await DoSomething(param1);
 
-        // 返回结果
+        // 傳回結果
         return new ToolResult
         {
             Success = true,
@@ -137,12 +137,17 @@ public class ProjectWorkTool : ITool { ... }
 ```csharp
 public class MyAIClient : IAIClient
 {
-    public string Name => "my_ai";
+    public string Endpoint => "https://api.example.com";
+    public string DefaultModel => "my-model";
+    public bool? StreamingMode => null;
+    public bool? SupportsToolCalls => true;
+    public int? ContextWindowTokens => 8192;
+    public bool? SupportsVision => false;
+    public bool? SupportsAudio => false;
 
-    public async Task<AIResponse> ChatAsync(AIRequest request)
+    public AIResponse Chat(AIRequest request)
     {
-        // 调用您的 AI API
-        var response = await CallMyAPI(request);
+        var response = CallMyAPI(request);
 
         return new AIResponse
         {
@@ -150,15 +155,6 @@ public class MyAIClient : IAIClient
             ToolCalls = response.ToolCalls,
             Usage = response.Usage
         };
-    }
-
-    public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
-    {
-        // 实现流式传输
-        await foreach (var chunk in StreamFromAPI(request))
-        {
-            yield return chunk;
-        }
     }
 }
 ```
@@ -186,17 +182,17 @@ public class DatabaseStorage : IStorage, ITimeStorage
 {
     public async Task<string> ReadAsync(string key)
     {
-        // 从您的数据库读取
+        // 從您的資料庫讀取
     }
 
     public async Task WriteAsync(string key, string value)
     {
-        // 写入您的数据库
+        // 寫入您的資料庫
     }
 
     public async Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end)
     {
-        // 时间索引查询
+        // 時間索引查詢
     }
 }
 ```
@@ -243,7 +239,7 @@ public class MyPluginTool : ITool
 
 3. 將編譯後的 DLL 放入外掛程式目錄，`PluginLoader` 將自動載入。
 
-> **安全限制**：外掛程式不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空間。外掛程式透過 `AssemblyLoadContext` 隔離載入。
+> **安全限制**：外掛程式預設不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空間。但外掛程式可透過 `[PluginCapability]` 屬性宣告所需能力（Network、FileIO、Process、AI），載入器據此放寬對應命名空間的安全掃描規則。不可宣告的能力（P/Invoke、Unsafe、反射發射等）始終被阻止。外掛程式透過 `AssemblyLoadContext` 隔離載入。
 
 ### 新增新皮膚
 
@@ -289,7 +285,7 @@ SiliconLife.Common/
 ├── Localization/          # 在地化基底類別與 34 種語言變體實作
 ├── Security/              # 權限管理器
 ├── SiliconBeing/          # 預設矽基生命體實作
-├── Tools/                 # 共享的內建工具（25 個）
+├── Tools/                 # 共享的內建工具（23 個）
 ├── Web/                   # Web 基礎設施
 └── WebView/               # Playwright WebView 實作
 
@@ -329,38 +325,38 @@ SiliconLife.Fast/         # 版本特有目錄
 ### 1. 設定開發環境
 
 ```bash
-# 克隆仓库
+# 複製儲存庫
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 
-# 恢复依赖
+# 還原依賴
 dotnet restore
 
-# 构建
+# 建置
 dotnet build
 ```
 
 ### 2. 執行測試
 
 ```bash
-# 运行所有测试
+# 執行所有測試
 dotnet test
 
-# 运行特定测试项目
+# 執行特定測試專案
 dotnet test tests/SiliconLife.Core.Tests
 ```
 
 ### 3. 除錯
 
 ```bash
-# 以调试输出运行
+# 以偵錯輸出執行
 dotnet run --project src/SiliconLife.Default --configuration Debug
 ```
 
 ### 4. 程式碼格式化
 
 ```bash
-# 格式化代码
+# 格式化程式碼
 dotnet format
 ```
 
@@ -375,13 +371,13 @@ public class MyCustomCalendar : CalendarBase
 
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
-        // 您的转换逻辑
+        // 您的轉換邏輯
         return new CalendarDate(year, month, day);
     }
 
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
-        // 反向转换
+        // 反向轉換
         return new GregorianDate(year, month, day);
     }
 }
@@ -419,18 +415,18 @@ public class MyWorkflowTemplate : WorkflowTemplate
 
     public override void DefineStates()
     {
-        AddState("start", "开始", isInitial: true);
-        AddState("processing", "处理中");
-        AddState("review", "审核");
+        AddState("start", "開始", isInitial: true);
+        AddState("processing", "處理中");
+        AddState("review", "審核");
         AddState("done", "完成", isFinal: true);
     }
 
     public override void DefineTransitions()
     {
-        AddTransition("start", "processing", "开始处理");
-        AddTransition("processing", "review", "提交审核");
-        AddTransition("review", "done", "审核通过");
-        AddTransition("review", "processing", "审核退回");
+        AddTransition("start", "processing", "開始處理");
+        AddTransition("processing", "review", "提交審核");
+        AddTransition("review", "done", "審核通過");
+        AddTransition("review", "processing", "審核退回");
     }
 }
 ```
@@ -461,10 +457,10 @@ public class MyToolTests
             }
         };
 
-        // 执行
+        // 執行
         var result = await tool.ExecuteAsync(call);
 
-        // 断言
+        // 判斷
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
     }

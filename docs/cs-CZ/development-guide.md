@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. Vložte zkompilovanou DLL do adresáře zásuvných modulů, `PluginLoader` ji automaticky načte.
 
-> **Bezpečnostní omezení**: Zásuvné moduly nemohou odkazovat na jmenné prostory `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` atd. Zásuvné moduly jsou izolovaně načítány pomocí `AssemblyLoadContext`.
+> **Bezpečnostní omezení**: Ve výchozím nastavení zásuvné moduly nemohou odkazovat na jmenné prostory `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` atd. Pokud však zásuvný modul deklaruje požadované schopnosti (Network, FileIO, Process, AI) pomocí atributu `[PluginCapability]`, zavaděč odpovídajícím způsobem uvolňuje pravidla bezpečnostního skenování. Nedeklarovatelné schopnosti (P/Invoke, Unsafe, Reflection Emit atd.) jsou vždy blokovány. Zásuvné moduly jsou izolovaně načítány pomocí `AssemblyLoadContext`.
 
 ### Přidání nového skinu
 

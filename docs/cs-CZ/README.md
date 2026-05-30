@@ -13,18 +13,18 @@
 - **Řízeno Souborem Duše** — každou Křemíkovou Bytost pohání základní soubor s výzvami (`soul.md`), který definuje unikátní osobnost a vzorce chování
 - **Architektura Tělo-Mozek** — *Tělo* (SiliconBeing) udržuje životní funkce a detekuje spouštěcí scénáře; *Mozek* (Správce Kontextu) načítá historii, volá AI, provádí nástroje a perzistuje odpovědi
 - **Schopnost sebeevoluce** — pomocí technologie dynamické kompilace Roslyn mohou Křemíkové Bytosti přepisovat vlastní kód a dosáhnout evoluce
-- **Správa aktivních stavů** — podporuje čtyři aktivní stavy: Idle (nečinný), Working (pracující), Error (chyba), Stopped (zastavený), po 10 po sobě jdoucích chybách automaticky přejde do stavu Stopped
+- **Správa aktivních stavů** — podporuje devět aktivních stavů: Idle (nečinný), SingleChat, GroupChat, Task, Timer, Broadcast, Project, MemoryCompression, Stopped (zastavený), po 10 po sobě jdoucích chybách automaticky přejde do stavu Stopped
 
 ### Systém zásuvných modulů
 - **Architektura rozšíření zásuvnými moduly** — rozšíření funkcí prostřednictvím rozhraní IPlugin, podpora dynamického načítání DLL zásuvných modulů z adresáře
-- **Bezpečnostní Sandbox** — zavaděč zásuvných modulů provádí přísné bezpečnostní skenování, zakazuje přístup k jmenným prostorům System.IO, System.Net atd.
+- **Deklarace schopností zásuvných modulů** — zásuvné moduly deklarují požadované schopnosti (Network, FileIO, Process, AI) pomocí atributu `[PluginCapability]`, zavaděč odpovídajícím způsobem uvolňuje pravidla bezpečnostního skenování; nedeklarovatelné schopnosti (P/Invoke, Unsafe, Reflection Emit atd.) jsou vždy blokovány
 - **Izolované načítání** — používá vlastní AssemblyLoadContext pro izolované načítání, zabraňuje vlivu zásuvných modulů na stabilitu hlavního programu
 - **Integrace nástrojů** — zásuvné moduly mohou registrovat vlastní nástroje prostřednictvím rozhraní ITool, automaticky se integrují do smyčky volání nástrojů
 
 ### Nástroje a exekuce
-- **24 vestavěných nástrojů** — pokrývající kalendář, chat, konfiguraci, disk, síť, paměť, úkoly, časovače, znalostní bázi, pracovní poznámky, projektový pracovní prostor, WebView prohlížeč, hot-reload atd.
+- **24 vestavěných nástrojů** — pokrývající kalendář, chat, konfiguraci, disk, síť, paměť, úkoly, časovače, znalostní bázi, pracovní poznámky, projektový pracovní prostor, WebView prohlížeč a další
 - **Izolace scénářů nástrojů** — každý nástroj deklaruje dostupné scénáře pomocí vlastnosti `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project), vlastnost `ChatOnly` omezuje nástroj pouze na scénář chatu
-- **Nástroj hot-reload** — podporuje automatickou kompilaci, aktualizaci souborů a restart SiliconLife.Fast za běhu, bez nutnosti ručního zásahu
+- **Rozhraní schopností IAIClient** — AI klienti deklarují schopnosti pro streamovací režim, volání nástrojů, kontextové okno, vidění a audio, Správce Kontextu přizpůsobuje své chování odpovídajícím způsobem
 - **Smyčka volání nástrojů** — AI vrací volání nástroje → provede nástroj → výsledek je předán AI → smyčka pokračuje, dokud není vrácena čistě textová odpověď
 - **Exekutor-oprávnění zabezpečení** — všechny I/O operace procházejí exekutorem s přísným ověřováním oprávnění
   - 3-úrovňový řetězec ověření oprávnění: Uživatelská Frekvenční Mezipaměť → Rozhraní Zpětného Volání Oprávnění → (IsCurator: Zpracovatel Dotazů na Oprávnění | Non-curator: Globální ACL → výchozí zamítnutí)
@@ -35,6 +35,9 @@
   - **Ollama** — lokální nasazení modelů, používá nativní HTTP API
   - **Alibaba Cloud Bailian (DashScope)** — cloudová AI služba, kompatibilní s OpenAI API, podporuje 13+ modelů, nasazení ve více regionech
   - **Volcengine Ark** — cloudová AI služba ByteDance, podporuje streamovací a nestreamovací režim, vestavěné řízení rychlosti
+  - **Herdsman** — inferenční engine bez autentizace, kompatibilní s OpenAI API formátem
+  - **Meituan LongCat** — vlastní velký model Meituan, kompatibilní s OpenAI API formátem, autentizace API klíčem
+  - **Qiniu Cloud AI** — cloudová AI služba Qiniu, autentizace API klíčem
 - **32 kalendářních systémů** — úplné pokrytí hlavních světových kalendářů, včetně gregoriánského, čínského lunárního, islámského, hebrejského, japonského, perského, mayského, čínských historických kalendářů atd.
 - **Znalostní síť** — znalostní graf založený na trojicích (subjekt-relace-objekt), podporuje ukládání, dotazování a objevování cest
 - **Projektový pracovní prostor** — správa projektového prostoru, podpora vytváření/archivace/ničení projektů, přiřazování rolí, pracovní poznámky, sledování úkolů a izolace oprávnění nástrojů
@@ -90,7 +93,7 @@ Tento projekt nabízí dvě implementační verze pro různé scénáře:
   - SpeedyPack engine + automatická komprimace zaručuje bezpečnost dat
   - Component UI architektura, 27 deklarativních komponent
   - 7 skinových témat, podpora automatického objevování a přepínání
-  - Nástroj hot-reload podporuje online aktualizace a restart
+  - Nástroj hot-reload podporuje online aktualizace a restart → Linux automaticky otevírá prohlížeč pro přístup k webovému rozhraní, podporuje parametr `--no-tray`
 - **Zvýšení výkonu**: latence čtení úložiště snížena 1000x, latence zápisu snížena 15000x, kapacita souběžného zpracování zvýšena 50x
 - **Popis role**: hluboce optimalizovaná produkční implementace, první volba pro dlouhodobý provoz a skutečné produkční prostředí
 - **Spouštěcí příkaz**: `dotnet run --project src/SiliconLife.Fast`
@@ -119,7 +122,7 @@ Tento projekt nabízí dvě implementační verze pro různé scénáře:
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programovací jazyk | C# | C# |
 | Typ aplikace | Konzolová aplikace | Desktopová aplikace (systémová lišta Windows/macOS / stavové okno Linux) |
-| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud) | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud) |
+| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
 | Datové úložiště | Souborový systém (JSON + časově indexované adresáře) | SpeedyPack (formát .spk, mapování v paměti + asynchronní perzistence) |
 | Webový server | HttpListener (vestavěný v .NET) | HttpListener (vestavěný v .NET) |
 | Dynamická kompilace | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -157,7 +160,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Globální lokátor služeb
 │   │
 │   ├── SiliconLife.Common/                # Sdílená implementace (společná pro obě verze)
-│   │   ├── AI/                            # AI klienti a továrny (Ollama, DashScope, VolcengineArk)
+│   │   ├── AI/                            # AI klienti a továrny (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32 implementací kalendáře
 │   │   ├── Localization/                  # Základ lokalizace a 34 jazykových/regionálních variant
 │   │   ├── Resources/                     # Sdílené zdrojové soubory
@@ -260,6 +263,9 @@ Volání nástroje → Exekutor → Správce Oprávnění → [Frekvenční mezi
   - **Ollama**: [Nainstalujte Ollama](https://ollama.com) a stáhněte model (např. `ollama pull llama3`)
   - **Alibaba Cloud Bailian**: Získejte API klíč z [konzole Bailian](https://bailian.console.aliyun.com/)
   - **Volcengine Ark**: Získejte API klíč z [konzole Volcengine](https://console.volcengine.com/ark)
+  - **Herdsman**: Není vyžadována autentizace, kompatibilní s OpenAI API formátem
+  - **Meituan LongCat**: Získejte API klíč z platformy Meituan
+  - **Qiniu Cloud AI**: Získejte API klíč z [konzole Qiniu](https://portal.qiniu.com/)
 
 ### Sestavení projektu
 
@@ -342,7 +348,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Fáze 10.5: Inkrementální vylepšení (Vysílací Kanál, Audit Tokenů, 32 kalendářů, vylepšení nástrojů, lokalizace 34 jazykových variant)
 - [x] Fáze 10.6: Dokončování a optimalizace (WebView, systém nápovědy, projektový pracovní prostor, Znalostní Síť, engine pracovních postupů)
 - [x] Fáze 11: Úložný engine SpeedyPack (náhrada LiteDB, mapování v paměti, asynchronní fronta zápisů, automatická komprimace)
-- [x] Fáze 12: Systém zásuvných modulů (rozhraní IPlugin, Bezpečnostní Sandbox PluginLoader, izolované načítání, integrace nástrojů)
+- [x] Fáze 12: Systém zásuvných modulů (rozhraní IPlugin, Deklarace schopností PluginLoader, izolované načítání, integrace nástrojů)
 
 ### 🚧 V plánu
 - [ ] Fáze 13: Integrace externího IM (Feishu / WhatsApp / Telegram)

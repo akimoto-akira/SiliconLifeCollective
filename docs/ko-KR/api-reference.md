@@ -574,6 +574,25 @@ AI 설정 편집기 인터페이스를 반환합니다.
       "apiKey": "...",
       "region": "beijing",
       "model": "qwen3.6-plus"
+    },
+    "VolcengineArk": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
+    },
+    "Herdsman": {
+      "endpoint": "http://localhost:8000",
+      "model": "..."
+    },
+    "LongCat": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
+    },
+    "QiniuAI": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
     }
   }
 }

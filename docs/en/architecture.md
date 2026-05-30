@@ -288,6 +288,42 @@ The system supports multiple AI backends through the `IAIClient` interface:
 - **Configuration**: `apiKey`, `endpoint`, `model`
 - **Characteristics**: ByteDance AI service, supports various Doubao models
 
+### HerdsmanClient
+
+- **Type**: Local/Cloud inference engine
+- **Protocol**: OpenAI-compatible API
+- **Authentication**: None
+- **Features**: Streaming, tool calls, reasoning content
+- **Configuration**: `endpoint`, `model`
+
+### LongCatClient (Meituan LongCat)
+
+- **Type**: Cloud AI service
+- **Protocol**: OpenAI-compatible API
+- **Authentication**: Bearer token (API key)
+- **Features**: Streaming, tool calls
+- **Configuration**: `apiKey`, `endpoint`, `model`
+
+### QiniuAIClient (Qiniu Cloud AI)
+
+- **Type**: Cloud AI service
+- **Protocol**: OpenAI-compatible API
+- **Authentication**: Bearer token (API key)
+- **Features**: Streaming, tool calls
+- **Configuration**: `apiKey`, `endpoint`, `model`
+
+### IAIClient Capability Interface
+
+The `IAIClient` interface defines the capabilities of each AI client, allowing `ContextManager` to adapt its behavior:
+
+| Capability | Return Type | Description |
+|-----------|------------|-------------|
+| `StreamingMode` | `StreamingMode` | Supported streaming mode (None/Streaming/Reasoning) |
+| `SupportsToolCalls` | `bool` | Tool call support |
+| `ContextWindowTokens` | `int` | Context window size in tokens |
+| `SupportsVision` | `bool` | Vision (image) support |
+| `SupportsAudio` | `bool` | Audio support |
+
 ### Client Factory Pattern
 
 Each AI client type has a corresponding factory implementing `IAIClientFactory`:
@@ -295,6 +331,9 @@ Each AI client type has a corresponding factory implementing `IAIClientFactory`:
 - `OllamaClientFactory` — Creates OllamaClient instances
 - `DashScopeClientFactory` — Creates DashScopeClient instances
 - `VolcengineArkClientFactory` — Creates VolcengineArkClient instances
+- `HerdsmanClientFactory` — Creates HerdsmanClient instances
+- `LongCatClientFactory` — Creates LongCatClient instances
+- `QiniuAIClientFactory` — Creates QiniuAIClient instances
 
 Factories provide:
 - `CreateClient(Dictionary<string, object> config)` — Instantiates a client from configuration
@@ -321,6 +360,9 @@ Factories provide:
 | Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan AI service |
 | Moonshot (Kimi) | 📋 | Cloud | Moonshot Kimi AI service |
 | Volcengine Ark Doubao | ✅ | Cloud | ByteDance Doubao AI service |
+| Herdsman | ✅ | Local/Cloud | Authentication-free inference engine, compatible with OpenAI API format |
+| Meituan LongCat | ✅ | Cloud | Meituan's self-developed large model, compatible with OpenAI API format, API key authentication |
+| Qiniu Cloud AI | ✅ | Cloud | Qiniu cloud AI service, API key authentication |
 | DeepSeek (Direct) | 📋 | Cloud | DeepSeek AI service |
 | Yi (01.AI) | 📋 | Cloud | Yi AI service |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI service |

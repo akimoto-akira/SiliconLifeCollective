@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. Umieść skompilowany DLL w katalogu wtyczek, `PluginLoader` załaduje go automatycznie.
 
-> **Ograniczenia bezpieczeństwa**: wtyczki nie mogą odwoływać się do przestrzeni nazw takich jak `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`. Wtyczki są ładowane izolowanie przez `AssemblyLoadContext`.
+> **Ograniczenia bezpieczeństwa**: domyślnie wtyczki nie mogą odwoływać się do przestrzeni nazw takich jak `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`. Jednakże wtyczki mogą deklarować wymagane możliwości poprzez atrybut `[PluginCapability]` (Network, FileIO, Process, AI), a ładowarka na tej podstawie łagodzi reguły skanowania bezpieczeństwa odpowiednich przestrzeni nazw. Możliwości niezdeklarowalne (P/Invoke, Unsafe, Reflection Emit itp.) są zawsze blokowane. Wtyczki są ładowane izolowanie przez `AssemblyLoadContext`.
 
 ### Dodawanie nowej skórki
 

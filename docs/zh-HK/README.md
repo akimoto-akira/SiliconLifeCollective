@@ -13,18 +13,17 @@
 - **靈魂檔案驅動** — 每個矽基生命體由核心提示檔案（`soul.md`）驅動，定義獨特個性和行為模式
 - **身體-大腦架構** — *身體*（SiliconBeing）維持生命體徵並偵測觸發場景；*大腦*（ContextManager）負責載入歷史、呼叫 AI、執行工具和持久化回應
 - **自我進化能力** — 透過 Roslyn 動態編譯技術，矽基生命體可以重寫自己的程式碼實作進化
-- **活動狀態管理** — 支援 Idle（空閒）、Working（工作）、Error（錯誤）、Stopped（已停止）四種活動狀態，連續 10 次錯誤自動進入 Stopped 狀態
+- **活動狀態管理** — 支援 Idle（空閒）、SingleChat（一對一聊天）、GroupChat（群聊）、Task（任務）、Timer（定時器）、Broadcast（廣播）、Project（項目）、MemoryCompression（記憶壓縮）、Stopped（已停止）九種活動狀態，連續 10 次錯誤自動進入 Stopped 狀態
 
 ### 插件系統
 - **插件擴充架構** — 透過 IPlugin 介面實作功能擴充，支援從目錄動態載入插件 DLL
-- **安全沙箱** — 插件載入器執行嚴格的安全掃描，禁止存取 System.IO、System.Net 等命名空間
+- **插件能力宣告** — 插件透過 `[PluginCapability]` 屬性宣告所需能力（Network、FileIO、Process、AI），載入器據此放寬安全掃描規則；不可宣告的能力（P/Invoke、Unsafe、反射發射等）始終被阻止
 - **隔離載入** — 使用自訂 AssemblyLoadContext 隔離載入，防止插件影響主程式穩定性
 - **工具整合** — 插件可透過 ITool 介面註冊自訂工具，自動整合到工具呼叫迴圈
 
 ### 工具與執行
-- **24 個內建工具** — 涵蓋日曆、聊天、設定、磁碟、網路、記憶、任務、定時器、知識庫、工作筆記、項目工作區、WebView 瀏覽器、熱重載等
-- **工具場景隔離** — 每個工具透過 `ToolScenario` 屬性宣告可用場景（Chat、Task、Timer、MemoryCompression、Project），`ChatOnly` 屬性限制工具僅在聊天場景使用
-- **熱重載工具** — 支援 SiliconLife.Fast 在執行中自動編譯、更新檔案並重啟，無需手動干預
+- **24 個內建工具** — 涵蓋日曆、聊天、設定、磁碟、網路、記憶、任務、定時器、知識庫、工作筆記、項目工作區、項目任務、項目工作筆記、項目工作、WebView 瀏覽器、動態編譯、程式碼執行、權限管理、Token 審計、日誌查詢、資料庫、系統資訊、說明文件等
+- **工具場景隔離** — 每個工具透過 `ToolScenario` 屬性宣告可用場景（Chat、Task、Timer、MemoryCompression、Project），`ChatOnly` 屬性限制工具僅在聊天場景使用，`SiliconManagerOnly` 屬性限制工具僅主理人使用
 - **工具呼叫迴圈** — AI 回傳工具呼叫 → 執行工具 → 結果回饋給 AI → 持續迴圈直到回傳純文字回應
 - **執行器-權限安全** — 所有 I/O 操作透過執行器進行嚴格的權限驗證
   - 3 級權限驗證鏈：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → 預設拒絕)
@@ -35,6 +34,10 @@
   - **Ollama** — 本地模型部署，使用原生 HTTP API
   - **阿里雲百煉（DashScope）** — 雲端 AI 服務，相容 OpenAI API，支援 13+ 模型，多區域部署
   - **火山引擎 Ark（VolcengineArk）** — 字節跳動雲端 AI 服務，支援串流和非串流模式，內建速率控制
+  - **牧馬人推理引擎（Herdsman）** — 無需認證的推理引擎，相容 OpenAI API 格式
+  - **美團 LongCat** — 美團自研大模型，相容 OpenAI API 格式，API Key 認證
+  - **七牛雲 AI** — 七牛雲大模型推理服務，相容 OpenAI API 格式，API Key 認證
+- **AI 客戶端能力發現** — IAIClient 介面支援宣告串流模式、工具呼叫、視覺輸入、音訊輸入、上下文視窗大小等能力，ContextManager 據此自適應調整行為
 - **32 種日曆系統** — 全球主要曆法全覆蓋，包括公曆、農曆、伊斯蘭曆、希伯來曆、日本曆、波斯曆、瑪雅曆、中國歷史曆法等
 - **知識網絡系統** — 基於三元組（主體-關係-客體）的知識圖譜，支援儲存、查詢和路徑發現
 - **項目工作區** — 項目空間管理，支援項目建立/歸檔/銷毀、角色分配、工作筆記、任務追蹤和工具權限隔離
@@ -119,7 +122,7 @@
 | 執行時期 | .NET 9 | .NET 9（Windows/macOS/Linux） |
 | 程式語言 | C# | C# |
 | 應用類型 | 主控台應用程式 | 桌面應用程式（Windows/macOS 系統匣 / Linux 狀態視窗） |
-| AI 整合 | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端） | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端） |
+| AI 整合 | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端）、牧馬人推理引擎、美團LongCat、七牛雲AI | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端）、牧馬人推理引擎、美團LongCat、七牛雲AI |
 | 資料儲存 | 檔案系統（JSON + 時間索引目錄） | SpeedyPack（.spk 格式，記憶體映射 + 非同步持久化） |
 | Web 伺服器 | HttpListener（.NET 內建） | HttpListener（.NET 內建） |
 | 動態編譯 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -133,122 +136,122 @@
 ```
 SiliconLifeCollective.sln
 ├── src/
-│   ├── SiliconLife.Core/                  # 核心库（接口、抽象类）
-│   │   ├── AI/                            # AI 客户端接口、上下文管理器、消息模型
-│   │   ├── Audit/                         # Token 使用审计系统
-│   │   ├── Chat/                          # 聊天系统、会话管理、广播频道
-│   │   ├── Compilation/                   # 动态编译、安全扫描、代码加密
-│   │   ├── Config/                        # 配置管理系统
-│   │   ├── Executors/                     # 执行器（磁盘、网络、命令行）
-│   │   ├── IM/                            # 即时通讯提供者接口
-│   │   ├── Knowledge/                     # 知识网络系统
-│   │   ├── Localization/                  # 本地化系统
-│   │   ├── Logging/                       # 日志系统
-│   │   ├── Plugins/                       # 插件系统（IPlugin 接口、PluginLoader 加载器）
-│   │   ├── Project/                       # 项目管理系统
-│   │   ├── Runtime/                       # 主循环、时钟对象、核心主机
-│   │   ├── Security/                      # 权限管理系统
-│   │   ├── SiliconBeing/                  # 硅基生命体基类、管理器、工厂
-│   │   ├── Storage/                       # 存储接口
-│   │   ├── Time/                          # 不完整日期（时间范围查询）
-│   │   ├── Tools/                         # 工具接口和工具管理器
-│   │   ├── WebView/                       # WebView 浏览器接口
-│   │   ├── Workflow/                      # 工作流引擎（模板、实例、状态转换）
-│   │   └── ServiceLocator.cs              # 全局服务定位器
+│   ├── SiliconLife.Core/                  # 核心函式庫（介面、抽象類別）
+│   │   ├── AI/                            # AI 客戶端介面、上下文管理器、訊息模型
+│   │   ├── Audit/                         # Token 使用審計系統
+│   │   ├── Chat/                          # 聊天系統、工作階段管理、廣播頻道
+│   │   ├── Compilation/                   # 動態編譯、安全掃描、程式碼加密
+│   │   ├── Config/                        # 設定管理系統
+│   │   ├── Executors/                     # 執行器（磁碟、網路、命令列）
+│   │   ├── IM/                            # 即時通訊提供者介面
+│   │   ├── Knowledge/                     # 知識網絡系統
+│   │   ├── Localization/                  # 在地化系統
+│   │   ├── Logging/                       # 日誌系統
+│   │   ├── Plugins/                       # 插件系統（IPlugin 介面、PluginLoader 載入器）
+│   │   ├── Project/                       # 項目管理系統
+│   │   ├── Runtime/                       # 主迴圈、時鐘物件、核心主機
+│   │   ├── Security/                      # 權限管理系統
+│   │   ├── SiliconBeing/                  # 矽基生命體基類、管理器、工廠
+│   │   ├── Storage/                       # 儲存介面
+│   │   ├── Time/                          # 不完整日期（時間範圍查詢）
+│   │   ├── Tools/                         # 工具介面和工具管理器
+│   │   ├── WebView/                       # WebView 瀏覽器介面
+│   │   ├── Workflow/                      # 工作流引擎（範本、實例、狀態轉換）
+│   │   └── ServiceLocator.cs              # 全域服務定位器
 │   │
-│   ├── SiliconLife.Common/                # 共享实现（两个版本共用）
-│   │   ├── AI/                            # AI 客户端与工厂（Ollama、DashScope、VolcengineArk）
-│   │   ├── Calendar/                      # 32 种日历实现
-│   │   ├── Localization/                  # 本地化基类与 34 种语言/地区变体实现
-│   │   ├── Resources/                     # 共享资源文件
-│   │   ├── Security/                      # 权限管理器
-│   │   ├── SiliconBeing/                  # 默认硅基生命体实现
-│   │   ├── Tools/                         # 23 个通用工具实现
-│   │   ├── Web/                           # Web 基础设施
-│   │   └── WebView/                       # Playwright WebView 实现
+│   ├── SiliconLife.Common/                # 共享實作（兩個版本共用）
+│   │   ├── AI/                            # AI 客戶端與工廠（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI）
+│   │   ├── Calendar/                      # 32 種日曆實作
+│   │   ├── Localization/                  # 在地化基類與 34 種語言/地區變體實作
+│   │   ├── Resources/                     # 共享資源檔案
+│   │   ├── Security/                      # 權限管理器
+│   │   ├── SiliconBeing/                  # 預設矽基生命體實作
+│   │   ├── Tools/                         # 23 個通用工具實作
+│   │   ├── Web/                           # Web 基礎設施
+│   │   └── WebView/                       # Playwright WebView 實作
 │   │
-│   ├── SiliconLife.App/                   # 应用层（Web UI + 帮助文档，Default 与 Fast 共享）
-│   │   ├── Config/                        # 应用配置
-│   │   ├── Data/                          # 数据目录
-│   │   ├── Help/                          # 帮助文档本地化（多语言）
-│   │   ├── Tools/                         # HelpTool（帮助文档查询工具）
-│   │   └── Web/                           # Web UI 实现
-│   │       ├── Component/                 # UI 组件库（27 个组件）
-│   │       ├── Controllers/               # 24 个控制器
-│   │       ├── Models/                    # 视图模型
-│   │       ├── Views/                     # HTML 视图
-│   │       └── Skins/                     # 7 种皮肤主题
+│   ├── SiliconLife.App/                   # 應用層（Web UI + 說明文件，Default 與 Fast 共享）
+│   │   ├── Config/                        # 應用設定
+│   │   ├── Data/                          # 資料目錄
+│   │   ├── Help/                          # 說明文件在地化（多語言）
+│   │   ├── Tools/                         # HelpTool（說明文件查詢工具）
+│   │   └── Web/                           # Web UI 實作
+│   │       ├── Component/                 # UI 元件庫（27 個元件）
+│   │       ├── Controllers/               # 24 個控制器
+│   │       ├── Models/                    # 視圖模型
+│   │       ├── Views/                     # HTML 視圖
+│   │       └── Skins/                     # 7 種佈景主題
 │   │
-│   ├── SiliconLife.Default/               # 默认实现 + 应用程序入口（控制台版）
-│   │   ├── Program.cs                     # 入口点（装配所有组件）
-│   │   ├── Config/                        # 默认配置数据
-│   │   ├── Knowledge/                     # 知识网络实现
-│   │   ├── Logging/                       # 日志提供者实现（控制台 + 文件系统）
-│   │   ├── Project/                       # 项目系统实现
-│   │   └── Storage/                       # 文件系统存储实现
+│   ├── SiliconLife.Default/               # 預設實作 + 應用程式入口（主控台版）
+│   │   ├── Program.cs                     # 進入點（裝配所有元件）
+│   │   ├── Config/                        # 預設設定資料
+│   │   ├── Knowledge/                     # 知識網絡實作
+│   │   ├── Logging/                       # 日誌提供者實作（主控台 + 檔案系統）
+│   │   ├── Project/                       # 項目系統實作
+│   │   └── Storage/                       # 檔案系統儲存實作
 │   │
-│   ├── SiliconLife.Fast/                  # 高性能实现 + 应用程序入口（窗体版）
-│   │   ├── Program.cs                     # 入口点（窗体应用程序）
-│   │   ├── App.axaml / App.cs             # Avalonia 应用定义
-│   │   ├── Config/                        # 配置数据（与 Default 共享）
-│   │   ├── Knowledge/                     # 知识网络实现（内存优化）
-│   │   ├── Logging/                       # 高性能日志提供者
-│   │   ├── Project/                       # 项目系统实现
-│   │   ├── Storage/                       # SpeedyPack 存储适配器
-│   │   └── Tray/                          # 系统托盘（34 种语言变体本地化）
+│   ├── SiliconLife.Fast/                  # 高效能實作 + 應用程式入口（視窗版）
+│   │   ├── Program.cs                     # 進入點（視窗應用程式）
+│   │   ├── App.axaml / App.cs             # Avalonia 應用定義
+│   │   ├── Config/                        # 設定資料（與 Default 共享）
+│   │   ├── Knowledge/                     # 知識網絡實作（記憶體最佳化）
+│   │   ├── Logging/                       # 高效能日誌提供者
+│   │   ├── Project/                       # 項目系統實作
+│   │   ├── Storage/                       # SpeedyPack 儲存配接器
+│   │   └── Tray/                          # 系統匣（34 種語言變體在地化）
 │   │
-│   ├── SiliconLife.Speedy/                # SpeedyPack 高性能存储引擎
-│   │   ├── SpeedyPack.cs                  # 核心类（内存目录映射 + 缓存 + 异步写入）
-│   │   ├── SpeedyPackOptions.cs           # 配置选项（缓存 TTL、最大条目数等）
-│   │   ├── IPackTransaction.cs            # 事务接口
-│   │   ├── SpkFileInfo.cs                 # 文件信息
-│   │   └── Internal/                      # 内部实现
-│   │       ├── DirectoryMap.cs            # 内存目录映射
-│   │       ├── EntryCache.cs              # 条目缓存
-│   │       ├── FreeList.cs                # 空闲空间管理
-│   │       ├── PackFileReader.cs          # 包文件读取器
-│   │       ├── PackFileWriter.cs          # 包文件写入器
-│   │       ├── WriteQueue.cs              # 异步写入队列
-│   │       ├── WriteOperation.cs          # 写入操作
-│   │       ├── SpeedyTransaction.cs       # 事务实现
-│   │       ├── SpkHeader.cs               # 包文件头
-│   │       └── PathNormalizer.cs          # 路径规范化
+│   ├── SiliconLife.Speedy/                # SpeedyPack 高效能儲存引擎
+│   │   ├── SpeedyPack.cs                  # 核心類別（記憶體目錄映射 + 快取 + 非同步寫入）
+│   │   ├── SpeedyPackOptions.cs           # 設定選項（快取 TTL、最大條目數等）
+│   │   ├── IPackTransaction.cs            # 事務介面
+│   │   ├── SpkFileInfo.cs                 # 檔案資訊
+│   │   └── Internal/                      # 內部實作
+│   │       ├── DirectoryMap.cs            # 記憶體目錄映射
+│   │       ├── EntryCache.cs              # 條目快取
+│   │       ├── FreeList.cs                # 空閒空間管理
+│   │       ├── PackFileReader.cs          # 封包檔案讀取器
+│   │       ├── PackFileWriter.cs          # 封包檔案寫入器
+│   │       ├── WriteQueue.cs              # 非同步寫入佇列
+│   │       ├── WriteOperation.cs          # 寫入操作
+│   │       ├── SpeedyTransaction.cs       # 事務實作
+│   │       ├── SpkHeader.cs               # 封包檔案標頭
+│   │       └── PathNormalizer.cs          # 路徑正規化
 │   │
 │   └── SiliconLife.Speedy.Manager/        # SpeedyPack 管理工具（Avalonia UI）
-│       ├── MainForm.cs                    # 主窗体
-│       ├── Program.cs                     # 入口点
-│       └── slc.ico                        # 应用图标
+│       ├── MainForm.cs                    # 主表單
+│       ├── Program.cs                     # 進入點
+│       └── slc.ico                        # 應用程式圖示
 │
-├── docs/                                  # 多语言文档
-│   ├── zh-CN/                             # 简体中文文档
-│   ├── en/                                # 英文文档
-│   └── ...                                # 其他语言文档
+├── docs/                                  # 多語言文件
+│   ├── zh-CN/                             # 簡體中文文件
+│   ├── en/                                # 英文文件
+│   └── ...                                # 其他語言文件
 │
-└── 总文档/                                 # 需求文档和架构文档
-    ├── 需求文档.md
-    ├── 架构大纲.md
-    └── 实现顺序.md
+└── 總文件/                                 # 需求文件和架構文件
+    ├── 需求文件.md
+    ├── 架構大綱.md
+    └── 實作順序.md
 ```
 
 ## 🏗️ 架構概覽
 
 ### 排程架構
 ```
-主循环（专用线程，看门狗 + 熔断器）
-  └── 时钟对象（按优先级排序）
-       └── 硅基生命体管理器
-            └── 硅基生命体运行器（临时线程，超时 + 熔断器）
-                 └── 硅基生命体.Tick()
+主迴圈（專用執行緒，看門狗 + 熔斷器）
+  └── 時鐘物件（按優先順序排序）
+       └── 矽基生命體管理器
+            └── 矽基生命體執行器（臨時執行緒，逾時 + 熔斷器）
+                 └── 矽基生命體.Tick()
                       └── 上下文管理器.思考()
-                           └── AI 客户端.聊天()
-                                └── 工具调用循环 → 持久化到聊天系统
+                           └── AI 客戶端.聊天()
+                                └── 工具呼叫迴圈 → 持久化到聊天系統
 ```
 
 ### 安全架構
 所有 AI 發起的 I/O 操作必須透過嚴格的安全鏈：
 
 ```
-工具调用 → 执行器 → 权限管理器 → [频率缓存 → 回调 → (IsCurator: 询问用户 | Non-curator: 全局ACL)]
+工具呼叫 → 執行器 → 權限管理器 → [頻率快取 → 回呼 → (IsCurator: 詢問使用者 | Non-curator: 全域ACL)]
 ```
 
 ## 🚀 快速開始
@@ -342,7 +345,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] 階段 10.5：增量增強（廣播頻道、Token 審計、32 種日曆、工具增強、34 種語言變體在地化）
 - [x] 階段 10.6：完善與最佳化（WebView、說明系統、項目工作區、知識網絡、工作流引擎）
 - [x] 階段 11：SpeedyPack 儲存引擎（替換 LiteDB、記憶體映射、非同步寫入佇列、自動壓縮）
-- [x] 階段 12：插件系統（IPlugin 介面、PluginLoader 安全沙箱、隔離載入、工具整合）
+- [x] 階段 12：插件系統（IPlugin 介面、PluginLoader 能力宣告、隔離載入、工具整合）
 
 ### 🚧 計劃中
 - [ ] 階段 13：外部即時通訊整合（飛書 / WhatsApp / Telegram）
@@ -416,15 +419,15 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 
 **策略 1：Default 驗證，Fast 生產**
 ```
-开发/验证环境：SiliconLife.Default（验证架构、调试功能）
-生产环境：SiliconLife.Fast（高性能、后台运行、处理实时请求）
+開發/驗證環境：SiliconLife.Default（驗證架構、偵錯功能）
+生產環境：SiliconLife.Fast（高效能、背景執行、處理即時請求）
 ```
 
 **策略 2：Fast 主執行，Default 定期備份**
 ```
-SiliconLife.Fast（日常使用，处理实时请求）
-    ↓ 定期备份
-SiliconLife.Default（冷数据归档，数据安全兜底）
+SiliconLife.Fast（日常使用，處理即時請求）
+    ↓ 定期備份
+SiliconLife.Default（冷資料歸檔，資料安全兜底）
 ```
 
 ## 📄 授權條款

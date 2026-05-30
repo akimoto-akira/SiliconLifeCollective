@@ -26,7 +26,6 @@
   - SpeedyPack 引擎 + 自动压缩保证数据安全
   - Component UI 架构，27 个声明式组件
   - 7 种皮肤主题，支持自动发现和切换
-  - 热重载工具支持在线更新和重启
   - Linux 自动打开浏览器访问 Web UI，支持 `--no-tray` 参数
 - **性能提升**：存储读取延迟降低 1000 倍，写入延迟降低 15000 倍
 - **角色说明**：经过深度优化的生产级实现，具备系统托盘后台运行、SpeedyPack 引擎 + 自动压缩等特性，是长期运行和实际生产环境的首选
@@ -294,11 +293,26 @@
 - `OllamaClientFactory` —— 创建 OllamaClient 实例
 - `DashScopeClientFactory` —— 创建 DashScopeClient 实例
 - `VolcengineArkClientFactory` —— 创建 VolcengineArkClient 实例
+- `HerdsmanClientFactory` —— 创建 HerdsmanClient 实例
+- `LongCatClientFactory` —— 创建 LongCatClient 实例
+- `QiniuAIClientFactory` —— 创建 QiniuAIClient 实例
 
 工厂提供：
 - `CreateClient(Dictionary<string, object> config)` —— 从配置实例化客户端
 - `GetConfigKeyOptions(string key, ...)` —— 返回配置键的动态选项（例如可用模型、区域）
 - `GetDisplayName()` —— 客户端类型的本地化显示名称
+
+### IAIClient 能力接口
+
+`IAIClient` 接口定义了 AI 客户端的能力声明属性，`ContextManager` 据此自适应调整行为：
+
+| 属性 | 类型 | 描述 |
+|------|------|------|
+| `StreamingMode` | `bool?` | 流式模式支持：true=仅流式、false=仅非流式、null=两种均支持（默认流式） |
+| `SupportsToolCalls` | `bool?` | 工具调用支持：true=支持、false=不支持（跳过工具注入）、null=未知（默认支持） |
+| `ContextWindowTokens` | `int?` | 上下文窗口大小（token 数），用于 token 预算裁剪替代固定 MaxContextMessages |
+| `SupportsVision` | `bool?` | 视觉输入支持：true=支持图片、false=不支持、null=未知（默认不支持） |
+| `SupportsAudio` | `bool?` | 音频输入支持：true=支持音频、false=不支持、null=未知（默认不支持） |
 
 ### AI平台支持清单
 
@@ -320,6 +334,9 @@
 | 智普AI（GLM） | 📋 | 云端 | 智谱清言AI服务 |
 | 月之暗面（Kimi） | 📋 | 云端 | 月之暗面Kimi AI服务 |
 | 火山方舟引擎.豆包 | ✅ | 云端 | 字节跳动豆包AI服务 |
+| 牧马人推理引擎（Herdsman） | ✅ | 本地/云端 | 无需认证的推理引擎，兼容 OpenAI API 格式 |
+| 美团 LongCat | ✅ | 云端 | 美团自研大模型，兼容 OpenAI API 格式，API Key 认证 |
+| 七牛云 AI | ✅ | 云端 | 七牛云大模型推理服务，兼容 OpenAI API 格式，API Key 认证 |
 | DeepSeek（直连） | 📋 | 云端 | 深度求索AI服务 |
 | 零一万物 | 📋 | 云端 | 零一万物AI服务 |
 | 腾讯混元 | 📋 | 云端 | 腾讯混元AI服务 |
@@ -685,16 +702,19 @@ public interface IPlugin
 3. **隔离加载** — 使用自定义 `AssemblyLoadContext` 隔离加载插件
 4. **生命周期管理** — 调用插件的 OnLoad、OnStart、OnStop、OnUnload 方法
 
-### 安全沙箱
+### 安全沙箱与能力声明
 
 插件加载器执行以下安全检查：
 
 | 检查项 | 描述 |
 |--------|------|
-| 禁止命名空间 | System.IO、System.Net.Http、System.Net.WebSockets、System.Net.Sockets、Microsoft.CodeAnalysis |
+| 可声明能力 | Network（网络访问）、FileIO（文件读写）、Process（进程管理）、AI（AI 调用） |
+| 不可声明能力 | P/Invoke、Unsafe、反射发射、System.IO、System.Net 等始终被阻止 |
 | 可信程序集白名单 | Google.Protobuf、Newtonsoft.Json、MessagePack、Serilog、Microsoft.Extensions.Logging.Abstractions、Dapper |
 | 禁止类型检查 | 扫描插件中引用的危险类型 |
 | 禁止成员检查 | 扫描插件中调用的危险方法 |
+
+插件通过 `[PluginCapability]` 属性声明所需能力，加载器据此放宽对应命名空间的安全扫描规则。例如声明了 `FileIO` 能力的插件可以使用 `System.IO` 命名空间，但不可声明的能力（如 P/Invoke、Unsafe、反射发射等）始终被阻止。
 
 ### 工具集成
 
@@ -723,6 +743,9 @@ public interface IPlugin
 | `GroupChat` | 正在进行群聊 |
 | `Task` | 正在执行任务 |
 | `Timer` | 正在执行定时器 |
+| `Broadcast` | 正在处理广播消息 |
+| `Project` | 正在执行项目工作 |
+| `MemoryCompression` | 正在执行记忆压缩 |
 | `Stopped` | 已停止，因连续错误或手动停止 |
 
 **Stopped 状态机制**：
@@ -736,6 +759,9 @@ Idle → SingleChat → Idle（聊天完成）
 Idle → GroupChat → Idle（群聊完成）
 Idle → Task → Idle（任务完成）
 Idle → Timer → Idle（定时器完成）
+Idle → Broadcast → Idle（广播完成）
+Idle → Project → Idle（项目工作完成）
+Idle → MemoryCompression → Idle（记忆压缩完成）
 任意 → Stopped（连续 10 次错误）
 Stopped → Idle（新聊天消息到达或手动重启）
 ```

@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. Place the compiled DLL in the plugins directory, `PluginLoader` will automatically load it.
 
-> **Security Restrictions**: Plugins cannot reference `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` and other namespaces. Plugins are loaded in isolation via `AssemblyLoadContext`.
+> **Security Restrictions**: By default, plugins cannot reference `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` and other namespaces. However, if a plugin declares required capabilities (Network, FileIO, Process, AI) via the `[PluginCapability]` attribute, the loader relaxes security scanning rules accordingly. Non-declarable capabilities (P/Invoke, Unsafe, Reflection Emit, etc.) are always blocked. Plugins are loaded in isolation via `AssemblyLoadContext`.
 
 ### Adding a New Skin
 

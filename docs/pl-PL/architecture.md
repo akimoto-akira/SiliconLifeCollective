@@ -26,7 +26,6 @@ Projekt oferuje dwie wersje implementacji, współdzielące ten sam projekt arch
   - Silnik SpeedyPack + automatyczna kompakcja gwarantująca bezpieczeństwo danych
   - Architektura Component UI, 27 komponentów deklaratywnych
   - 7 motywów skórek, obsługa automatycznego wykrywania i przełączania
-  - Narzędzie gorącego przeładowania obsługujące aktualizacje online i restart
   - Linux automatycznie otwiera przeglądarkę z Web UI, obsługa parametru `--no-tray`
 - **Poprawa wydajności**: opóźnienie odczytu przechowywania zmniejszone 1000-krotnie, opóźnienie zapisu zmniejszone 15000-krotnie
 - **Opis roli**: głęboko zoptymalizowana implementacja produkcyjna, z funkcjami takimi jak działanie w tle w zasobniku systemowym, silnik SpeedyPack + automatyczna kompakcja, zalecana do długotrwałego działania i rzeczywistych środowisk produkcyjnych
@@ -294,11 +293,26 @@ Każdy typ klienta AI ma odpowiednią implementację fabryki `IAIClientFactory`:
 - `OllamaClientFactory` — tworzy instancje OllamaClient
 - `DashScopeClientFactory` — tworzy instancje DashScopeClient
 - `VolcengineArkClientFactory` — tworzy instancje VolcengineArkClient
+- `HerdsmanClientFactory` — tworzy instancje HerdsmanClient
+- `LongCatClientFactory` — tworzy instancje LongCatClient
+- `QiniuAIClientFactory` — tworzy instancje QiniuAIClient
 
 Fabryki dostarczają:
 - `CreateClient(Dictionary<string, object> config)` — tworzy instancję klienta z konfiguracji
 - `GetConfigKeyOptions(string key, ...)` — zwraca dynamiczne opcje klucza konfiguracji (np. dostępne modele, regiony)
 - `GetDisplayName()` — zlokalizowana nazwa wyświetlana typu klienta
+
+### Interfejs możliwości IAIClient
+
+Interfejs `IAIClient` definiuje właściwości deklaracji możliwości klienta AI, na podstawie których `ContextManager` dostosowuje adaptacyjnie zachowanie:
+
+| Właściwość | Typ | Opis |
+|------|------|------|
+| `StreamingMode` | `bool?` | Obsługa trybu strumieniowego: true=tylko strumieniowy, false=tylko niestrumieniowy, null=oba obsługiwane (domyślnie: strumieniowy) |
+| `SupportsToolCalls` | `bool?` | Obsługa wywołań narzędzi: true=obsługiwane, false=nieobsługiwane (ignoruj wstrzykiwanie narzędzi), null=nieznane (domyślnie: obsługiwane) |
+| `ContextWindowTokens` | `int?` | Rozmiar okna kontekstu (liczba tokenów), używany do cięcia budżetu tokenów zamiast stałego MaxContextMessages |
+| `SupportsVision` | `bool?` | Obsługa wejścia wizyjnego: true=obsługuje obrazy, false=nie obsługuje, null=nieznane (domyślnie: nie obsługuje) |
+| `SupportsAudio` | `bool?` | Obsługa wejścia audio: true=obsługuje dźwięk, false=nie obsługuje, null=nieznane (domyślnie: nie obsługuje) |
 
 ### Lista obsługiwanych platform AI
 
@@ -320,6 +334,9 @@ Fabryki dostarczają:
 | Zhipu AI (GLM) | 📋 | Chmurowa | Usługa AI Zhipu Qingyan |
 | Moonshot (Kimi) | 📋 | Chmurowa | Usługa AI Moonshot Kimi |
 | Volcengine Ark Doubao | ✅ | Chmurowa | Usługa AI ByteDance Doubao |
+| Herdsman | ✅ | Lokalna/Chmurowa | Silnik wnioskowania bez autoryzacji, kompatybilny z formatem OpenAI API |
+| Meituan LongCat | ✅ | Chmurowa | Autorski duży model Meituan, kompatybilny z formatem OpenAI API, autoryzacja przez klucz API |
+| Qiniu Cloud AI | ✅ | Chmurowa | Chmurowa usługa wnioskowania dużych modeli Qiniu Cloud, kompatybilna z formatem OpenAI API, autoryzacja przez klucz API |
 | DeepSeek (bezpośrednie połączenie) | 📋 | Chmurowa | Usługa AI DeepSeek |
 | 01.AI (Yi) | 📋 | Chmurowa | Usługa AI 01.AI |
 | Tencent Hunyuan | 📋 | Chmurowa | Usługa AI Tencent Hunyuan |

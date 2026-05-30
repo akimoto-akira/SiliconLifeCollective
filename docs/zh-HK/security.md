@@ -6,7 +6,7 @@
 
 ## 概述
 
-矽基生命群的安全性建立在**分層防禦**模型之上。核心原則：**所有 I/O 操作必須通過執行器**，執行器在執行前強制執行權限檢查。
+矽基生命群的安全性建立在**分層防禦**模型之上。核心原則：**所有 I/O 操作必須透過執行器**，執行器在執行前強制執行權限檢查。
 
 ```
 工具呼叫 → 執行器 → 權限管理器 → 頻率快取 → 回呼 → (IsCurator: 詢問使用者 | Non-curator: 全域ACL)
@@ -38,7 +38,7 @@
 
 ### 特殊角色：矽基主理人
 
-矽基主理人擁有最高權限級別（`IsCurator = true`）。當權限鏈到達分支判斷時，主理人的操作會通過 `IPermissionAskHandler` 詢問使用者確認，而非直接短路為允許。非主理人則查詢全域 ACL。
+矽基主理人擁有最高權限級別（`IsCurator = true`）。當權限鏈到達分支判斷時，主理人的操作會透過 `IPermissionAskHandler` 詢問使用者確認，而非直接短路為允許。非主理人則查詢全域 ACL。
 
 ### 私有權限管理器
 
@@ -156,7 +156,7 @@
 ```
 
 - 規則按順序評估；第一次匹配獲勝。
-- 只有矽基主理人可以修改全域 ACL（通過其專用工具）。
+- 只有矽基主理人可以修改全域 ACL（透過其專用工具）。
 - 變更立即生效。
 - 全域 ACL **不在**上述每個查詢的優先級鏈中 —— 它在內部由回呼函式引用。
 
@@ -239,7 +239,7 @@ Web 前端立即顯示**互動式卡片**，顯示：
 
 ### 繼承約束
 
-所有自定義矽基生命（物件）類**必須**繼承 `SiliconBeingBase`。編譯器在類型級別強制執行此約束。
+所有自訂矽基生命（物件）類**必須**繼承 `SiliconBeingBase`。編譯器在類型級別強制執行此約束。
 
 ### 加密儲存
 
@@ -270,9 +270,9 @@ Web 前端立即顯示**互動式卡片**，顯示：
 每個 PermissionManager 持有**回呼函式變數**：
 
 - **預設**：指向內建預設權限函式。
-- **動態編譯後**：被生命體的自定義權限函式覆蓋。
+- **動態編譯後**：被生命體的自訂權限函式覆蓋。
 - **二選一**：任何時候只有一個回呼處於活動狀態。
-- **編譯失敗**：不影響當前回呼 —— 預設或上次成功的自定義函式保持有效。
+- **編譯失敗**：不影響當前回呼 —— 預設或上次成功的自訂函式保持有效。
 
 ### 回呼簽名
 
@@ -295,7 +295,7 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 [2026-04-01 15:30:28] ALLOWED  | Being:Curator    | Type:CommandLine   | Resource:del /f /q *.log | Source:UserDecision
 ```
 
-日誌持久化到儲存，可通過 Web UI（日誌控制器）查看。
+日誌持久化到儲存，可透過 Web UI（日誌控制器）查看。
 
 ---
 
@@ -307,45 +307,50 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **異常檢測** —— 異常的 token 消耗模式可能表明提示詞注入或資源濫用。
 - **僅主理人存取** —— `TokenAuditTool`（標記為 `[SiliconManagerOnly]`）允許主理人查詢和彙總 token 使用。
 - ** Web 儀表板** —— `UsageController` 提供基於瀏覽器的儀表板，帶趨勢圖和資料匯出。
-- **持久化儲存** —— 記錄通過 `ITimeStorage` 儲存，用於時間序列查詢和長期分析。
+- **持久化儲存** —— 記錄透過 `ITimeStorage` 儲存，用於時間序列查詢和長期分析。
 
 ---
 
-## 插件安全
+## 外掛程式安全
 
-插件系統引入了第三方程式碼執行的安全風險，通過以下機制緩解：
+外掛程式系統引入了第三方程式碼執行的安全風險，透過以下機制緩解：
 
-### 安全沙箱
+### 安全沙箱與能力宣告
 
-`PluginLoader` 在載入插件時執行嚴格的安全掃描：
+`PluginLoader` 在載入外掛程式時執行安全掃描，同時支援能力宣告機制：
 
-1. **禁止命名空間檢查** — 插件不能引用以下命名空間：
-   - `System.IO` — 檔案系統存取
-   - `System.Net.Http` — HTTP 請求
-   - `System.Net.WebSockets` — WebSocket 連線
-   - `System.Net.Sockets` — 原始套接字
-   - `Microsoft.CodeAnalysis` — 編譯器 API
+1. **可宣告能力** — 外掛程式透過 `[PluginCapability]` 屬性宣告所需能力：
+   - `Network` — 網路存取（允許引用 `System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`）
+   - `FileIO` — 檔案讀寫（允許引用 `System.IO`）
+   - `Process` — 行程管理
+   - `AI` — AI 呼叫
 
-2. **可信組件白名單** — 以下組件的引用被允許：
+2. **不可宣告能力** — 以下能力始終被阻止：
+   - P/Invoke（`System.Runtime.InteropServices`）
+   - Unsafe 程式碼（`System.Runtime.CompilerServices.Unsafe`）
+   - 反射發射（`System.Reflection.Emit`）
+   - 編譯器 API（`Microsoft.CodeAnalysis`）
+
+3. **可信組件白名單** — 以下組件的引用被允許：
    - `Google.Protobuf`、`Newtonsoft.Json`、`MessagePack`
    - `Serilog`、`Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **禁止類型檢查** — 掃描插件中引用的危險類型
+4. **禁止類型檢查** — 掃描外掛程式中引用的危險類型
 
-4. **禁止成員檢查** — 掃描插件中呼叫的危險方法
+5. **禁止成員檢查** — 掃描外掛程式中呼叫的危險方法
 
 ### 隔離載入
 
-- 使用自定義 `AssemblyLoadContext` 隔離載入每個插件
-- 插件之間的類型和組件不會互相干擾
-- 插件卸載時可以釋放相關資源
+- 使用自訂 `AssemblyLoadContext` 隔離載入每個外掛程式
+- 外掛程式之間的類型和組件不會互相干擾
+- 外掛程式卸載時可以釋放相關資源
 
 ### 工具權限約束
 
-- 插件通過 `ITool` 介面註冊的工具受相同的權限系統約束
-- 插件工具不能繞過權限驗證鏈
-- 插件工具受 `[SiliconManagerOnly]` 標記約束
+- 外掛程式透過 `ITool` 介面註冊的工具受相同的權限系統約束
+- 外掛程式工具不能繞過權限驗證鏈
+- 外掛程式工具受 `[SiliconManagerOnly]` 標記約束
 
 ---
 

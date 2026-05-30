@@ -86,23 +86,20 @@
 
 **工具名称**: `chat`
 
+**可用场景**: Chat（`[ChatOnly]`，仅在聊天场景可用）
+
 **功能描述**: 管理聊天会话和消息发送。
 
 **支持的操作**:
-- `send_message` — 发送消息
-- `get_messages` — 获取历史消息
-- `create_group` — 创建群聊
-- `add_member` — 添加群成员
-- `remove_member` — 移除群成员
-- `get_chat_info` — 获取聊天信息
-- `terminate_chat` — 终止聊天（已读不回）
+- `send` — 发送消息到指定会话
+- `mark_read` — 标记消息为已读
 
 **使用示例**:
 ```json
 {
-  "action": "send_message",
-  "target_id": "being-uuid-or-user-0",
-  "message": "你好，让我们协作吧！"
+  "action": "send",
+  "channel_id": "session-uuid",
+  "content": "你好，让我们协作吧！"
 }
 ```
 
@@ -112,20 +109,20 @@
 
 **工具名称**: `config`
 
-**功能描述**: 读取和修改系统配置。
+**功能描述**: 读取系统配置信息。
 
 **支持的操作**:
-- `read` — 读取配置项
-- `write` — 写入配置项
-- `list` — 列出所有配置
-- `get_ai_config` — 获取 AI 客户端配置
-- `set_ai_config` — 设置 AI 客户端配置
+- `get_all` — 获取所有配置项
+- `get_group` — 获取指定分组的配置项
+- `get_field` — 获取指定配置字段
+- `get_enum_values` — 获取枚举类型的可选值（如可用模型、区域等）
 
 **使用示例**:
 ```json
 {
-  "action": "read",
-  "key": "AIClients.Ollama.Model"
+  "action": "get_field",
+  "group": "AIClients.Ollama",
+  "field": "Model"
 }
 ```
 
@@ -198,9 +195,12 @@
 - `create_directory` — 创建目录
 - `search_files` — 搜索文件
 - `search_content` — 搜索文件内容
-- `count_lines` — 统计行数
-- `read_lines` — 读取指定行
+- `count_lines` — 统计文件行数
+- `read_lines` — 读取指定行范围
 - `replace_text` — 替换文本
+- `clear_file` — 清空文件内容
+- `replace_lines` — 替换指定行范围
+- `append` — 追加内容到文件
 
 **权限要求**: `FileAccess`
 
@@ -716,53 +716,6 @@
   "keywords": "认证,JWT,OAuth2"
 }
 ```
-
----
-
-### 25. 热重载工具 (HotReloadTool)
-
-**工具名称**: `hot_reload`
-
-**功能描述**: 支持 SiliconLife.Fast 在运行中自动编译、更新文件并重启，无需手动干预。
-
-**支持的操作**:
-- `execute` — 执行完整的构建、复制和重启流程
-- `build_only` — 仅构建项目，不复制和重启
-
-**工作流程**:
-1. 编译 SiliconLife.Fast 项目
-2. 优雅关闭当前运行的 Fast 实例（通过 HTTP API）
-3. 等待进程退出和端口释放
-4. 复制构建输出到目标目录（跳过 HotReload 自身文件）
-5. 重新启动 Fast 实例
-
-**特性**:
-- 自动检测并关闭旧进程
-- 安全文件复制（不覆盖 HotReload.exe）
-- 端口释放等待机制
-- 支持自定义端口配置
-
-**使用示例**:
-```json
-{
-  "action": "execute",
-  "project_path": "src/SiliconLife.Fast",
-  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
-  "configuration": "Debug",
-  "port": 8080
-}
-```
-
-**参数说明**:
-- `project_path`: 项目路径（相对于解决方案根目录）
-- `source_path`: 构建输出目录
-- `configuration`: 构建配置（Debug/Release）
-- `port`: Fast 实例的 Web 端口（默认 8080）
-
-**注意事项**:
-- 仅适用于 SiliconLife.Fast 版本
-- 需要 HotReload.exe 在 tools/HotReload 目录下
-- 重启过程中会有短暂的服务中断（约 3-5 秒）
 
 ---
 

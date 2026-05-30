@@ -124,6 +124,9 @@ Konfigurace AI backendu:
 - Ollama (lokální)
 - Bailian (cloud)
 - Volcengine Ark (cloud)
+- Herdsman (lokální/cloud, bez autentizace)
+- Meituan LongCat (cloud)
+- Qiniu Cloud AI (cloud)
 - Vlastní klienti
 
 ### Nastavení úložiště

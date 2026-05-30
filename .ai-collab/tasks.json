@@ -257,7 +257,8 @@
       "createdAt": "2026-05-30T05:00:00+08:00",
       "createdBy": "catpaw",
       "assignedTo": "catpaw",
-      "completedAt": "2026-05-30T06:30:00+08:00"
+      "completedAt": "2026-05-30T06:30:00+08:00",
+      "relatedCommit": "e40314b"
     }
   ],
   "taskIndex": {

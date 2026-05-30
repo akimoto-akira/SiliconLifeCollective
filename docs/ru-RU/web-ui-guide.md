@@ -124,6 +124,9 @@ dashboard.onmessage = (event) => {
 - Ollama (локальный)
 - Bailian (облачный)
 - Volcengine Ark (облачный)
+- Herdsman (локальный/облачный, без аутентификации)
+- Meituan LongCat (облачный)
+- Qiniu Cloud AI (облачный)
 - Пользовательский клиент
 
 ### Настройки хранения

@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. コンパイル済み DLL をプラグインディレクトリに配置すると、`PluginLoader` が自動的にロードします。
 
-> **セキュリティ制限**：プラグインは `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` などの名前空間を参照できません。プラグインは `AssemblyLoadContext` を介して分離ロードされます。
+> **セキュリティ制限**：デフォルトではプラグインは `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` などの名前空間を参照できません。ただし、プラグインが `[PluginCapability]` 属性で必要な能力（Network, FileIO, Process, AI）を宣言すると、ローダーは該当するセキュリティスキャンルールを緩和します。宣言不可能な能力（P/Invoke, Unsafe, Reflection Emit 等）は常にブロックされます。プラグインは `AssemblyLoadContext` を介して分離ロードされます。
 
 ### 新しいスキンの追加
 

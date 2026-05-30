@@ -107,6 +107,9 @@ curl -X POST http://localhost:8080/api/beings \
 | `GroupChat` | 正在进行群聊 |
 | `Task` | 正在执行任务 |
 | `Timer` | 正在执行定时器 |
+| `Broadcast` | 正在处理广播消息 |
+| `Project` | 正在执行项目工作 |
+| `MemoryCompression` | 正在执行记忆压缩 |
 | `Stopped` | 已停止，因连续错误或手动停止 |
 
 **Stopped 状态机制**：
@@ -122,6 +125,9 @@ Idle → SingleChat → Idle（聊天完成）
 Idle → GroupChat → Idle（群聊完成）
 Idle → Task → Idle（任务完成）
 Idle → Timer → Idle（定时器完成）
+Idle → Broadcast → Idle（广播完成）
+Idle → Project → Idle（项目工作完成）
+Idle → MemoryCompression → Idle（记忆压缩完成）
 任意 → Stopped（连续 10 次错误）
 Stopped → Idle（新聊天消息到达或手动重启）
 ```

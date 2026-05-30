@@ -323,25 +323,30 @@ Dzienniki są utrwalane w pamięci masowej i dostępne do przeglądania przez We
 
 System wtyczek wprowadza zagrożenia bezpieczeństwa związane z wykonywaniem kodu stron trzecich, łagodzone przez następujące mechanizmy:
 
-### Bezpieczna piaskownica
+### Bezpieczna piaskownica i deklaracja możliwości
 
-`PluginLoader` wykonuje rygorystyczne skanowanie bezpieczeństwa podczas ładowania wtyczek:
+`PluginLoader` wykonuje skanowanie bezpieczeństwa podczas ładowania wtyczek, jednocześnie obsługując mechanizm deklaracji możliwości:
 
-1. **Sprawdzanie zakazanych przestrzeni nazw** — wtyczki nie mogą odwoływać się do następujących przestrzeni nazw:
-   - `System.IO` — dostęp do systemu plików
-   - `System.Net.Http` — żądania HTTP
-   - `System.Net.WebSockets` — połączenia WebSocket
-   - `System.Net.Sockets` — gniazda surowe
-   - `Microsoft.CodeAnalysis` — API kompilatora
+1. **Możliwości deklarowalne** — wtyczki deklarują wymagane możliwości poprzez atrybut `[PluginCapability]`:
+   - `Network` — dostęp do sieci (pozwala na odwoływanie się do `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`)
+   - `FileIO` — odczyt/zapis plików (pozwala na odwoływanie się do `System.IO`)
+   - `Process` — zarządzanie procesami
+   - `AI` — wywołania AI
 
-2. **Biała lista zaufanych zestawów** — referencje do następujących zestawów są dozwolone:
+2. **Możliwości niezdeklarowalne** — następujące możliwości są zawsze blokowane:
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Kod Unsafe (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - API kompilatora (`Microsoft.CodeAnalysis`)
+
+3. **Biała lista zaufanych zestawów** — referencje do następujących zestawów są dozwolone:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Sprawdzanie zakazanych typów** — skanowanie wtyczek pod kątem referencji do niebezpiecznych typów
+4. **Sprawdzanie zakazanych typów** — skanowanie wtyczek pod kątem referencji do niebezpiecznych typów
 
-4. **Sprawdzanie zakazanych składowych** — skanowanie wtyczek pod kątem wywołań niebezpiecznych metod
+5. **Sprawdzanie zakazanych składowych** — skanowanie wtyczek pod kątem wywołań niebezpiecznych metod
 
 ### Izolowane ładowanie
 

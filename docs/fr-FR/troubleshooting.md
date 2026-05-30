@@ -349,10 +349,11 @@ Plugin load failed: Security check failed
 ```
 
 **Solution** :
-1. Vérifier que le plugin ne référence pas d'espaces de noms interdits (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Vérifier que le plugin ne référence que des assemblys de la liste blanche de confiance
-3. Vérifier que le plugin implémente correctement l'interface `IPlugin`
-4. Consulter les journaux pour les détails de l'échec de la vérification de sécurité
+1. Vérifier que le plugin ne référence pas d'espaces de noms interdits non déclarables (ex. : `System.Runtime.InteropServices`, `System.Reflection.Emit`, `Microsoft.CodeAnalysis`)
+2. Si le plugin nécessite `System.IO` ou `System.Net.Http`, vérifier qu'il a déclaré les capacités `FileIO` ou `Network` via `[PluginCapability]`
+3. Vérifier que le plugin ne référence que des assemblys dans la liste blanche des assemblys de confiance
+4. Vérifier que le plugin implémente correctement l'interface `IPlugin`
+5. Consulter les journaux pour les détails de l'échec de la vérification de sécurité
 
 #### Problème : Outils du plugin non enregistrés
 

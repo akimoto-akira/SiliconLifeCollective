@@ -124,6 +124,9 @@ Configurar el backend de IA:
 - Ollama (local)
 - Bailian (nube)
 - Volcengine Ark (nube)
+- Herdsman (local/nube, sin autenticación)
+- Meituan LongCat (nube)
+- Qiniu Cloud AI (nube)
 - Cliente personalizado
 
 ### Ajustes de Almacenamiento

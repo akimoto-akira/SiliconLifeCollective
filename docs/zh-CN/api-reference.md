@@ -1,4 +1,4 @@
-﻿# API 参考
+# API 参考
 
 > **版本：v0.2.0-alpha**
 
@@ -574,6 +574,25 @@ data: {"type": "complete", "sessionId": "uuid"}
       "apiKey": "...",
       "region": "beijing",
       "model": "qwen3.6-plus"
+    },
+    "VolcengineArk": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
+    },
+    "Herdsman": {
+      "endpoint": "http://localhost:8000",
+      "model": "..."
+    },
+    "LongCat": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
+    },
+    "QiniuAI": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
     }
   }
 }
@@ -1323,13 +1342,27 @@ eventSource.onmessage = (event) => {
 ```csharp
 public interface IAIClient
 {
-    string Name { get; }
+    string Endpoint { get; }
+    string DefaultModel { get; }
+    bool? StreamingMode { get; }
+    bool? SupportsToolCalls { get; }
+    int? ContextWindowTokens { get; }
+    bool? SupportsVision { get; }
+    bool? SupportsAudio { get; }
     
-    Task<AIResponse> ChatAsync(AIRequest request);
-    
-    IAsyncEnumerable<string> StreamChatAsync(AIRequest request);
+    AIResponse Chat(AIRequest request);
 }
 ```
+
+| 属性 | 类型 | 描述 |
+|------|------|------|
+| `Endpoint` | `string` | AI 服务端点 URL |
+| `DefaultModel` | `string` | 默认模型名称 |
+| `StreamingMode` | `bool?` | 流式模式：true=仅流式、false=仅非流式、null=两种均支持 |
+| `SupportsToolCalls` | `bool?` | 工具调用支持：true=支持、false=不支持（跳过工具注入）、null=未知 |
+| `ContextWindowTokens` | `int?` | 上下文窗口大小（token 数），用于 token 预算裁剪 |
+| `SupportsVision` | `bool?` | 视觉输入支持：true=支持图片、false=不支持、null=未知 |
+| `SupportsAudio` | `bool?` | 音频输入支持：true=支持音频、false=不支持、null=未知 |
 
 ### AIRequest 结构
 

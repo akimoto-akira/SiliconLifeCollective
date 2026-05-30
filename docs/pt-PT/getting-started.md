@@ -33,6 +33,9 @@ Este projecto oferece duas versões de implementação:
 - **Ollama** (opcional, para IA local) - [Download](https://ollama.com/)
 - **Chave API DashScope** (opcional, para IA na nuvem) - [Solicitar](https://bailian.console.aliyun.com/)
 - **Chave API Volcengine Ark** (opcional, para IA na nuvem) - [Solicitar](https://console.volcengine.com/ark)
+- **Herdsman** (opcional, motor de inferência local/nuvem) - sem autenticação, compatível com o formato OpenAI API
+- **Chave API Meituan LongCat** (opcional, para IA na nuvem) - autenticação por API Key
+- **Chave API Qiniu Cloud AI** (opcional, para IA na nuvem) - autenticação por API Key
 
 ## Início Rápido
 
@@ -97,6 +100,49 @@ Edite `src/SiliconLife.Default/Config/DefaultConfigData.cs` ou modifique a confi
 ```
 
 > **Nota**: O parâmetro Model do Volcengine Ark aceita o ID do endpoint de inferência (por exemplo `ep-20241212123456-abcde`), e não o nome do modelo.
+
+#### Opção D: Herdsman (Local/Nuvem)
+
+```json
+{
+  "AIClients": {
+    "Herdsman": {
+      "Endpoint": "http://localhost:8000",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
+
+> **Características**: sem autenticação, compatível com o formato OpenAI API, suporte a chamadas de ferramentas e conteúdo de raciocínio.
+
+#### Opção E: Meituan LongCat (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "LongCat": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
+
+#### Opção F: Qiniu Cloud AI (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "QiniuAI": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.qiniu.com/v1/chat/completions",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
 
 ### 4. Executar a Aplicação
 

@@ -719,53 +719,6 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 25. Narzędzie gorącego przeładowania (HotReloadTool)
-
-**Nazwa narzędzia**: `hot_reload`
-
-**Opis funkcji**: obsługa automatycznej kompilacji, aktualizacji plików i restartu SiliconLife.Fast w trakcie działania, bez konieczności ręcznej interwencji.
-
-**Obsługiwane operacje**:
-- `execute` — wykonanie pełnego procesu budowania, kopiowania i restartu
-- `build_only` — tylko budowanie projektu, bez kopiowania i restartu
-
-**Przepływ pracy**:
-1. Kompilacja projektu SiliconLife.Fast
-2. Eleganckie zamknięcie bieżącej instancji Fast (przez HTTP API)
-3. Oczekiwanie na zakończenie procesu i zwolnienie portu
-4. Kopiowanie wyników budowania do katalogu docelowego (pomijanie plików HotReload)
-5. Ponowne uruchomienie instancji Fast
-
-**Cechy**:
-- Automatyczne wykrywanie i zamykanie starego procesu
-- Bezpieczne kopiowanie plików (bez nadpisywania HotReload.exe)
-- Mechanizm oczekiwania na zwolnienie portu
-- Obsługa niestandardowej konfiguracji portu
-
-**Przykład użycia**:
-```json
-{
-  "action": "execute",
-  "project_path": "src/SiliconLife.Fast",
-  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
-  "configuration": "Debug",
-  "port": 8080
-}
-```
-
-**Opis parametrów**:
-- `project_path`: ścieżka projektu (względem katalogu głównego rozwiązania)
-- `source_path`: katalog wyników budowania
-- `configuration`: konfiguracja budowania (Debug/Release)
-- `port`: port Web instancji Fast (domyślnie 8080)
-
-**Uwagi**:
-- Dotyczy tylko wersji SiliconLife.Fast
-- Wymaga HotReload.exe w katalogu tools/HotReload
-- Podczas restartu wystąpi krótka przerwa w działaniu usługi (około 3-5 sekund)
-
----
-
 ## Przepływ wywołań narzędzi
 
 ```

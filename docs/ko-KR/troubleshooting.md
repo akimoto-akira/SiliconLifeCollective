@@ -349,10 +349,11 @@ Plugin load failed: Security check failed
 ```
 
 **해결책**:
-1. 플러그인이 금지된 네임스페이스를 참조하지 않았는지 확인 (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. 플러그인이 신뢰할 수 있는 어셈블리 화이트리스트의 어셈블리만 참조하는지 확인
-3. 플러그인이 `IPlugin` 인터페이스를 올바르게 구현했는지 확인
-4. 로그에서 보안 검사 실패의 상세 원인 확인
+1. 플러그인이 선언 불가능한 금지 네임스페이스를 참조하지 않았는지 확인 (예: `System.Runtime.InteropServices`, `System.Reflection.Emit`, `Microsoft.CodeAnalysis`)
+2. 플러그인이 `System.IO`나 `System.Net.Http`가 필요한 경우, `[PluginCapability]`로 `FileIO`나 `Network` 역량을 선언했는지 확인
+3. 플러그인이 신뢰할 수 있는 어셈블리 화이트리스트의 어셈블리만 참조하는지 확인
+4. 플러그인이 `IPlugin` 인터페이스를 올바르게 구현했는지 확인
+5. 로그에서 보안 검사 실패의 상세 원인 확인
 
 #### 문제: 플러그인 툴이 등록되지 않음
 

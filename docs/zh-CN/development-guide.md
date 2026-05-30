@@ -1,4 +1,4 @@
-﻿# 开发指南
+# 开发指南
 
 > **版本：v0.2.0-alpha**
 
@@ -137,12 +137,18 @@ public class ProjectWorkTool : ITool { ... }
 ```csharp
 public class MyAIClient : IAIClient
 {
-    public string Name => "my_ai";
+    public string Endpoint => "https://api.example.com";
+    public string DefaultModel => "my-model";
+    public bool? StreamingMode => null;
+    public bool? SupportsToolCalls => true;
+    public int? ContextWindowTokens => 8192;
+    public bool? SupportsVision => false;
+    public bool? SupportsAudio => false;
     
-    public async Task<AIResponse> ChatAsync(AIRequest request)
+    public AIResponse Chat(AIRequest request)
     {
         // 调用您的 AI API
-        var response = await CallMyAPI(request);
+        var response = CallMyAPI(request);
         
         return new AIResponse
         {
@@ -150,15 +156,6 @@ public class MyAIClient : IAIClient
             ToolCalls = response.ToolCalls,
             Usage = response.Usage
         };
-    }
-    
-    public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
-    {
-        // 实现流式传输
-        await foreach (var chunk in StreamFromAPI(request))
-        {
-            yield return chunk;
-        }
     }
 }
 ```
@@ -243,7 +240,7 @@ public class MyPluginTool : ITool
 
 3. 将编译后的 DLL 放入插件目录，`PluginLoader` 将自动加载。
 
-> **安全限制**：插件不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空间。插件通过 `AssemblyLoadContext` 隔离加载。
+> **安全限制**：插件默认不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空间。但插件可通过 `[PluginCapability]` 属性声明所需能力（Network、FileIO、Process、AI），加载器据此放宽对应命名空间的安全扫描规则。不可声明的能力（P/Invoke、Unsafe、反射发射等）始终被阻止。插件通过 `AssemblyLoadContext` 隔离加载。
 
 ### 添加新皮肤
 
@@ -289,7 +286,7 @@ SiliconLife.Common/
 ├── Localization/          # 本地化基类与 34 种语言变体实现
 ├── Security/              # 权限管理器
 ├── SiliconBeing/          # 默认硅基生命体实现
-├── Tools/                 # 共享的内置工具（25 个）
+├── Tools/                 # 共享的内置工具（23 个）
 ├── Web/                   # Web 基础设施
 └── WebView/               # Playwright WebView 实现
 

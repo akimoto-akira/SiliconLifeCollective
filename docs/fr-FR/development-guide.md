@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. Placer la DLL compilée dans le répertoire des plugins, `PluginLoader` la chargera automatiquement.
 
-> **Restrictions de sécurité** : Les plugins ne peuvent pas référencer les espaces de noms `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`, etc. Les plugins sont chargés de manière isolée via `AssemblyLoadContext`.
+> **Restrictions de sécurité** : Par défaut, les plugins ne peuvent pas référencer les espaces de noms `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`, etc. Cependant, si un plugin déclare les capacités nécessaires (Network, FileIO, Process, AI) via l'attribut `[PluginCapability]`, le chargeur assouplit les règles d'analyse de sécurité en conséquence. Les capacités non déclarables (P/Invoke, Unsafe, Reflection Emit, etc.) sont toujours bloquées. Les plugins sont chargés de manière isolée via `AssemblyLoadContext`.
 
 ### Ajouter un nouveau thème
 

@@ -124,6 +124,9 @@ Konfiguracja backendów AI:
 - Ollama (lokalna)
 - Bailian (chmurowa)
 - Volcengine Ark (chmurowa)
+- Herdsman (lokalna/chmurowa, bez autoryzacji)
+- Meituan LongCat (chmurowa)
+- Qiniu Cloud AI (chmurowa)
 - Niestandardowi klienci
 
 ### Ustawienia przechowywania

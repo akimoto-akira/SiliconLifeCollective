@@ -13,18 +13,18 @@
 - **Soul File Driven** — Each Silicon Being is driven by a core prompt file (`soul.md`), defining unique personality and behavior patterns
 - **Body-Brain Architecture** — *Body* (SiliconBeing) maintains vital signs and detects trigger scenarios; *Brain* (ContextManager) handles loading history, calling AI, executing tools, and persisting responses
 - **Self-Evolution Capability** — Through Roslyn dynamic compilation technology, Silicon Beings can rewrite their own code to achieve evolution
-- **Activity State Management** — Supports four activity states: Idle, Working, Error, Stopped. Automatically enters Stopped state after 10 consecutive errors
+- **Activity State Management** — Supports nine activity states: Idle, SingleChat, GroupChat, Task, Timer, Broadcast, Project, MemoryCompression, Stopped. Automatically enters Stopped state after 10 consecutive errors
 
 ### Plugin System
 - **Plugin Extension Architecture** — Feature extension via IPlugin interface, supporting dynamic loading of plugin DLLs from directories
-- **Security Sandbox** — Plugin Loader performs strict security scanning, blocking access to System.IO, System.Net, and other namespaces
+- **Plugin Capability Declaration** — Plugins declare required capabilities (Network, FileIO, Process, AI) via the `[PluginCapability]` attribute, and the loader relaxes security scanning rules accordingly; non-declarable capabilities (P/Invoke, Unsafe, Reflection Emit, etc.) are always blocked
 - **Isolated Loading** — Uses custom AssemblyLoadContext for isolated loading, preventing plugins from affecting main program stability
 - **Tool Integration** — Plugins can register custom tools via ITool interface, automatically integrated into the tool call loop
 
 ### Tools & Execution
-- **24 Built-in Tools** — Covering calendar, chat, configuration, disk, network, memory, tasks, timers, knowledge base, work notes, project workspace, WebView browser, hot reload, and more
+- **24 Built-in Tools** — Covering calendar, chat, configuration, disk, network, memory, tasks, timers, knowledge base, work notes, project workspace, WebView browser, and more
 - **Tool Scenario Isolation** — Each tool declares available scenarios via the `ToolScenario` attribute (Chat, Task, Timer, MemoryCompression, Project); the `ChatOnly` attribute restricts tools to chat scenarios only
-- **Hot Reload Tool** — Supports automatic compilation, file update, and restarting SiliconLife.Fast during runtime, without manual intervention
+- **IAIClient Capability Interface** — AI clients declare capabilities for streaming mode, tool calls, context window, vision, and audio, and the ContextManager adapts its behavior accordingly
 - **Tool Call Loop** — AI returns tool call → Execute tool → Results fed back to AI → Continue loop until pure text response
 - **Executor-Permission Security** — All I/O operations go through strict permission validation via executors
   - 3-level permission validation chain: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → Deny by default)
@@ -35,6 +35,9 @@
   - **Ollama** — Local model deployment, using native HTTP API
   - **Alibaba Cloud DashScope (Bailian)** — Cloud AI service, OpenAI API compatible, supporting 13+ models, multi-region deployment
   - **Volcengine Ark** — ByteDance cloud AI service, supporting streaming and non-streaming modes, built-in rate control
+  - **Herdsman** — Authentication-free inference engine, compatible with OpenAI API format
+  - **Meituan LongCat** — Meituan's self-developed large model, compatible with OpenAI API format, API key authentication
+  - **Qiniu Cloud AI** — Qiniu cloud AI service, API key authentication
 - **32 Calendar Systems** — Comprehensive coverage of global major calendars, including Gregorian, Chinese Lunar, Islamic, Hebrew, Japanese, Persian, Mayan, Chinese Historical Calendar, and more
 - **Knowledge Network System** — Knowledge graph based on triplets (subject-relation-object), supporting storage, querying, and path discovery
 - **Project Workspace** — Project space management, supporting project creation/archival/destruction, role assignment, work notes, task tracking, and tool permission isolation
@@ -90,7 +93,7 @@ This project provides two implementation versions to meet different scenario nee
   - SpeedyPack engine + auto-compaction ensures data security
   - Component UI architecture, 27 declarative components
   - 7 skin themes with auto-discovery and switching
-  - Hot reload tool for online updates and restarts
+  - Hot reload tool for online updates and restarts → Linux automatically opens browser to access Web UI, supports `--no-tray` parameter
 - **Performance Improvement**: Storage read latency reduced by 1000x, write latency reduced by 15000x, concurrent processing capacity increased by 50x
 - **Role Description**: A production-grade implementation with deep optimization, the first choice for long-term operation and actual production environments
 - **Startup Command**: `dotnet run --project src/SiliconLife.Fast`
@@ -119,7 +122,7 @@ This project provides two implementation versions to meet different scenario nee
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programming Language | C# | C# |
 | Application Type | Console application | Desktop application (Windows/macOS system tray / Linux status window) |
-| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud) |
+| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
 | Data Storage | File system (JSON + time-indexed directories) | SpeedyPack (.spk format, memory mapping + asynchronous persistence) |
 | Web Server | HttpListener (.NET built-in) | HttpListener (.NET built-in) |
 | Dynamic Compilation | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -157,7 +160,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Global service locator
 │   │
 │   ├── SiliconLife.Common/                # Shared implementation (used by both versions)
-│   │   ├── AI/                            # AI clients and factories (Ollama, DashScope, VolcengineArk)
+│   │   ├── AI/                            # AI clients and factories (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32 calendar implementations
 │   │   ├── Localization/                  # Localization base classes and 34 language/region variant implementations
 │   │   ├── Resources/                     # Shared resource files
@@ -260,6 +263,9 @@ Tool Call → Executor → Permission Manager → [Frequency Cache → Callback 
   - **Ollama**: [Install Ollama](https://ollama.com) and pull models (e.g., `ollama pull llama3`)
   - **Alibaba Cloud DashScope**: Get API key from [DashScope Console](https://bailian.console.aliyun.com/)
   - **Volcengine Ark**: Get API key from [Volcengine Console](https://console.volcengine.com/ark)
+  - **Herdsman**: No authentication required, compatible with OpenAI API format
+  - **Meituan LongCat**: Get API key from Meituan platform
+  - **Qiniu Cloud AI**: Get API key from [Qiniu Console](https://portal.qiniu.com/)
 
 ### Build the Project
 
@@ -342,7 +348,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Phase 10.5: Incremental Enhancements (Broadcast Channels, Token Audit, 32 Calendars, Tool Enhancements, 34 Language Variant Localization)
 - [x] Phase 10.6: Refinement & Optimization (WebView, Help System, Project Workspace, Knowledge Network, Workflow Engine)
 - [x] Phase 11: SpeedyPack Storage Engine (Replaced LiteDB, memory mapping, async write queue, auto-compaction)
-- [x] Phase 12: Plugin System (IPlugin interface, PluginLoader Security Sandbox, isolated loading, tool integration)
+- [x] Phase 12: Plugin System (IPlugin interface, PluginLoader Capability Declaration, isolated loading, tool integration)
 
 ### 🚧 Planned
 - [ ] Phase 13: External IM Integration (Feishu / WhatsApp / Telegram)

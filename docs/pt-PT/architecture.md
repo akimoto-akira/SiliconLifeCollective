@@ -26,8 +26,7 @@ Este projecto oferece duas versões de implementação que partilham o mesmo des
   - Motor SpeedyPack + compactação automática garantindo a segurança dos dados
   - Arquitectura Component UI, 27 componentes declarativos
   - 7 temas de skin, com descoberta e troca automáticas
-  - Ferramenta de recarregamento a quente para actualização e reinício online
-  - Abertura automática do navegador para aceder à Web UI no Linux, com suporte ao parâmetro `--no-tray`
+  - Linux abre automaticamente o navegador para aceder ao Web UI, suporte ao parâmetro `--no-tray`
 - **Melhoria de desempenho**: Latência de leitura de armazenamento reduzida 1000x, latência de escrita reduzida 15000x
 - **Descrição do papel**: Implementação de nível de produção profundamente optimizada, com funcionalidades como execução em segundo plano na bandeja do sistema, motor SpeedyPack + compactação automática, sendo a escolha preferida para execução prolongada e ambientes de produção reais
 
@@ -298,11 +297,26 @@ Cada tipo de cliente de IA tem uma implementação de fábrica correspondente `I
 - `OllamaClientFactory` — Cria instâncias de OllamaClient
 - `DashScopeClientFactory` — Cria instâncias de DashScopeClient
 - `VolcengineArkClientFactory` — Cria instâncias de VolcengineArkClient
+- `HerdsmanClientFactory` — Cria instâncias de HerdsmanClient
+- `LongCatClientFactory` — Cria instâncias de LongCatClient
+- `QiniuAIClientFactory` — Cria instâncias de QiniuAIClient
 
 As fábricas fornecem:
 - `CreateClient(Dictionary<string, object> config)` — Instancia o cliente a partir da configuração
 - `GetConfigKeyOptions(string key, ...)` — Retorna opções dinâmicas para a chave de configuração (por exemplo, modelos disponíveis, regiões)
 - `GetDisplayName()` — Nome de exibição localizado do tipo de cliente
+
+### Interface de Capacidades IAIClient
+
+A interface `IAIClient` define propriedades de declaração de capacidades do cliente de IA, com base nas quais o `ContextManager` ajusta adaptativamente o comportamento:
+
+| Propriedade | Tipo | Descrição |
+|------|------|------|
+| `StreamingMode` | `bool?` | Suporte ao modo de streaming: true=apenas streaming, false=apenas não-streaming, null=ambos suportados (predefinição: streaming) |
+| `SupportsToolCalls` | `bool?` | Suporte a chamadas de ferramentas: true=suportado, false=não suportado (ignorar injeção de ferramentas), null=desconhecido (predefinição: suportado) |
+| `ContextWindowTokens` | `int?` | Tamanho da janela de contexto (número de tokens), usado para corte de orçamento de tokens em vez de MaxContextMessages fixo |
+| `SupportsVision` | `bool?` | Suporte a entrada visual: true=suporta imagens, false=não suporta, null=desconhecido (predefinição: não suporta) |
+| `SupportsAudio` | `bool?` | Suporte a entrada de áudio: true=suporta áudio, false=não suporta, null=desconhecido (predefinição: não suporta) |
 
 ### Lista de Suporte de Plataformas de IA
 
@@ -324,6 +338,9 @@ As fábricas fornecem:
 | Zhipu AI (GLM) | 📋 | Nuvem | Serviço de IA Zhipu Qingyan |
 | Moonshot (Kimi) | 📋 | Nuvem | Serviço de IA Moonshot Kimi |
 | Volcengine Ark (Doubao) | ✅ | Nuvem | Serviço de IA Doubao da ByteDance |
+| Herdsman | ✅ | Local/Nuvem | Motor de inferência sem autenticação, compatível com o formato OpenAI API |
+| Meituan LongCat | ✅ | Nuvem | Modelo grande auto-desenvolvido da Meituan, compatível com o formato OpenAI API, autenticação por API Key |
+| Qiniu Cloud AI | ✅ | Nuvem | Serviço de inferência de modelo grande da Qiniu Cloud, compatível com o formato OpenAI API, autenticação por API Key |
 | DeepSeek (Directo) | 📋 | Nuvem | Serviço de IA DeepSeek |
 | 01.AI (Yi) | 📋 | Nuvem | Serviço de IA 01.AI |
 | Tencent Hunyuan | 📋 | Nuvem | Serviço de IA Tencent Hunyuan |

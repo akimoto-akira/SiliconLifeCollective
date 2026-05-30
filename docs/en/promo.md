@@ -119,7 +119,7 @@ Start with a single simple assistant. As you discover what's possible, create mo
 
 ### Extensible Plugin System
 
-Extend functionality through plugins — community-built tools and capabilities can be easily added. Each plugin runs in a security sandbox, ensuring system safety.
+Extend functionality through plugins — community-built tools and capabilities can be easily added. Each plugin declares required capabilities via the `[PluginCapability]` attribute, ensuring system safety.
 
 ### Dual Version Options
 

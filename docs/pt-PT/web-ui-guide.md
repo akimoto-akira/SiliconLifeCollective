@@ -124,6 +124,9 @@ Configurar o backend de IA:
 - Ollama (local)
 - DashScope (nuvem)
 - Volcengine Ark (nuvem)
+- Herdsman (local/nuvem, sem autenticação)
+- Meituan LongCat (nuvem)
+- Qiniu Cloud AI (nuvem)
 - Clientes personalizados
 
 ### Definições de Armazenamento

@@ -291,6 +291,42 @@ Systém podporuje více AI backendů prostřednictvím rozhraní `IAIClient`:
 - **Konfigurace**: `apiKey`, `endpoint`, `model`
 - **Charakteristika**: AI služba ByteDance, podpora více modelů Doubao
 
+### HerdsmanClient
+
+- **Typ**: Lokální/cloudový inferenční engine
+- **Protokol**: OpenAI-kompatibilní API
+- **Autentizace**: Žádná
+- **Funkce**: Streamování, volání nástrojů, reasoning obsah
+- **Konfigurace**: `endpoint`, `model`
+
+### LongCatClient (Meituan LongCat)
+
+- **Typ**: Cloudová AI služba
+- **Protokol**: OpenAI-kompatibilní API
+- **Autentizace**: Bearer token (API klíč)
+- **Funkce**: Streamování, volání nástrojů
+- **Konfigurace**: `apiKey`, `endpoint`, `model`
+
+### QiniuAIClient (Qiniu Cloud AI)
+
+- **Typ**: Cloudová AI služba
+- **Protokol**: OpenAI-kompatibilní API
+- **Autentizace**: Bearer token (API klíč)
+- **Funkce**: Streamování, volání nástrojů
+- **Konfigurace**: `apiKey`, `endpoint`, `model`
+
+### Rozhraní schopností IAIClient
+
+Rozhraní `IAIClient` definuje schopnosti každého AI klienta a umožňuje `Správci Kontextu` přizpůsobit své chování:
+
+| Schopnost | Návratový typ | Popis |
+|-----------|--------------|-------|
+| `StreamingMode` | `StreamingMode` | Podporovaný streamovací režim (None/Streaming/Reasoning) |
+| `SupportsToolCalls` | `bool` | Podpora volání nástrojů |
+| `ContextWindowTokens` | `int` | Velikost kontextového okna v tokenech |
+| `SupportsVision` | `bool` | Podpora vidění (obrázky) |
+| `SupportsAudio` | `bool` | Podpora audia |
+
 ### Vzor továrny klientů
 
 Každý typ AI klienta má odpovídající implementaci továrny `IAIClientFactory`:
@@ -298,6 +334,9 @@ Každý typ AI klienta má odpovídající implementaci továrny `IAIClientFacto
 - `OllamaClientFactory` — vytváří instance OllamaClient
 - `DashScopeClientFactory` — vytváří instance DashScopeClient
 - `VolcengineArkClientFactory` — vytváří instance VolcengineArkClient
+- `HerdsmanClientFactory` — vytváří instance HerdsmanClient
+- `LongCatClientFactory` — vytváří instance LongCatClient
+- `QiniuAIClientFactory` — vytváří instance QiniuAIClient
 
 Továrny poskytují:
 - `CreateClient(Dictionary<string, object> config)` — instancuje klienta z konfigurace
@@ -324,6 +363,9 @@ Továrny poskytují:
 | Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan AI služba |
 | Moonshot (Kimi) | 📋 | Cloud | Moonshot Kimi AI služba |
 | Volcengine Ark.Doubao | ✅ | Cloud | ByteDance Doubao AI služba |
+| Herdsman | ✅ | Lokální/Cloud | Inferenční engine bez autentizace, kompatibilní s OpenAI API formátem |
+| Meituan LongCat | ✅ | Cloud | Vlastní velký model Meituan, kompatibilní s OpenAI API formátem, autentizace API klíčem |
+| Qiniu Cloud AI | ✅ | Cloud | Cloudová AI služba Qiniu, autentizace API klíčem |
 | DeepSeek (přímé připojení) | 📋 | Cloud | DeepSeek AI služba |
 | 01.AI (Yi) | 📋 | Cloud | 01.AI AI služba |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI služba |
@@ -685,10 +727,10 @@ public interface IPlugin
 
 ### Zavaděč zásuvných modulů
 
-`PluginLoader` je zodpovědný za načítání DLL zásuvných modulů ze zadaného adresáře a provádí přísné bezpečnostní kontroly:
+`PluginLoader` je zodpovědný za načítání DLL zásuvných modulů ze zadaného adresáře a provádí bezpečnostní kontroly s deklarací schopností:
 
 1. **Skenování adresáře** — prohledá všechny .dll soubory v adresáři zásuvných modulů
-2. **Bezpečnostní skenování** — kontroluje, zda zásuvný modul neodkazuje na zakázané jmenné prostory
+2. **Kontrola schopností** — kontroluje schopnosti deklarované pomocí `[PluginCapability]` a odpovídajícím způsobem uvolňuje bezpečnostní pravidla
 3. **Izolované načítání** — používá vlastní `AssemblyLoadContext` pro izolované načítání zásuvných modulů
 4. **Správa životního cyklu** — volá metody OnLoad, OnStart, OnStop, OnUnload zásuvného modulu
 

@@ -104,11 +104,14 @@ Los Seres de Silicio tienen los siguientes estados de actividad:
 
 | Estado | Descripción |
 |------|------|
-| `Idle` | Estado inactivo, esperando activación del reloj |
+| `Idle` | Estado inactivo, esperando activación |
 | `SingleChat` | En chat uno a uno |
 | `GroupChat` | En chat grupal |
 | `Task` | Ejecutando tarea |
 | `Timer` | Ejecutando temporizador |
+| `Broadcast` | Procesando mensaje de difusión |
+| `Project` | Trabajando en proyecto |
+| `MemoryCompression` | Compresión de memoria |
 | `Stopped` | Detenido, por errores consecutivos o detención manual |
 
 **Mecanismo de estado Stopped**:

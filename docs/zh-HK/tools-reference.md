@@ -19,8 +19,8 @@
 - **開發工具** — 程式碼執行、日誌查詢
 - **實用工具** — 系統資訊、Token 審計、說明文件、知識網絡
 - **瀏覽器工具** — WebView 瀏覽器自動化
-- **項目工具** — 項目管理、項目任務、項目工作筆記、項目工作
-- **插件工具** — 透過插件系統註冊的第三方工具
+- **專案工具** — 專案管理、專案任務、專案工作筆記、專案工作
+- **外掛程式工具** — 透過外掛程式系統註冊的第三方工具
 
 ### 工具場景系統
 
@@ -32,7 +32,7 @@
 | `Task` | `1 << 1` | 任務場景（矽基生命體執行任務時） |
 | `Timer` | `1 << 2` | 定時器場景（矽基生命體執行定時任務時） |
 | `MemoryCompression` | `1 << 3` | 記憶壓縮場景 |
-| `Project` | `1 << 4` | 項目場景（ThinkOnProject 模式） |
+| `Project` | `1 << 4` | 專案場景（ThinkOnProject 模式） |
 | `All` | 上述所有 | 所有場景均可用 |
 
 此外，`[ChatOnly]` 屬性標記的工具僅在聊天場景可用（如 HelpTool），不會出現在任務和定時器場景中。
@@ -86,23 +86,20 @@
 
 **工具名稱**: `chat`
 
+**可用場景**: Chat（`[ChatOnly]`，僅在聊天場景可用）
+
 **功能描述**: 管理聊天會話和訊息傳送。
 
 **支援的操作**:
-- `send_message` — 傳送訊息
-- `get_messages` — 取得歷史訊息
-- `create_group` — 建立群聊
-- `add_member` — 新增群成員
-- `remove_member` — 移除群成員
-- `get_chat_info` — 取得聊天資訊
-- `terminate_chat` — 終止聊天（已讀不回）
+- `send` — 傳送訊息到指定會話
+- `mark_read` — 標記訊息為已讀
 
 **使用範例**:
 ```json
 {
-  "action": "send_message",
-  "target_id": "being-uuid-or-user-0",
-  "message": "你好，讓我們協作吧！"
+  "action": "send",
+  "channel_id": "session-uuid",
+  "content": "你好，讓我們協作吧！"
 }
 ```
 
@@ -112,20 +109,20 @@
 
 **工具名稱**: `config`
 
-**功能描述**: 讀取和修改系統設定。
+**功能描述**: 讀取系統設定資訊。
 
 **支援的操作**:
-- `read` — 讀取設定項
-- `write` — 寫入設定項
-- `list` — 列出所有設定
-- `get_ai_config` — 取得 AI 用戶端設定
-- `set_ai_config` — 設定 AI 用戶端設定
+- `get_all` — 取得所有設定項
+- `get_group` — 取得指定群組的設定項
+- `get_field` — 取得指定設定欄位
+- `get_enum_values` — 取得列舉類型的可選值（如可用模型、區域等）
 
 **使用範例**:
 ```json
 {
-  "action": "read",
-  "key": "AIClients.Ollama.Model"
+  "action": "get_field",
+  "group": "AIClients.Ollama",
+  "field": "Model"
 }
 ```
 
@@ -198,9 +195,12 @@
 - `create_directory` — 建立目錄
 - `search_files` — 搜尋檔案
 - `search_content` — 搜尋檔案內容
-- `count_lines` — 統計行數
-- `read_lines` — 讀取指定行
+- `count_lines` — 統計檔案行數
+- `read_lines` — 讀取指定行範圍
 - `replace_text` — 替換文字
+- `clear_file` — 清空檔案內容
+- `replace_lines` — 替換指定行範圍
+- `append` — 附加內容到檔案
 
 **權限要求**: `FileAccess`
 
@@ -420,7 +420,7 @@
 
 ---
 
-### 15. 項目工具 (ProjectTool) 🔒
+### 15. 專案工具 (ProjectTool) 🔒
 
 **工具名稱**: `project`
 
@@ -428,45 +428,45 @@
 
 **可用場景**: Chat、Task、Timer
 
-**功能描述**: 管理項目工作區，支援項目生命週期管理、成員分配和角色管理。
+**功能描述**: 管理專案工作區，支援專案生命週期管理、成員分配和角色管理。
 
 **支援的操作**:
-- `create` — 建立新項目空間
-- `archive` — 歸檔項目
-- `restore` — 還原已歸檔的項目
-- `destroy` — 銷毀項目並清理資料（不可還原）
-- `list` — 列出所有項目
-- `get` — 取得項目詳情
-- `assign` — 將矽基生命體分配到項目
-- `remove` — 從項目中移除矽基生命體
-- `update` — 更新項目名稱/描述
+- `create` — 建立新專案空間
+- `archive` — 歸檔專案
+- `restore` — 還原已歸檔的專案
+- `destroy` — 銷毀專案並清理資料（不可還原）
+- `list` — 列出所有專案
+- `get` — 取得專案詳情
+- `assign` — 將矽基生命體分配到專案
+- `remove` — 從專案中移除矽基生命體
+- `update` — 更新專案名稱/描述
 - `list-workflow-templates` — 列出可用的工作流範本
-- `assign_role` — 為矽基生命體分配項目角色
-- `remove_role` — 移除矽基生命體的項目角色
-- `list_roles` — 列出項目的角色分配
+- `assign_role` — 為矽基生命體分配專案角色
+- `remove_role` — 移除矽基生命體的專案角色
+- `list_roles` — 列出專案的角色分配
 
 **使用範例**:
 ```json
 {
   "action": "create",
   "name": "My Project",
-  "description": "項目描述"
+  "description": "專案描述"
 }
 ```
 
 ---
 
-### 16. 項目任務工具 (ProjectTaskTool)
+### 16. 專案任務工具 (ProjectTaskTool)
 
 **工具名稱**: `project_task`
 
 **可用場景**: Chat、Task、Timer
 
-**功能描述**: 管理項目空間內的任務，支援完整的任務生命週期。
+**功能描述**: 管理專案空間內的任務，支援完整的任務生命週期。
 
 **支援的操作**:
-- `create` — 建立項目任務
-- `list` — 列出項目任務
+- `create` — 建立專案任務
+- `list` — 列出專案任務
 - `get` — 取得任務詳情
 - `update` — 更新任務標題/描述/優先順序
 - `assign` — 為任務分配負責人
@@ -490,20 +490,20 @@
 
 ---
 
-### 17. 項目工作筆記工具 (ProjectWorkNoteTool)
+### 17. 專案工作筆記工具 (ProjectWorkNoteTool)
 
 **工具名稱**: `project_work_note`
 
 **可用場景**: Chat、Task、Timer
 
-**功能描述**: 管理項目空間內的工作筆記（公開，類似工作本），支援頁面式筆記管理。
+**功能描述**: 管理專案空間內的工作筆記（公開，類似工作本），支援頁面式筆記管理。
 
 **支援的操作**:
 - `create` — 建立筆記頁面（需要 `project_id`、`summary` 和 `content`，可選 `keywords`）
 - `read` — 讀取筆記頁面（需要 `project_id` 和 `page_number` 或 `note_id`）
 - `update` — 更新筆記頁面（需要 `project_id`、`page_number` 和 `content`，可選 `summary` 和 `keywords`）
 - `delete` — 刪除筆記頁面（需要 `project_id` 和 `page_number` 或 `note_id`）
-- `list` — 列出項目的所有筆記頁面摘要
+- `list` — 列出專案的所有筆記頁面摘要
 - `directory` — 產生筆記目錄/概覽
 - `search` — 按關鍵詞搜尋筆記（需要 `project_id` 和 `keyword`，可選 `max_results`）
 
@@ -520,23 +520,23 @@
 
 ---
 
-### 18. 項目工作工具 (ProjectWorkTool) 🔒
+### 18. 專案工作工具 (ProjectWorkTool) 🔒
 
 **工具名稱**: `project_work`
 
 **權限要求**: 僅限矽基主理人使用（`[SiliconManagerOnly]`）
 
-**可用場景**: Project（`[ToolScenario(ToolScenarioFlag.Project)]`，僅在項目場景可用）
+**可用場景**: Project（`[ToolScenario(ToolScenarioFlag.Project)]`，僅在專案場景可用）
 
-**功能描述**: 項目工作操作工具，用於主理人在 ThinkOnProject 場景中管理項目工作流。
+**功能描述**: 專案工作操作工具，用於主理人在 ThinkOnProject 場景中管理專案工作流。
 
 **支援的操作**:
-- `create-task` — 建立項目任務
+- `create-task` — 建立專案任務
 - `assign-task` — 為任務分配矽基生命體
-- `chat` — 傳送訊息到項目群聊
-- `broadcast` — 廣播訊息到項目頻道
-- `complete` — 標記項目為已完成
-- `status` — 取得項目狀態
+- `chat` — 傳送訊息到專案群聊
+- `broadcast` — 廣播訊息到專案頻道
+- `complete` — 標記專案為已完成
+- `status` — 取得專案狀態
 
 **使用範例**:
 ```json
@@ -719,53 +719,6 @@
 
 ---
 
-### 25. 熱重載工具 (HotReloadTool)
-
-**工具名稱**: `hot_reload`
-
-**功能描述**: 支援 SiliconLife.Fast 在執行中自動編譯、更新檔案並重啟，無需手動干預。
-
-**支援的操作**:
-- `execute` — 執行完整的建構、複製和重啟流程
-- `build_only` — 僅建構專案，不複製和重啟
-
-**工作流程**:
-1. 編譯 SiliconLife.Fast 專案
-2. 優雅關閉目前執行的 Fast 實例（透過 HTTP API）
-3. 等待處理程序結束和連接埠釋放
-4. 複製建構輸出到目標目錄（跳過 HotReload 自身檔案）
-5. 重新啟動 Fast 實例
-
-**特性**:
-- 自動偵測並關閉舊處理程序
-- 安全檔案複製（不覆寫 HotReload.exe）
-- 連接埠釋放等待機制
-- 支援自訂連接埠設定
-
-**使用範例**:
-```json
-{
-  "action": "execute",
-  "project_path": "src/SiliconLife.Fast",
-  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
-  "configuration": "Debug",
-  "port": 8080
-}
-```
-
-**參數說明**:
-- `project_path`: 專案路徑（相對於解決方案根目錄）
-- `source_path`: 建構輸出目錄
-- `configuration`: 建構設定（Debug/Release）
-- `port`: Fast 實例的 Web 連接埠（預設 8080）
-
-**注意事項**:
-- 僅適用於 SiliconLife.Fast 版本
-- 需要 HotReload.exe 在 tools/HotReload 目錄下
-- 重啟過程中會有短暫的服務中斷（約 3-5 秒）
-
----
-
 ## 工具呼叫流程
 
 ```
@@ -816,7 +769,7 @@ public class MyCustomTool : ITool
         Description = Description,
         Parameters = new Dictionary<string, object>
         {
-            ["param1"] = new { type = "string", description = "参数说明" }
+            ["param1"] = new { type = "string", description = "參數說明" }
         }
     };
 
@@ -849,14 +802,14 @@ public class MyCustomTool : ITool
 
 將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時透過反射自動發現並註冊。
 
-### 步驟 2a: 透過插件註冊工具
+### 步驟 2a: 透過外掛程式註冊工具
 
-也可以透過插件系統註冊自訂工具：
+也可以透過外掛程式系統註冊自訂工具：
 
-1. 在插件專案中實作 `ITool` 介面
-2. 編譯插件 DLL 並放入插件目錄
-3. `ToolManager.ScanAllPluginAssemblies()` 會自動掃描所有已載入插件中的 ITool 實作
-4. 插件工具受相同的權限系統約束
+1. 在外掛程式專案中實作 `ITool` 介面
+2. 編譯外掛程式 DLL 並放入外掛程式目錄
+3. `ToolManager.ScanAllPluginAssemblies()` 會自動掃描所有已載入外掛程式中的 ITool 實作
+4. 外掛程式工具受相同的權限系統約束
 
 ### 步驟 3: （可選）標記為主理人專用
 
@@ -864,7 +817,7 @@ public class MyCustomTool : ITool
 [SiliconManagerOnly]
 public class AdminOnlyTool : ITool
 {
-    // 仅硅基主理人可访问
+    // 僅矽基主理人可存取
 }
 ```
 
@@ -875,7 +828,7 @@ public class AdminOnlyTool : ITool
 ```csharp
 if (!call.Parameters.ContainsKey("required_param"))
 {
-    return ToolResult.Failure("缺少必需参数: required_param");
+    return ToolResult.Failure("缺少必需參數: required_param");
 }
 ```
 
@@ -884,11 +837,11 @@ if (!call.Parameters.ContainsKey("required_param"))
 ```csharp
 try
 {
-    // 执行操作
+    // 執行操作
 }
 catch (Exception ex)
 {
-    Logger.Error($"工具 {Name} 执行失败: {ex.Message}");
+    Logger.Error($"工具 {Name} 執行失敗: {ex.Message}");
     return ToolResult.Failure(ex.Message);
 }
 ```
@@ -911,8 +864,8 @@ if (!allowed)
 
 ```csharp
 public string Description =>
-    "用于在不同日历系统之间转换日期。" +
-    "需要提供 'date'、'from_calendar' 和 'to_calendar' 参数。";
+    "用於在不同日曆系統之間轉換日期。" +
+    "需要提供 'date'、'from_calendar' 和 'to_calendar' 參數。";
 ```
 
 ## 故障排除

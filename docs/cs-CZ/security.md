@@ -321,25 +321,30 @@ Protokoly jsou perzistentní v úložišti a prohlížitelné přes Web UI (kont
 
 Systém zásuvných modulů přináší bezpečnostní rizika spojená s prováděním kódu třetích stran, která jsou zmírňována následujícími mechanismy:
 
-### Bezpečnostní Sandbox
+### Bezpečnostní Sandbox a deklarace schopností
 
-`PluginLoader` provádí při načítání zásuvných modulů přísné bezpečnostní kontroly:
+`PluginLoader` provádí při načítání zásuvných modulů bezpečnostní kontroly a současně podporuje mechanismus deklarace schopností:
 
-1. **Kontrola zakázaných jmenných prostorů** — zásuvné moduly nemohou odkazovat na následující jmenné prostory:
-   - `System.IO` — přístup k souborovému systému
-   - `System.Net.Http` — HTTP požadavky
-   - `System.Net.WebSockets` — WebSocket připojení
-   - `System.Net.Sockets` — raw sockety
-   - `Microsoft.CodeAnalysis` — API kompilátoru
+1. **Deklarovatelné schopnosti** — zásuvné moduly deklarují požadované schopnosti pomocí atributu `[PluginCapability]`:
+   - `Network` — síťový přístup (umožňuje reference na `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`)
+   - `FileIO` — čtení/zápis souborů (umožňuje reference na `System.IO`)
+   - `Process` — správa procesů
+   - `AI` — volání AI
 
-2. **Whitelist důvěryhodných sestavení** — reference na následující sestavení jsou povoleny:
+2. **Nedeklarovatelné schopnosti** — následující schopnosti jsou vždy blokovány:
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Unsafe kód (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - API kompilátoru (`Microsoft.CodeAnalysis`)
+
+3. **Whitelist důvěryhodných sestavení** — reference na následující sestavení jsou povoleny:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Kontrola zakázaných typů** — skenování nebezpečných typů odkazovaných v zásuvném modulu
+4. **Kontrola zakázaných typů** — skenování nebezpečných typů odkazovaných v zásuvném modulu
 
-4. **Kontrola zakázaných členů** — skenování nebezpečných metod volaných v zásuvném modulu
+5. **Kontrola zakázaných členů** — skenování nebezpečných metod volaných v zásuvném modulu
 
 ### Izolované načítání
 

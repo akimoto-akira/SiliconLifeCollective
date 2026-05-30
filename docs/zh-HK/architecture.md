@@ -25,8 +25,7 @@
   - Windows/macOS 系統匣背景執行，系統匣狀態視窗即時監控；Linux 狀態視窗直接顯示
   - SpeedyPack 引擎 + 自動壓縮保證資料安全
   - Component UI 架構，27 個宣告式元件
-  - 7 種外觀主題，支援自動探索和切換
-  - 熱重載工具支援線上更新和重啟
+  - 7 種佈景主題，支援自動探索和切換
   - Linux 自動開啟瀏覽器存取 Web UI，支援 `--no-tray` 參數
 - **效能提升**：儲存讀取延遲降低 1000 倍，寫入延遲降低 15000 倍
 - **角色說明**：經過深度最佳化的生產級實作，具備系統匣背景執行、SpeedyPack 引擎 + 自動壓縮等特性，是長期執行和實際生產環境的首選
@@ -294,11 +293,26 @@
 - `OllamaClientFactory` —— 建立 OllamaClient 實例
 - `DashScopeClientFactory` —— 建立 DashScopeClient 實例
 - `VolcengineArkClientFactory` —— 建立 VolcengineArkClient 實例
+- `HerdsmanClientFactory` —— 建立 HerdsmanClient 實例
+- `LongCatClientFactory` —— 建立 LongCatClient 實例
+- `QiniuAIClientFactory` —— 建立 QiniuAIClient 實例
 
 工廠提供：
 - `CreateClient(Dictionary<string, object> config)` —— 從設定實例化用戶端
 - `GetConfigKeyOptions(string key, ...)` —— 傳回設定鍵的動態選項（例如可用模型、區域）
 - `GetDisplayName()` —— 用戶端類型的在地化顯示名稱
+
+### IAIClient 能力介面
+
+`IAIClient` 介面定義了 AI 用戶端的能力宣告屬性，`ContextManager` 據此自適應調整行為：
+
+| 屬性 | 類型 | 描述 |
+|------|------|------|
+| `StreamingMode` | `bool?` | 串流模式支援：true=僅串流、false=僅非串流、null=兩種均支援（預設串流） |
+| `SupportsToolCalls` | `bool?` | 工具呼叫支援：true=支援、false=不支援（跳過工具注入）、null=未知（預設支援） |
+| `ContextWindowTokens` | `int?` | 上下文視窗大小（token 數），用於 token 預算裁剪替代固定 MaxContextMessages |
+| `SupportsVision` | `bool?` | 視覺輸入支援：true=支援圖片、false=不支援、null=未知（預設不支援） |
+| `SupportsAudio` | `bool?` | 音訊輸入支援：true=支援音訊、false=不支援、null=未知（預設不支援） |
 
 ### AI平台支援清單
 
@@ -320,6 +334,9 @@
 | 智普AI（GLM） | 📋 | 雲端 | 智譜清言AI服務 |
 | 月之暗面（Kimi） | 📋 | 雲端 | 月之暗面Kimi AI服務 |
 | 火山方舟引擎.豆包 | ✅ | 雲端 | 位元組跳動豆包AI服務 |
+| 牧馬人推理引擎（Herdsman） | ✅ | 本地/雲端 | 無需認證的推理引擎，相容 OpenAI API 格式 |
+| 美團 LongCat | ✅ | 雲端 | 美團自研大模型，相容 OpenAI API 格式，API Key 認證 |
+| 七牛雲 AI | ✅ | 雲端 | 七牛雲大模型推理服務，相容 OpenAI API 格式，API Key 認證 |
 | DeepSeek（直連） | 📋 | 雲端 | 深度求索AI服務 |
 | 零一萬物 | 📋 | 雲端 | 零一萬物AI服務 |
 | 騰訊混元 | 📋 | 雲端 | 騰訊混元AI服務 |

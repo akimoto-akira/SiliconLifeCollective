@@ -351,15 +351,6 @@ public class ContextManager
             _timerForContext.GetCurrentCycle().Messages.Add(chatMsg);
             _being.TimerSystem?.Save();
         }
-        else if (_taskForContext != null)
-        {
-            _taskForContext.GetCurrentCycle().Messages.Add(chatMsg);
-            TaskCenter.Instance.UpdateTask(_taskForContext);
-        }
-        else if (_projectThinkSession != null)
-        {
-            _projectThinkSession.GetCurrentCycle().Messages.Add(chatMsg);
-        }
         else if (_session != null)
         {
             ChatSystem? chatSystem = ServiceLocator.Instance.ChatSystem;
@@ -1112,7 +1103,23 @@ public class ContextManager
         if (response.Success && response.HasToolCalls)
         {
             _logger.Debug(_being.Id, "AI returned tool calls, persisting intermediate round");
-            PersistAndDeliverToolCallRound(response, projectId);
+            if (_taskForContext != null || _projectThinkSession != null)
+            {
+                // Caller is responsible for executing tools and syncing to cycle
+                _messages.Add(new ChatMessage(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
+                {
+                    Role = MessageRole.Assistant,
+                    Thinking = response.Thinking,
+                    ToolCallsJson = System.Text.Json.JsonSerializer.Serialize(response.ToolCalls!),
+                    PromptTokens = response.PromptTokens,
+                    CompletionTokens = response.CompletionTokens,
+                    TotalTokens = response.TotalTokens,
+                });
+            }
+            else
+            {
+                PersistAndDeliverToolCallRound(response, projectId);
+            }
         }
         else if (response.Success)
         {
@@ -1145,7 +1152,23 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
             if (response.Success && response.HasToolCalls)
             {
                 _logger.Debug(_being.Id, "AI returned tool calls (async), persisting intermediate round");
-                PersistAndDeliverToolCallRound(response, projectId);
+                if (_taskForContext != null || _projectThinkSession != null)
+                {
+                    // Caller is responsible for executing tools and syncing to cycle
+                    _messages.Add(new ChatMessage(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
+                    {
+                        Role = MessageRole.Assistant,
+                        Thinking = response.Thinking,
+                        ToolCallsJson = System.Text.Json.JsonSerializer.Serialize(response.ToolCalls!),
+                        PromptTokens = response.PromptTokens,
+                        CompletionTokens = response.CompletionTokens,
+                        TotalTokens = response.TotalTokens,
+                    });
+                }
+                else
+                {
+                    PersistAndDeliverToolCallRound(response, projectId);
+                }
             }
             else if (response.Success)
             {
@@ -1637,12 +1660,37 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
             task.Start();
         }
 
-        ChatHistoryCycle cycle = task.GetCurrentCycle();
-
         string? scenarioContext = BuildTaskScenarioContext(task);
         AIResponse response = GetResponse(scenarioContext, task, ToolScenarioFlag.Task);
 
-        cycle.Messages.AddRange(_messages.Skip(cycle.Messages.Count).ToList());
+        ChatHistoryCycle cycle = task.GetCurrentCycle();
+        if (response.Success && response.HasToolCalls)
+        {
+            cycle.Messages.Add(new ChatMessage(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
+            {
+                Role = MessageRole.Assistant,
+                Thinking = response.Thinking,
+                ToolCallsJson = System.Text.Json.JsonSerializer.Serialize(response.ToolCalls!),
+                PromptTokens = response.PromptTokens,
+                CompletionTokens = response.CompletionTokens,
+                TotalTokens = response.TotalTokens,
+            });
+            foreach (var toolMsg in ExecuteToolCalls(response.ToolCalls!))
+            {
+                cycle.Messages.Add(toolMsg);
+            }
+        }
+        else if (response.Success)
+        {
+            cycle.Messages.Add(new ChatMessage(_being.Id, _session?.Id ?? Guid.Empty, response.Content ?? string.Empty)
+            {
+                Role = MessageRole.Assistant,
+                Thinking = response.Thinking,
+                PromptTokens = response.PromptTokens,
+                CompletionTokens = response.CompletionTokens,
+                TotalTokens = response.TotalTokens,
+            });
+        }
 
         if (response.Success && !string.IsNullOrEmpty(response.Content))
         {
@@ -1723,17 +1771,46 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
 
         string scenarioContext = BuildProjectScenarioContext(project, attentionInfo);
 
-        _messages.Add(new ChatMessage
+        ChatMessage userMsg = new ChatMessage
         {
             Role = MessageRole.User,
             Content = $"You are the curator of project \"{project.Name}\". Please review the project status and take action.",
-        });
+        };
+        _messages.Add(userMsg);
 
         ChatHistoryCycle cycle = session.GetCurrentCycle();
-        cycle.Messages.AddRange(_messages);
+        cycle.Messages.Add(userMsg);
 
         AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project, projectId: project.Id);
         session.CurrentRound++;
+
+        if (response.Success && response.HasToolCalls)
+        {
+            cycle.Messages.Add(new ChatMessage(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
+            {
+                Role = MessageRole.Assistant,
+                Thinking = response.Thinking,
+                ToolCallsJson = System.Text.Json.JsonSerializer.Serialize(response.ToolCalls!),
+                PromptTokens = response.PromptTokens,
+                CompletionTokens = response.CompletionTokens,
+                TotalTokens = response.TotalTokens,
+            });
+            foreach (var toolMsg in ExecuteToolCalls(response.ToolCalls!, project.Id))
+            {
+                cycle.Messages.Add(toolMsg);
+            }
+        }
+        else if (response.Success)
+        {
+            cycle.Messages.Add(new ChatMessage(_being.Id, _session?.Id ?? Guid.Empty, response.Content ?? string.Empty)
+            {
+                Role = MessageRole.Assistant,
+                Thinking = response.Thinking,
+                PromptTokens = response.PromptTokens,
+                CompletionTokens = response.CompletionTokens,
+                TotalTokens = response.TotalTokens,
+            });
+        }
 
         if (!response.Success)
         {
@@ -1775,6 +1852,19 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
             return AIResponse.Failed("Project not found");
         }
 
+        // Use the session from project to ensure the same object reference
+        // so that modifications (messages, state) are persisted when SaveProjectThinkSession is called
+        var projectSession = project.ThinkSessions.FirstOrDefault(s => s.Id == session.Id);
+        if (projectSession == null)
+        {
+            // Fallback: session may have been moved to ThinkSessionHistory (completed)
+            projectSession = project.ThinkSessionHistory.FirstOrDefault(s => s.Id == session.Id);
+            if (projectSession == null)
+            {
+                return AIResponse.Failed("Think session not found in project");
+            }
+        }
+        session = projectSession;
         _projectThinkSession = session;
 
         session.CurrentRound++;
@@ -1810,7 +1900,33 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project, projectId: project.Id);
 
         ChatHistoryCycle currentCycle = session.GetCurrentCycle();
-        currentCycle.Messages.AddRange(_messages.Skip(currentCycle.Messages.Count).ToList());
+        if (response.Success && response.HasToolCalls)
+        {
+            currentCycle.Messages.Add(new ChatMessage(_being.Id, _session?.Id ?? Guid.Empty, response.Content)
+            {
+                Role = MessageRole.Assistant,
+                Thinking = response.Thinking,
+                ToolCallsJson = System.Text.Json.JsonSerializer.Serialize(response.ToolCalls!),
+                PromptTokens = response.PromptTokens,
+                CompletionTokens = response.CompletionTokens,
+                TotalTokens = response.TotalTokens,
+            });
+            foreach (var toolMsg in ExecuteToolCalls(response.ToolCalls!, project.Id))
+            {
+                currentCycle.Messages.Add(toolMsg);
+            }
+        }
+        else if (response.Success)
+        {
+            currentCycle.Messages.Add(new ChatMessage(_being.Id, _session?.Id ?? Guid.Empty, response.Content ?? string.Empty)
+            {
+                Role = MessageRole.Assistant,
+                Thinking = response.Thinking,
+                PromptTokens = response.PromptTokens,
+                CompletionTokens = response.CompletionTokens,
+                TotalTokens = response.TotalTokens,
+            });
+        }
 
         if (!response.Success)
         {
@@ -2630,17 +2746,6 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
             _timerForContext.GetCurrentCycle().Messages.Add(assistantMsg);
             _timerForContext.GetCurrentCycle().Messages.AddRange(toolResultMessages);
             _being.TimerSystem?.Save();
-        }
-        else if (_taskForContext != null)
-        {
-            _taskForContext.GetCurrentCycle().Messages.Add(assistantMsg);
-            _taskForContext.GetCurrentCycle().Messages.AddRange(toolResultMessages);
-            TaskCenter.Instance.UpdateTask(_taskForContext);
-        }
-        else if (_projectThinkSession != null)
-        {
-            _projectThinkSession.GetCurrentCycle().Messages.Add(assistantMsg);
-            _projectThinkSession.GetCurrentCycle().Messages.AddRange(toolResultMessages);
         }
         else if (_session != null)
         {

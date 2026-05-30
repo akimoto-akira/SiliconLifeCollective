@@ -349,10 +349,11 @@ Plugin load failed: Security check failed
 ```
 
 **解決策**：
-1. プラグインが禁止された名前空間（`System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis`）を参照していないか確認
-2. プラグインが信頼できるアセンブリホワイトリスト内のアセンブリのみを参照していることを確認
-3. プラグインが `IPlugin` インターフェースを正しく実装していることを確認
-4. ログでセキュリティチェック失敗の詳細を確認
+1. プラグインが宣言不可能な禁止名前空間を参照していないか確認（例：`System.Runtime.InteropServices`、`System.Reflection.Emit`、`Microsoft.CodeAnalysis`）
+2. プラグインが `System.IO` や `System.Net.Http` を必要とする場合、`[PluginCapability]` で `FileIO` や `Network` 能力を宣言しているか確認
+3. プラグインが信頼できるアセンブリホワイトリスト内のアセンブリのみを参照していることを確認
+4. プラグインが `IPlugin` インターフェースを正しく実装していることを確認
+5. ログでセキュリティチェック失敗の詳細を確認
 
 #### 問題：プラグインツールが登録されない
 

@@ -719,53 +719,6 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 25. Hot-Reload-Werkzeug (HotReloadTool)
-
-**Werkzeugname**: `hot_reload`
-
-**Funktionsbeschreibung**: Unterstützt automatische Kompilierung, Dateiaktualisierung und Neustart von SiliconLife.Fast während der Laufzeit ohne manuellen Eingriff.
-
-**Unterstützte Operationen**:
-- `execute` — Vollständigen Build-, Kopier- und Neustart-Prozess ausführen
-- `build_only` — Nur das Projekt kompilieren, ohne Kopieren und Neustarten
-
-**Arbeitsablauf**:
-1. SiliconLife.Fast-Projekt kompilieren
-2. Aktuell laufende Fast-Instanz ordnungsgemäß herunterfahren (über HTTP-API)
-3. Auf Prozessbeendigung und Portfreigabe warten
-4. Build-Ausgabe in Zielverzeichnis kopieren (HotReload-eigene Dateien überspringen)
-5. Fast-Instanz neu starten
-
-**Eigenschaften**:
-- Automatische Erkennung und Beendigung alter Prozesse
-- Sicheres Dateikopieren (HotReload.exe wird nicht überschrieben)
-- Portfreigabe-Wartemechanismus
-- Unterstützung für benutzerdefinierte Portkonfiguration
-
-**Verwendungsbeispiel**:
-```json
-{
-  "action": "execute",
-  "project_path": "src/SiliconLife.Fast",
-  "source_path": "src/SiliconLife.Fast/bin/Debug/net9.0",
-  "configuration": "Debug",
-  "port": 8080
-}
-```
-
-**Parameterbeschreibung**:
-- `project_path`: Projektpfad (relativ zum Lösungs-Stammverzeichnis)
-- `source_path`: Build-Ausgabeverzeichnis
-- `configuration`: Build-Konfiguration (Debug/Release)
-- `port`: Web-Port der Fast-Instanz (Standard 8080)
-
-**Hinweise**:
-- Nur für die SiliconLife.Fast-Version anwendbar
-- Erfordert HotReload.exe im Verzeichnis tools/HotReload
-- Während des Neustarts gibt es eine kurze Dienstunterbrechung (ca. 3-5 Sekunden)
-
----
-
 ## Werkzeugaufruf-Prozess
 
 ```

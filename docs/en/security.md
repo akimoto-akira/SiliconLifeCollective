@@ -317,25 +317,30 @@ Logs are persisted to storage and viewable via Web UI (Log Controller).
 
 The plugin system introduces security risks from third-party code execution, mitigated through the following mechanisms:
 
-### Security Sandbox
+### Security Sandbox & Capability Declaration
 
-`PluginLoader` performs strict security scanning when loading plugins:
+`PluginLoader` performs security scanning when loading plugins and simultaneously supports the capability declaration mechanism:
 
-1. **Forbidden Namespace Check** — Plugins cannot reference the following namespaces:
-   - `System.IO` — File system access
-   - `System.Net.Http` — HTTP requests
-   - `System.Net.WebSockets` — WebSocket connections
-   - `System.Net.Sockets` — Raw sockets
-   - `Microsoft.CodeAnalysis` — Compiler API
+1. **Declarable Capabilities** — Plugins declare required capabilities via the `[PluginCapability]` attribute:
+   - `Network` — Network access (allows references to `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`)
+   - `FileIO` — File read/write (allows references to `System.IO`)
+   - `Process` — Process management
+   - `AI` — AI calls
 
-2. **Trusted Assembly Whitelist** — References to the following assemblies are allowed:
+2. **Non-Declarable Capabilities** — The following capabilities are always blocked:
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Unsafe code (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - Compiler API (`Microsoft.CodeAnalysis`)
+
+3. **Trusted Assembly Whitelist** — References to the following assemblies are allowed:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Forbidden Type Check** — Scans for dangerous types referenced in plugins
+4. **Forbidden Type Check** — Scans for dangerous types referenced in plugins
 
-4. **Forbidden Member Check** — Scans for dangerous methods called in plugins
+5. **Forbidden Member Check** — Scans for dangerous methods called in plugins
 
 ### Isolated Loading
 

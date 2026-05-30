@@ -33,6 +33,9 @@
 - **Ollama**（可選，用於本地端 AI） - [下載](https://ollama.com/)
 - **百鍊 API 金鑰**（可選，用於雲端 AI） - [申請](https://bailian.console.aliyun.com/)
 - **火山引擎 Ark API 金鑰**（可選，用於雲端 AI） - [申請](https://console.volcengine.com/ark)
+- **牧馬人推理引擎**（可選，本地/雲端推理） - 無需認證，相容 OpenAI API 格式
+- **美團 LongCat API 金鑰**（可選，用於雲端 AI） - API Key 認證
+- **七牛雲 AI API 金鑰**（可選，用於雲端 AI） - API Key 認證
 
 ## 快速開始
 
@@ -97,6 +100,49 @@ dotnet build
 ```
 
 > **注意**：火山引擎 Ark 的 Model 參數接受推理接入點 ID（例如 `ep-20241212123456-abcde`），而非模型名稱。
+
+#### 選項 D：牧馬人推理引擎（本地/雲端）
+
+```json
+{
+  "AIClients": {
+    "Herdsman": {
+      "Endpoint": "http://localhost:8000",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
+
+> **特點**：無需認證，相容 OpenAI API 格式，支援工具呼叫和推理內容。
+
+#### 選項 E：美團 LongCat（雲端）
+
+```json
+{
+  "AIClients": {
+    "LongCat": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
+
+#### 選項 F：七牛雲 AI（雲端）
+
+```json
+{
+  "AIClients": {
+    "QiniuAI": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.qiniu.com/v1/chat/completions",
+      "Model": "your-model-name"
+    }
+  }
+}
+```
 
 ### 4. 執行應用程式
 

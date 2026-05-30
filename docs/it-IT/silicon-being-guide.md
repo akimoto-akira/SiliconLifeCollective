@@ -255,6 +255,9 @@ Gli Esseri di Silicio possono anche personalizzare la propria logica dei permess
 | `GroupChat` | Chat di gruppo in corso |
 | `Task` | Esecuzione di un'attività |
 | `Timer` | Esecuzione di un timer |
+| `Broadcast` | Elaborazione messaggi broadcast |
+| `Project` | Lavoro su progetto |
+| `MemoryCompression` | Compressione della memoria |
 | `Stopped` | Fermato |
 
 ### File di Stato (state.json)

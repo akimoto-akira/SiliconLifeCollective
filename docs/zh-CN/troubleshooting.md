@@ -349,8 +349,9 @@ Plugin load failed: Security check failed
 ```
 
 **解决方案**：
-1. 检查插件是否引用了禁止的命名空间（`System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis`）
-2. 验证插件只引用了可信程序集白名单中的程序集
+1. 检查插件是否引用了未声明的禁止命名空间（如 `System.Runtime.InteropServices`、`System.Reflection.Emit`、`Microsoft.CodeAnalysis`）
+2. 如果插件需要 `System.IO` 或 `System.Net.Http`，确认插件已通过 `[PluginCapability]` 声明 `FileIO` 或 `Network` 能力
+3. 验证插件只引用了可信程序集白名单中的程序集
 3. 检查插件是否正确实现 `IPlugin` 接口
 4. 查看日志获取详细的安全检查失败原因
 

@@ -14,11 +14,11 @@
 ┌─────────────────────────────────────────────┐
 │          權限驗證                            │
 ├─────────────────────────────────────────────┤
-│  级别 1：UserFrequencyCache                  │
+│  級別 1：UserFrequencyCache                  │
 │  ↓ 高頻使用者決策快取（HighDeny/HighAllow）  │
-│  级别 2：IPermissionCallback                 │
+│  級別 2：IPermissionCallback                 │
 │  ↓ 自訂邏輯（Allowed/Denied/AskUser）       │
-│  级别 3：IsCurator?                          │
+│  級別 3：IsCurator?                          │
 │  ↓ 是 → IPermissionAskHandler（詢問使用者）  │
 │  ↓ 否 → GlobalACL → 預設拒絕                │
 │  結果：允許或拒絕                            │
@@ -32,7 +32,7 @@
 >    - **主理人** → `IPermissionAskHandler`（透過 IM 詢問使用者）
 >    - **非主理人** → `GlobalACL` → 預設拒絕
 
-## 级别 1：UserFrequencyCache
+## 級別 1：UserFrequencyCache
 
 每個生命體的高頻使用者決策快取（HighDeny/HighAllow），僅存在於記憶體中。
 
@@ -49,7 +49,7 @@ if (cachedResult.HasValue)
 - **僅記憶體**：快取不持久化，重啟後遺失
 - **可設定過期時間**：使用者可以設定快取條目的有效期
 
-## 级别 2：IPermissionCallback
+## 級別 2：IPermissionCallback
 
 用於動態權限邏輯的自訂回呼。
 
@@ -91,7 +91,7 @@ public class DefaultPermissionCallback : IPermissionCallback
 }
 ```
 
-## 级别 3：分支判斷（IsCurator / GlobalACL）
+## 級別 3：分支判斷（IsCurator / GlobalACL）
 
 當回呼傳回 `AskUser` 或沒有設定回呼時，系統根據主理人身份進行分支：
 
@@ -176,7 +176,7 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 
 `PermissionRequestQueue` 管理待處理的權限請求，支援非同步等待使用者回應：
 
-- **請求入隊** — 當權限鏈到達级别 5 時，建立一個 `TaskCompletionSource<AskPermissionResult>` 並入隊
+- **請求入隊** — 當權限鏈到達級別 5 時，建立一個 `TaskCompletionSource<AskPermissionResult>` 並入隊
 - **Web UI 展示** — 透過 `PermissionRequestController` 在 Web UI 中展示待處理的權限請求
 - **使用者回應** — 使用者在 Web UI 中批准或拒絕，可選擇快取決策和設定快取持續時間
 - **快取選項** — 使用者可以將權限決策快取 1 小時、24 小時、7 天或 30 天
@@ -261,14 +261,14 @@ curl http://localhost:8080/api/permissions/list
 
 ## 工具權限系統
 
-除了操作级别的權限驗證鏈，系統還提供了**工具權限**管理機制，用於控制矽基生命體可以使用哪些工具。
+除了操作級別的權限驗證鏈，系統還提供了**工具權限**管理機制，用於控制矽基生命體可以使用哪些工具。
 
 ### 兩級工具權限
 
-工具權限分為兩個级别：
+工具權限分為兩個級別：
 
-1. **矽基生命體级别** — 控制單個矽基生命體可以使用哪些工具操作
-2. **專案级别** — 控制專案空間內可用的工具操作，獨立於矽基生命體级别的權限
+1. **矽基生命體級別** — 控制單個矽基生命體可以使用哪些工具操作
+2. **專案級別** — 控制專案空間內可用的工具操作，獨立於矽基生命體級別的權限
 
 ### 工具權限設定
 

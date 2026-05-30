@@ -13,18 +13,17 @@
 - **소울 파일 기반** — 각 실리콘 비잉은 핵심 프롬프트 파일(`soul.md`)에 의해 구동되며, 독특한 개성과 행동 패턴을 정의
 - **신체-두뇌 아키텍처** — *신체*(SiliconBeing)는 생명 상태를 유지하고 트리거 시나리오를 감지; *두뇌*(컨텍스트 매니저)는 기록 로드, AI 호출, 툴 실행 및 응답 영속화 담당
 - **자가 진화 능력** — Roslyn 동적 컴파일 기술을 통해 실리콘 비잉이 자신의 코드를 재작성하여 진화 가능
-- **활동 상태 관리** — Idle(대기), Working(작업), Error(오류), Stopped(중지) 네 가지 활동 상태 지원, 연속 10회 오류 발생 시 자동으로 Stopped 상태 진입
+- **활동 상태 관리** — Idle(대기), SingleChat(1:1 채팅), GroupChat(그룹 채팅), Task(태스크), Timer(타이머), Broadcast(브로드캐스트), Project(프로젝트), MemoryCompression(메모리 압축), Stopped(중지) 아홉 가지 활동 상태 지원, 연속 10회 오류 발생 시 자동으로 Stopped 상태 진입
 
 ### 플러그인 시스템
-- **플러그인 확장 아키텍처** — IPlugin 인터페이스를 통해 기능 확장 구현, 디렉토리에서 플러그인 DLL 동적 로드 지원
-- **보안 샌드박스** — 플러그인 로더가 엄격한 보안 스캔을 실행하여 System.IO, System.Net 등 네임스페이스 접근 금지
+- **플러그인 확장 아키텍처** — IPlugin 인터페이스를 통한 기능 확장, 디렉토리에서 플러그인 DLL 동적 로드 지원
+- **플러그인 역량 선언** — 플러그인이 `[PluginCapability]` 속성으로 필요한 역량(Network, FileIO, Process, AI)을 선언하면, 로더가 해당 보안 스캔 규칙을 완화; 선언 불가능한 역량(P/Invoke, Unsafe, Reflection Emit 등)은 항상 차단
 - **격리 로딩** — 커스텀 AssemblyLoadContext를 사용한 격리 로딩으로 플러그인이 메인 프로그램 안정성에 영향을 주지 않음
 - **툴 통합** — 플러그인은 ITool 인터페이스를 통해 커스텀 툴을 등록할 수 있으며, 툴 콜 루프에 자동 통합
 
 ### 툴 및 실행
-- **24개 내장 툴** — 캘린더, 채팅, 설정, 디스크, 네트워크, 메모리, 태스크, 타이머, 노리지 베이스, 워크 노트, 프로젝트 워크스페이스, WebView 브라우저, 핫 리로드 등 포괄
-- **툴 시나리오 격리** — 각 툴은 `ToolScenario` 속성으로 사용 가능한 시나리오(Chat, Task, Timer, MemoryCompression, Project)를 선언하며, `ChatOnly` 속성으로 채팅 시나리오에서만 사용 제한
-- **핫 리로드 툴** — SiliconLife.Fast가 실행 중인 동안 자동으로 컴파일, 파일 업데이트 및 재시작 지원, 수동 개입 불필요
+- **24개 내장 툴** — 캘린더, 채팅, 설정, 디스크, 네트워크, 메모리, 태스크, 타이머, 노리지 베이스, 워크 노트, 프로젝트 워크스페이스, WebView 브라우저 등 포괄
+- **툴 시나리오 격리** — 각 툴이 `ToolScenario` 속성(Chat, Task, Timer, MemoryCompression, Project)으로 사용 가능한 시나리오를 선언하며, `ChatOnly` 속성은 툴 사용을 채팅 시나리오로만 제한
 - **툴 콜 루프** — AI가 툴 콜 반환 → 툴 실행 → 결과를 AI에 피드백 → 순수 텍스트 응답 반환까지 지속 루프
 - **이그제큐터-퍼미션 보안** — 모든 I/O 작업은 이그제큐터를 통해 엄격한 퍼미션 검증 수행
   - 3단계 퍼미션 검증 체인: 사용자 빈도 캐시 → 퍼미션 콜백 인터페이스 → (IsCurator: 퍼미션 요청 핸들러 | Non-curator: 글로벌 ACL → 기본 거부)
@@ -35,6 +34,9 @@
   - **Ollama** — 로컬 모델 배포, 네이티브 HTTP API 사용
   - **알리바바 클라우드 DashScope(百炼)** — 클라우드 AI 서비스, OpenAI API 호환, 13개 이상 모델 지원, 다중 지역 배포
   - **Volcengine Ark(火山引擎)** — ByteDance 클라우드 AI 서비스, 스트리밍 및 비스트리밍 모드 지원, 내장 속도 제어
+  - **Herdsman** — 인증 없는 추론 엔진, OpenAI API 형식 호환
+  - **Meituan LongCat** — 메이퇀 자체 개발 대형 모델, OpenAI API 형식 호환, API 키 인증
+  - **Qiniu Cloud AI** — 치니우 클라우드 대형 모델 추론 서비스, OpenAI API 형식 호환, API 키 인증
 - **32가지 캘린더 시스템** — 전 세계 주요 달력 완전 커버, 양력, 음력, 이슬람력, 히브리력, 일본력, 페르시아력, 마야력, 중국 역사력 등 포함
 - **노리지 네트워크 시스템** — 트리플(주어-관계-목적어) 기반 지식 그래프, 저장, 쿼리 및 경로 발견 지원
 - **프로젝트 워크스페이스** — 프로젝트 공간 관리, 프로젝트 생성/아카이빙/삭제, 역할 할당, 워크 노트, 태스크 추적 및 툴 퍼미션 격리 지원
@@ -90,7 +92,7 @@
   - SpeedyPack 엔진 + 자동 압축으로 데이터 보안 보장
   - Component UI 아키텍처, 27개 선언형 컴포넌트
   - 7가지 스킨 테마, 자동 감지 및 전환 지원
-  - 핫 리로드 툴로 온라인 업데이트 및 재시작 지원
+  - 핫 리로드 툴 → Linux에서 자동으로 브라우저를 열어 Web UI에 접속, `--no-tray` 매개변수 지원
 - **성능 향상**: 스토리지 읽기 지연 시간 1000배 감소, 쓰기 지연 시간 15000배 감소, 동시 처리 능력 50배 향상
 - **역할 설명**: 심층 최적화가 적용된 프로덕션급 구현으로, 장기 운영 및 실제 프로덕션 환경의 최선의 선택
 - **시작 명령**: `dotnet run --project src/SiliconLife.Fast`
@@ -119,7 +121,7 @@
 | 런타임 | .NET 9 | .NET 9(Windows/macOS/Linux) |
 | 프로그래밍 언어 | C# | C# |
 | 애플리케이션 유형 | 콘솔 애플리케이션 | 데스크톱 애플리케이션(Windows/macOS 시스템 트레이 / Linux 상태 창) |
-| AI 통합 | Ollama(로컬), 알리바바 클라우드 DashScope(클라우드), Volcengine Ark(클라우드) | Ollama(로컬), 알리바바 클라우드 DashScope(클라우드), Volcengine Ark(클라우드) |
+| AI 통합 | Ollama(로컬), 알리바바 클라우드 DashScope(클라우드), Volcengine Ark(클라우드), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama(로컬), 알리바바 클라우드 DashScope(클라우드), Volcengine Ark(클라우드), Herdsman, Meituan LongCat, Qiniu Cloud AI |
 | 데이터 스토리지 | 파일 시스템(JSON + 시간 인덱스 디렉토리) | SpeedyPack(.spk 형식, 메모리 매핑 + 비동기 영속화) |
 | 웹 서버 | HttpListener(.NET 내장) | HttpListener(.NET 내장) |
 | 동적 컴파일 | Roslyn(Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn(Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -157,7 +159,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # 글로벌 서비스 로케이터
 │   │
 │   ├── SiliconLife.Common/                # 공유 구현(두 버전 공용)
-│   │   ├── AI/                            # AI 클라이언트 및 팩토리(Ollama, DashScope, VolcengineArk)
+│   │   ├── AI/                            # AI 클라이언트 및 팩토리(Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32가지 캘린더 구현
 │   │   ├── Localization/                  # 로컬라이제이션 베이스 클래스 및 34개 언어/지역 변형 구현
 │   │   ├── Resources/                     # 공유 리소스 파일
@@ -342,7 +344,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] 단계 10.5: 점진적 향상(브로드캐스트 채널, 토큰 사용 감사, 32가지 캘린더, 툴 향상, 34개 언어 변형 로컬라이제이션)
 - [x] 단계 10.6: 완성 및 최적화(WebView, 도움말 시스템, 프로젝트 워크스페이스, 노리지 네트워크, 워크플로 엔진)
 - [x] 단계 11: SpeedyPack 스토리지 엔진(LiteDB 교체, 메모리 매핑, 비동기 쓰기 큐, 자동 압축)
-- [x] 단계 12: 플러그인 시스템(플러그인 인터페이스, 플러그인 로더 보안 샌드박스, 격리 로딩, 툴 통합)
+- [x] 단계 12: 플러그인 시스템(플러그인 인터페이스, 역량 선언 메커니즘, 격리 로딩, 툴 통합)
 
 ### 🚧 계획 중
 - [ ] 단계 13: 외부 IM 통합(Feishu / WhatsApp / Telegram)

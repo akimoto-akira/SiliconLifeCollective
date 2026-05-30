@@ -349,10 +349,11 @@ Plugin load failed: Security check failed
 ```
 
 **Rozwiązanie**:
-1. Sprawdź, czy wtyczka odwołuje się do zakazanych przestrzeni nazw (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Zweryfikuj, że wtyczka odwołuje się tylko do zestawów z białej listy zaufanych zestawów
-3. Sprawdź, czy wtyczka poprawnie implementuje interfejs `IPlugin`
-4. Zobacz dzienniki, aby uzyskać szczegółowe przyczyny niepowodzenia sprawdzania bezpieczeństwa
+1. Sprawdź, czy wtyczka odwołuje się do niezdeklarowalnych zakazanych przestrzeni nazw (np. `System.Runtime.InteropServices`, `System.Reflection.Emit`, `Microsoft.CodeAnalysis`)
+2. Jeśli wtyczka wymaga `System.IO` lub `System.Net.Http`, upewnij się, że zadeklarowała możliwości `FileIO` lub `Network` poprzez `[PluginCapability]`
+3. Zweryfikuj, że wtyczka odwołuje się tylko do zestawów z białej listy zaufanych zestawów
+4. Sprawdź, czy wtyczka poprawnie implementuje interfejs `IPlugin`
+5. Zobacz dzienniki, aby uzyskać szczegółowe przyczyny niepowodzenia sprawdzania bezpieczeństwa
 
 #### Problem: narzędzia wtyczki nie są zarejestrowane
 

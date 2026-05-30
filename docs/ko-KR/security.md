@@ -316,25 +316,30 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 
 플러그인 시스템은 서드파티 코드 실행의 보안 위험을 도입하며, 다음 메커니즘으로 완화됩니다:
 
-### 보안 샌드박스
+### 보안 샌드박스 및 역량 선언
 
-`PluginLoader`는 플러그인 로딩 시 엄격한 보안 스캔을 실행합니다:
+`PluginLoader`는 플러그인 로딩 시 보안 스캔을 실행하며, 동시에 역량 선언 메커니즘을 지원합니다:
 
-1. **금지 네임스페이스 검사** — 플러그인은 다음 네임스페이스를 참조할 수 없습니다:
-   - `System.IO` — 파일 시스템 접근
-   - `System.Net.Http` — HTTP 요청
-   - `System.Net.WebSockets` — WebSocket 연결
-   - `System.Net.Sockets` — 원시 소켓
-   - `Microsoft.CodeAnalysis` — 컴파일러 API
+1. **선언 가능한 역량** — 플러그인이 `[PluginCapability]` 속성으로 필요한 역량을 선언합니다:
+   - `Network` — 네트워크 접근(`System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets` 참조 허용)
+   - `FileIO` — 파일 읽기/쓰기(`System.IO` 참조 허용)
+   - `Process` — 프로세스 관리
+   - `AI` — AI 호출
 
-2. **신뢰할 수 있는 어셈블리 화이트리스트** — 다음 어셈블리의 참조가 허용됩니다:
+2. **선언 불가능한 역량** — 다음 역량은 항상 차단됩니다:
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Unsafe 코드 (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - 컴파일러 API (`Microsoft.CodeAnalysis`)
+
+3. **신뢰할 수 있는 어셈블리 화이트리스트** — 다음 어셈블리의 참조가 허용됩니다:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **금지 타입 검사** — 플러그인에서 참조하는 위험한 타입 스캔
+4. **금지 타입 검사** — 플러그인에서 참조하는 위험한 타입 스캔
 
-4. **금지 멤버 검사** — 플러그인에서 호출하는 위험한 메서드 스캔
+5. **금지 멤버 검사** — 플러그인에서 호출하는 위험한 메서드 스캔
 
 ### 격리 로딩
 

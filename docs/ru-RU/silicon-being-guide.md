@@ -110,6 +110,9 @@ curl -X POST http://localhost:8080/api/beings \
 | `GroupChat` | Ведение группового чата |
 | `Task` | Выполнение задачи |
 | `Timer` | Выполнение таймера |
+| `Broadcast` | Обработка широковещательного сообщения |
+| `Project` | Работа над проектом |
+| `MemoryCompression` | Сжатие памяти |
 | `Stopped` | Остановлено из-за последовательных ошибок или ручной остановки |
 
 **Механизм состояния Stopped**:
@@ -125,6 +128,9 @@ Idle → SingleChat → Idle (чат завершён)
 Idle → GroupChat → Idle (групповой чат завершён)
 Idle → Task → Idle (задача завершена)
 Idle → Timer → Idle (таймер завершён)
+Idle → Broadcast → Idle (широковещание обработано)
+Idle → Project → Idle (работа над проектом завершена)
+Idle → MemoryCompression → Idle (сжатие памяти завершено)
 Любое → Stopped (10 последовательных ошибок)
 Stopped → Idle (новое чат-сообщение или ручной перезапуск)
 ```

@@ -349,10 +349,11 @@ Plugin load failed: Security check failed
 ```
 
 **Solução**:
-1. Verificar se o plugin referencia namespaces proibidos (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Confirmar que o plugin apenas referencia assemblies na lista branca de assemblies fiáveis
-3. Verificar se o plugin implementa correctamente a interface `IPlugin`
-4. Consultar os registos para obter detalhes sobre a falha na verificação de segurança
+1. Verificar se o plugin referencia namespaces proibidos não declaráveis (por exemplo, `System.Runtime.InteropServices`, `System.Reflection.Emit`, `Microsoft.CodeAnalysis`)
+2. Se o plugin necessita de `System.IO` ou `System.Net.Http`, confirmar que declarou as capacidades `FileIO` ou `Network` através de `[PluginCapability]`
+3. Confirmar que o plugin apenas referencia assemblies na lista branca de assemblies fiáveis
+4. Verificar se o plugin implementa correctamente a interface `IPlugin`
+5. Consultar os registos para obter detalhes sobre a falha na verificação de segurança
 
 #### Problema: Ferramentas do plugin não registadas
 

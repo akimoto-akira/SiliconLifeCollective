@@ -33,6 +33,9 @@ Tento projekt nabízí dvě implementační verze:
 - **Ollama** (volitelné, pro lokální AI) - [Stažení](https://ollama.com/)
 - **API klíč Bailian** (volitelné, pro cloudovou AI) - [Žádost](https://bailian.console.aliyun.com/)
 - **API klíč Volcengine Ark** (volitelné, pro cloudovou AI) - [Žádost](https://console.volcengine.com/ark)
+- **Herdsman** (volitelné, lokální/cloudový inferenční engine) — bez autentizace, kompatibilní s OpenAI API formátem
+- **API klíč Meituan LongCat** (volitelné, pro cloudovou AI) — autentizace API klíčem
+- **API klíč Qiniu Cloud AI** (volitelné, pro cloudovou AI) — autentizace API klíčem
 
 ## Rychlý start
 
@@ -97,6 +100,49 @@ Upravte `src/SiliconLife.Default/Config/DefaultConfigData.cs` nebo upravte konfi
 ```
 
 > **Poznámka**: Parametr Model pro Volcengine Ark přijímá ID inferenčního přístupového bodu (např. `ep-20241212123456-abcde`), nikoli název modelu.
+
+#### Možnost D: Herdsman (lokální/cloud)
+
+```json
+{
+  "AIClients": {
+    "Herdsman": {
+      "Endpoint": "http://localhost:8000",
+      "Model": "název-modelu"
+    }
+  }
+}
+```
+
+> **Funkce**: Bez autentizace, kompatibilní s OpenAI API formátem, podporuje volání nástrojů a reasoning obsah.
+
+#### Možnost E: Meituan LongCat (cloud)
+
+```json
+{
+  "AIClients": {
+    "LongCat": {
+      "ApiKey": "api-klíč",
+      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
+      "Model": "název-modelu"
+    }
+  }
+}
+```
+
+#### Možnost F: Qiniu Cloud AI (cloud)
+
+```json
+{
+  "AIClients": {
+    "QiniuAI": {
+      "ApiKey": "api-klíč",
+      "Endpoint": "https://api.qiniu.com/v1/chat/completions",
+      "Model": "název-modelu"
+    }
+  }
+}
+```
 
 ### 4. Spuštění aplikace
 

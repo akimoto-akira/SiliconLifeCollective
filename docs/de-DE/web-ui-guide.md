@@ -124,6 +124,9 @@ KI-Backends konfigurieren:
 - Ollama (lokal)
 - Bailian (Cloud)
 - Volcano Engine Ark (Cloud)
+- Herdsman (lokal/Cloud, keine Authentifizierung)
+- Meituan LongCat (Cloud)
+- Qiniu Cloud AI (Cloud)
 - Benutzerdefinierter Client
 
 ### Speichereinstellungen

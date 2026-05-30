@@ -110,6 +110,9 @@ Os Silicon Beings têm os seguintes estados de actividade:
 | `GroupChat` | Em chat de grupo |
 | `Task` | A executar tarefa |
 | `Timer` | A executar temporizador |
+| `Broadcast` | A processar mensagem de difusão |
+| `Project` | A trabalhar no projecto |
+| `MemoryCompression` | Compressão de memória |
 | `Stopped` | Parado, devido a erros consecutivos ou paragem manual |
 
 **Mecanismo do estado Stopped**:
@@ -125,6 +128,9 @@ Idle → SingleChat → Idle (chat concluído)
 Idle → GroupChat → Idle (chat de grupo concluído)
 Idle → Task → Idle (tarefa concluída)
 Idle → Timer → Idle (temporizador concluído)
+Idle → Broadcast → Idle (difusão processada)
+Idle → Project → Idle (trabalho no projecto concluído)
+Idle → MemoryCompression → Idle (compressão de memória concluída)
 Qualquer → Stopped (10 erros consecutivos)
 Stopped → Idle (nova mensagem de chat ou reinício manual)
 ```

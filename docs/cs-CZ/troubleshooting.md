@@ -349,10 +349,11 @@ Plugin load failed: Security check failed
 ```
 
 **Řešení**:
-1. Zkontrolujte, zda zásuvný modul neodkazuje na zakázané jmenné prostory (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Ověřte, že zásuvný modul odkazuje pouze na sestavení z whitelistu důvěryhodných sestavení
-3. Zkontrolujte, že zásuvný modul správně implementuje rozhraní `IPlugin`
-4. Zobrazte protokoly pro podrobné informace o selhání bezpečnostní kontroly
+1. Zkontrolujte, zda zásuvný modul neodkazuje na nedeklarovatelné jmenné prostory (P/Invoke, Unsafe, Reflection Emit, `Microsoft.CodeAnalysis`)
+2. Pokud zásuvný modul vyžaduje síťový nebo souborový přístup, ujistěte se, že deklaruje odpovídající schopnosti pomocí atributu `[PluginCapability]` (Network, FileIO, Process, AI)
+3. Ověřte, že zásuvný modul odkazuje pouze na sestavení z whitelistu důvěryhodných sestavení
+4. Zkontrolujte, že zásuvný modul správně implementuje rozhraní `IPlugin`
+5. Zobrazte protokoly pro podrobné informace o selhání bezpečnostní kontroly
 
 #### Problém: Nástroj zásuvného modulu není registrován
 

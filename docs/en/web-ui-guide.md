@@ -124,6 +124,9 @@ Configure AI backends:
 - Ollama (local)
 - Bailian (cloud)
 - Volcano Engine Ark (cloud)
+- Herdsman (local/cloud, no authentication)
+- Meituan LongCat (cloud)
+- Qiniu Cloud AI (cloud)
 - Custom clients
 
 ### Storage Settings

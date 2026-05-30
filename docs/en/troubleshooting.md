@@ -349,10 +349,11 @@ Plugin load failed: Security check failed
 ```
 
 **Solution**:
-1. Check if the plugin references forbidden namespaces (`System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis`)
-2. Verify the plugin only references assemblies in the trusted assembly whitelist
-3. Check that the plugin correctly implements the `IPlugin` interface
-4. Check logs for detailed security check failure reasons
+1. Check if the plugin references non-declarable namespaces (P/Invoke, Unsafe, Reflection Emit, `Microsoft.CodeAnalysis`)
+2. If the plugin needs network or file access, ensure it declares the corresponding capabilities via the `[PluginCapability]` attribute (Network, FileIO, Process, AI)
+3. Verify the plugin only references assemblies in the trusted assembly whitelist
+4. Check that the plugin correctly implements the `IPlugin` interface
+5. Check logs for detailed security check failure reasons
 
 #### Issue: Plugin tools not registered
 

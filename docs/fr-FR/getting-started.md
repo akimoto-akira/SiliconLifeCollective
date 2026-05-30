@@ -33,6 +33,9 @@ Ce projet propose deux versions d'implémentation :
 - **Ollama** (facultatif, pour l'IA locale) - [Télécharger](https://ollama.com/)
 - **Clé API Bailian** (facultatif, pour l'IA cloud) - [Demander](https://bailian.console.aliyun.com/)
 - **Clé API Volcengine Ark** (facultatif, pour l'IA cloud) - [Demander](https://console.volcengine.com/ark)
+- **Herdsman** (facultatif, moteur d'inférence local/cloud) - Sans authentification, compatible avec le format API OpenAI
+- **Clé API Meituan LongCat** (facultatif, pour l'IA cloud) - Authentification par clé API
+- **Clé API Qiniu Cloud AI** (facultatif, pour l'IA cloud) - Authentification par clé API
 
 ## Démarrage rapide
 
@@ -97,6 +100,49 @@ dotnet build
 ```
 
 > **Note** : Le paramètre Model de Volcengine Ark accepte un ID de point d'accès d'inférence (par exemple `ep-20241212123456-abcde`), et non un nom de modèle.
+
+#### Option D : Herdsman (Local/Cloud)
+
+```json
+{
+  "AIClients": {
+    "Herdsman": {
+      "Endpoint": "http://localhost:8000",
+      "Model": "nom-du-modèle"
+    }
+  }
+}
+```
+
+> **Caractéristiques** : Sans authentification, compatible avec le format API OpenAI, prend en charge les appels d'outils et le contenu de raisonnement.
+
+#### Option E : Meituan LongCat (Cloud)
+
+```json
+{
+  "AIClients": {
+    "LongCat": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
+      "Model": "nom-du-modèle"
+    }
+  }
+}
+```
+
+#### Option F : Qiniu Cloud AI (Cloud)
+
+```json
+{
+  "AIClients": {
+    "QiniuAI": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://api.qiniu.com/v1/chat/completions",
+      "Model": "nom-du-modèle"
+    }
+  }
+}
+```
 
 ### 4. Exécuter l'application
 

@@ -319,25 +319,30 @@ Los registros se persisten en almacenamiento y se pueden ver a través de la Web
 
 El sistema de plugins introduce riesgos de seguridad por la ejecución de código de terceros, mitigados mediante los siguientes mecanismos:
 
-### Sandbox de Seguridad
+### Sandbox de Seguridad y Declaración de Capacidades
 
-`PluginLoader` ejecuta escaneos de seguridad estrictos al cargar plugins:
+`PluginLoader` ejecuta escaneos de seguridad al cargar plugins y soporta simultáneamente el mecanismo de declaración de capacidades:
 
-1. **Verificación de espacios de nombres prohibidos** — Los plugins no pueden referenciar los siguientes espacios de nombres:
-   - `System.IO` — Acceso al sistema de archivos
-   - `System.Net.Http` — Solicitudes HTTP
-   - `System.Net.WebSockets` — Conexiones WebSocket
-   - `System.Net.Sockets` — Sockets sin procesar
-   - `Microsoft.CodeAnalysis` — API del compilador
+1. **Capacidades declarables** — Los plugins declaran las capacidades necesarias mediante el atributo `[PluginCapability]`:
+   - `Network` — Acceso a la red (permite referencias a `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`)
+   - `FileIO` — Lectura/escritura de archivos (permite referencias a `System.IO`)
+   - `Process` — Gestión de procesos
+   - `AI` — Llamadas a IA
 
-2. **Lista blanca de ensamblados de confianza** — Se permiten referencias a los siguientes ensamblados:
+2. **Capacidades no declarables** — Las siguientes capacidades siempre están bloqueadas:
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Código Unsafe (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - API del compilador (`Microsoft.CodeAnalysis`)
+
+3. **Lista blanca de ensamblados de confianza** — Se permiten referencias a los siguientes ensamblados:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Verificación de tipos prohibidos** — Escanea tipos peligrosos referenciados en el plugin
+4. **Verificación de tipos prohibidos** — Escanea tipos peligrosos referenciados en el plugin
 
-4. **Verificación de miembros prohibidos** — Escanea métodos peligrosos invocados en el plugin
+5. **Verificación de miembros prohibidos** — Escanea métodos peligrosos invocados en el plugin
 
 ### Carga Aislada
 

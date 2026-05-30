@@ -574,6 +574,25 @@ Retourne la page de l'interface de configuration système.
       "apiKey": "...",
       "region": "beijing",
       "model": "qwen3.6-plus"
+    },
+    "VolcengineArk": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
+    },
+    "Herdsman": {
+      "endpoint": "http://localhost:8000",
+      "model": "..."
+    },
+    "LongCat": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
+    },
+    "QiniuAI": {
+      "apiKey": "...",
+      "endpoint": "...",
+      "model": "..."
     }
   }
 }

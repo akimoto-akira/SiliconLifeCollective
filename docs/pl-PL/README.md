@@ -13,18 +13,17 @@
 - **Sterowanie Plikiem Duszy** — każda Istota Krzemowa jest napędzana przez główny plik podpowiedzi (`soul.md`), definiujący unikalną osobowość i wzorce zachowań
 - **Architektura Ciało-Mózg** — *Ciało* (SiliconBeing) utrzymuje parametry życiowe i wykrywa scenariusze wyzwalania; *Mózg* (Menedżer Kontekstu) odpowiada za ładowanie historii, wywoływanie AI, wykonywanie narzędzi i trwałość odpowiedzi
 - **Zdolność samewolucji** — poprzez technologię dynamicznej kompilacji Roslyn, Istoty Krzemowe mogą przepisywać swój własny kod, realizując ewolucję
-- **Zarządzanie stanem aktywności** — obsługa czterech stanów aktywności: Idle (bezczynny), Working (pracujący), Error (błąd), Stopped (zatrzymany); po 10 kolejnych błędach automatycznie przechodzi w stan Stopped
+- **Zarządzanie stanem aktywności** — obsługa dziewięciu stanów aktywności: Idle (bezczynny), SingleChat (czat indywidualny), GroupChat (czat grupowy), Task (zadanie), Timer (czasomierz), Broadcast (transmisja), Project (projekt), MemoryCompression (kompresja pamięci), Stopped (zatrzymany); po 10 kolejnych błędach automatycznie przechodzi w stan Stopped
 
 ### System wtyczek
-- **Architektura rozszerzeń wtyczek** — rozszerzanie funkcjonalności poprzez interfejs IPlugin, obsługa dynamicznego ładowania bibliotek DLL wtyczek z katalogu
-- **Bezpieczna piaskownica** — ładowarka wtyczek wykonuje rygorystyczne skanowanie bezpieczeństwa, zabraniając dostępu do przestrzeni nazw takich jak System.IO, System.Net
+- **Architektura rozszerzeń wtyczek** — rozszerzanie funkcjonalności poprzez interfejs IPlugin, obsługa dynamicznego ładowania bibliotek DLL wtyczek z katalogów
+- **Deklaracja możliwości wtyczek** — wtyczki deklarują wymagane możliwości poprzez atrybut `[PluginCapability]` (Network, FileIO, Process, AI), a ładowarka na tej podstawie łagodzi reguły skanowania bezpieczeństwa; możliwości niezdeklarowalne (P/Invoke, Unsafe, Reflection Emit itp.) są zawsze blokowane
 - **Ładowanie izolowane** — wykorzystanie niestandardowego AssemblyLoadContext do izolowanego ładowania, zapobiegające wpływowi wtyczek na stabilność programu głównego
 - **Integracja narzędzi** — wtyczki mogą rejestrować niestandardowe narzędzia poprzez interfejs ITool, automatycznie integrując się z pętlą wywołań narzędzi
 
 ### Narzędzia i wykonywanie
-- **24 wbudowane narzędzia** — obejmujące kalendarz, czat, konfigurację, dysk, sieć, pamięć, zadania, czasomierz, bazę wiedzy, notatki pracy, przestrzeń projektową, WebView, gorące przeładowanie itp.
+- **24 wbudowane narzędzia** — obejmujące kalendarz, czat, konfigurację, dysk, sieć, pamięć, zadania, czasomierz, bazę wiedzy, notatki pracy, przestrzeń projektową, WebView itp.
 - **Izolacja scenariuszy narzędzi** — każde narzędzie deklaruje dostępne scenariusze poprzez atrybut `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project), atrybut `ChatOnly` ogranicza narzędzie wyłącznie do scenariusza czatu
-- **Narzędzie gorącego przeładowania** — obsługa automatycznej kompilacji, aktualizacji plików i restartu SiliconLife.Fast w trakcie działania, bez konieczności ręcznej interwencji
 - **Pętla wywołań narzędzi** — AI zwraca wywołanie narzędzia → wykonanie narzędzia → wynik przekazywany do AI → ciągła pętla aż do zwrócenia czystej tekstowej odpowiedzi
 - **Bezpieczeństwo Wykonawca-Uprawnienia** — wszystkie operacje I/O przechodzą przez rygorystyczną weryfikację uprawnień wykonawcy
   - 3-poziomowy łańcuch weryfikacji uprawnień: Pamięć Podręczna Częstotliwości Użytkownika → Interfejs Wywołania Zwrotnego Uprawnień → (IsCurator: Obsługa Zapytań o Uprawnienia | Non-curator: Globalna ACL → domyślna odmowa)
@@ -35,6 +34,9 @@
   - **Ollama** — lokalne wdrażanie modeli, wykorzystujące natywne HTTP API
   - **Alibaba Cloud Bailian (DashScope)** — chmurowa usługa AI, kompatybilna z OpenAI API, obsługa 13+ modeli, wdrożenie wieloregionalne
   - **Volcengine Ark (VolcengineArk)** — chmurowa usługa AI ByteDance, obsługa trybu strumieniowego i niestrumieniowego, wbudowana kontrola szybkości
+  - **Herdsman** — silnik wnioskowania bez autoryzacji, kompatybilny z formatem OpenAI API
+  - **Meituan LongCat** — autorski duży model Meituan, kompatybilny z formatem OpenAI API, autoryzacja przez klucz API
+  - **Qiniu Cloud AI** — chmurowa usługa wnioskowania dużych modeli Qiniu Cloud, kompatybilna z formatem OpenAI API, autoryzacja przez klucz API
 - **32 systemy kalendarzowe** — pełne pokrycie głównych kalendarzy świata, w tym gregoriański, chiński księżycowy, islamski, hebrajski, japoński, perski, majański, chińskie kalendarze historyczne itp.
 - **System Sieci Wiedzy** — graf wiedzy oparty na trójkach (podmiot-relacja-obiekt), obsługujący przechowywanie, zapytania i odkrywanie ścieżek
 - **Przestrzeń projektowa** — zarządzanie przestrzenią projektową, obsługa tworzenia/archiwizacji/niszczenia projektów, przypisywania ról, notatek pracy, śledzenia zadań i izolacji uprawnień narzędzi
@@ -90,7 +92,7 @@ Projekt oferuje dwie wersje implementacji, spełniające różne potrzeby scenar
   - Silnik SpeedyPack + automatyczna kompakcja gwarantująca bezpieczeństwo danych
   - Architektura Component UI, 27 komponentów deklaratywnych
   - 7 motywów skórek, obsługa automatycznego wykrywania i przełączania
-  - Narzędzie gorącego przeładowania obsługujące aktualizacje online i restart
+  - Narzędzie gorącego przeładowania → Linux automatycznie otwiera przeglądarkę, aby uzyskać dostęp do Web UI, obsługa parametru `--no-tray`
 - **Poprawa wydajności**: opóźnienie odczytu przechowywania zmniejszone 1000-krotnie, opóźnienie zapisu zmniejszone 15000-krotnie, zdolność obsługi współbieżnej zwiększona 50-krotnie
 - **Opis roli**: głęboko zoptymalizowana implementacja produkcyjna, zalecana do długotrwałego działania i rzeczywistych środowisk produkcyjnych
 - **Polecenie uruchomienia**: `dotnet run --project src/SiliconLife.Fast`
@@ -119,7 +121,7 @@ Projekt oferuje dwie wersje implementacji, spełniające różne potrzeby scenar
 | Środowisko uruchomieniowe | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Język programowania | C# | C# |
 | Typ aplikacji | Aplikacja konsolowa | Aplikacja desktopowa (Windows/macOS zasobnik systemowy / Linux okno statusu) |
-| Integracja AI | Ollama (lokalna), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura) | Ollama (lokalna), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura) |
+| Integracja AI | Ollama (lokalna), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (lokalna), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura), Herdsman, Meituan LongCat, Qiniu Cloud AI |
 | Przechowywanie danych | System plików (JSON + katalogi indeksowane czasowo) | SpeedyPack (format .spk, mapowanie pamięci + asynchroniczna trwałość) |
 | Serwer Web | HttpListener (wbudowany w .NET) | HttpListener (wbudowany w .NET) |
 | Kompilacja dynamiczna | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -157,7 +159,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Globalny lokalizator usług
 │   │
 │   ├── SiliconLife.Common/                # Współdzielone implementacje (wspólne dla obu wersji)
-│   │   ├── AI/                            # Klienci AI i fabryki (Ollama, DashScope, VolcengineArk)
+│   │   ├── AI/                            # Klienci AI i fabryki (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32 implementacje kalendarzy
 │   │   ├── Localization/                  # Baza lokalizacji i 34 implementacje wariantów językowych/regionalnych
 │   │   ├── Resources/                     # Współdzielone pliki zasobów

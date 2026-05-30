@@ -319,25 +319,30 @@ Der `TokenUsageAuditManager` bietet sicherheitsrelevantes KI-Token-Verbrauchs-Tr
 
 Das Plugin-System führt Sicherheitsrisiken durch Drittanbieter-Code-Ausführung ein, die durch folgende Mechanismen gemildert werden:
 
-### Sicherheits-Sandbox
+### Sicherheits-Sandbox und Fähigkeitsdeklaration
 
-Der `PluginLoader` führt beim Laden strenge Sicherheitsprüfungen durch:
+Der `PluginLoader` führt beim Laden Sicherheitsprüfungen durch und unterstützt gleichzeitig den Fähigkeitsdeklarationsmechanismus:
 
-1. **Verbotene Namespace-Prüfung** — Plugins dürfen nicht auf folgende Namespaces verweisen:
-   - `System.IO` — Dateisystemzugriff
-   - `System.Net.Http` — HTTP-Anfragen
-   - `System.Net.WebSockets` — WebSocket-Verbindungen
-   - `System.Net.Sockets` — Raw-Sockets
-   - `Microsoft.CodeAnalysis` — Compiler-API
+1. **Deklarierbare Fähigkeiten** — Plugins deklarieren erforderliche Fähigkeiten über das `[PluginCapability]`-Attribut:
+   - `Network` — Netzwerkzugriff (erlaubt Referenzen auf `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`)
+   - `FileIO` — Datei-Lese-/Schreibzugriff (erlaubt Referenzen auf `System.IO`)
+   - `Process` — Prozessverwaltung
+   - `AI` — KI-Aufrufe
 
-2. **Vertrauenswürdige Assembly-Whitelist** — Referenzen auf folgende Assemblys sind erlaubt:
+2. **Nicht deklarierbare Fähigkeiten** — Die folgenden Fähigkeiten werden immer blockiert:
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Unsafe-Code (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - Compiler-API (`Microsoft.CodeAnalysis`)
+
+3. **Vertrauenswürdige Assembly-Whitelist** — Referenzen auf folgende Assemblys sind erlaubt:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Verbotene Typ-Prüfung** — Scannt nach gefährlichen Typen, die im Plugin referenziert werden
+4. **Verbotene Typ-Prüfung** — Scannt nach gefährlichen Typen, die im Plugin referenziert werden
 
-4. **Verbotene Member-Prüfung** — Scannt nach gefährlichen Methoden, die im Plugin aufgerufen werden
+5. **Verbotene Member-Prüfung** — Scannt nach gefährlichen Methoden, die im Plugin aufgerufen werden
 
 ### Isoliertes Laden
 

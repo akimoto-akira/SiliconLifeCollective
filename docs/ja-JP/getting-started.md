@@ -33,6 +33,9 @@
 - **Ollama**（オプション、ローカル AI 用） - [ダウンロード](https://ollama.com/)
 - **百炼 API キー**（オプション、クラウド AI 用） - [申請](https://bailian.console.aliyun.com/)
 - **火山引擎 Ark API キー**（オプション、クラウド AI 用） - [申請](https://console.volcengine.com/ark)
+- **Herdsman**（オプション、ローカル/クラウド推論エンジン） - 認証不要、OpenAI API 形式互換
+- **Meituan LongCat API キー**（オプション、クラウド AI 用） - API キー認証
+- **Qiniu Cloud AI API キー**（オプション、クラウド AI 用） - API キー認証
 
 ## クイックスタート
 
@@ -97,6 +100,49 @@ dotnet build
 ```
 
 > **注意**：火山引擎 Ark の Model パラメータには、モデル名ではなく推論エンドポイント ID（例：`ep-20241212123456-abcde`）を使用します。
+
+#### オプション D：Herdsman（ローカル/クラウド）
+
+```json
+{
+  "AIClients": {
+    "Herdsman": {
+      "Endpoint": "http://localhost:8000",
+      "Model": "モデル名"
+    }
+  }
+}
+```
+
+> **特徴**：認証不要、OpenAI API 形式互換、ツールコールと推論コンテンツに対応。
+
+#### オプション E：Meituan LongCat（クラウド）
+
+```json
+{
+  "AIClients": {
+    "LongCat": {
+      "ApiKey": "API-キー",
+      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
+      "Model": "モデル名"
+    }
+  }
+}
+```
+
+#### オプション F：Qiniu Cloud AI（クラウド）
+
+```json
+{
+  "AIClients": {
+    "QiniuAI": {
+      "ApiKey": "API-キー",
+      "Endpoint": "https://api.qiniu.com/v1/chat/completions",
+      "Model": "モデル名"
+    }
+  }
+}
+```
 
 ### 4. アプリケーションの実行
 

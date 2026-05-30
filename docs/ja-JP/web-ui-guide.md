@@ -124,6 +124,9 @@ AI バックエンドの設定：
 - Ollama（ローカル）
 - 百錬（クラウド）
 - Volcengine Ark（クラウド）
+- Herdsman（ローカル/クラウド、認証不要）
+- Meituan LongCat（クラウド）
+- Qiniu Cloud AI（クラウド）
 - カスタムクライアント
 
 ### ストレージ設定

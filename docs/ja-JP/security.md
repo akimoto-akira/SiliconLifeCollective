@@ -317,25 +317,30 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 
 プラグインシステムはサードパーティコード実行のセキュリティリスクを導入します。以下のメカニズムで緩和します：
 
-### セキュリティサンドボックス
+### セキュリティサンドボックスと能力宣言
 
-`PluginLoader` はプラグインのロード時に厳格なセキュリティスキャンを実行します：
+`PluginLoader` はプラグインのロード時にセキュリティスキャンを実行し、同時に能力宣言メカニズムをサポートします：
 
-1. **禁止名前空間チェック** — プラグインは以下の名前空間を参照できません：
-   - `System.IO` — ファイルシステムアクセス
-   - `System.Net.Http` — HTTP リクエスト
-   - `System.Net.WebSockets` — WebSocket 接続
-   - `System.Net.Sockets` — 生ソケット
-   - `Microsoft.CodeAnalysis` — コンパイラ API
+1. **宣言可能な能力** — プラグインは `[PluginCapability]` 属性で必要な能力を宣言します：
+   - `Network` — ネットワークアクセス（`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets` の参照を許可）
+   - `FileIO` — ファイル読み書き（`System.IO` の参照を許可）
+   - `Process` — プロセス管理
+   - `AI` — AI 呼び出し
 
-2. **信頼アセンブリホワイトリスト** — 以下のアセンブリの参照が許可：
+2. **宣言不可能な能力** — 以下の能力は常にブロックされます：
+   - P/Invoke（`System.Runtime.InteropServices`）
+   - Unsafe コード（`System.Runtime.CompilerServices.Unsafe`）
+   - Reflection Emit（`System.Reflection.Emit`）
+   - コンパイラ API（`Microsoft.CodeAnalysis`）
+
+3. **信頼アセンブリホワイトリスト** — 以下のアセンブリの参照が許可：
    - `Google.Protobuf`、`Newtonsoft.Json`、`MessagePack`
    - `Serilog`、`Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **禁止型チェック** — プラグイン内で参照される危険な型をスキャン
+4. **禁止型チェック** — プラグイン内で参照される危険な型をスキャン
 
-4. **禁止メンバーチェック** — プラグイン内で呼び出される危険なメソッドをスキャン
+5. **禁止メンバーチェック** — プラグイン内で呼び出される危険なメソッドをスキャン
 
 ### 分離ロード
 

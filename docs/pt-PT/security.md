@@ -320,25 +320,30 @@ O `TokenUsageAuditManager` fornece rastreamento do consumo de tokens de IA relac
 
 O sistema de plugins introduz riscos de segurança de execução de código de terceiros, mitigados pelos seguintes mecanismos:
 
-### Sandbox Segura
+### Sandbox Segura e Declaração de Capacidades
 
-O `PluginLoader` executa uma verificação de segurança rigorosa ao carregar plugins:
+O `PluginLoader` executa uma verificação de segurança ao carregar plugins, suportando simultaneamente o mecanismo de declaração de capacidades:
 
-1. **Verificação de namespaces proibidos** — Os plugins não podem referenciar os seguintes namespaces:
-   - `System.IO` — Acesso ao sistema de ficheiros
-   - `System.Net.Http` — Pedidos HTTP
-   - `System.Net.WebSockets` — Ligações WebSocket
-   - `System.Net.Sockets` — Sockets raw
-   - `Microsoft.CodeAnalysis` — API do compilador
+1. **Capacidades declaráveis** — Os plugins declaram as capacidades necessárias através do atributo `[PluginCapability]`:
+   - `Network` — Acesso à rede (permite referenciar `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`)
+   - `FileIO` — Leitura/escrita de ficheiros (permite referenciar `System.IO`)
+   - `Process` — Gestão de processos
+   - `AI` — Chamadas de IA
 
-2. **Lista branca de assemblies fiáveis** — Referências aos seguintes assemblies são permitidas:
+2. **Capacidades não declaráveis** — As seguintes capacidades são sempre bloqueadas:
+   - P/Invoke (`System.Runtime.InteropServices`)
+   - Código Unsafe (`System.Runtime.CompilerServices.Unsafe`)
+   - Reflection Emit (`System.Reflection.Emit`)
+   - API do compilador (`Microsoft.CodeAnalysis`)
+
+3. **Lista branca de assemblies fiáveis** — Referências aos seguintes assemblies são permitidas:
    - `Google.Protobuf`, `Newtonsoft.Json`, `MessagePack`
    - `Serilog`, `Microsoft.Extensions.Logging.Abstractions`
    - `Dapper`
 
-3. **Verificação de tipos proibidos** — Analisa tipos perigosos referenciados no plugin
+4. **Verificação de tipos proibidos** — Analisa tipos perigosos referenciados no plugin
 
-4. **Verificação de membros proibidos** — Analisa métodos perigosos chamados no plugin
+5. **Verificação de membros proibidos** — Analisa métodos perigosos chamados no plugin
 
 ### Carregamento Isolado
 

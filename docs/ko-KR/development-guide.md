@@ -243,7 +243,7 @@ public class MyPluginTool : ITool
 
 3. 컴파일된 DLL을 플러그인 디렉토리에 넣으면 `플러그인 로더`가 자동으로 로드합니다.
 
-> **보안 제한**: 플러그인은 `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` 등의 네임스페이스를 참조할 수 없습니다. 플러그인은 `AssemblyLoadContext`를 통해 격리 로드됩니다.
+> **보안 제한**: 기본적으로 플러그인은 `System.IO`, `System.Net.Http`, `System.Net.WebSockets`, `System.Net.Sockets`, `Microsoft.CodeAnalysis` 등의 네임스페이스를 참조할 수 없습니다. 단, 플러그인이 `[PluginCapability]` 속성으로 필요한 역량(Network, FileIO, Process, AI)을 선언하면, 로더가 해당 보안 스캔 규칙을 완화합니다. 선언 불가능한 역량(P/Invoke, Unsafe, Reflection Emit 등)은 항상 차단됩니다. 플러그인은 `AssemblyLoadContext`를 통해 격리 로드됩니다.
 
 ### 새 스킨 추가
 
