@@ -330,7 +330,8 @@ public class ProjectTool : ITool
         bool result = pm.AssignBeing(projectId, beingId);
         if (result)
         {
-            return ToolResult.Successful($"Assigned being {beingId} to project {projectId}.");
+            var project = pm.GetProject(projectId);
+            return ToolResult.Successful($"Assigned being {beingId} to project {projectId}.", SlimProject(project));
         }
         return ToolResult.Failed($"Failed to assign being to project {projectId} (project not found).");
     }
@@ -350,7 +351,8 @@ public class ProjectTool : ITool
         bool result = pm.RemoveBeing(projectId, beingId);
         if (result)
         {
-            return ToolResult.Successful($"Removed being {beingId} from project {projectId}.");
+            var project = pm.GetProject(projectId);
+            return ToolResult.Successful($"Removed being {beingId} from project {projectId}.", SlimProject(project));
         }
         return ToolResult.Failed($"Failed to remove being from project {projectId}.");
     }
@@ -377,7 +379,7 @@ public class ProjectTool : ITool
                 $"Project updated successfully.\n" +
                 $"Name: {project.Name}\n" +
                 $"Description: {project.Description}",
-                project);
+                SlimProject(project));
         }
         return ToolResult.Failed($"Failed to update project {projectId} (not found or not active).");
     }
@@ -426,16 +428,21 @@ public class ProjectTool : ITool
 
         string roleName = rnObj!.ToString()!.Trim();
 
-        // Verify the being is already assigned to the project
+        // Auto-assign the being to the project if not already assigned
         if (!pm.IsBeingAssigned(projectId, beingId))
         {
-            return ToolResult.Failed($"Being {beingId} is not assigned to project {projectId}. Assign the being to the project first using the 'assign' action.");
+            bool assigned = pm.AssignBeing(projectId, beingId);
+            if (!assigned)
+            {
+                return ToolResult.Failed($"Failed to assign being {beingId} to project {projectId} (project not found).");
+            }
         }
 
         bool result = pm.AssignRole(projectId, roleName, beingId);
         if (result)
         {
-            return ToolResult.Successful($"Assigned being {beingId} to role '{roleName}' in project {projectId}.");
+            var project = pm.GetProject(projectId);
+            return ToolResult.Successful($"Assigned being {beingId} to role '{roleName}' in project {projectId}.", SlimProject(project));
         }
         return ToolResult.Failed($"Failed to assign being to role in project {projectId} (project not found).");
     }
@@ -465,6 +472,32 @@ public class ProjectTool : ITool
             return ToolResult.Successful($"Removed being {beingId} from role '{roleName}' in project {projectId}.");
         }
         return ToolResult.Failed($"Failed to remove being from role '{roleName}' in project {projectId} (project not found or being not in role).");
+    }
+
+    /// <summary>
+    /// Creates a slim representation of a project, stripping large data like ThinkSessions
+    /// to avoid exceeding AI input token limits.
+    /// </summary>
+    private static object? SlimProject(ProjectSpace? project)
+    {
+        if (project == null) return null;
+        return new
+        {
+            project.Id,
+            project.Name,
+            project.Description,
+            project.Status,
+            project.CreatedBy,
+            project.CreatedAt,
+            project.UpdatedAt,
+            project.AssignedBeings,
+            project.WorkflowTemplateName,
+            project.GroupChatSessionId,
+            project.BroadcastChannelId,
+            project.RoleAssignments,
+            ActiveThinkSessions = project.ThinkSessions.Count,
+            CompletedThinkSessions = project.ThinkSessionHistory.Count,
+        };
     }
 
     private static ToolResult ExecuteListRoles(IProjectManager pm, Dictionary<string, object> parameters)

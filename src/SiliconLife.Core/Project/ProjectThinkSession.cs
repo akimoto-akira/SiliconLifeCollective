@@ -74,16 +74,6 @@ public sealed class ProjectThinkSession
     /// </summary>
     public ProjectThinkState State { get; set; } = ProjectThinkState.Idle;
 
-    /// <summary>
-    /// Gets or sets the current AI interaction round within this session.
-    /// Each round represents one AI call (which may include tool calls that need follow-up).
-    /// </summary>
-    public int CurrentRound { get; set; } = 0;
-
-    /// <summary>
-    /// Gets or sets the maximum AI interaction rounds allowed per session (prevent infinite loops).
-    /// </summary>
-    public int MaxRounds { get; set; } = 10;
 
     /// <summary>
     /// Gets or sets the chat history cycles for this session.
@@ -100,6 +90,11 @@ public sealed class ProjectThinkSession
     /// Gets or sets the completion timestamp (null if not completed).
     /// </summary>
     public DateTime? CompletedAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets the failure reason (null if not failed).
+    /// </summary>
+    public string? FailureReason { get; set; }
 
     /// <summary>
     /// Creates a new ProjectThinkSession with default values.
@@ -161,10 +156,14 @@ public sealed class ProjectThinkSession
     /// <summary>
     /// Marks this session as completed with the given state.
     /// </summary>
-    public void Complete(ProjectThinkState finalState = ProjectThinkState.Completed)
+    public void Complete(ProjectThinkState finalState = ProjectThinkState.Completed, string? reason = null)
     {
         State = finalState;
         CompletedAt = DateTime.Now;
+        if (finalState == ProjectThinkState.Failed && reason != null)
+        {
+            FailureReason = reason;
+        }
         SealCurrentCycle(finalState);
     }
 }

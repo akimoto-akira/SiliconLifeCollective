@@ -84,8 +84,7 @@ public class ProjectThinkSessionItem
     public string BeingId { get; set; } = "";
     public string BeingName { get; set; } = "";
     public string State { get; set; } = "";
-    public int CurrentRound { get; set; }
-    public int MaxRounds { get; set; }
+    public string? FailureReason { get; set; }
     public string CreatedAt { get; set; } = "";
     public string? CompletedAt { get; set; }
     public int CycleCount { get; set; }
@@ -98,8 +97,7 @@ public class ProjectThinkDetailViewModel : ViewModelBase
     public string ProjectName { get; set; } = "";
     public string SessionId { get; set; } = "";
     public string State { get; set; } = "";
-    public int CurrentRound { get; set; }
-    public int MaxRounds { get; set; }
+    public string? FailureReason { get; set; }
     public string CreatedAt { get; set; } = "";
     public string? CompletedAt { get; set; }
     public Dictionary<string, string> ToolDisplayNames { get; set; } = new();

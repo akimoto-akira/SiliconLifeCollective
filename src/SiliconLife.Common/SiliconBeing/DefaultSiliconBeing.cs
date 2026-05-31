@@ -257,8 +257,8 @@ public class DefaultSiliconBeing : SiliconBeingBase
                 if (executingSession != null)
                 {
                     _activityRaw = (int)BeingActivity.Project;
-                    _logger.Info(Id, "Being {0}: continuing project think session {1} (round={2})",
-                        Name, executingSession.Id, executingSession.CurrentRound);
+                    _logger.Info(Id, "Being {0}: continuing project think session {1}",
+                        Name, executingSession.Id);
                     if (!ExecuteBrain("ThinkOnProjectContinue", null,
                         _ => new ContextManager(this, executingSession).ThinkOnProjectContinue(executingSession)))
                         errorOccurred = true;

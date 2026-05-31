@@ -351,17 +351,18 @@ public class ProjectManager : IProjectManager
     {
         var projects = new List<ProjectSpace>();
         
-        // Scan all project keys under "projects/" prefix
+        // Scan all project subdirectories under "projects/" prefix
         var projectKeys = _storage.ListKeys(ProjectsPrefix);
         
         foreach (var key in projectKeys)
         {
-            // Only read meta keys
-            if (!key.EndsWith("/meta", StringComparison.OrdinalIgnoreCase))
+            // Each entry should be a project subdirectory like "projects/{id}/"
+            if (!key.EndsWith("/"))
                 continue;
             
-            // Read project data (each meta key stores one ProjectSpace)
-            var projectData = _storage.Read<ProjectSpace>(key);
+            // Directly read the meta file for this project
+            string metaKey = key + "meta";
+            var projectData = _storage.Read<ProjectSpace>(metaKey);
             if (projectData != null && projectData.Length > 0)
             {
                 projects.AddRange(projectData);
@@ -413,25 +414,12 @@ public class ProjectManager : IProjectManager
                         // Session not in memory, need to restore from storage
                         // Read metadata from storage to get members and name
                         string metaKey = $"sessions/group/{project.GroupChatSessionId.Value}/meta";
-                        var metaDicts = _storage.Read<Dictionary<string, object>>(metaKey);
-                        var metaDict = metaDicts.FirstOrDefault();
+                        var metaArray = _storage.Read<GroupChatSessionMetadata>(metaKey);
+                        var meta = metaArray.FirstOrDefault();
                         
-                        if (metaDict != null)
+                        if (meta != null)
                         {
-                            string name = metaDict.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() ?? "" : "";
-                            var members = new List<Guid>();
-                            
-                            if (metaDict.TryGetValue("Members", out var membersObj) && membersObj is List<object> memberList)
-                            {
-                                foreach (var m in memberList)
-                                {
-                                    if (Guid.TryParse(m?.ToString(), out Guid memberId))
-                                        members.Add(memberId);
-                                }
-                            }
-                            
-                            // Restore session with fixed ID
-                            chatSystem.CreateGroupSession(members, name, project.GroupChatSessionId.Value);
+                            chatSystem.CreateGroupSession(meta.Members, meta.Name, project.GroupChatSessionId.Value);
                             _logger.Info(null, "Restored group chat session for project {0}: {1}", projectId, project.GroupChatSessionId.Value);
                         }
                     }
@@ -488,25 +476,12 @@ public class ProjectManager : IProjectManager
                         // Session not in memory, need to restore from storage
                         // Read metadata from storage to get members and name
                         string metaKey = $"sessions/group/{project.GroupChatSessionId.Value}/meta";
-                        var metaDicts = _storage.Read<Dictionary<string, object>>(metaKey);
-                        var metaDict = metaDicts.FirstOrDefault();
+                        var metaArray = _storage.Read<GroupChatSessionMetadata>(metaKey);
+                        var meta = metaArray.FirstOrDefault();
                         
-                        if (metaDict != null)
+                        if (meta != null)
                         {
-                            string name = metaDict.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() ?? "" : "";
-                            var members = new List<Guid>();
-                            
-                            if (metaDict.TryGetValue("Members", out var membersObj) && membersObj is List<object> memberList)
-                            {
-                                foreach (var m in memberList)
-                                {
-                                    if (Guid.TryParse(m?.ToString(), out Guid memberId))
-                                        members.Add(memberId);
-                                }
-                            }
-                            
-                            // Restore session with fixed ID
-                            chatSystem.CreateGroupSession(members, name, project.GroupChatSessionId.Value);
+                            chatSystem.CreateGroupSession(meta.Members, meta.Name, project.GroupChatSessionId.Value);
                             _logger.Info(null, "Restored group chat session for project {0}: {1}", projectId, project.GroupChatSessionId.Value);
                         }
                     }

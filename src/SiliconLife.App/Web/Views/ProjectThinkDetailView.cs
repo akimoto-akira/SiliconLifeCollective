@@ -39,12 +39,13 @@ public class ProjectThinkDetailView : ViewBase
                 H.A(vm.Localization.ProjectThinkBackToProjects).Href($"/project/{vm.ProjectId}/think-history").Class("back-link"),
                 H.H1(vm.Localization.ProjectThinkDetailHeader),
                 H.P(
-                    $"{string.Format(vm.Localization.ProjectThinkProjectName, vm.ProjectName)} | {vm.Localization.ProjectThinkRoundLabel}{vm.CurrentRound}/{vm.MaxRounds}"
+                    string.Format(vm.Localization.ProjectThinkProjectName, vm.ProjectName)
                 ).Class("page-subtitle"),
                 H.Div(
                     H.Span(stateText).Class($"execution-state {stateCssClass}"),
                     H.Span(createdAtText).Class("session-meta"),
-                    H.Span(completedAtText ?? "").When(completedAtText != null, H.Span(completedAtText!)).Class("session-meta")
+                    H.Span(completedAtText ?? "").When(completedAtText != null, H.Span(completedAtText!)).Class("session-meta"),
+                    H.Span(vm.FailureReason != null ? $"\u2014 {vm.FailureReason}" : "").When(vm.FailureReason != null, H.Span($"\u2014 {vm.FailureReason}")).Class("session-meta failure-reason")
                 ).Class("session-info")
             ).Class("page-header"),
             H.Div().Id("message-list").Class("message-list"),
@@ -104,6 +105,10 @@ public class ProjectThinkDetailView : ViewBase
                 .Property("background", "rgba(255,82,82,0.15)")
                 .Property("color", "var(--accent-error, #ff5252)")
             .EndSelector()
+            .Selector(".failure-reason")
+                .Property("color", "var(--accent-error, #ff5252)")
+                .Property("font-size", "0.9em")
+            .EndSelector()
             // Cycle collapsible styles
             .Selector(".cycle-collapsible")
                 .Property("margin", "8px 0")
@@ -157,8 +162,6 @@ public class ProjectThinkDetailView : ViewBase
         var apiUrl = $"/api/projects/{vm.ProjectId}/think-sessions/detail?sessionId={vm.SessionId}";
         return ChatHistoryDetailView.GetScriptsStatic(
             vm.ToolDisplayNames, apiUrl, vm.Localization.ProjectThinkNoRecords,
-            includeCycleData: true,
-            cycleLabel: vm.Localization.ProjectThinkCycleLabel,
-            cycleRoundFormat: vm.Localization.ProjectThinkRoundN);
+            includeCycleData: false);
     }
 }

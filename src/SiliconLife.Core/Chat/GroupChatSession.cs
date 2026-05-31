@@ -14,6 +14,19 @@
 namespace SiliconLife.Collective;
 
 /// <summary>
+/// Metadata record for group chat session persistence.
+/// Replaces anonymous type to support System.Text.Json ReferenceHandler.Preserve.
+/// </summary>
+public record GroupChatSessionMetadata
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = "";
+    public List<Guid> Members { get; init; } = [];
+    public string Type { get; init; } = "";
+    public DateTime UpdatedAt { get; init; }
+}
+
+/// <summary>
 /// Group chat session — persists messages via <see cref="ITimeStorage"/>.
 /// Uses a fixed session ID (not derived from members) to ensure stability
 /// when members are added or removed.
@@ -186,7 +199,7 @@ public class GroupChatSession : SessionBase
     /// </summary>
     private void SaveMetadata()
     {
-        var meta = new
+        var meta = new GroupChatSessionMetadata
         {
             Id = Id,
             Name = Name,

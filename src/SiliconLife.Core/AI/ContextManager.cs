@@ -201,8 +201,8 @@ public class ContextManager
             }
         }
 
-        _logger.Info(_being.Id, "ContextManager created for being {0}, projectThinkSession={1} (round={2})",
-            _being.Name, thinkSession.Id, thinkSession.CurrentRound);
+        _logger.Info(_being.Id, "ContextManager created for being {0}, projectThinkSession={1}",
+            _being.Name, thinkSession.Id);
     }
 
     /// <summary>
@@ -1760,7 +1760,6 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
             BeingId = _being.Id,
             ProjectId = project.Id,
             State = ProjectThinkState.Started,
-            CurrentRound = 0,
         };
         _projectThinkSession = session;
 
@@ -1782,7 +1781,6 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         cycle.Messages.Add(userMsg);
 
         AIResponse response = GetResponse(scenarioContext, scenario: ToolScenarioFlag.Project, projectId: project.Id);
-        session.CurrentRound++;
 
         if (response.Success && response.HasToolCalls)
         {
@@ -1814,7 +1812,7 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
 
         if (!response.Success)
         {
-            session.Complete(ProjectThinkState.Failed);
+            session.Complete(ProjectThinkState.Failed, response.ErrorMessage ?? "AI call failed");
             SaveProjectThinkSession(project);
             RecordToMemory(loc.FormatMemoryEventTask($"ThinkOnProject failed: {response.ErrorMessage ?? "AI call failed"}"));
         }
@@ -1848,7 +1846,7 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         var project = projectManager.GetProject(session.ProjectId);
         if (project == null)
         {
-            session.Complete(ProjectThinkState.Failed);
+            session.Complete(ProjectThinkState.Failed, "Project not found");
             return AIResponse.Failed("Project not found");
         }
 
@@ -1867,17 +1865,8 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         session = projectSession;
         _projectThinkSession = session;
 
-        session.CurrentRound++;
-        if (session.CurrentRound > session.MaxRounds)
-        {
-            _logger.Warn(_being.Id, "Project think session {0}: Max rounds ({1}) reached", session.Id, session.MaxRounds);
-            session.Complete(ProjectThinkState.Failed);
-            SaveProjectThinkSession(project);
-            return AIResponse.Failed("Max rounds reached");
-        }
-
-        _logger.Info(_being.Id, "ThinkOnProjectContinue: being={0}, session={1}, round={2}, project={3}",
-            _being.Name, session.Id, session.CurrentRound, project.Name);
+        _logger.Info(_being.Id, "ThinkOnProjectContinue: being={0}, session={1}, project={2}",
+            _being.Name, session.Id, project.Name);
 
         Language lang = Config.Instance?.Data?.Language ?? Language.ZhCN;
         LocalizationBase loc = LocalizationManager.Instance.GetLocalization(lang);
@@ -1930,7 +1919,7 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
 
         if (!response.Success)
         {
-            session.Complete(ProjectThinkState.Failed);
+            session.Complete(ProjectThinkState.Failed, response.ErrorMessage ?? "AI call failed");
             SaveProjectThinkSession(project);
             RecordToMemory(loc.FormatMemoryEventTask($"ThinkOnProject failed: {response.ErrorMessage ?? "AI call failed"}"));
         }
@@ -1963,14 +1952,36 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         var session = _projectThinkSession;
         if (session == null) return;
 
-        if (session.State == ProjectThinkState.Completed || session.State == ProjectThinkState.Failed)
+        // Reload the latest project from storage to avoid overwriting changes made by tool calls
+        // (e.g., assign/remove operations modify AssignedBeings, RoleAssignments, etc.)
+        var freshProject = projectManager.GetProject(project.Id);
+        if (freshProject == null) return;
+
+        // Sync think session state onto the fresh project
+        var existingSession = freshProject.ThinkSessions.FirstOrDefault(s => s.Id == session.Id);
+        if (existingSession == null)
         {
-            project.ThinkSessions.Remove(session);
-            project.ThinkSessionHistory.Add(session);
+            // Session was added to the stale copy but not yet in storage — add it
+            freshProject.ThinkSessions.Add(session);
+        }
+        else
+        {
+            // Replace the old session reference with the updated one
+            int idx = freshProject.ThinkSessions.IndexOf(existingSession);
+            freshProject.ThinkSessions[idx] = session;
         }
 
-        project.UpdatedAt = DateTime.UtcNow;
-        projectManager.SaveProject(project);
+        if (session.State == ProjectThinkState.Completed || session.State == ProjectThinkState.Failed)
+        {
+            freshProject.ThinkSessions.Remove(session);
+            if (!freshProject.ThinkSessionHistory.Any(s => s.Id == session.Id))
+            {
+                freshProject.ThinkSessionHistory.Add(session);
+            }
+        }
+
+        freshProject.UpdatedAt = DateTime.UtcNow;
+        projectManager.SaveProject(freshProject);
     }
 
     private ProjectAttentionInfo? FindProjectNeedingAttention()

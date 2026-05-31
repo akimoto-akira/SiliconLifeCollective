@@ -184,28 +184,18 @@ public class ChatSystem
 
                     // Read session metadata
                     string metaKey = $"sessions/group/{sessionIdStr}/meta";
-                    var metaDictArray = _storage.Read<Dictionary<string, object>>(metaKey);
-                    var metaDict = metaDictArray.FirstOrDefault();
+                    var metaArray = _storage.Read<GroupChatSessionMetadata>(metaKey);
+                    var meta = metaArray.FirstOrDefault();
                     
-                    if (metaDict == null)
+                    if (meta == null)
                     {
                         _logger.Warn(null, "Failed to read metadata for session: {0}", sessionId);
                         continue;
                     }
 
-                    string name = metaDict.TryGetValue("Name", out var nameObj) ? nameObj?.ToString() ?? "" : "";
-                    var members = new List<Guid>();
-                    
-                    if (metaDict.TryGetValue("Members", out var membersObj) && membersObj is List<object> memberList)
-                    {
-                        foreach (var m in memberList)
-                        {
-                            if (Guid.TryParse(m?.ToString(), out Guid memberId))
-                                members.Add(memberId);
-                        }
-                    }
+                    string name = meta.Name;
+                    var members = meta.Members;
 
-                    // Recreate the session with fixed ID
                     GroupChatSession session = new(sessionId, members, _storage, name);
                     _sessions[sessionId] = session;
                     loadedCount++;

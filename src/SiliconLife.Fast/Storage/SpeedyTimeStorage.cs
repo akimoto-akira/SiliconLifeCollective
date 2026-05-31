@@ -123,7 +123,16 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
 
     private void UpsertIntoArray<T>(string path, T data)
     {
-        var list = ReadArray<T>(path);
+        List<T> list;
+        try
+        {
+            list = ReadArray<T>(path);
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            list = [];
+        }
+
         object? newId = typeof(T).GetProperty("Id")?.GetValue(data);
         if (newId != null)
         {

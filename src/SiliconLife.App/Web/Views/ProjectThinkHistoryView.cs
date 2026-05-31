@@ -101,6 +101,10 @@ public class ProjectThinkHistoryView : ViewBase
                 .Property("background", "rgba(255,82,82,0.15)")
                 .Property("color", "var(--accent-error, #ff5252)")
             .EndSelector()
+            .Selector(".failure-reason")
+                .Property("color", "var(--accent-error, #ff5252)")
+                .Property("font-size", "0.9em")
+            .EndSelector()
             .Selector(".execution-info")
                 .Property("font-size", "13px")
                 .Property("color", "var(--text-secondary)")
@@ -174,12 +178,6 @@ public class ProjectThinkHistoryView : ViewBase
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "stateText"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</span></div><div class='execution-info'><span class='execution-info-label'>"))
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => vm.Localization.ProjectThinkRoundLabel))
-            .Op(() => "+", () => (JsSyntax)Js.Id(() => "e").Prop(() => "currentRound"))
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => "/"))
-            .Op(() => "+", () => (JsSyntax)Js.Id(() => "e").Prop(() => "maxRounds"))
-            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))
-            .Op(() => "+", () => Js.Str(() => "<div class='execution-info'><span class='execution-info-label'>"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => vm.Localization.ProjectThinkMessageCountLabel))
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "e").Prop(() => "messageCount"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>"))
@@ -190,6 +188,13 @@ public class ProjectThinkHistoryView : ViewBase
                 () => Js.Id(() => "e").Prop(() => "completedAt"),
                 () => Js.Str(() => "<div class='execution-info'><span class='execution-info-label'>Completed:</span>")
                     .Op(() => "+", () => (JsSyntax)Js.Id(() => "e").Prop(() => "completedAt"))
+                    .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")),
+                () => Js.Str(() => "")
+            ))
+            .Op(() => "+", () => Js.Ternary(
+                () => Js.Id(() => "e").Prop(() => "failureReason"),
+                () => Js.Str(() => "<div class='execution-info failure-reason'>")
+                    .Op(() => "+", () => (JsSyntax)Js.Id(() => "e").Prop(() => "failureReason"))
                     .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div>")),
                 () => Js.Str(() => "")
             ));
