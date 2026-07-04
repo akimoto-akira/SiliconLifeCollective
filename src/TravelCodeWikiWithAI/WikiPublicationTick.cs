@@ -21,23 +21,23 @@ namespace TravelCodeWikiWithAI;
 /// 5) 步骤7：发现文档就绪 → 触发BuildDocument+发布
 /// 
 /// 约束：每帧只创建一个任务，防止任务爆炸。
-/// 前置条件：_pbf.OK == true
+/// 前置条件：OsmOnlineApiService.OK == true
 /// 任务创建时从角色池取执行者（依赖task-350）。
 /// </summary>
 public class WikiPublicationTick : TickObject
 {
+    /// <summary>
+    /// 记录已尝试展开但无法再展开的父节点 OSM ID，防止 FindEmptyParent 反复返回同一死节点。
+    /// </summary>
+    private readonly HashSet<long> _fullyExpandedParents = new();
+
     public WikiPublicationTick() : base(TimeSpan.FromSeconds(2), autoRegister: true)
     {
     }
 
     protected override void OnTick(TimeSpan deltaTime)
     {
-        if (TravelCodeWikiWithAIPlugin._pbf == null)
-        {
-            return;
-        }
-
-        if (!TravelCodeWikiWithAIPlugin._pbf.OK)
+        if (!OsmOnlineApiService.OK)
         {
             return;
         }
@@ -113,8 +113,7 @@ public class WikiPublicationTick : TickObject
     /// </summary>
     private bool ScanForCodeAssignment(GeoWorld world, ProjectTaskSystem taskSystem)
     {
-        var pbf = TravelCodeWikiWithAIPlugin._pbf;
-        if (pbf == null || !pbf.OK)
+        if (!OsmOnlineApiService.OK)
         {
             return false;
         }
@@ -126,7 +125,13 @@ public class WikiPublicationTick : TickObject
         }
 
         long parentOsmId = (emptyParent == world) ? -1 : emptyParent.OSMID;
-        return ExpandOneLayer(emptyParent, parentOsmId, taskSystem);
+        bool expanded = ExpandOneLayer(emptyParent, parentOsmId, taskSystem);
+        if (!expanded)
+        {
+            // 该节点无法再展开，标记为已完成，下次跳过
+            _fullyExpandedParents.Add(parentOsmId);
+        }
+        return expanded;
     }
 
     /// <summary>
@@ -149,7 +154,13 @@ public class WikiPublicationTick : TickObject
 
         if (!hasChildren)
         {
-            if (location is GeoWorld || location.OSMID > 0)
+            if (location is GeoWorld)
+            {
+                // world 用 -1 标识，若已标记为完成则跳过
+                if (_fullyExpandedParents.Contains(-1)) return null;
+                return location;
+            }
+            if (location.OSMID > 0 && !_fullyExpandedParents.Contains(location.OSMID))
             {
                 return location;
             }
@@ -231,7 +242,6 @@ public class WikiPublicationTick : TickObject
     /// </summary>
     private bool ExpandOneLayer(GeoLocation parent, long parentOsmId, ProjectTaskSystem taskSystem)
     {
-        var pbf = TravelCodeWikiWithAIPlugin._pbf;
         bool anyAction = false;
 
         var fixedChildren = GetFixedOsmIdMapping(parentOsmId);
@@ -248,7 +258,7 @@ public class WikiPublicationTick : TickObject
                 continue;
 
             string fixedId = childInfo.TryGetValue("id", out var fid) ? fid : null;
-            var childTags = GetOsmRelationTags(pbf, childOsmId);
+            var childTags = GetOsmRelationTags(childOsmId);
             string resolvedId = ResolveEntityId(childTags, fixedId);
 
             if (resolvedId != null)
@@ -265,15 +275,11 @@ public class WikiPublicationTick : TickObject
 
         if (parentOsmId > 0)
         {
-            var relations = pbf.GetDataById<OSMRelations>(parentOsmId);
-            if (relations.Count > 0)
+            var relInfo = OsmOnlineApiService.GetRelationInfo(parentOsmId);
+            if (relInfo != null)
             {
-                var rel = relations[relations.Count - 1];
-                foreach (var member in rel.Refs)
+                foreach (var member in relInfo.SubRelations)
                 {
-                    if (member.Type != OSMRelationRefType.Relations)
-                        continue;
-
                     string role = member.Role ?? "";
                     if (role != "" && role != "admin" && role != "label" && role != "subarea" && role != "child")
                         continue;
@@ -288,7 +294,7 @@ public class WikiPublicationTick : TickObject
                     if (HasExistingTask(taskSystem, objectKey, "CodeAssignment"))
                         continue;
 
-                    var childTags = GetOsmRelationTags(pbf, member.Id);
+                    var childTags = GetOsmRelationTags(member.Id);
                     if (childTags == null || childTags.Count == 0)
                         continue;
 
@@ -315,16 +321,18 @@ public class WikiPublicationTick : TickObject
     }
 
     /// <summary>
-    /// 从 PBF 获取 OSM Relation 的 tags，找不到返回空字典
+    /// 从在线 API 获取 OSM Relation 的 tags，找不到返回空字典
     /// </summary>
-    private Dictionary<string, string> GetOsmRelationTags(PbfFileDataSource pbf, long osmId)
+    private Dictionary<string, string> GetOsmRelationTags(long osmId)
     {
-        var relations = pbf.GetDataById<OSMRelations>(osmId);
-        if (relations.Count > 0)
+        try
         {
-            return relations[relations.Count - 1].GetTags();
+            return OsmOnlineApiService.GetRelationTags(osmId);
         }
-        return new Dictionary<string, string>();
+        catch
+        {
+            return new Dictionary<string, string>();
+        }
     }
 
     /// <summary>

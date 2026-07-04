@@ -154,19 +154,14 @@ public class GeoDataTool : ITool
 
     /// <summary>
     /// 列出指定区域内的 OSM POI 数据（名称、类型标签、坐标）
-    /// List OSM POI data in the specified area (name, type tags, coordinates)
-    /// 
-    /// 从 PBF 数据源中查找与该实体相关的 OSM Relations，
-    /// 提取标签信息（tourism, aeroway, harbour, amenity 等 POI 类型标签）。
     /// </summary>
     private ToolResult ExecuteListOsmPois(Dictionary<string, object> parameters)
     {
         try
         {
-            var pbf = TravelCodeWikiWithAIPlugin._pbf;
-            if (pbf == null || !pbf.OK)
+            if (!OsmOnlineApiService.OK)
             {
-                return ToolResult.Failed("PBF data source not available. OSM data has not been loaded.");
+                return ToolResult.Failed("Online OSM API not available.");
             }
 
             if (!parameters.TryGetValue("entity_path", out var epObj) || epObj is not string entityPath || string.IsNullOrEmpty(entityPath))
@@ -195,11 +190,7 @@ public class GeoDataTool : ITool
             // Strategy 1: If entity has an OSMID, look up its OSM relation for sub-elements
             if (entity.OSMID > 0)
             {
-                var relations = pbf.GetDataById<OSMRelations>(entity.OSMID);
-                foreach (var rel in relations)
-                {
-                    CollectPOIsFromRelation(rel, pois, tagFilter);
-                }
+                CollectPOIsFromRelation(entity.OSMID, pois, tagFilter);
             }
 
             // Strategy 2: Scan OSM nodes within the entity's MapInfo bounding box
@@ -251,10 +242,9 @@ public class GeoDataTool : ITool
     {
         try
         {
-            var pbf = TravelCodeWikiWithAIPlugin._pbf;
-            if (pbf == null || !pbf.OK)
+            if (!OsmOnlineApiService.OK)
             {
-                return ToolResult.Failed("PBF data source not available");
+                return ToolResult.Failed("Online OSM api not available");
             }
 
             if (!parameters.TryGetValue("entity_path", out var epObj) || epObj is not string entityPath || string.IsNullOrEmpty(entityPath))
@@ -406,17 +396,15 @@ public class GeoDataTool : ITool
     // ===== refresh_osm =====
 
     /// <summary>
-    /// 刷新实体的 OSM 数据
-    /// Refresh an entity's OSM data by re-reading from the PBF data source
+    /// 刷新实体的 OSM 数据（从在线 API 重新获取）
     /// </summary>
     private ToolResult ExecuteRefreshOsm(Dictionary<string, object> parameters)
     {
         try
         {
-            var pbf = TravelCodeWikiWithAIPlugin._pbf;
-            if (pbf == null || !pbf.OK)
+            if (!OsmOnlineApiService.OK)
             {
-                return ToolResult.Failed("PBF data source not available");
+                return ToolResult.Failed("Online OSM api not available");
             }
 
             if (!parameters.TryGetValue("entity_path", out var epObj) || epObj is not string entityPath || string.IsNullOrEmpty(entityPath))
@@ -436,17 +424,14 @@ public class GeoDataTool : ITool
                 return ToolResult.Failed($"Entity not found: {entityPath}");
             }
 
-            // Refresh OSM data by looking up the entity's OSMID in the PBF
+            // Refresh OSM data from online API
             var changes = new List<string>();
 
             if (entity.OSMID > 0)
             {
-                var relations = pbf.GetDataById<OSMRelations>(entity.OSMID);
-                if (relations.Count > 0)
+                var tags = OsmOnlineApiService.GetRelationTags(entity.OSMID);
+                if (tags.Count > 0)
                 {
-                    var rel = relations[relations.Count - 1]; // use latest version
-                    var tags = rel.GetTags();
-
                     // Update Name from OSM tags if current Name is null
                     if (entity.Name == null || entity.Name.Count == 0)
                     {
@@ -490,7 +475,7 @@ public class GeoDataTool : ITool
             }
             else
             {
-                changes.Add("Entity has no OSMID — cannot refresh from PBF");
+                changes.Add("Entity has no OSMID — cannot refresh from online API");
             }
 
             var result = new Dictionary<string, object?>
@@ -514,20 +499,15 @@ public class GeoDataTool : ITool
     // ===== expand_children =====
 
     /// <summary>
-    /// 展开实体的子区域（从 PBF 数据中提取）
-    /// Expand an entity's child areas by extracting sub-regions from PBF data
-    /// 
-    /// 查找 OSM Relation 中 role=label/admin 等子成员，
-    /// 为每个子区域创建对应的 GeoLocation 子类实例并挂载到父实体。
+    /// 展开实体的子区域（从在线 API 获取）
     /// </summary>
     private ToolResult ExecuteExpandChildren(Dictionary<string, object> parameters)
     {
         try
         {
-            var pbf = TravelCodeWikiWithAIPlugin._pbf;
-            if (pbf == null || !pbf.OK)
+            if (!OsmOnlineApiService.OK)
             {
-                return ToolResult.Failed("PBF data source not available");
+                return ToolResult.Failed("Online OSM API not available");
             }
 
             if (!parameters.TryGetValue("entity_path", out var epObj) || epObj is not string entityPath || string.IsNullOrEmpty(entityPath))
@@ -549,26 +529,21 @@ public class GeoDataTool : ITool
 
             if (entity.OSMID <= 0)
             {
-                return ToolResult.Failed($"Entity {entityPath} has no OSMID — cannot expand children from PBF");
+                return ToolResult.Failed($"Entity {entityPath} has no OSMID — cannot expand children");
             }
 
             // Find the OSM relation for this entity
-            var relations = pbf.GetDataById<OSMRelations>(entity.OSMID);
-            if (relations.Count == 0)
+            var relInfo = OsmOnlineApiService.GetRelationInfo(entity.OSMID);
+            if (relInfo == null)
             {
                 return ToolResult.Failed($"No OSM relation found for OSMID {entity.OSMID}");
             }
 
-            var rel = relations[relations.Count - 1];
             var addedChildren = new List<Dictionary<string, object?>>();
 
             // Iterate over relation members to find sub-areas
-            foreach (var member in rel.Refs)
+            foreach (var member in relInfo.SubRelations)
             {
-                // Only process relation members with admin/label/subarea roles
-                if (member.Type != OSMRelationRefType.Relations)
-                    continue;
-
                 string role = member.Role ?? "";
                 if (role != "" && role != "admin" && role != "label" && role != "subarea" && role != "child")
                     continue;
@@ -588,13 +563,10 @@ public class GeoDataTool : ITool
                 if (alreadyExists)
                     continue;
 
-                // Look up the child relation in PBF
-                var childRelations = pbf.GetDataById<OSMRelations>(member.Id);
-                if (childRelations.Count == 0)
+                // Look up the child relation tags from online API
+                var childTags = OsmOnlineApiService.GetRelationTags(member.Id);
+                if (childTags.Count == 0)
                     continue;
-
-                var childRel = childRelations[childRelations.Count - 1];
-                var childTags = childRel.GetTags();
 
                 // Determine admin level and create appropriate GeoLocation subclass
                 GeoLocation childEntity = CreateGeoLocationFromTags(entity, childTags, member.Id);
@@ -636,83 +608,50 @@ public class GeoDataTool : ITool
     private static GeoProject? GetGeoProject() => TravelCodeWikiWithAIPlugin._geoProject;
 
     /// <summary>
-    /// Collect POIs from an OSM relation by examining its member nodes/ways
+    /// 从在线 API 获取 Relation 的所有成员（node/way），筛选出 POI
     /// </summary>
-    private void CollectPOIsFromRelation(OSMRelations rel, List<Dictionary<string, object?>> pois, string? tagFilter)
+    private void CollectPOIsFromRelation(long osmId, List<Dictionary<string, object?>> pois, string? tagFilter)
     {
-        var pbf = TravelCodeWikiWithAIPlugin._pbf;
-        if (pbf == null) return;
-
-        var tags = rel.GetTags();
+        var detail = OsmOnlineApiService.GetRelationDetail(osmId);
+        if (detail == null) return;
 
         // Check if the relation itself is a POI
-        if (IsPOITag(tags, tagFilter))
+        if (IsPOITag(detail.Tags, tagFilter))
         {
-            pois.Add(BuildPOIEntry(rel.Id, "relation", tags, default));
+            pois.Add(BuildPOIEntry(detail.Id, "relation", detail.Tags, default));
         }
 
-        // Examine member nodes for POI data
-        foreach (var member in rel.Refs)
+        // Examine member nodes/ways for POI data
+        foreach (var member in detail.Members)
         {
-            if (member.Type == OSMRelationRefType.Node)
+            if (member.Type == "node")
             {
-                var nodes = pbf.GetDataById<OSMNode>(member.Id);
-                foreach (var node in nodes)
+                var nodeInfo = OsmOnlineApiService.GetNodeInfo(member.Id);
+                if (nodeInfo == null) continue;
+
+                if (IsPOITag(nodeInfo.Tags, tagFilter))
                 {
-                    var nodeTags = node.GetTags();
-                    if (IsPOITag(nodeTags, tagFilter))
-                    {
-                        pois.Add(BuildPOIEntry(node.Id, "node", nodeTags, node.LngLat));
-                    }
+                    pois.Add(BuildPOIEntry(member.Id, "node", nodeInfo.Tags,
+                        new Vector2DD(nodeInfo.Lon, nodeInfo.Lat)));
                 }
             }
-            else if (member.Type == OSMRelationRefType.Way)
+            else if (member.Type == "way")
             {
-                // Ways typically don't have coordinates, but they might have POI tags
-                var ways = pbf.GetDataById<OSMWay>(member.Id);
-                foreach (var way in ways)
+                var wayTags = OsmOnlineApiService.GetWayTags(member.Id);
+                if (IsPOITag(wayTags, tagFilter))
                 {
-                    var wayTags = way.GetTags();
-                    if (IsPOITag(wayTags, tagFilter))
-                    {
-                        pois.Add(BuildPOIEntry(way.Id, "way", wayTags, default));
-                    }
+                    pois.Add(BuildPOIEntry(member.Id, "way", wayTags, default));
                 }
             }
         }
     }
 
     /// <summary>
-    /// Collect POIs from OSM nodes within a bounding box area
+    /// 在线 API 不支持边界框扫描，已废弃
     /// </summary>
     private void CollectPOIsFromBoundingBox(MapInfo mapInfo, List<Dictionary<string, object?>> pois, string? tagFilter)
     {
-        var pbf = TravelCodeWikiWithAIPlugin._pbf;
-        if (pbf == null) return;
-
-        // Use OSMArray to scan all nodes — this is a broad scan
-        // In production, a spatial index would be more efficient
-        var osmNodes = new OSMArray<OSMNode>(pbf);
-        double minLon = mapInfo.Center.X - 0.5;
-        double maxLon = mapInfo.Center.X + 0.5;
-        double minLat = mapInfo.Center.Y - 0.5;
-        double maxLat = mapInfo.Center.Y + 0.5;
-
-        foreach (var node in osmNodes)
-        {
-            if (node == null) continue;
-
-            // Rough bounding box filter
-            if (node.LngLat.X < minLon || node.LngLat.X > maxLon ||
-                node.LngLat.Y < minLat || node.LngLat.Y > maxLat)
-                continue;
-
-            var tags = node.GetTags();
-            if (IsPOITag(tags, tagFilter))
-            {
-                pois.Add(BuildPOIEntry(node.Id, "node", tags, node.LngLat));
-            }
-        }
+        // 在线 API 不支持按边界框扫描所有节点，跳过此策略
     }
 
     /// <summary>
@@ -802,39 +741,30 @@ public class GeoDataTool : ITool
     }
 
     /// <summary>
-    /// Get OSM tags and location for a given OSM element
+    /// 从在线 API 获取 OSM 元素的 tags 和坐标
     /// </summary>
     private Dictionary<string, string>? GetOSMTags(long osmId, string osmType, out Vector2DD location)
     {
         location = default;
-        var pbf = TravelCodeWikiWithAIPlugin._pbf;
-        if (pbf == null) return null;
+        if (!OsmOnlineApiService.OK) return null;
 
         switch (osmType.ToLowerInvariant())
         {
             case "node":
-                var nodes = pbf.GetDataById<OSMNode>(osmId);
-                if (nodes.Count > 0)
+                var nodeInfo = OsmOnlineApiService.GetNodeInfo(osmId);
+                if (nodeInfo != null)
                 {
-                    location = nodes[0].LngLat;
-                    return nodes[0].GetTags();
+                    location = new Vector2DD(nodeInfo.Lon, nodeInfo.Lat);
+                    return nodeInfo.Tags;
                 }
                 break;
 
             case "way":
-                var ways = pbf.GetDataById<OSMWay>(osmId);
-                if (ways.Count > 0)
-                {
-                    return ways[0].GetTags();
-                }
-                break;
+                return OsmOnlineApiService.GetWayTags(osmId);
 
             case "relation":
-                var rels = pbf.GetDataById<OSMRelations>(osmId);
-                if (rels.Count > 0)
-                {
-                    return rels[0].GetTags();
-                }
+                var tags = OsmOnlineApiService.GetRelationTags(osmId);
+                if (tags.Count > 0) return tags;
                 break;
         }
 

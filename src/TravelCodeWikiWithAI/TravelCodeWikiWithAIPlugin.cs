@@ -128,7 +128,6 @@ public class TravelCodeWikiWithAIPlugin : IPlugin
     private SpeedyPack? _speedyPack;
     private SpeedyPack? _cldrPack;
     public static CldrDataProvider? _cldrProvider;
-    public static PbfFileDataSource _pbf;
     public static GeoProject? _geoProject;
     public static MediaWikiPublishService? _publishService;
 
@@ -166,20 +165,13 @@ public class TravelCodeWikiWithAIPlugin : IPlugin
     /// </summary>
     private void StartupThreadFunction()
     {
+        // 等待 Curator 就绪
         while (SiliconBeingManager.GetCuratorBeing() == null)
         {
             Thread.Sleep(1000);
         }
 
-        PermissionedStream ps = PermissionedStreamFactory.CreateReadStream(SiliconBeingManager.GetCuratorBeing().Id,
-            "D:\\pbf\\beijing-internal.osh.pbf");
-        if (ps == null)
-        {
-            return;
-        }
-        _pbf = new PbfFileDataSource(ps);
-        _pbf.Parse();
-
+        // 加载 GeoProject
         if (_speedyPack != null)
         {
             _geoProject = GeoDataBase.LoadFromPack<GeoProject>(_speedyPack, "geo/root");
@@ -196,7 +188,8 @@ public class TravelCodeWikiWithAIPlugin : IPlugin
             TranslationDefaults.ApplyDefaults(_geoProject.Translation);
         }
 
-        _pbf.OK = true;
+        // 启用在线 OSM API
+        OsmOnlineApiService.OK = true;
     }
 
     public void OnStop()
