@@ -20,10 +20,18 @@ using Microsoft.CodeAnalysis;
 
 namespace SiliconLife.Collective;
 
+/// <summary>
+/// Records information about a plugin that failed to load.
+/// </summary>
+/// <param name="DirectoryName">The directory name of the failed plugin.</param>
+/// <param name="ErrorMessage">The error message describing why the plugin failed to load.</param>
+public record FailedPluginInfo(string DirectoryName, string ErrorMessage);
+
 public class PluginLoader
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<PluginLoader>();
     private readonly List<LoadedPlugin> _loadedPlugins = [];
+    private readonly List<FailedPluginInfo> _failedPlugins = [];
     private readonly List<string> _pluginDirectories = [];
 
     /// <summary>
@@ -56,6 +64,11 @@ public class PluginLoader
     public IReadOnlyList<string> PluginDirectories => _pluginDirectories.AsReadOnly();
 
     public IReadOnlyList<IPlugin> Plugins => _loadedPlugins.Select(p => p.Plugin).ToList();
+
+    /// <summary>
+    /// Gets the list of plugins that failed to load.
+    /// </summary>
+    public IReadOnlyList<FailedPluginInfo> FailedPlugins => _failedPlugins.AsReadOnly();
 
     /// <summary>
     /// Loads plugins from all configured directories. Each directory's sub-directories
@@ -110,6 +123,7 @@ public class PluginLoader
                 dllPath,
                 violations.Count,
                 string.Join("\n  - ", violations));
+            _failedPlugins.Add(new FailedPluginInfo(dirName, string.Join("; ", violations)));
             return;
         }
 
@@ -125,6 +139,7 @@ public class PluginLoader
             if (pluginTypes.Length == 0)
             {
                 _logger.Warn(null, "No IPlugin implementation found in {0}", dllPath);
+                _failedPlugins.Add(new FailedPluginInfo(dirName, "No IPlugin implementation found"));
                 context.Unload();
                 return;
             }
@@ -133,6 +148,7 @@ public class PluginLoader
             {
                 string typeNames = string.Join(", ", pluginTypes.Select(t => t.Name));
                 _logger.Error(null, "Multiple IPlugin implementations found in {0}: [{1}]. Only one is allowed.", dllPath, typeNames);
+                _failedPlugins.Add(new FailedPluginInfo(dirName, "Multiple IPlugin implementations found"));
                 context.Unload();
                 return;
             }
@@ -150,6 +166,7 @@ public class PluginLoader
         catch (Exception ex)
         {
             _logger.Error(null, "Failed to load plugin from {0}: {1}", pluginDir, ex.Message);
+            _failedPlugins.Add(new FailedPluginInfo(dirName, ex.Message));
         }
     }
 
@@ -201,6 +218,7 @@ public class PluginLoader
         }
 
         _loadedPlugins.Clear();
+        _failedPlugins.Clear();
         _logger.Info(null, "All plugins unloaded");
     }
 
@@ -241,6 +259,7 @@ public class PluginLoader
                 "[CS-Source] Compilation failed for plugin {0}:\n  - {1}",
                 dirName,
                 string.Join("\n  - ", compileErrors));
+            _failedPlugins.Add(new FailedPluginInfo(dirName, "Compilation failed: " + string.Join("; ", compileErrors)));
             return;
         }
 
@@ -254,6 +273,7 @@ public class PluginLoader
         catch (Exception ex)
         {
             _logger.Error(null, "[CS-Source] Failed to write temp DLL for scanning: {0}", ex.Message);
+            _failedPlugins.Add(new FailedPluginInfo(dirName, "Failed to write temp DLL: " + ex.Message));
             return;
         }
 
@@ -267,6 +287,7 @@ public class PluginLoader
                     dirName,
                     violations.Count,
                     string.Join("\n  - ", violations));
+                _failedPlugins.Add(new FailedPluginInfo(dirName, string.Join("; ", violations)));
                 return;
             }
 
@@ -278,6 +299,7 @@ public class PluginLoader
             if (pluginTypes.Length == 0)
             {
                 _logger.Warn(null, "[CS-Source] No IPlugin implementation found in compiled source for {0}", dirName);
+                _failedPlugins.Add(new FailedPluginInfo(dirName, "No IPlugin implementation found"));
                 return;
             }
 
@@ -285,6 +307,7 @@ public class PluginLoader
             {
                 string typeNames = string.Join(", ", pluginTypes.Select(t => t.Name));
                 _logger.Error(null, "[CS-Source] Multiple IPlugin implementations found in {0}: [{1}]. Only one is allowed.", dirName, typeNames);
+                _failedPlugins.Add(new FailedPluginInfo(dirName, "Multiple IPlugin implementations found"));
                 return;
             }
 
@@ -622,7 +645,20 @@ public class PluginLoader
     ];
 
     /// <summary>
-    /// Rule 7: Whitelist of types in the System.IO namespace that **do not directly perform file I/O**.
+    /// Rule 7a: Whitelist of types in the System.CodeDom.Compiler namespace that are **purely metadata attributes**
+    /// and have no compilation or code generation capability.
+    /// These types are exempted even if they fall under the System.CodeDom.Compiler prefix match in <c>ForbiddenNamespaces</c>.
+    /// <para>Criteria: ① Pure metadata attributes with no behavioral side effects; ② Commonly emitted by auto-generated code (ResX, T4, etc.).</para>
+    /// <para>Types that actually perform compilation such as CSharpCodeProvider / CodeDomProvider are NOT in the exemption list.</para>
+    /// </summary>
+    private static readonly HashSet<string> CodeDomCompilerAllowedTypes = new(StringComparer.Ordinal)
+    {
+        // —— Metadata attributes emitted by code generators (no compilation capability) ——
+        "GeneratedCodeAttribute",   // [GeneratedCode("tool", "version")] — purely informational marker
+    };
+
+    /// <summary>
+    /// Rule 7b: Whitelist of types in the System.IO namespace that **do not directly perform file I/O**.
     /// These types are exempted even if they fall under the System.IO prefix match in <c>ForbiddenNamespaces</c>.
     /// <para>Criteria: ① Pure in-memory operations; ② Compression/decompression streams; ③ Enum/exception classes; ④ Wrapper streams (do not directly open files).</para>
     /// <para>Types that actually perform file I/O such as FileStream / File / Directory are NOT in the exemption list.</para>
@@ -1029,7 +1065,13 @@ public class PluginLoader
             {
                 if (ns == forbidden || ns.StartsWith(forbidden + ".", StringComparison.Ordinal))
                 {
-                    // Rule 7: System.IO namespace exemption — types that don't directly perform file I/O are allowed
+                    // Rule 7a: System.CodeDom.Compiler namespace exemption — purely metadata attributes
+                    if (ns.StartsWith("System.CodeDom.Compiler", StringComparison.Ordinal) && CodeDomCompilerAllowedTypes.Contains(name))
+                    {
+                        continue; // Skip this namespace rule, continue checking other rules
+                    }
+
+                    // Rule 7b: System.IO namespace exemption — types that don't directly perform file I/O are allowed
                     if (ns.StartsWith("System.IO", StringComparison.Ordinal) && SystemIOAllowedTypes.Contains(name))
                     {
                         continue; // Skip this namespace rule, continue checking other rules

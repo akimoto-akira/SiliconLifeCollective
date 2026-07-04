@@ -724,8 +724,9 @@ _ => permissionType.ToString()
     public override string AboutGitHubLink => "GitHub 저장소";
     public override string AboutGiteeLink => "Gitee 미러";
     public override string AboutSocialMediaLabel => "소셜 미디어 플랫폼";
-    public override string AboutPluginListLabel => "플러그인 목록";
-    public override string GetSocialMediaName(string platform) => platform switch
+public override string AboutPluginListLabel => "플러그인 목록";
+public override string AboutFailedPluginListLabel => "로드 실패한 플러그인";
+public override string GetSocialMediaName(string platform) => platform switch
     {
         "Bilibili" => "B站",
         "YouTube" => "YouTube",

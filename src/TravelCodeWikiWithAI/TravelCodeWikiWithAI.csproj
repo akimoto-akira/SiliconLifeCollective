@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.35.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Update="PHPText.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>PHPText.Designer.cs</LastGenOutput>

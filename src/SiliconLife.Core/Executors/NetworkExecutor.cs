@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,6 +66,10 @@ public static class NetworkExecutor
             ? bodyObj?.ToString()
             : null;
 
+        // Determine if binary response is expected
+        bool expectBinary = request.Parameters.TryGetValue("expect_binary", out object? expectBinaryObj)
+            && expectBinaryObj is bool b && b;
+
         _logger.Info(null, "Network request: {0} {1}", method, request.ResourcePath);
 
         try
@@ -87,17 +91,33 @@ public static class NetworkExecutor
             }
 
             HttpResponseMessage httpResponse = HttpClient.SendAsync(httpRequest).GetAwaiter().GetResult();
-            string responseContent = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-
-            _logger.Debug(null, "Network response: {0}, size={1}", (int)httpResponse.StatusCode, responseContent.Length);
 
             if (httpResponse.IsSuccessStatusCode)
             {
-                return ExecutorResult.Successful(responseContent, (int)httpResponse.StatusCode);
+                string? contentType = httpResponse.Content.Headers.ContentType?.MediaType;
+
+                if (expectBinary || IsBinaryContentType(contentType))
+                {
+                    // Binary response (images, etc.)
+                    byte[] responseBytes = httpResponse.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                    _logger.Debug(null, "Network response (binary): {0}, size={1}, type={2}", (int)httpResponse.StatusCode, responseBytes.Length, contentType);
+                    return ExecutorResult.SuccessfulBinary(responseBytes, contentType, (int)httpResponse.StatusCode);
+                }
+                else
+                {
+                    // Text response (XML, JSON, HTML, etc.)
+                    string responseContent = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    _logger.Debug(null, "Network response: {0}, size={1}", (int)httpResponse.StatusCode, responseContent.Length);
+                    return ExecutorResult.Successful(responseContent, (int)httpResponse.StatusCode);
+                }
             }
 
+            // Error response — always read as text for error messages
+            string errorContent = httpResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            _logger.Debug(null, "Network response (error): {0}", (int)httpResponse.StatusCode);
+
             return ExecutorResult.Failed(
-                $"HTTP {(int)httpResponse.StatusCode} {httpResponse.ReasonPhrase}: {responseContent}",
+                $"HTTP {(int)httpResponse.StatusCode} {httpResponse.ReasonPhrase}: {errorContent}",
                 (int)httpResponse.StatusCode);
         }
         catch (HttpRequestException ex)
@@ -115,6 +135,36 @@ public static class NetworkExecutor
             _logger.Error(null, "Network error: {0}, {1}", ex, request.ResourcePath);
             return ExecutorResult.Failed($"Network error: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Determines if a content type indicates binary data that should be read as bytes
+    /// </summary>
+    private static bool IsBinaryContentType(string? contentType)
+    {
+        if (string.IsNullOrEmpty(contentType)) return false;
+
+        // Common binary content types
+        string[] binaryPrefixes =
+        [
+            "image/",       // image/png, image/jpeg, image/webp, etc.
+            "audio/",       // audio/mpeg, audio/ogg, etc.
+            "video/",       // video/mp4, etc.
+            "application/octet-stream",
+            "application/zip",
+            "application/gzip",
+            "application/x-bzip2",
+            "application/pdf",
+            "application/x-protobuf",
+        ];
+
+        foreach (var prefix in binaryPrefixes)
+        {
+            if (contentType.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>

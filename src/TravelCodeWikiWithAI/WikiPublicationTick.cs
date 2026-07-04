@@ -30,6 +30,7 @@ public class WikiPublicationTick : TickObject
     /// 记录已尝试展开但无法再展开的父节点 OSM ID，防止 FindEmptyParent 反复返回同一死节点。
     /// </summary>
     private readonly HashSet<long> _fullyExpandedParents = new();
+    private OsmOnlineApiService? _osmApi;
 
     public WikiPublicationTick() : base(TimeSpan.FromSeconds(2), autoRegister: true)
     {
@@ -40,6 +41,17 @@ public class WikiPublicationTick : TickObject
         if (!OsmOnlineApiService.OK)
         {
             return;
+        }
+
+        // 初始化 OsmOnlineApiService 实例（使用 Curator 的 ID 作为 callerId）
+        var curator = SiliconBeingManager.GetCuratorBeing();
+        if (curator != null)
+        {
+            _osmApi = new OsmOnlineApiService(curator.Id);
+        }
+        else if (_osmApi == null)
+        {
+            return; // 没有 Curator 且尚未初始化
         }
 
         ProcessOneTaskPerTick();
@@ -237,7 +249,7 @@ public class WikiPublicationTick : TickObject
     }
 
     /// <summary>
-    /// 为指定父实体展开完整一层子级：查询固定映射和 PBF Relation，
+    /// 为指定父实体展开完整一层子级：查询固定映射和在线 OSM Relation，
     /// 处理所有子 OSM（创建实体或发布任务），而非只处理一个。
     /// </summary>
     private bool ExpandOneLayer(GeoLocation parent, long parentOsmId, ProjectTaskSystem taskSystem)
@@ -275,7 +287,7 @@ public class WikiPublicationTick : TickObject
 
         if (parentOsmId > 0)
         {
-            var relInfo = OsmOnlineApiService.GetRelationInfo(parentOsmId);
+            var relInfo = _osmApi?.GetRelationInfo(parentOsmId);
             if (relInfo != null)
             {
                 foreach (var member in relInfo.SubRelations)
@@ -327,7 +339,7 @@ public class WikiPublicationTick : TickObject
     {
         try
         {
-            return OsmOnlineApiService.GetRelationTags(osmId);
+            return _osmApi?.GetRelationTags(osmId) ?? new Dictionary<string, string>();
         }
         catch
         {

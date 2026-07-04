@@ -685,8 +685,9 @@ _ => permissionType.ToString()
     public override string AboutGitHubLink => "Repository GitHub";
     public override string AboutGiteeLink => "Mirror Gitee";
     public override string AboutSocialMediaLabel => "Piattaforme social";
-    public override string AboutPluginListLabel => "Elenco plugin";
-    public override string GetSocialMediaName(string platform) => platform switch
+public override string AboutPluginListLabel => "Elenco plugin";
+public override string AboutFailedPluginListLabel => "Plugin con errore di caricamento";
+public override string GetSocialMediaName(string platform) => platform switch
     {
         "Bilibili" => "Bilibili",
         "YouTube" => "YouTube",

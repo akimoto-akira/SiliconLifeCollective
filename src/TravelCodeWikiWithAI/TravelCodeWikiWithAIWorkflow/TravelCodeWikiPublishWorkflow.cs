@@ -56,7 +56,7 @@ public static class TravelCodeWikiPublishWorkflow
             Description = "旅游编码维基内容发布工作流（7步流程）：数据导入 → POI分类 → 编码分配 → 内容编写 → 翻译 → 维基发布 → 已发布",
             States = new List<string>
             {
-                "DataImport",        // 步骤1-2：数据导入阶段（PBF加载+地理实体构建）
+                "DataImport",        // 步骤1-2：数据导入阶段（OSM在线API查询+地理实体构建）
                 "POIClassify",       // 步骤3：POI分类阶段
                 "CodeAssign",        // 步骤4：编码分配阶段
                 "ContentCreation",   // 步骤5：内容编写阶段

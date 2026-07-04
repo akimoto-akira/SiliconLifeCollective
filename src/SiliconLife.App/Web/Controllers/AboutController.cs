@@ -48,7 +48,8 @@ public class AboutController : Controller
         { 
             Skin = skin, 
             ActiveMenu = "about",
-            PluginList = GetPluginList()
+            PluginList = GetPluginList(),
+            FailedPluginList = GetFailedPluginList()
         };
         var html = view.Render(vm);
         RenderHtml(html);
@@ -81,6 +82,33 @@ public class AboutController : Controller
             };
         }
         
+        return result;
+    }
+
+    /// <summary>
+    /// Gets the failed plugin list from PluginLoader
+    /// </summary>
+    private static List<AboutViewModel.FailedPluginInfo> GetFailedPluginList()
+    {
+        var result = new List<AboutViewModel.FailedPluginInfo>();
+
+        // Get PluginLoader from ServiceLocator
+        var pluginLoader = ServiceLocator.Instance.GetService<PluginLoader>();
+        if (pluginLoader == null)
+        {
+            return result;
+        }
+
+        // Get all failed plugins
+        foreach (var failed in pluginLoader.FailedPlugins)
+        {
+            result.Add(new AboutViewModel.FailedPluginInfo
+            {
+                DirectoryName = failed.DirectoryName,
+                ErrorMessage = failed.ErrorMessage
+            });
+        }
+
         return result;
     }
 }

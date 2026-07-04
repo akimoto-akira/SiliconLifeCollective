@@ -724,8 +724,9 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string AboutGitHubLink => "GitHub Repository";
     public override string AboutGiteeLink => "Gitee Mirror";
     public override string AboutSocialMediaLabel => "Social Media";
-    public override string AboutPluginListLabel => "Plugin List";
-    public override string GetSocialMediaName(string platform) => platform switch
+public override string AboutPluginListLabel => "Plugin List";
+public override string AboutFailedPluginListLabel => "Failed Plugins";
+public override string GetSocialMediaName(string platform) => platform switch
     {
         "Bilibili" => "Bilibili",
         "YouTube" => "YouTube",

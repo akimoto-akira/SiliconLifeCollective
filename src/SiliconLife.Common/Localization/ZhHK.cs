@@ -579,9 +579,10 @@ _ => permissionType.ToString()
     public override string AboutGitHubLink => "GitHub 倉庫";
     public override string AboutGiteeLink => "Gitee 鏡像";
     public override string AboutSocialMediaLabel => "自媒體平台";
-    public override string AboutPluginListLabel => "插件列表";
+public override string AboutPluginListLabel => "插件列表";
+public override string AboutFailedPluginListLabel => "載入失敗的插件";
 
-    public override string GetSocialMediaName(string platform) => platform switch
+public override string GetSocialMediaName(string platform) => platform switch
     {
         "Bilibili" => "B站",
         "YouTube" => "YouTube",

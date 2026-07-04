@@ -43,6 +43,20 @@ public class AboutViewModel : ViewModelBase
     /// Plugin list (plugin ID -> plugin info)
     /// </summary>
     public Dictionary<string, PluginInfo> PluginList { get; set; } = new();
+
+    /// <summary>
+    /// Failed plugin item with error information
+    /// </summary>
+    public class FailedPluginInfo
+    {
+        public string DirectoryName { get; set; } = string.Empty;
+        public string ErrorMessage { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// List of plugins that failed to load
+    /// </summary>
+    public List<FailedPluginInfo> FailedPluginList { get; set; } = new();
     
     public List<SocialMedia> SocialMediaList { get; set; } = new()
     {

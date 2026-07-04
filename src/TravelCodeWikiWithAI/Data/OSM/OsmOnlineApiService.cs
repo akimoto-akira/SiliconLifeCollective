@@ -1,38 +1,47 @@
-using System.Net;
-using System.Net.Http;
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// 迁移变更（安全扫描合规版）：
+//   HttpClient/CookieContainer/HttpClientHandler → NetworkExecutor（全部HTTP请求通过安全执行器）
+//   System.IO.File / Directory → PermissionedStreamFactory / SafePath（文件IO通过权限体系）
+//   会话Cookie维持 → NetworkExecutor 静态 HttpClient 自动处理（OSM API v0.6 不需要 Cookie）
+//
+// 安全扫描合规说明：
+//   本文件不再直接引用 System.Net.Http / System.Net 命名空间中的任何类型，
+//   所有网络请求通过 SiliconLife.Collective.NetworkExecutor 发起，
+//   所有文件IO通过 SiliconLife.Collective.PermissionedStreamFactory / SafePath 操作，
+//   符合插件安全扫描规则（Rule 2: Network access 必须通过 NetworkExecutor，
+//   Rule 1: File IO 必须通过 PermissionedStreamFactory）。
+
+using SiliconLife.Collective;
 using System.Xml.Linq;
 
 namespace TravelCodeWikiWithAI.Data.OSM;
 
 /// <summary>
-/// OSM 在线 API 服务（同步封装）。
-/// 替代 PBF 本地文件，按需从 OSM API v0.6 查询 Relation 数据。
+/// OSM 在线 API 服务（同步封装，通过 NetworkExecutor 合规版）。
+/// 按需从 OSM API v0.6 查询 Relation 数据。
 ///
 /// 设计要点：
-/// - 全部方法同步返回，内部用 .GetAwaiter().GetResult() 包装
+/// - 全部方法同步返回，内部通过 NetworkExecutor 发起请求
 /// - 双端点 failover（主站 + api 子域名）
-/// - 本地 XML 文件缓存，避免重复请求
-/// - 请求头模拟浏览器
+/// - 本地 XML 文件缓存，通过 PermissionedStreamFactory 读写
+/// - 请求头通过 ExecutorRequest.Parameters["headers"] 传递
+/// - callerId 由调用方传入，确保权限检查按硅基人粒度执行
 /// </summary>
-public static class OsmOnlineApiService
+public class OsmOnlineApiService
 {
-    private static readonly HttpClientHandler _handler = new()
-    {
-        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
-        CookieContainer = new CookieContainer(),
-        UseCookies = true
-    };
-
-    private static readonly HttpClient _http = new(_handler)
-    {
-        Timeout = TimeSpan.FromSeconds(30),
-        DefaultRequestHeaders =
-        {
-            { "User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" },
-            { "Accept", "application/xml,text/xml,*/*" },
-            { "Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8" }
-        }
-    };
+    private static readonly ILogger _logger = LogManager.Instance.GetLogger(typeof(OsmOnlineApiService));
 
     /// <summary>
     /// OSM API 备用端点列表（按优先级排序）。
@@ -57,12 +66,26 @@ public static class OsmOnlineApiService
     /// </summary>
     public static bool OK { get; set; }
 
+    /// <summary>
+    /// 当前调用者 ID（硅基人 GUID）
+    /// </summary>
+    private readonly Guid _callerId;
+
+    /// <summary>
+    /// 创建 OsmOnlineApiService 实例
+    /// </summary>
+    /// <param name="callerId">调用者硅基人 ID，用于权限检查</param>
+    public OsmOnlineApiService(Guid callerId)
+    {
+        _callerId = callerId;
+    }
+
     // ========== 公开方法 ==========
 
     /// <summary>
     /// 查询 Relation 的 tags（轻量，不拉 full）
     /// </summary>
-    public static Dictionary<string, string> GetRelationTags(long osmId)
+    public Dictionary<string, string> GetRelationTags(long osmId)
     {
         var xml = FetchXml($"relation/{osmId}");
         var relation = xml.Element("osm")?.Element("relation");
@@ -74,7 +97,7 @@ public static class OsmOnlineApiService
     /// <summary>
     /// 查询 Relation 的一级子关系成员（不拉 full，只取 relation 元素本身的 members）
     /// </summary>
-    public static OsmRelationInfo? GetRelationInfo(long osmId)
+    public OsmRelationInfo? GetRelationInfo(long osmId)
     {
         var xml = FetchXml($"relation/{osmId}");
         var relation = xml.Element("osm")?.Element("relation");
@@ -109,7 +132,7 @@ public static class OsmOnlineApiService
     /// <summary>
     /// 查询 Relation 的所有成员（node/way/relation），含 tags
     /// </summary>
-    public static OsmRelationDetail? GetRelationDetail(long osmId)
+    public OsmRelationDetail? GetRelationDetail(long osmId)
     {
         var xml = FetchXml($"relation/{osmId}");
         var relation = xml.Element("osm")?.Element("relation");
@@ -143,7 +166,7 @@ public static class OsmOnlineApiService
     /// <summary>
     /// 查询 Node 的 tags 和坐标
     /// </summary>
-    public static OsmNodeInfo? GetNodeInfo(long osmId)
+    public OsmNodeInfo? GetNodeInfo(long osmId)
     {
         var xml = FetchXml($"node/{osmId}");
         var node = xml.Element("osm")?.Element("node");
@@ -166,7 +189,7 @@ public static class OsmOnlineApiService
     /// <summary>
     /// 查询 Way 的 tags
     /// </summary>
-    public static Dictionary<string, string> GetWayTags(long osmId)
+    public Dictionary<string, string> GetWayTags(long osmId)
     {
         var xml = FetchXml($"way/{osmId}");
         var way = xml.Element("osm")?.Element("way");
@@ -175,40 +198,68 @@ public static class OsmOnlineApiService
         return ParseTags(way);
     }
 
-    // ========== 内部 HTTP ==========
+    // ========== 内部 HTTP（通过 NetworkExecutor） ==========
 
-    private static XDocument FetchXml(string relativePath)
+    /// <summary>
+    /// 默认请求头（模拟浏览器，对 OSM API 是必要的）
+    /// </summary>
+    private static readonly Dictionary<string, string> DefaultHeaders = new()
     {
-        // 1. 查本地缓存
+        ["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        ["Accept"] = "application/xml,text/xml,*/*",
+        ["Accept-Language"] = "zh-CN,zh;q=0.9,en;q=0.8"
+    };
+
+    private XDocument FetchXml(string relativePath)
+    {
+        // 1. 查本地缓存（通过 PermissionedStreamFactory）
         string? cachePath = GetCachePath(relativePath);
-        if (cachePath != null && File.Exists(cachePath))
+        if (cachePath != null)
         {
-            try { return XDocument.Load(cachePath); }
-            catch { /* 缓存损坏，继续网络请求 */ }
+            using var readStream = PermissionedStreamFactory.CreateReadStream(_callerId, cachePath);
+            if (readStream != null)
+            {
+                try
+                {
+                    return XDocument.Load(readStream);
+                }
+                catch { /* 缓存损坏，继续网络请求 */ }
+            }
         }
 
         Exception? lastException = null;
 
-        // 2. 按顺序尝试每个端点
+        // 2. 按顺序尝试每个端点（通过 NetworkExecutor）
         for (int attempt = 0; attempt < BaseUrls.Length; attempt++)
         {
             string url = BaseUrls[attempt] + "/" + relativePath;
 
             try
             {
-                var response = _http.GetAsync(url).GetAwaiter().GetResult();
-                response.EnsureSuccessStatusCode();
+                var request = new ExecutorRequest(_callerId, url, "http_get",
+                    new Dictionary<string, object>
+                    {
+                        ["method"] = "GET",
+                        ["headers"] = DefaultHeaders
+                    });
+                var result = NetworkExecutor.Execute(request, TimeSpan.FromSeconds(30));
 
-                using var stream = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
-                var doc = XDocument.Load(stream);
+                if (result.Success && result.Output != null)
+                {
+                    // 记住可用端点
+                    _workingIndex = attempt;
 
-                // 记住可用端点
-                _workingIndex = attempt;
+                    // 解析 XML
+                    var doc = XDocument.Parse(result.Output);
 
-                // 写入缓存
-                WriteCache(cachePath, doc);
+                    // 写入缓存（通过 PermissionedStreamFactory）
+                    WriteCache(cachePath, doc);
 
-                return doc;
+                    return doc;
+                }
+
+                // 非 SSL/连接错误，直接失败（不再尝试下一个端点）
+                lastException = new InvalidOperationException(result.Error ?? $"HTTP request failed for {url}");
             }
             catch (Exception ex) when (IsConnectionOrSslError(ex))
             {
@@ -218,10 +269,14 @@ public static class OsmOnlineApiService
         }
 
         // 3. 所有端点失败，尝试过期缓存
-        if (cachePath != null && File.Exists(cachePath))
+        if (cachePath != null)
         {
-            try { return XDocument.Load(cachePath); }
-            catch { /* 忽略 */ }
+            using var readStream = PermissionedStreamFactory.CreateReadStream(_callerId, cachePath);
+            if (readStream != null)
+            {
+                try { return XDocument.Load(readStream); }
+                catch { /* 忽略 */ }
+            }
         }
 
         throw new InvalidOperationException(
@@ -250,25 +305,26 @@ public static class OsmOnlineApiService
         return false;
     }
 
-    // ========== 缓存 ==========
+    // ========== 缓存（通过 PermissionedStreamFactory / SafePath） ==========
 
     private static string? GetCachePath(string relativePath)
     {
         if (string.IsNullOrEmpty(CacheDir)) return null;
         // relativePath 格式如 "relation/12345" 或 "relation/12345/full"
         string sanitized = relativePath.Replace('/', Path.DirectorySeparatorChar);
-        return Path.Combine(CacheDir, sanitized + ".xml");
+        return SafePath.Combine(CacheDir, sanitized + ".xml");
     }
 
-    private static void WriteCache(string? cachePath, XDocument doc)
+    private void WriteCache(string? cachePath, XDocument doc)
     {
         if (cachePath == null) return;
         try
         {
-            var dir = Path.GetDirectoryName(cachePath)!;
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-            doc.Save(cachePath);
+            using var writeStream = PermissionedStreamFactory.CreateWriteStream(_callerId, cachePath);
+            if (writeStream != null)
+            {
+                doc.Save(writeStream);
+            }
         }
         catch { /* 缓存写入失败不影响主流程 */ }
     }

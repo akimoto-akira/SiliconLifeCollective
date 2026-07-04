@@ -31,6 +31,8 @@ namespace TravelCodeWikiWithAI;
 /// </summary>
 public class GeoDataTool : ITool
 {
+    private Guid _callerId;
+    private OsmOnlineApiService? _osmApi;
     /// <summary>
     /// 工具名称 / Tool name
     /// </summary>
@@ -45,7 +47,7 @@ public class GeoDataTool : ITool
         "'classify_poi' to classify a POI and mount it to the geo entity tree, " +
         "'assign_code' to assign an identifier code to a geo entity, " +
         "'refresh_osm' to refresh an entity's OSM data, " +
-        "'expand_children' to expand an entity's child areas from PBF data.";
+        "'expand_children' to expand an entity's child areas from OSM data.";
 
     /// <summary>
     /// 获取工具支持的动作列表 / Get supported action list
@@ -134,6 +136,9 @@ public class GeoDataTool : ITool
     /// </summary>
     public ToolResult Execute(Guid callerId, Dictionary<string, object> parameters)
     {
+        _callerId = callerId;
+        _osmApi = new OsmOnlineApiService(callerId);
+
         if (!parameters.TryGetValue("action", out var actionObj) || actionObj is not string action)
         {
             return ToolResult.Failed("Missing required parameter: action");
@@ -181,7 +186,7 @@ public class GeoDataTool : ITool
                 return ToolResult.Failed($"Entity not found: {entityPath}");
             }
 
-            // If entity has OSMID, find it in PBF data
+            // If entity has OSMID, look up its OSM data
             string? tagFilter = parameters.TryGetValue("tag_filter", out var tf) ? tf?.ToString() : null;
 
             // Collect POI candidates from OSM data
@@ -429,7 +434,7 @@ public class GeoDataTool : ITool
 
             if (entity.OSMID > 0)
             {
-                var tags = OsmOnlineApiService.GetRelationTags(entity.OSMID);
+                var tags = _osmApi!.GetRelationTags(entity.OSMID);
                 if (tags.Count > 0)
                 {
                     // Update Name from OSM tags if current Name is null
@@ -533,7 +538,7 @@ public class GeoDataTool : ITool
             }
 
             // Find the OSM relation for this entity
-            var relInfo = OsmOnlineApiService.GetRelationInfo(entity.OSMID);
+            var relInfo = _osmApi!.GetRelationInfo(entity.OSMID);
             if (relInfo == null)
             {
                 return ToolResult.Failed($"No OSM relation found for OSMID {entity.OSMID}");
@@ -564,7 +569,7 @@ public class GeoDataTool : ITool
                     continue;
 
                 // Look up the child relation tags from online API
-                var childTags = OsmOnlineApiService.GetRelationTags(member.Id);
+                var childTags = _osmApi!.GetRelationTags(member.Id);
                 if (childTags.Count == 0)
                     continue;
 
@@ -612,7 +617,7 @@ public class GeoDataTool : ITool
     /// </summary>
     private void CollectPOIsFromRelation(long osmId, List<Dictionary<string, object?>> pois, string? tagFilter)
     {
-        var detail = OsmOnlineApiService.GetRelationDetail(osmId);
+        var detail = _osmApi!.GetRelationDetail(osmId);
         if (detail == null) return;
 
         // Check if the relation itself is a POI
@@ -626,7 +631,7 @@ public class GeoDataTool : ITool
         {
             if (member.Type == "node")
             {
-                var nodeInfo = OsmOnlineApiService.GetNodeInfo(member.Id);
+                var nodeInfo = _osmApi!.GetNodeInfo(member.Id);
                 if (nodeInfo == null) continue;
 
                 if (IsPOITag(nodeInfo.Tags, tagFilter))
@@ -637,7 +642,7 @@ public class GeoDataTool : ITool
             }
             else if (member.Type == "way")
             {
-                var wayTags = OsmOnlineApiService.GetWayTags(member.Id);
+                var wayTags = _osmApi!.GetWayTags(member.Id);
                 if (IsPOITag(wayTags, tagFilter))
                 {
                     pois.Add(BuildPOIEntry(member.Id, "way", wayTags, default));
@@ -746,12 +751,12 @@ public class GeoDataTool : ITool
     private Dictionary<string, string>? GetOSMTags(long osmId, string osmType, out Vector2DD location)
     {
         location = default;
-        if (!OsmOnlineApiService.OK) return null;
+        if (!OsmOnlineApiService.OK || _osmApi == null) return null;
 
         switch (osmType.ToLowerInvariant())
         {
             case "node":
-                var nodeInfo = OsmOnlineApiService.GetNodeInfo(osmId);
+                var nodeInfo = _osmApi.GetNodeInfo(osmId);
                 if (nodeInfo != null)
                 {
                     location = new Vector2DD(nodeInfo.Lon, nodeInfo.Lat);
@@ -760,10 +765,10 @@ public class GeoDataTool : ITool
                 break;
 
             case "way":
-                return OsmOnlineApiService.GetWayTags(osmId);
+                return _osmApi.GetWayTags(osmId);
 
             case "relation":
-                var tags = OsmOnlineApiService.GetRelationTags(osmId);
+                var tags = _osmApi.GetRelationTags(osmId);
                 if (tags.Count > 0) return tags;
                 break;
         }

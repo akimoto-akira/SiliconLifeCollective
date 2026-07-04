@@ -263,10 +263,11 @@ public class RuRU : DefaultLocalizationBase
     public override string AboutGitHubLink => "GitHub";
     public override string AboutGiteeLink => "Gitee";
     public override string AboutSocialMediaLabel => "Социальные сети";
-    public override string AboutPluginListLabel => "Список плагинов";
-    public override string GetSocialMediaName(string platform) => platform;
+public override string AboutPluginListLabel => "Список плагинов";
+public override string AboutFailedPluginListLabel => "Плагины с ошибкой загрузки";
+public override string GetSocialMediaName(string platform) => platform;
 
-    public override string MemoryPageHeader => "Просмотр памяти";
+public override string MemoryPageHeader => "Просмотр памяти";
     public override string MemoryEmptyState => "Нет данных в памяти";
     public override string MemorySearchPlaceholder => "Поиск в памяти...";
     public override string MemorySearchButton => "Искать";

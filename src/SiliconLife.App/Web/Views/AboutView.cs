@@ -60,6 +60,7 @@ public class AboutView : ViewBase
                     ).Class("about-info-row")
                 ).Class("card"),
                 RenderPluginSection(vm),
+                RenderFailedPluginSection(vm),
                 H.Div(
                     H.P(vm.Localization.AboutCopyright).Class("about-copyright")
                 ).Class("about-footer")
@@ -112,6 +113,29 @@ public class AboutView : ViewBase
                 H.Div(pluginItems).Class("about-plugin-list")
             ).Class("about-plugin-section")
         ).Class("card about-plugin-card");
+    }
+
+    private static H RenderFailedPluginSection(AboutViewModel vm)
+    {
+        if (vm.FailedPluginList == null || vm.FailedPluginList.Count == 0)
+            return H.Div();
+
+        var failedItems = vm.FailedPluginList.Select(fp =>
+            H.Div(
+                H.Div(
+                    H.Span(fp.DirectoryName).Class("about-failed-plugin-name"),
+                    H.Span("✗").Class("about-failed-plugin-icon")
+                ).Class("about-failed-plugin-header"),
+                H.P(fp.ErrorMessage).Class("about-failed-plugin-error")
+            ).Class("about-failed-plugin-item")
+        ).ToArray();
+
+        return H.Div(
+            H.Details(
+                H.Summary(vm.Localization.AboutFailedPluginListLabel).Class("about-summary"),
+                H.Div(failedItems).Class("about-failed-plugin-list")
+            ).Class("about-failed-plugin-section")
+        ).Class("card about-failed-plugin-card");
     }
 
     private static CssBuilder GetStyles()
@@ -262,6 +286,53 @@ public class AboutView : ViewBase
             .Selector(".about-plugin-author")
                 .Property("color", "var(--text-primary)")
                 .Property("font-weight", "500")
+            .EndSelector()
+            .Selector(".about-failed-plugin-card")
+                .Property("margin-top", "24px")
+            .EndSelector()
+            .Selector(".about-failed-plugin-section")
+                .Property("width", "100%")
+            .EndSelector()
+            .Selector(".about-failed-plugin-section[open] .about-summary::before")
+                .Property("transform", "rotate(90deg)")
+            .EndSelector()
+            .Selector(".about-failed-plugin-list")
+                .Property("padding", "12px 0 12px 24px")
+                .Property("display", "grid")
+                .Property("grid-template-columns", "repeat(auto-fill, minmax(300px, 1fr))")
+                .Property("gap", "16px")
+            .EndSelector()
+            .Selector(".about-failed-plugin-item")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("padding", "16px")
+                .Property("background", "var(--bg-secondary)")
+                .Property("border-radius", "8px")
+                .Property("border", "1px solid var(--color-error, #e53e3e)")
+                .Property("border-left", "3px solid var(--color-error, #e53e3e)")
+            .EndSelector()
+            .Selector(".about-failed-plugin-header")
+                .Property("display", "flex")
+                .Property("justify-content", "space-between")
+                .Property("align-items", "center")
+                .Property("margin-bottom", "10px")
+            .EndSelector()
+            .Selector(".about-failed-plugin-name")
+                .Property("font-weight", "700")
+                .Property("font-size", "16px")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".about-failed-plugin-icon")
+                .Property("color", "var(--color-error, #e53e3e)")
+                .Property("font-size", "16px")
+                .Property("font-weight", "700")
+            .EndSelector()
+            .Selector(".about-failed-plugin-error")
+                .Property("color", "var(--text-secondary)")
+                .Property("line-height", "1.6")
+                .Property("margin", "0")
+                .Property("font-size", "13px")
+                .Property("word-break", "break-word")
             .EndSelector();
     }
 }

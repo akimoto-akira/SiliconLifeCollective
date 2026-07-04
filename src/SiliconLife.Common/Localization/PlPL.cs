@@ -268,9 +268,10 @@ public class PlPL : DefaultLocalizationBase
     public override string AboutGitHubLink => "Repozytorium GitHub";
     public override string AboutGiteeLink => "Lustro Gitee";
     public override string AboutSocialMediaLabel => "Media społecznościowe";
-    public override string AboutPluginListLabel => "Lista wtyczek";
+public override string AboutPluginListLabel => "Lista wtyczek";
+public override string AboutFailedPluginListLabel => "Wtyczki z błędem ładowania";
 
-    // ===== Memory Page =====
+// ===== Memory Page =====
     public override string MemoryPageHeader => "Pamięć";
     public override string MemoryEmptyState => "Brak pamięci";
     public override string MemorySearchPlaceholder => "Szukaj w pamięci...";

@@ -1,6 +1,7 @@
 using SiliconLife.Collective;
 using SiliconLife.Common;
 using SiliconLife.Speedy;
+using SiliconLife.Speedy;
 using TravelCodeWikiWithAI.Cldr;
 using TravelCodeWikiWithAI.Data;
 using TravelCodeWikiWithAI.Data.OSM;
@@ -10,6 +11,8 @@ using TravelCodeWikiWithAI.TravelCodeWikiWithAIWorkflow;
 
 namespace TravelCodeWikiWithAI;
 
+[PluginCapability(Capability.Network, Reason = "Access OSM API for geographic data queries and tile requests")]
+[PluginCapability(Capability.FileIO, Reason = "Cache OSM API responses to local XML files and tile images")]
 public class TravelCodeWikiWithAIPlugin : IPlugin
 {
     public string Id => "com.siliconlife.travel-code-wiki";

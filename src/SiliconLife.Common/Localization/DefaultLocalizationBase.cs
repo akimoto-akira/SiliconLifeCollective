@@ -1165,10 +1165,15 @@ public abstract class DefaultLocalizationBase : LocalizationBase
     /// <summary>
     /// Gets the plugin list label for about page
     /// </summary>
-    public abstract string AboutPluginListLabel { get; }
+public abstract string AboutPluginListLabel { get; }
 
-    /// <summary>
-    /// Gets the localized display name for a social media platform
+/// <summary>
+/// Gets the failed plugin list label for about page
+/// </summary>
+public abstract string AboutFailedPluginListLabel { get; }
+
+/// <summary>
+/// Gets the localized display name for a social media platform
     /// </summary>
     /// <param name="platform">The platform identifier</param>
     /// <returns>The localized display name</returns>
