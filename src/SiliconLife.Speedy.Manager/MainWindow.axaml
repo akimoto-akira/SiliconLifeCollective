@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SiliconLife.Speedy.Manager"
         x:Class="SiliconLife.Speedy.Manager.MainWindow"
         Title="Speedy Pack Manager"
         Width="1200" Height="800"
@@ -85,7 +86,7 @@
                           Background="Transparent"
                           BorderThickness="0">
                     <TreeView.ItemTemplate>
-                        <TreeDataTemplate ItemsSource="{Binding Children}">
+                        <TreeDataTemplate DataType="local:DirectoryTreeNode" ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal" Spacing="4">
                                 <TextBlock Text="📁" IsVisible="{Binding !IsFile}" />
                                 <TextBlock Text="📄" IsVisible="{Binding IsFile}" />

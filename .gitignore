@@ -71,7 +71,6 @@ YDoc/
 .qoder/
 .kiro/
 *.csproj.targets
-src/TravelCodeWikiWithAI/
 .trae/
 .catpaw/
 cldr/

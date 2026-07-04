@@ -78,7 +78,7 @@ public partial class TrayStatusWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Topmost = false;
         CanResize = false;
-        SystemDecorations = SystemDecorations.Full; // Show title bar with close button
+        WindowDecorations = Avalonia.Controls.WindowDecorations.Full; // Show title bar with close button
         Background = Avalonia.Media.SolidColorBrush.Parse("#1E1E1E");
         Opacity = 0.95;
         
@@ -484,7 +484,7 @@ public partial class TrayStatusWindow : Window
                 Height = 200,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 CanResize = false,
-                SystemDecorations = SystemDecorations.Full,
+                WindowDecorations = Avalonia.Controls.WindowDecorations.Full,
                 Topmost = true,
                 Background = Avalonia.Media.SolidColorBrush.Parse("#2D2D2D")
             };
