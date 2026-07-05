@@ -122,6 +122,11 @@ public abstract class GeoLocation : GeoDataBase
     public string wikidata { get; set; } = string.Empty;
 
     /// <summary>
+    /// 维基百科页面（格式通常为 lang:Title）/ Wikipedia page (format: lang:Title)
+    /// </summary>
+    public string wikipedia { get; set; } = string.Empty;
+
+    /// <summary>
     /// 地区分类代码 / Area type code
     /// </summary>
     public string AreaType { get; set; } = string.Empty;
@@ -262,6 +267,34 @@ public abstract class GeoLocation : GeoDataBase
                 Display = new MediaWikiNoLanguage(table) { Content = wikidata }
             };
             AddInfoTableRow(table, "Wikidata", wdLink);
+        }
+
+        // Wikipedia
+        if (!string.IsNullOrEmpty(wikipedia))
+        {
+            // OSM wikipedia 标签格式为 "lang:Title"，如 "en:China"
+            string wpUrl;
+            string wpDisplay;
+            int colonIdx = wikipedia.IndexOf(':');
+            if (colonIdx > 0)
+            {
+                string lang = wikipedia.Substring(0, colonIdx);
+                string title = wikipedia.Substring(colonIdx + 1);
+                wpUrl = $"https://{lang}.wikipedia.org/wiki/{title}";
+                wpDisplay = wikipedia;
+            }
+            else
+            {
+                wpUrl = "https://en.wikipedia.org/wiki/" + wikipedia;
+                wpDisplay = wikipedia;
+            }
+
+            MediaWikiExternalLink wpLink = new MediaWikiExternalLink(table)
+            {
+                URL = new MediaWikiNoLanguage(table) { Content = wpUrl },
+                Display = new MediaWikiNoLanguage(table) { Content = wpDisplay }
+            };
+            AddInfoTableRow(table, "Wikipedia", wpLink);
         }
 
         return table;

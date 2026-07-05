@@ -339,6 +339,70 @@ namespace TravelCodeWikiWithAI.Data.OSM
     }
 
     /// <summary>
+    /// OSM元素类型 / OSM element type
+    /// </summary>
+    public enum OSMElementType
+    {
+        /// <summary>
+        /// 关系 / Relation
+        /// </summary>
+        Relation,
+
+        /// <summary>
+        /// 节点 / Node
+        /// </summary>
+        Node,
+
+        /// <summary>
+        /// 路径 / Way
+        /// </summary>
+        Way
+    }
+
+    /// <summary>
+    /// 固定 OSM ID 映射结构 / Fixed OSM ID mapping structure
+    /// </summary>
+    public struct FixedOsmMapping
+    {
+        /// <summary>
+        /// OSM ID / OSM identifier
+        /// </summary>
+        public long OsmId { get; set; }
+
+        /// <summary>
+        /// 实体编码 / Entity code
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
+        /// 简体中文名称 / Simplified Chinese name
+        /// </summary>
+        public string ZhCn { get; set; }
+
+        /// <summary>
+        /// 英文名称 / English name
+        /// </summary>
+        public string En { get; set; }
+
+        /// <summary>
+        /// OSM 元素类型 / OSM element type
+        /// </summary>
+        public OSMElementType ElementType { get; set; }
+
+        /// <summary>
+        /// 构造函数 / Constructor
+        /// </summary>
+        public FixedOsmMapping(long osmId, string id, string zhCn, string en, OSMElementType elementType)
+        {
+            OsmId = osmId;
+            Id = id;
+            ZhCn = zhCn;
+            En = en;
+            ElementType = elementType;
+        }
+    }
+
+    /// <summary>
     /// OSM关系引用结构 / OSM relation reference structure
     /// </summary>
     public struct OSMRelationRef

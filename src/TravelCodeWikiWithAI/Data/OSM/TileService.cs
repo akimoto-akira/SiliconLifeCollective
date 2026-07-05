@@ -13,16 +13,17 @@
 
 // 迁移变更（从原始 HUDSequenceGenerator 项目迁移，适配 NetworkExecutor 权限体系）：
 //   HttpClient/CookieContainer/HttpClientHandler → NetworkExecutor（全部HTTP请求通过安全执行器）
-//   System.IO.File / Directory → PermissionedStreamFactory / SafePath（文件IO通过权限体系）
+//   本地 PNG 瓦片缓存 → TravelCodeWikiWithAIPlugin.SpeedyPack（统一通过 SpeedyPack 读写）
 //   Cookie 预热 → 通过 NetworkExecutor 预热（NetworkExecutor 静态 HttpClient 自动维持 Cookie）
 //
 // 安全扫描合规说明：
 //   本文件不直接引用 System.Net.Http / System.Net 命名空间中的任何类型，
 //   所有网络请求通过 SiliconLife.Collective.NetworkExecutor 发起，
-//   所有文件IO通过 SiliconLife.Collective.PermissionedStreamFactory / SafePath 操作，
+//   瓦片缓存通过 TravelCodeWikiWithAIPlugin.SpeedyPack 统一持久化，
 //   符合插件安全扫描规则。
 
 using SiliconLife.Collective;
+using SiliconLife.Speedy;
 using System.Xml.Linq;
 
 namespace TravelCodeWikiWithAI.Data.OSM;
@@ -32,11 +33,11 @@ namespace TravelCodeWikiWithAI.Data.OSM;
 ///
 /// 功能：
 /// - 经纬度/缩放级别 ↔ 瓦片坐标转换（标准 Slippy Map 公式）
-/// - 按需下载瓦片并缓存到本地磁盘（通过 PermissionedStreamFactory）
+/// - 按需下载瓦片并缓存到 TravelCodeWikiWithAIPlugin.SpeedyPack（key 前缀由 cacheDir 指定）
 /// - 计算视口所需瓦片并拼接为完整底图
 /// - Cookie 预热机制（首次请求前访问 OSM 主站获取 Cookie）
 ///
-/// 缓存目录结构（由调用方指定）：
+/// 缓存 key 结构（由调用方指定 cacheDir 前缀）：
 ///   {cacheDir}/{z}/{x}/{y}.png
 ///
 /// OSM 瓦片请求流程：
@@ -44,7 +45,7 @@ namespace TravelCodeWikiWithAI.Data.OSM;
 ///   2. 后续瓦片请求通过 NetworkExecutor 携带 cookies + Referer + 浏览器级 Accept 头部
 ///
 /// 原始来源：D:\跟着AI去穷游\src\HUDSequenceGenerator\Services\TileService.cs
-/// 迁移变更：HttpClient → NetworkExecutor, File IO → PermissionedStreamFactory
+/// 迁移变更：HttpClient → NetworkExecutor, File IO → SpeedyPack
 /// </summary>
 public class TileService
 {
@@ -62,7 +63,7 @@ public class TileService
     /// 创建瓦片服务实例
     /// </summary>
     /// <param name="callerId">调用者硅基人 ID，用于权限检查</param>
-    /// <param name="cacheDir">瓦片缓存目录（绝对路径，如 osmcache/tiles）</param>
+    /// <param name="cacheDir">瓦片缓存 key 前缀（如 osmcache/tiles）</param>
     /// <param name="source">瓦片源</param>
     /// <param name="customUrlTemplate">自定义URL模板（source=Custom时使用，如 https://example.com/{z}/{x}/{y}.png）</param>
     public TileService(Guid callerId, string cacheDir, TileSource source = TileSource.OpenStreetMap, string? customUrlTemplate = null)
@@ -150,7 +151,7 @@ public class TileService
     #region 瓦片获取（缓存 + 下载）
 
     /// <summary>
-    /// 获取单张瓦片（先查本地缓存，未命中则下载）
+    /// 获取单张瓦片（先查 SpeedyPack 缓存，未命中则下载）
     /// 返回 null 表示获取失败
     /// </summary>
     public byte[]? GetTileBytes(int x, int y, int z)
@@ -159,45 +160,38 @@ public class TileService
         int maxTile = (int)Math.Pow(2, z);
         if (x >= maxTile || y >= maxTile) return null;
 
-        // 本地缓存路径
-        string? cachePath = SafePath.Combine(_cacheDir, z.ToString(), x.ToString(), $"{y}.png");
+        string cacheKey = GetTileKey(x, y, z);
+        var pack = TravelCodeWikiWithAIPlugin.SpeedyPack;
 
-        // 查本地缓存（通过 PermissionedStreamFactory）
-        if (cachePath != null)
+        // 查 SpeedyPack 缓存
+        if (pack != null)
         {
-            using var readStream = PermissionedStreamFactory.CreateReadStream(_callerId, cachePath);
-            if (readStream != null)
+            try
             {
-                try
-                {
-                    using var ms = new MemoryStream();
-                    readStream.CopyTo(ms);
-                    return ms.ToArray();
-                }
-                catch { /* 缓存损坏 */ }
+                var cached = pack.Read(cacheKey);
+                if (cached != null) return cached;
             }
+            catch { /* 缓存损坏，继续下载 */ }
         }
 
         // 下载
         var bytes = DownloadTile(x, y, z);
-        if (bytes != null)
+        if (bytes != null && pack != null)
         {
-            // 写入缓存（通过 PermissionedStreamFactory）
-            if (cachePath != null)
+            // 写入 SpeedyPack 缓存
+            try
             {
-                try
-                {
-                    using var writeStream = PermissionedStreamFactory.CreateWriteStream(_callerId, cachePath);
-                    if (writeStream != null)
-                    {
-                        writeStream.Write(bytes, 0, bytes.Length);
-                    }
-                }
-                catch { /* 缓存写入失败不影响使用 */ }
+                pack.Write(cacheKey, bytes, "raw");
             }
+            catch { /* 缓存写入失败不影响使用 */ }
         }
 
         return bytes;
+    }
+
+    private string GetTileKey(int x, int y, int z)
+    {
+        return $"{_cacheDir.TrimEnd('/')}/{z}/{x}/{y}.png";
     }
 
     private byte[]? DownloadTile(int x, int y, int z)

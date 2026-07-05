@@ -199,53 +199,33 @@ public class WikiPublicationTick : TickObject
     /// <summary>
     /// 固定 OSM ID 映射。由于地图文件体积限制，部分行政区域的 OSM ID 与名称需要预设。
     /// 参数 parentOsmId 为父实体的 OSM ID，-1 代表顶级（世界根节点）。
-    /// 返回值为该父实体下预设的子实体：OSM ID → { id, 语言名称... }。
+    /// 返回值为该父实体下预设的子实体结构体数组。
     /// </summary>
-    private Dictionary<long, Dictionary<string, string>> GetFixedOsmIdMapping(long parentOsmId)
+    private FixedOsmMapping[] GetFixedOsmIdMapping(long parentOsmId)
     {
         if (parentOsmId == -1)
         {
-            return new Dictionary<long, Dictionary<string, string>>
-            {
-                [2186656] = new() { ["id"] = "AS", ["zh-cn"] = "亚洲", ["en"] = "Asia" },
-                [2186657] = new() { ["id"] = "EU", ["zh-cn"] = "欧洲", ["en"] = "Europe" },
-                [2186658] = new() { ["id"] = "AF", ["zh-cn"] = "非洲", ["en"] = "Africa" },
-                [2186659] = new() { ["id"] = "NA", ["zh-cn"] = "北美洲", ["en"] = "North America" },
-                [2186660] = new() { ["id"] = "SA", ["zh-cn"] = "南美洲", ["en"] = "South America" },
-                [2186661] = new() { ["id"] = "OC", ["zh-cn"] = "大洋洲", ["en"] = "Oceania" },
-                [2186662] = new() { ["id"] = "AN", ["zh-cn"] = "南极洲", ["en"] = "Antarctica" },
-            };
+            return
+            [
+                new FixedOsmMapping(36966065, "AS", "亚洲", "Asia", OSMElementType.Node),
+                new FixedOsmMapping(25871341, "EU", "欧洲", "Europe", OSMElementType.Node),
+                new FixedOsmMapping(36966057, "AF", "非洲", "Africa", OSMElementType.Node),
+                new FixedOsmMapping(36966063, "NA", "北美洲", "North America", OSMElementType.Node),
+                new FixedOsmMapping(36966069, "SA", "南美洲", "South America", OSMElementType.Node),
+                new FixedOsmMapping(249399679, "OC", "大洋洲", "Oceania", OSMElementType.Node),
+                new FixedOsmMapping(36966060, "AN", "南极洲", "Antarctica", OSMElementType.Node),
+            ];
         }
 
-        if (parentOsmId == 2186656)
+        if (parentOsmId == 36966065)
         {
-            return new Dictionary<long, Dictionary<string, string>>
-            {
-                [307833] = new() { ["id"] = "CN", ["zh-cn"] = "中国", ["en"] = "China" },
-                [154312] = new() { ["id"] = "JP", ["zh-cn"] = "日本", ["en"] = "Japan" },
-                [193447] = new() { ["id"] = "KR", ["zh-cn"] = "韩国", ["en"] = "South Korea" },
-            };
+            return
+            [
+                new FixedOsmMapping(270056, "CN", "中国", "China", OSMElementType.Relation),
+            ];
         }
 
-        if (parentOsmId == 2186659)
-        {
-            return new Dictionary<long, Dictionary<string, string>>
-            {
-                [182909] = new() { ["id"] = "US", ["zh-cn"] = "美国", ["en"] = "United States" },
-            };
-        }
-
-        if (parentOsmId == 2186657)
-        {
-            return new Dictionary<long, Dictionary<string, string>>
-            {
-                [51701] = new() { ["id"] = "GB", ["zh-cn"] = "英国", ["en"] = "United Kingdom" },
-                [51477] = new() { ["id"] = "FR", ["zh-cn"] = "法国", ["en"] = "France" },
-                [51552] = new() { ["id"] = "DE", ["zh-cn"] = "德国", ["en"] = "Germany" },
-            };
-        }
-
-        return new Dictionary<long, Dictionary<string, string>>();
+        return Array.Empty<FixedOsmMapping>();
     }
 
     /// <summary>
@@ -257,20 +237,19 @@ public class WikiPublicationTick : TickObject
         bool anyAction = false;
 
         var fixedChildren = GetFixedOsmIdMapping(parentOsmId);
-        foreach (var kvp in fixedChildren)
+        foreach (var childInfo in fixedChildren)
         {
-            long childOsmId = kvp.Key;
-            var childInfo = kvp.Value;
+            long childOsmId = childInfo.OsmId;
 
             if (IsOsmIdMounted(parent, childOsmId))
                 continue;
 
-            string objectKey = $"OSM-{childOsmId}";
+            string objectKey = $"OSM-{childInfo.ElementType}-{childInfo.OsmId}";
             if (HasExistingTask(taskSystem, objectKey, "CodeAssignment"))
                 continue;
 
-            string fixedId = childInfo.TryGetValue("id", out var fid) ? fid : null;
-            var childTags = GetOsmRelationTags(childOsmId);
+            string fixedId = childInfo.Id;
+            var childTags = GetOsmElementTags(childOsmId, childInfo.ElementType);
             string resolvedId = ResolveEntityId(childTags, fixedId);
 
             if (resolvedId != null)
@@ -290,7 +269,7 @@ public class WikiPublicationTick : TickObject
             var relInfo = _osmApi?.GetRelationInfo(parentOsmId);
             if (relInfo != null)
             {
-                foreach (var member in relInfo.SubRelations)
+                foreach (var member in relInfo.Refs)
                 {
                     string role = member.Role ?? "";
                     if (role != "" && role != "admin" && role != "label" && role != "subarea" && role != "child")
@@ -299,14 +278,14 @@ public class WikiPublicationTick : TickObject
                     if (IsOsmIdMounted(parent, member.Id))
                         continue;
 
-                    if (fixedChildren.ContainsKey(member.Id))
+                    if (fixedChildren.Any(c => c.OsmId == member.Id))
                         continue;
 
                     string objectKey = $"OSM-{member.Id}";
                     if (HasExistingTask(taskSystem, objectKey, "CodeAssignment"))
                         continue;
 
-                    var childTags = GetOsmRelationTags(member.Id);
+                    var childTags = GetOsmElementTags(member.Id, OSMElementType.Relation);
                     if (childTags == null || childTags.Count == 0)
                         continue;
 
@@ -333,13 +312,18 @@ public class WikiPublicationTick : TickObject
     }
 
     /// <summary>
-    /// 从在线 API 获取 OSM Relation 的 tags，找不到返回空字典
+    /// 根据元素类型从在线 API 获取 OSM 实体的 tags，找不到返回空字典
     /// </summary>
-    private Dictionary<string, string> GetOsmRelationTags(long osmId)
+    private Dictionary<string, string> GetOsmElementTags(long osmId, OSMElementType elementType)
     {
         try
         {
-            return _osmApi?.GetRelationTags(osmId) ?? new Dictionary<string, string>();
+            return elementType switch
+            {
+                OSMElementType.Node => _osmApi?.GetNodeTags(osmId) ?? new Dictionary<string, string>(),
+                OSMElementType.Way => _osmApi?.GetWayTags(osmId) ?? new Dictionary<string, string>(),
+                _ => _osmApi?.GetRelationTags(osmId) ?? new Dictionary<string, string>(),
+            };
         }
         catch
         {
@@ -376,7 +360,7 @@ public class WikiPublicationTick : TickObject
     /// 创建地理实体并挂载到父实体。
     /// 实体包含 ID（不超过5字母）和 OSM ID（long 格式），以 world 为根形成树。
     /// </summary>
-    private void CreateAndMountEntity(GeoLocation parent, Dictionary<string, string> tags, Dictionary<string, string> fixedInfo, long osmId, string resolvedId)
+    private void CreateAndMountEntity(GeoLocation parent, Dictionary<string, string> tags, FixedOsmMapping? fixedInfo, long osmId, string resolvedId)
     {
         bool hasTags = tags != null && tags.Count > 0;
 
@@ -407,7 +391,14 @@ public class WikiPublicationTick : TickObject
         }
 
         child.OSMID = osmId;
-        child.OSCType = OSMRelationRefType.Relations;
+        child.OSCType = fixedInfo.HasValue
+            ? fixedInfo.Value.ElementType switch
+            {
+                OSMElementType.Node => OSMRelationRefType.Node,
+                OSMElementType.Way => OSMRelationRefType.Way,
+                _ => OSMRelationRefType.Relations,
+            }
+            : OSMRelationRefType.Relations;
         child.ID = resolvedId;
 
         if (hasTags)
@@ -424,19 +415,24 @@ public class WikiPublicationTick : TickObject
                 child.wikidata = wd;
             }
 
+            if (tags.TryGetValue("wikipedia", out var wp))
+            {
+                child.wikipedia = wp;
+            }
+
             if (tags.TryGetValue("boundary", out var boundaryTag))
             {
                 child.AreaType = boundaryTag;
             }
         }
-        else if (fixedInfo != null)
+        else if (fixedInfo.HasValue)
         {
+            var mapping = fixedInfo.Value;
             var name = new LanguageData();
-            foreach (var kv in fixedInfo)
-            {
-                if (kv.Key == "id") continue;
-                name[kv.Key] = kv.Value;
-            }
+            if (!string.IsNullOrEmpty(mapping.ZhCn))
+                name["zh-cn"] = mapping.ZhCn;
+            if (!string.IsNullOrEmpty(mapping.En))
+                name["en"] = mapping.En;
             if (name.Count > 0)
             {
                 child.Name = name;
@@ -553,7 +549,7 @@ public class WikiPublicationTick : TickObject
     /// <summary>
     /// 发布编码分配任务：由 AI 参考当地读音/方言分配不超过5个大写英文字母的 ID
     /// </summary>
-    private void PublishCodeAssignmentTask(ProjectTaskSystem taskSystem, long osmId, Dictionary<string, string> tags, Dictionary<string, string> fixedInfo, string objectKey, string parentPath)
+    private void PublishCodeAssignmentTask(ProjectTaskSystem taskSystem, long osmId, Dictionary<string, string> tags, FixedOsmMapping? fixedInfo, string objectKey, string parentPath)
     {
         string entityName;
         string nameList;
@@ -572,14 +568,18 @@ public class WikiPublicationTick : TickObject
                 adminLevelStr = al;
             }
         }
-        else if (fixedInfo != null)
+        else if (fixedInfo.HasValue)
         {
-            entityName = fixedInfo.TryGetValue("zh-cn", out string zn) ? zn :
-                         fixedInfo.TryGetValue("en", out string en) ? en :
+            var mapping = fixedInfo.Value;
+            entityName = !string.IsNullOrEmpty(mapping.ZhCn) ? mapping.ZhCn :
+                         !string.IsNullOrEmpty(mapping.En) ? mapping.En :
                          $"OSM-{osmId}";
-            nameList = string.Join("、", fixedInfo
-                .Where(kv => kv.Key != "id")
-                .Select(kv => $"{kv.Key}:{kv.Value}"));
+            var parts = new List<string>();
+            if (!string.IsNullOrEmpty(mapping.ZhCn))
+                parts.Add($"zh-cn:{mapping.ZhCn}");
+            if (!string.IsNullOrEmpty(mapping.En))
+                parts.Add($"en:{mapping.En}");
+            nameList = string.Join("、", parts);
         }
         else
         {

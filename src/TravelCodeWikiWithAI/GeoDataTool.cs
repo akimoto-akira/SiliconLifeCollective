@@ -547,7 +547,7 @@ public class GeoDataTool : ITool
             var addedChildren = new List<Dictionary<string, object?>>();
 
             // Iterate over relation members to find sub-areas
-            foreach (var member in relInfo.SubRelations)
+            foreach (var member in relInfo.Refs)
             {
                 string role = member.Role ?? "";
                 if (role != "" && role != "admin" && role != "label" && role != "subarea" && role != "child")
@@ -627,9 +627,9 @@ public class GeoDataTool : ITool
         }
 
         // Examine member nodes/ways for POI data
-        foreach (var member in detail.Members)
+        foreach (var member in detail.Refs)
         {
-            if (member.Type == "node")
+            if (member.Type == OSMRelationRefType.Node)
             {
                 var nodeInfo = _osmApi!.GetNodeInfo(member.Id);
                 if (nodeInfo == null) continue;
@@ -637,10 +637,10 @@ public class GeoDataTool : ITool
                 if (IsPOITag(nodeInfo.Tags, tagFilter))
                 {
                     pois.Add(BuildPOIEntry(member.Id, "node", nodeInfo.Tags,
-                        new Vector2DD(nodeInfo.Lon, nodeInfo.Lat)));
+                        nodeInfo.LngLat));
                 }
             }
-            else if (member.Type == "way")
+            else if (member.Type == OSMRelationRefType.Way)
             {
                 var wayTags = _osmApi!.GetWayTags(member.Id);
                 if (IsPOITag(wayTags, tagFilter))
@@ -759,7 +759,7 @@ public class GeoDataTool : ITool
                 var nodeInfo = _osmApi.GetNodeInfo(osmId);
                 if (nodeInfo != null)
                 {
-                    location = new Vector2DD(nodeInfo.Lon, nodeInfo.Lat);
+                    location = nodeInfo.LngLat;
                     return nodeInfo.Tags;
                 }
                 break;

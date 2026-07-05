@@ -12,7 +12,7 @@ using TravelCodeWikiWithAI.TravelCodeWikiWithAIWorkflow;
 namespace TravelCodeWikiWithAI;
 
 [PluginCapability(Capability.Network, Reason = "Access OSM API for geographic data queries and tile requests")]
-[PluginCapability(Capability.FileIO, Reason = "Cache OSM API responses to local XML files and tile images")]
+[PluginCapability(Capability.FileIO, Reason = "Cache OSM API responses and tile images to SpeedyPack")]
 public class TravelCodeWikiWithAIPlugin : IPlugin
 {
     public string Id => "com.siliconlife.travel-code-wiki";
@@ -66,7 +66,7 @@ public class TravelCodeWikiWithAIPlugin : IPlugin
         {
             // 创建 SpeedyPack 数据包，使用插件ID作为文件名
             string packFilePath = SafePath.Combine(Environment.CurrentDirectory, "TravelCodeWiki.spk");
-            _speedyPack = SpeedyPack.Open(packFilePath);
+            SpeedyPack = SpeedyPack.Open(packFilePath);
         }
         catch (Exception ex)
         {
@@ -127,8 +127,8 @@ public class TravelCodeWikiWithAIPlugin : IPlugin
         }
     }
 
+    public static SpeedyPack? SpeedyPack { get; private set; }
     private Thread? _startupThread;
-    private SpeedyPack? _speedyPack;
     private SpeedyPack? _cldrPack;
     public static CldrDataProvider? _cldrProvider;
     public static GeoProject? _geoProject;
@@ -175,9 +175,9 @@ public class TravelCodeWikiWithAIPlugin : IPlugin
         }
 
         // 加载 GeoProject
-        if (_speedyPack != null)
+        if (SpeedyPack != null)
         {
-            _geoProject = GeoDataBase.LoadFromPack<GeoProject>(_speedyPack, "geo/root");
+            _geoProject = GeoDataBase.LoadFromPack<GeoProject>(SpeedyPack, "geo/root");
         }
 
         if (_geoProject == null)
@@ -199,14 +199,14 @@ public class TravelCodeWikiWithAIPlugin : IPlugin
     {
         // 确保 SpeedyPack 被正确清理
         _cldrPack?.Dispose();
-        _speedyPack?.Dispose();
+        SpeedyPack?.Dispose();
     }
 
     public void OnUnload()
     {
         // 确保 SpeedyPack 被正确清理
         _cldrPack?.Dispose();
-        _speedyPack?.Dispose();
+        SpeedyPack?.Dispose();
     }
     
     private WikiPublicationTick _wikiPublicationTick;
