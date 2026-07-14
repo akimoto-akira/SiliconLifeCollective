@@ -350,6 +350,7 @@ Les fabriques fournissent :
 - 🚧 En développement
 - 📋 Planifié
 - 💡 En considération
+- ⚠️ Obsolète
 
 *Note : En raison de l'environnement réseau du développeur, l'accès aux services IA cloud étrangers [en considération] peut nécessiter des outils de proxy réseau, et le processus de débogage peut être instable.*
 
@@ -367,7 +368,7 @@ Les fabriques fournissent :
 | Meituan LongCat | ✅ | Cloud | Grand modèle développé en interne par Meituan, compatible avec le format API OpenAI, authentification par clé API |
 | Qiniu Cloud AI | ✅ | Cloud | Service IA cloud de Qiniu, authentification par clé API |
 | DeepSeek (connexion directe) | 📋 | Cloud | Service IA DeepSeek |
-| 01.AI (Yi) | 📋 | Cloud | Service IA 01.AI |
+| 01.AI (Yi) | ⚠️ | Cloud | Service IA 01.AI (Obsolète : inscription des nouveaux utilisateurs arrêtée) |
 | Tencent Hunyuan | 📋 | Cloud | Service IA Tencent Hunyuan |
 | SiliconFlow | 📋 | Cloud | Service IA SiliconFlow |
 | MiniMax | 📋 | Cloud | Service IA MiniMax |

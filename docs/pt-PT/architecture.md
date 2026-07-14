@@ -325,6 +325,7 @@ A interface `IAIClient` define propriedades de declaração de capacidades do cl
 - 🚧 Em desenvolvimento
 - 📋 Planeado
 - 💡 Em consideração
+- ⚠️ Obsoleto
 
 *Nota: Devido ao ambiente de rede do desenvolvedor, a integração com serviços de IA na nuvem estrangeiros [em consideração] pode exigir ferramentas de proxy de rede para acesso, e o processo de depuração pode ser instável.*
 
@@ -342,7 +343,7 @@ A interface `IAIClient` define propriedades de declaração de capacidades do cl
 | Meituan LongCat | ✅ | Nuvem | Modelo grande auto-desenvolvido da Meituan, compatível com o formato OpenAI API, autenticação por API Key |
 | Qiniu Cloud AI | ✅ | Nuvem | Serviço de inferência de modelo grande da Qiniu Cloud, compatível com o formato OpenAI API, autenticação por API Key |
 | DeepSeek (Directo) | 📋 | Nuvem | Serviço de IA DeepSeek |
-| 01.AI (Yi) | 📋 | Nuvem | Serviço de IA 01.AI |
+| 01.AI (Yi) | ⚠️ | Nuvem | Serviço de IA 01.AI (Obsoleto: registo de novos utilizadores interrompido) |
 | Tencent Hunyuan | 📋 | Nuvem | Serviço de IA Tencent Hunyuan |
 | SiliconFlow | 📋 | Nuvem | Serviço de IA SiliconFlow |
 | MiniMax | 📋 | Nuvem | Serviço de IA MiniMax |

@@ -350,6 +350,7 @@ Las fábricas proporcionan:
 - 🚧 En desarrollo
 - 📋 Planificado
 - 💡 En consideración
+- ⚠️ Obsoleto
 
 *Nota: Debido al entorno de red del desarrollador, la conexión a servicios de IA en la nube extranjeros marcados como [En consideración] puede requerir herramientas de proxy de red, y el proceso de depuración puede ser inestable.*
 
@@ -367,7 +368,7 @@ Las fábricas proporcionan:
 | Meituan LongCat | ✅ | Nube | Gran modelo de desarrollo propio de Meituan, compatible con el formato API OpenAI, autenticación por clave API |
 | Qiniu Cloud AI | ✅ | Nube | Servicio de IA en la nube de Qiniu, autenticación por clave API |
 | DeepSeek (conexión directa) | 📋 | Nube | Servicio de IA DeepSeek |
-| 01.AI (Yi) | 📋 | Nube | Servicio de IA 01.AI |
+| 01.AI (Yi) | ⚠️ | Nube | Servicio de IA 01.AI (Obsoleto: registro de nuevos usuarios suspendido) |
 | Tencent Hunyuan | 📋 | Nube | Servicio de IA Hunyuan de Tencent |
 | SiliconFlow | 📋 | Nube | Servicio de IA SiliconFlow |
 | MiniMax | 📋 | Nube | Servicio de IA MiniMax |

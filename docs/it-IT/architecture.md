@@ -326,6 +326,7 @@ L'interfaccia `IAIClient` definisce gli attributi di dichiarazione delle capacit
 - 🚧 In sviluppo
 - 📋 Pianificato
 - 💡 In considerazione
+- ⚠️ Deprecato
 
 *Nota: A causa dell'ambiente di rete dello sviluppatore, l'integrazione con servizi AI cloud esteri [in considerazione] potrebbe richiedere l'uso di strumenti proxy di rete per l'accesso, e il processo di debug potrebbe presentare instabilità.*
 
@@ -343,7 +344,7 @@ L'interfaccia `IAIClient` definisce gli attributi di dichiarazione delle capacit
 | Meituan LongCat | ✅ | Cloud | Modello di grandi dimensioni sviluppato autonomamente da Meituan, compatibile con il formato API OpenAI, autenticazione con chiave API |
 | Qiniu Cloud AI | ✅ | Cloud | Servizio di inferenza di modelli di grandi dimensioni di Qiniu Cloud, compatibile con il formato API OpenAI, autenticazione con chiave API |
 | DeepSeek (Connessione diretta) | 📋 | Cloud | Servizio AI DeepSeek |
-| 01.AI | 📋 | Cloud | Servizio AI 01.AI |
+| 01.AI | ⚠️ | Cloud | Servizio AI 01.AI (Deprecato: registrazione nuovi utenti interrotta) |
 | Tencent Hunyuan | 📋 | Cloud | Servizio AI Tencent Hunyuan |
 | SiliconFlow | 📋 | Cloud | Servizio AI SiliconFlow |
 | MiniMax | 📋 | Cloud | Servizio AI MiniMax |

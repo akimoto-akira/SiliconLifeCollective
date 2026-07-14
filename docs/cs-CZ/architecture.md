@@ -350,6 +350,7 @@ Továrny poskytují:
 - 🚧 Ve vývoji
 - 📋 Plánováno
 - 💡 Zvažováno
+- ⚠️ Zastaralé
 
 *Poznámka: Vzhledem k síťovému prostředí vývojáře může přístup ke cloudovým AI službám ze zahraničí ve stavu [Zvažováno] vyžadovat použití síťových proxy nástrojů a proces ladění může být nestabilní.*
 
@@ -367,7 +368,7 @@ Továrny poskytují:
 | Meituan LongCat | ✅ | Cloud | Vlastní velký model Meituan, kompatibilní s OpenAI API formátem, autentizace API klíčem |
 | Qiniu Cloud AI | ✅ | Cloud | Cloudová AI služba Qiniu, autentizace API klíčem |
 | DeepSeek (přímé připojení) | 📋 | Cloud | DeepSeek AI služba |
-| 01.AI (Yi) | 📋 | Cloud | 01.AI AI služba |
+| 01.AI (Yi) | ⚠️ | Cloud | 01.AI AI služba (Zastaralé: registrace nových uživatelů zastavena) |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI služba |
 | SiliconFlow | 📋 | Cloud | SiliconFlow AI služba |
 | MiniMax | 📋 | Cloud | MiniMax AI služba |

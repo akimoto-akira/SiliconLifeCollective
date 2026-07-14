@@ -347,6 +347,7 @@ Factories provide:
 - 🚧 In Development
 - 📋 Planned
 - 💡 Under Consideration
+- ⚠️ Deprecated
 
 *Note: Due to the developer's network environment, accessing overseas cloud AI services that are "Under Consideration" may require network proxy tools, and the debugging process may be unstable.*
 
@@ -364,7 +365,7 @@ Factories provide:
 | Meituan LongCat | ✅ | Cloud | Meituan's self-developed large model, compatible with OpenAI API format, API key authentication |
 | Qiniu Cloud AI | ✅ | Cloud | Qiniu cloud AI service, API key authentication |
 | DeepSeek (Direct) | 📋 | Cloud | DeepSeek AI service |
-| Yi (01.AI) | 📋 | Cloud | Yi AI service |
+| Yi (01.AI) | ⚠️ | Cloud | Yi AI service (Deprecated: stopped new user registration) |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI service |
 | SiliconFlow | 📋 | Cloud | SiliconFlow AI service |
 | MiniMax | 📋 | Cloud | MiniMax AI service |

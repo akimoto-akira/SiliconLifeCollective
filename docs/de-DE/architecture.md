@@ -351,6 +351,7 @@ Die Fabriken bieten:
 - 🚧 In Entwicklung
 - 📋 Geplant
 - 💡 In Erwägung
+- ⚠️ Veraltet
 
 *Hinweis: Aufgrund der Netzwerkumgebung des Entwicklers kann der Zugriff auf [in Erwägung befindliche] ausländische Cloud-KI-Dienste möglicherweise Netzwerk-Proxy-Tools erfordern, und der Debugging-Prozess kann instabil sein.*
 
@@ -368,7 +369,7 @@ Die Fabriken bieten:
 | Meituan LongCat | ✅ | Cloud | Meituans eigenes Großmodell, kompatibel mit OpenAI-API-Format, API-Schlüssel-Authentifizierung |
 | Qiniu Cloud AI | ✅ | Cloud | Qiniu Cloud-KI-Service, API-Schlüssel-Authentifizierung |
 | DeepSeek (Direktverbindung) | 📋 | Cloud | DeepSeek KI-Dienst |
-| 01.AI (Yi) | 📋 | Cloud | 01.AI KI-Dienst |
+| 01.AI (Yi) | ⚠️ | Cloud | 01.AI KI-Dienst (Veraltet: Registrierung neuer Nutzer eingestellt) |
 | Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan KI-Dienst |
 | SiliconFlow | 📋 | Cloud | SiliconFlow KI-Dienst |
 | MiniMax | 📋 | Cloud | MiniMax KI-Dienst |

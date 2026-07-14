@@ -321,6 +321,7 @@ Interfejs `IAIClient` definiuje właściwości deklaracji możliwości klienta A
 - 🚧 W rozwoju
 - 📋 Planowane
 - 💡 Rozważane
+- ⚠️ Przestarzałe
 
 *Uwaga: Ze względu na środowisko sieciowe dewelopera, łączenie z rozważanymi zagranicznymi chmurowymi usługami AI może wymagać użycia narzędzi proxy sieciowego, a proces debugowania może być niestabilny.*
 
@@ -338,7 +339,7 @@ Interfejs `IAIClient` definiuje właściwości deklaracji możliwości klienta A
 | Meituan LongCat | ✅ | Chmurowa | Autorski duży model Meituan, kompatybilny z formatem OpenAI API, autoryzacja przez klucz API |
 | Qiniu Cloud AI | ✅ | Chmurowa | Chmurowa usługa wnioskowania dużych modeli Qiniu Cloud, kompatybilna z formatem OpenAI API, autoryzacja przez klucz API |
 | DeepSeek (bezpośrednie połączenie) | 📋 | Chmurowa | Usługa AI DeepSeek |
-| 01.AI (Yi) | 📋 | Chmurowa | Usługa AI 01.AI |
+| 01.AI (Yi) | ⚠️ | Chmurowa | Usługa AI 01.AI (Przestarzałe: rejestracja nowych użytkowników wstrzymana) |
 | Tencent Hunyuan | 📋 | Chmurowa | Usługa AI Tencent Hunyuan |
 | SiliconFlow | 📋 | Chmurowa | Usługa AI SiliconFlow |
 | MiniMax | 📋 | Chmurowa | Usługa AI MiniMax |
