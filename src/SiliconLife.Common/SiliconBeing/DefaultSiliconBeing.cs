@@ -603,6 +603,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
             "HerdsmanClient" => new HerdsmanClientFactory(),
             "LongCatClient" => new LongCatClientFactory(),
             "QiniuAI" => new QiniuAIClientFactory(),
+            "DeepSeekClient" => new DeepSeekClientFactory(),
+            "ZhipuClient" => new ZhipuClientFactory(),
+            "MoonshotClient" => new MoonshotClientFactory(),
+            "SiliconFlowClient" => new SiliconFlowClientFactory(),
+            "MiniMaxClient" => new MiniMaxClientFactory(),
+            "ErnieClient" => new ErnieClientFactory(),
+            "HunyuanClient" => new HunyuanClientFactory(),
             _ => new OllamaClientFactory()
         };
     }

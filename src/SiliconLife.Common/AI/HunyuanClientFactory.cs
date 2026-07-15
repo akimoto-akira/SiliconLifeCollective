@@ -1,0 +1,102 @@
+// Copyright (c) 2026 Hoshino Kennji
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using SiliconLife.Collective;
+using SiliconLife.Common.Localization;
+
+namespace SiliconLife.Common.AI;
+
+/// <summary>
+/// Factory for creating Tencent Hunyuan (腾讯混元) client instances.
+/// Supports TokenHub (recommended) and legacy platform endpoints.
+/// </summary>
+public class HunyuanClientFactory : IAIClientFactory, IAIClientFactoryHelp
+{
+    private static readonly Dictionary<string, string> Models = new()
+    {
+        ["hy3"] = "Hy3 (TokenHub, 256K, 1 CNY/M input) - Recommended",
+        ["hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
+        ["hunyuan-lite"] = "Hunyuan-Lite (Free, 256K, No Tool Calling)",
+        ["hunyuan-turbos-latest"] = "Hunyuan-TurboS (0.8 CNY/M, 128K)",
+        ["hunyuan-t1-latest"] = "Hunyuan-T1 (1 CNY/M, 256K)",
+        ["hunyuan-a13b"] = "Hunyuan-A13B (0.5 CNY/M, Lightweight)",
+        ["hunyuan-functioncall"] = "Hunyuan-FunctionCall (Tool Calling)",
+    };
+
+    public IAIClient CreateClient(Dictionary<string, object> config)
+    {
+        string apiKey = config.TryGetValue("apiKey", out var ak)
+            ? ak.ToString() ?? "" : "";
+
+        string model = config.TryGetValue("model", out var m)
+            ? m.ToString() ?? "hy3" : "hy3";
+
+        // Auto-select endpoint based on model name if not explicitly configured
+        string endpoint = config.TryGetValue("endpoint", out var ep) && !string.IsNullOrEmpty(ep.ToString())
+            ? ep.ToString()!
+            : model.ToLowerInvariant() switch
+            {
+                "hy3" or "hy3-preview" => HunyuanClient.TokenHubEndpoint,
+                _ => HunyuanClient.LegacyEndpoint
+            };
+
+        bool thinkingEnabled = config.TryGetValue("thinkingEnabled", out var te)
+            ? Convert.ToBoolean(te.ToString())
+            : false;
+
+        int? contextWindowTokens = null;
+        if (config.TryGetValue("contextWindowTokens", out var cwt))
+        {
+            if (cwt is int intValue)
+                contextWindowTokens = Math.Min(intValue, HunyuanClient.MaxContextWindowTokens);
+            else if (int.TryParse(cwt.ToString(), out int parsedValue))
+                contextWindowTokens = Math.Min(parsedValue, HunyuanClient.MaxContextWindowTokens);
+        }
+
+        return new HunyuanClient(apiKey, endpoint, model, contextWindowTokens, thinkingEnabled);
+    }
+
+    public Dictionary<string, string> GetConfigKeysMetadata(Language language)
+    {
+        var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
+
+        if (localization == null)
+        {
+            return new Dictionary<string, string>
+            {
+                ["apiKey"] = "API Key",
+                ["model"] = "Model",
+                ["endpoint"] = "Endpoint",
+                ["contextWindowTokens"] = "Context Window Tokens"
+            };
+        }
+
+        return new Dictionary<string, string>
+        {
+            ["apiKey"] = localization.GetConfigDisplayName("HunyuanApiKey", out _),
+            ["model"] = localization.GetConfigDisplayName("HunyuanModel", out _),
+            ["endpoint"] = localization.GetConfigDisplayName("HunyuanEndpoint", out _),
+            ["contextWindowTokens"] = localization.GetConfigDisplayName("HunyuanContextWindowTokens", out _)
+        };
+    }
+
+    public Dictionary<string, string>? GetConfigKeyOptions(
+        string configKey, Dictionary<string, object> currentConfig, Language language)
+    {
+        if (configKey == "model")
+            return Models;
+        return null;
+    }
+
+    public string? GetHelpTopicId() => "hunyuan-setup";
+}
