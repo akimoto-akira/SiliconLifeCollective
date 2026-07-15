@@ -60,6 +60,36 @@ public abstract class HelpLocalizationBase
     /// <summary>Volcengine Ark</summary>
     public abstract string VolcengineArk { get; }
 
+    /// <summary>Herdsman Setup</summary>
+    public abstract string HerdsmanSetup { get; }
+
+    /// <summary>LongCat Setup</summary>
+    public abstract string LongCatSetup { get; }
+
+    /// <summary>Qiniu AI Setup</summary>
+    public abstract string QiniuAISetup { get; }
+
+    /// <summary>DeepSeek Setup</summary>
+    public abstract string DeepSeekSetup { get; }
+
+    /// <summary>Zhipu Setup</summary>
+    public abstract string ZhipuSetup { get; }
+
+    /// <summary>Moonshot Setup</summary>
+    public abstract string MoonshotSetup { get; }
+
+    /// <summary>SiliconFlow Setup</summary>
+    public abstract string SiliconFlowSetup { get; }
+
+    /// <summary>MiniMax Setup</summary>
+    public abstract string MiniMaxSetup { get; }
+
+    /// <summary>Ernie Setup</summary>
+    public abstract string ErnieSetup { get; }
+
+    /// <summary>Hunyuan Setup</summary>
+    public abstract string HunyuanSetup { get; }
+
     /// <summary>AI Clients</summary>
     public abstract string AIClients { get; }
 
@@ -124,6 +154,36 @@ public abstract class HelpLocalizationBase
     /// <summary>Volcengine Ark Title</summary>
     public abstract string VolcengineArk_Title { get; }
 
+    /// <summary>Herdsman Setup Title</summary>
+    public abstract string HerdsmanSetup_Title { get; }
+
+    /// <summary>LongCat Setup Title</summary>
+    public abstract string LongCatSetup_Title { get; }
+
+    /// <summary>Qiniu AI Setup Title</summary>
+    public abstract string QiniuAISetup_Title { get; }
+
+    /// <summary>DeepSeek Setup Title</summary>
+    public abstract string DeepSeekSetup_Title { get; }
+
+    /// <summary>Zhipu Setup Title</summary>
+    public abstract string ZhipuSetup_Title { get; }
+
+    /// <summary>Moonshot Setup Title</summary>
+    public abstract string MoonshotSetup_Title { get; }
+
+    /// <summary>SiliconFlow Setup Title</summary>
+    public abstract string SiliconFlowSetup_Title { get; }
+
+    /// <summary>MiniMax Setup Title</summary>
+    public abstract string MiniMaxSetup_Title { get; }
+
+    /// <summary>Ernie Setup Title</summary>
+    public abstract string ErnieSetup_Title { get; }
+
+    /// <summary>Hunyuan Setup Title</summary>
+    public abstract string HunyuanSetup_Title { get; }
+
     /// <summary>AI Clients Title</summary>
     public abstract string AIClients_Title { get; }
 
@@ -187,6 +247,36 @@ public abstract class HelpLocalizationBase
 
     /// <summary>Volcengine Ark Tags</summary>
     public abstract string[] VolcengineArk_Tags { get; }
+
+    /// <summary>Herdsman Setup Tags</summary>
+    public abstract string[] HerdsmanSetup_Tags { get; }
+
+    /// <summary>LongCat Setup Tags</summary>
+    public abstract string[] LongCatSetup_Tags { get; }
+
+    /// <summary>Qiniu AI Setup Tags</summary>
+    public abstract string[] QiniuAISetup_Tags { get; }
+
+    /// <summary>DeepSeek Setup Tags</summary>
+    public abstract string[] DeepSeekSetup_Tags { get; }
+
+    /// <summary>Zhipu Setup Tags</summary>
+    public abstract string[] ZhipuSetup_Tags { get; }
+
+    /// <summary>Moonshot Setup Tags</summary>
+    public abstract string[] MoonshotSetup_Tags { get; }
+
+    /// <summary>SiliconFlow Setup Tags</summary>
+    public abstract string[] SiliconFlowSetup_Tags { get; }
+
+    /// <summary>MiniMax Setup Tags</summary>
+    public abstract string[] MiniMaxSetup_Tags { get; }
+
+    /// <summary>Ernie Setup Tags</summary>
+    public abstract string[] ErnieSetup_Tags { get; }
+
+    /// <summary>Hunyuan Setup Tags</summary>
+    public abstract string[] HunyuanSetup_Tags { get; }
 
     /// <summary>AI Clients Tags</summary>
     public abstract string[] AIClients_Tags { get; }

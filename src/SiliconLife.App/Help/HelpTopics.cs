@@ -126,6 +126,86 @@ public static class HelpTopics
         },
         new()
         {
+            Id = "herdsman-setup",
+            PropertyName = nameof(HelpLocalizationBase.HerdsmanSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.HerdsmanSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.HerdsmanSetup_Tags),
+            Icon = "🐏"
+        },
+        new()
+        {
+            Id = "longcat-setup",
+            PropertyName = nameof(HelpLocalizationBase.LongCatSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.LongCatSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.LongCatSetup_Tags),
+            Icon = "🐈"
+        },
+        new()
+        {
+            Id = "qiniu-ai-setup",
+            PropertyName = nameof(HelpLocalizationBase.QiniuAISetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.QiniuAISetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.QiniuAISetup_Tags),
+            Icon = "☁️"
+        },
+        new()
+        {
+            Id = "deepseek-setup",
+            PropertyName = nameof(HelpLocalizationBase.DeepSeekSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.DeepSeekSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.DeepSeekSetup_Tags),
+            Icon = "🐳"
+        },
+        new()
+        {
+            Id = "zhipu-setup",
+            PropertyName = nameof(HelpLocalizationBase.ZhipuSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.ZhipuSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.ZhipuSetup_Tags),
+            Icon = "🔮"
+        },
+        new()
+        {
+            Id = "moonshot-setup",
+            PropertyName = nameof(HelpLocalizationBase.MoonshotSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.MoonshotSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.MoonshotSetup_Tags),
+            Icon = "🌙"
+        },
+        new()
+        {
+            Id = "siliconflow-setup",
+            PropertyName = nameof(HelpLocalizationBase.SiliconFlowSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.SiliconFlowSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.SiliconFlowSetup_Tags),
+            Icon = "🌊"
+        },
+        new()
+        {
+            Id = "minimax-setup",
+            PropertyName = nameof(HelpLocalizationBase.MiniMaxSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.MiniMaxSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.MiniMaxSetup_Tags),
+            Icon = "🎯"
+        },
+        new()
+        {
+            Id = "ernie-setup",
+            PropertyName = nameof(HelpLocalizationBase.ErnieSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.ErnieSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.ErnieSetup_Tags),
+            Icon = "📖"
+        },
+        new()
+        {
+            Id = "hunyuan-setup",
+            PropertyName = nameof(HelpLocalizationBase.HunyuanSetup),
+            TitlePropertyName = nameof(HelpLocalizationBase.HunyuanSetup_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.HunyuanSetup_Tags),
+            Icon = "🌀"
+        },
+        new()
+        {
             Id = "ai-clients",
             PropertyName = nameof(HelpLocalizationBase.AIClients),
             TitlePropertyName = nameof(HelpLocalizationBase.AIClients_Title),

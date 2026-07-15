@@ -34,6 +34,16 @@ public class HelpLocalizationCsCZ : HelpLocalizationBase
   public override string OllamaSetup_Title => "Instalace Ollama a stahování modelů";
   public override string BailianDashScope_Title => "Průvodce používáním platformy Alibaba Cloud Bailian";
   public override string VolcengineArk_Title => "Průvodce používáním platformy Volcengine Ark";
+  public override string HerdsmanSetup_Title => "Průvodce nastavením inferenčního enginu Herdsman";
+  public override string LongCatSetup_Title => "Průvodce nastavením modelu LongCat od Meituan";
+  public override string QiniuAISetup_Title => "Průvodce nastavením Qiniu Cloud AI";
+  public override string DeepSeekSetup_Title => "Průvodce nastavením platformy DeepSeek AI";
+  public override string ZhipuSetup_Title => "Průvodce nastavením platformy Zhipu AI (GLM)";
+  public override string MoonshotSetup_Title => "Průvodce nastavením platformy Moonshot (Kimi)";
+  public override string SiliconFlowSetup_Title => "Průvodce nastavením inferenční platformy SiliconFlow AI";
+  public override string MiniMaxSetup_Title => "Průvodce nastavením platformy MiniMax AI";
+  public override string ErnieSetup_Title => "Průvodce nastavením platformy Baidu ERNIE (Qianfan)";
+  public override string HunyuanSetup_Title => "Průvodce nastavením modelu Tencent Hunyuan";
   public override string AIClients_Title => "Konfigurace AI klienta";
 
   public override string BeingSoul_Title => "Soubor Duše";
@@ -89,6 +99,36 @@ public class HelpLocalizationCsCZ : HelpLocalizationBase
 
   public override string[] VolcengineArk_Tags => new[]
     { "Volcengine", "Ark", "Doubao", "ByteDance", "cloudová AI", "API", "konfigurace", "model" };
+
+  public override string[] HerdsmanSetup_Tags => new[]
+    { "Herdsman", "inference", "engine", "lokální AI", "API", "konfigurace", "model" };
+
+  public override string[] LongCatSetup_Tags => new[]
+    { "LongCat", "Meituan", "cloudová AI", "API", "konfigurace", "model", "velký model" };
+
+  public override string[] QiniuAISetup_Tags => new[]
+    { "Qiniu", "cloudová AI", "API", "konfigurace", "model", "inferencia" };
+
+  public override string[] DeepSeekSetup_Tags => new[]
+    { "DeepSeek", "AI", "API", "konfigurace", "model", "odvozování", "kód" };
+
+  public override string[] ZhipuSetup_Tags => new[]
+    { "Zhipu", "GLM", "AI", "API", "konfigurace", "model", "kód", "agent" };
+
+  public override string[] MoonshotSetup_Tags => new[]
+    { "Moonshot", "Kimi", "AI", "API", "konfigurace", "model", "dlouhý kontext" };
+
+  public override string[] SiliconFlowSetup_Tags => new[]
+    { "SiliconFlow", "AI", "inferencia", "API", "konfigurace", "model", "open source" };
+
+  public override string[] MiniMaxSetup_Tags => new[]
+    { "MiniMax", "AI", "API", "konfigurace", "model", "multimodální", "agent" };
+
+  public override string[] ErnieSetup_Tags => new[]
+    { "Baidu", "ERNIE", "Qianfan", "AI", "API", "konfigurace", "model" };
+
+  public override string[] HunyuanSetup_Tags => new[]
+    { "Tencent", "Hunyuan", "AI", "API", "konfigurace", "model", "multimodální" };
 
   public override string[] AIClients_Tags => new[]
     { "AI klient", "AI služba", "model", "konfigurace", "lokální", "cloud", "Ollama", "DashScope", "nastavení" };
@@ -2477,6 +2517,627 @@ Volcengine Ark používá **platbu za použití**:
 5. Je inferenční endpoint spuštěn?
 
 Příjemné používání!
+";
+
+  public override string HerdsmanSetup => @"
+# Průvodce nastavením inferenčního enginu Herdsman
+
+## Co je Herdsman?
+
+Herdsman je lehký lokální inferenční engine, navržený pro běh velkých jazykových modelů na vlastním hardwaru. Poskytuje API kompatibilní s OpenAI, které se snadno integruje se Silicon Life.
+
+**Výhody:**
+- Plně lokální běh, ochrana soukromí
+- Formát API kompatibilní s OpenAI
+- Podpora více open-source modelů
+- Nízká spotřeba prostředků
+- Po stažení modelů není vyžadováno síťové připojení
+
+## Kroky instalace
+
+### Krok 1: Stažení a instalace
+
+Navštivte stránku vydání Herdsman a stáhněte verzi vhodnou pro váš operační systém:
+- Windows: stáhněte soubor `.zip` a rozbalte jej
+- Linux: stáhněte soubor `.tar.gz` a rozbalte jej
+- macOS: stáhněte soubor `.dmg` a nainstalujte
+
+### Krok 2: Spuštění služby
+
+Po rozbalení spusťte spustitelný soubor Herdsman:
+- Windows: poklepejte na `herdsman.exe` nebo spusťte z příkazového řádku
+- Linux/macOS: `./herdsman --serve`
+
+Služba se spouští ve výchozím nastavení na portu `8080`. Navštivte `http://localhost:8080/v1/models` pro ověření funkčnosti.
+
+### Krok 3: Stažení modelů
+
+Použijte CLI rozhraní Herdsman pro stahování modelů:
+```
+herdsman pull <název_modelu>
+```
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **Herdsman** jako typ AI klienta
+2. Nastavte **Koncový bod Herdsman** na adresu vaší služby Herdsman (výchozí: `http://localhost:8080`)
+3. Nastavte **Model** na název staženého modelu
+4. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Dostupné modely
+
+Herdsman podporuje všechny modely ve formátu GGUF, včetně:
+- Řada Llama
+- Řada Qwen
+- Řada Mistral
+
+## Časté otázky
+
+1. Ujistěte se, že služba Herdsman běží před spuštěním Silicon Life
+2. Zkontrolujte, zda je URL koncového bodu správné a dostupné
+3. Potvrďte, že název modelu odpovídá staženému modelu
+4. Zkontrolujte, zda jsou systémové prostředky (paměť/GPU) dostatečné
+";
+
+  public override string LongCatSetup => @"
+# Průvodce nastavením modelu LongCat od Meituan
+
+## Co je LongCat?
+
+LongCat je platforma velkých jazykových modelů vyvinutá společností Meituan, nabízející výkonné AI schopnosti prostřednictvím API kompatibilního s OpenAI.
+
+**Výhody:**
+- Vyvinuto společností Meituan, vynikající porozumění čínštině
+- Formát API kompatibilní s OpenAI
+- Optimalizováno pro obchodní scénáře
+- Podpora dlouhých oken kontextu
+- Běh v cloudu, není vyžadován lokální hardware
+
+## Začínáme
+
+### Krok 1: Registrace
+
+Navštivte otevřenou platformu LongCat pro registraci:
+- URL: `https://longcat.sensetime.com`
+- Zaregistrujte se pomocí telefonního čísla nebo e-mailu
+- Proveďte ověření identity
+
+### Krok 2: Získání klíče API
+
+1. Přihlaste se na platformu LongCat
+2. Přejděte na **Správa API** → **API Keys**
+3. Klikněte na **Vytvořit API Key**
+4. Zkopírujte a bezpečně uložte svůj klíč API
+
+### Krok 3: Zobrazení dostupných modelů
+
+Zobrazte dostupné modely v sekci **Seznam modelů** na platformě.
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **LongCat** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API LongCat
+3. Nastavte **Koncový bod** na adresu API LongCat (výchozí koncový bod je předkonfigurován)
+4. Nastavte **Model** na požadovaný název modelu
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Způsob fakturace
+
+LongCat fakturuje podle spotřeby Tokenů. Aktuální ceny naleznete na platformě.
+
+## Časté otázky
+
+1. Potvrďte, že klíč API je správný a platný
+2. Ujistěte se, že zůstatek na účtu je dostatečný
+3. Zkontrolujte, zda je název modelu platný
+4. Ověřte síťové připojení ke koncovému bodu API LongCat
+";
+
+  public override string QiniuAISetup => @"
+# Průvodce nastavením Qiniu Cloud AI
+
+## Co je Qiniu Cloud AI?
+
+Qiniu Cloud AI je služba inferencie velkých modelů poskytovaná společností Qiniu Cloud, nabízející vysoce výkonné AI schopnosti prostřednictvím API rozhraní.
+
+**Výhody:**
+- Vysoce výkonná inference, nízká latence
+- Formát API kompatibilní s OpenAI
+- Podpora více populárních modelů
+- Automatické škálování v cloudu
+- Spolehlivá cloudová infrastruktura
+
+## Začínáme
+
+### Krok 1: Registrace v Qiniu Cloud
+
+1. Navštivte `https://www.qiniu.com`
+2. Zaregistrujte se a proveďte ověření účtu
+3. Aktivujte službu AI inferencie
+
+### Krok 2: Získání klíče API
+
+1. Přihlaste se do konzole Qiniu Cloud
+2. Přejděte na **AI služby** → **Správa API**
+3. Vytvořte nebo zobrazte svůj klíč API
+4. Zkopírujte klíč API a URL koncového bodu
+
+### Krok 3: Zobrazení dostupných modelů
+
+Zobrazte dostupné modely v sekci AI služby v konzoli.
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **Qiniu AI** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API Qiniu Cloud
+3. Nastavte **Koncový bod** na adresu API služby inferencie
+4. Nastavte **Model** na požadovaný název modelu
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Způsob fakturace
+
+Qiniu Cloud AI fakturuje podle spotřeby. Podrobné informace o cenách naleznete na platformě.
+
+## Časté otázky
+
+1. Ujistěte se, že klíč API a koncový bod jsou správné
+2. Ověřte, že zůstatek nebo kvóta účtu je dostatečná
+3. Zkontrolujte, zda je název modelu podporován
+4. Potvrďte síťové připojení k API Qiniu Cloud
+";
+
+  public override string DeepSeekSetup => @"
+# Průvodce nastavením platformy DeepSeek AI
+
+## Co je DeepSeek?
+
+DeepSeek je AI společnost specializující se na vývoj vysoce výkonných velkých jazykových modelů, známá svými výjimečnými schopnostmi odvozování a programování. API DeepSeek poskytuje rozhraní kompatibilní s OpenAI.
+
+**Výhody:**
+- Výjimečné schopnosti odvozování a matematiky
+- Vynikající generování a porozumění kódu
+- Formát API kompatibilní s OpenAI
+- Velmi konkurenceschopné ceny
+- Podpora dlouhých oken kontextu (128K)
+
+## Začínáme
+
+### Krok 1: Registrace
+
+1. Navštivte `https://platform.deepseek.com`
+2. Zaregistrujte se pomocí e-mailu nebo telefonního čísla
+3. Proveďte ověření účtu
+
+### Krok 2: Získání klíče API
+
+1. Přihlaste se na platformu DeepSeek
+2. Přejděte na stránku **API Keys**
+3. Klikněte na **Vytvořit API Key**
+4. Zkopírujte a bezpečně uložte svůj klíč API
+
+### Krok 3: Dobití zůstatku
+
+DeepSeek využívá předplacený model. Před použitím API je nutné dobit zůstatek.
+
+## Dostupné modely
+
+- **deepseek-v4-flash**: nejnovější vlajková loď, špičkové schopnosti odvozování (kontext 128K)
+- **deepseek-chat**: vyvážený konverzační model (kontext 64K)
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **DeepSeek** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API DeepSeek
+3. Nastavte **Model** na požadovaný název modelu (např. `deepseek-v4-flash`)
+4. Nastavte **Koncový bod** na adresu API DeepSeek (výchozí: `https://api.deepseek.com`, ponechte prázdné pro výchozí hodnotu)
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Způsob fakturace
+
+DeepSeek využív fakturaci podle spotřeby:
+- Vstupní a výstupní Tokeny se fakturují samostatně
+- Aktuální sazby na `https://api-docs.deepseek.com`
+
+## Časté otázky
+
+1. Potvrďte, že klíč API je správný
+2. Ujistěte se, že zůstatek na účtu je dostatečný
+3. Zkontrolujte, zda je název modelu platný
+4. Při použití vlastního koncového bodu ověřte URL koncového bodu
+";
+
+  public override string ZhipuSetup => @"
+# Průvodce nastavením platformy Zhipu AI (GLM)
+
+## Co je Zhipu AI?
+
+Zhipu AI je přední čínská AI společnost, vývojář řady GLM (General Language Model). Otevřená platforma Zhipu poskytuje přístup API k výkonným modelům, kompatibilní s OpenAI.
+
+**Výhody:**
+- Řada modelů GLM, vynikající čínsko-anglické bilingvní schopnosti
+- Vynikající schopnosti programování a agentů
+- Formát API kompatibilní s OpenAI
+- Bezplatné kvóty pro některé modely
+- Podpora multimodálních úloh
+
+## Začínáme
+
+### Krok 1: Registrace
+
+1. Navštivte `https://open.bigmodel.cn`
+2. Zaregistrujte se pomocí telefonního čísla
+3. Proveďte ověření identity
+
+### Krok 2: Získání klíče API
+
+1. Přihlaste se na otevřenou platformu Zhipu
+2. Přejděte na **Správa API** → **API Keys**
+3. Vytvořte nový klíč API
+4. Zkopírujte a uložte svůj klíč API
+
+### Krok 3: Zobrazení bezplatných kvót
+
+Noví uživatelé mohou získat bezplatné Tokeny pro GLM-4-Flash. Podrobnosti v **Správa fakturace**.
+
+## Dostupné modely
+
+- **glm-5.1-plus**: vlajkový model, hluboké odvozování (kontext 128K)
+- **glm-5.1**: vynikající poměr cena/výkon, výkonný (kontext 128K)
+- **glm-5.1-flash**: rychlý a ekonomický (kontext 128K)
+- **glm-4-flash**: bezplatný model (kontext 128K)
+- **glm-4-flashx**: ultra rychlý, nízké náklady (kontext 128K)
+- **glm-4-air**: lehký, vynikající poměr cena/výkon (kontext 128K)
+- **glm-4-airx**: lehký, vysoká rychlost (kontext 8K)
+- **glm-4-long**: dlouhý kontext, 1 milion Tokenů (kontext 1M)
+- **glm-4-plus**: stabilní vlajkový model (kontext 128K)
+- **codegeex-4**: model pro generování kódu (kontext 128K)
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **Zhipu GLM** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API Zhipu
+3. Nastavte **Model** na požadovaný název modelu
+4. Nastavte **Koncový bod** na adresu API (ponechte prázdné pro výchozí hodnotu)
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Způsob fakturace
+
+- GLM-4-Flash je bezplatný
+- Ostatní modely fakturovány podle spotřeby
+- Podrobnosti na `https://open.bigmodel.cn/pricing`
+
+## Časté otázky
+
+1. Potvrďte, že klíč API je správný
+2. Zkontrolujte, zda bezplatná kvóta není vyčerpána
+3. Ujistěte se, že název modelu odpovídá dostupným modelům
+4. Ověřte síťové připojení k API Zhipu
+";
+
+  public override string MoonshotSetup => @"
+# Průvodce nastavením platformy Moonshot (Kimi)
+
+## Co je Moonshot?
+
+Moonshot je společnost stojící za Kimi, jedním z nejoblíbenějších AI asistentů v Číně. Platforma Moonshot poskytuje přístup API k modelům Kimi, známým podporou ultradlouhých oken kontextu.
+
+**Výhody:**
+- Podpora ultradlouhých oken kontextu (až 2 miliony Tokenů)
+- Vynikající porozumění čínštině
+- Formát API kompatibilní s OpenAI
+- Výkonné schopnosti zpracování dokumentů
+- Konkurenceschopné ceny
+
+## Začínáme
+
+### Krok 1: Registrace
+
+1. Navštivte `https://platform.moonshot.cn`
+2. Zaregistrujte se pomocí telefonního čísla
+3. Proveďte ověření identity
+
+### Krok 2: Získání klíče API
+
+1. Přihlaste se na platformu Moonshot
+2. Přejděte na **Správa klíčů API**
+3. Vytvořte nový klíč API
+4. Zkopírujte a bezpečně uložte
+
+### Krok 3: Dobití zůstatku
+
+Dobijte svůj účet. Noví uživatelé mohou získat bezplatné zkušební Tokeny.
+
+## Dostupné modely
+
+- **kimi-latest**: nejnovější vlajkový model, hluboké odvozování (kontext 256K)
+- **moonshot-v1-128k**: standardní model, dlouhý kontext (kontext 128K)
+- **moonshot-v1-32k**: standardní model (kontext 32K)
+- **moonshot-v1-8k**: standardní model, ekonomický (kontext 8K)
+- **moonshot-v1-200k**: model s dlouhým dosahem (kontext 200K)
+- **moonshot-v1-auto**: automatický výběr modelu podle délky vstupu (kontext 192K)
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **Moonshot Kimi** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API Moonshot
+3. Nastavte **Model** na požadovaný název modelu
+4. Nastavte **Koncový bod** na adresu API (ponechte prázdné pro výchozí hodnotu)
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Způsob fakturace
+
+Moonshot fakturuje podle spotřeby Tokenů, sazby se liší podle modelu. Podrobnosti na `https://platform.moonshot.cn/docs/pricing`.
+
+## Časté otázky
+
+1. Potvrďte, že klíč API je správný
+2. Ujistěte se, že zůstatek na účtu je dostatečný
+3. Zkontrolujte, zda je název modelu platný
+4. Při zpracování dlouhých dokumentů se ujistěte, že model podporuje požadovanou délku kontextu
+";
+
+  public override string SiliconFlowSetup => @"
+# Průvodce nastavením inferenční platformy SiliconFlow AI
+
+## Co je SiliconFlow?
+
+SiliconFlow je cloudová inferenční platforma AI, nabízející jednotný přístup prostřednictvím API kompatibilního s OpenAI k různým open-source a komerčním velkým jazykovým modelům.
+
+**Výhody:**
+- Přístup k mnoha open-source modelům (Qwen, DeepSeek, Llama atd.)
+- Jednotné API kompatibilní s OpenAI pro všechny modely
+- Optimalizované zrychlení, vysoká rychlost inferencie
+- Bezplatné kvóty pro některé modely
+- Není vyžadován lokální hardware
+
+## Začínáme
+
+### Krok 1: Registrace
+
+1. Navštivte `https://siliconflow.cn`
+2. Zaregistrujte se pomocí telefonního čísla nebo účtu GitHub
+3. Dokončete nastavení účtu
+
+### Krok 2: Získání klíče API
+
+1. Přihlaste se na platformu SiliconFlow
+2. Přejděte na stránku **API Keys**
+3. Vytvořte nový klíč API
+4. Zkopírujte a uložte
+
+### Krok 3: Procházení dostupných modelů
+
+SiliconFlow hostuje velké množství modelů. Zobrazte všechny dostupné možnosti a ceny v **Knihovně modelů**.
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **SiliconFlow** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API SiliconFlow
+3. Nastavte **Model** na požadovaný název modelu (např. `deepseek-ai/DeepSeek-V3`)
+4. Nastavte **Koncový bod** na adresu API (ponechte prázdné pro výchozí hodnotu)
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Dostupné modely
+
+SiliconFlow nabízí bohatý výběr modelů, včetně:
+- Řada DeepSeek (V3, R1 atd.)
+- Řada Qwen
+- Řada Llama
+- Řada GLM
+- A další open-source modely
+
+Úplný seznam naleznete v knihovně modelů na platformě.
+
+## Způsob fakturace
+
+- Některé modely (např. Qwen2.5-7B-Instruct) jsou bezplatné
+- Placené modely fakturovány podle spotřeby
+- Podrobnosti na `https://siliconflow.cn/pricing`
+
+## Časté otázky
+
+1. Potvrďte, že klíč API je správný
+2. Ujistěte se, že formát názvu modelu je správný (např. `výrobce/název_modelu`)
+3. U placených modelů zkontrolujte zůstatek na účtu
+4. Ověřte síťové připojení k API SiliconFlow
+";
+
+  public override string MiniMaxSetup => @"
+# Průvodce nastavením platformy MiniMax AI
+
+## Co je MiniMax?
+
+MiniMax je AI společnost nabízející velké jazykové modely s výkonnými schopnostmi v dialogu, odvozování a multimodálních úlohách. Platforma MiniMax poskytuje přístup API k jejím modelům.
+
+**Výhody:**
+- Výkonné schopnosti dialogu a odvozování
+- Podpora multimodálních modelů
+- Formát API kompatibilní s OpenAI
+- Podpora domácích a mezinárodních koncových bodů
+- Modely optimalizované pro agenty
+
+## Začínáme
+
+### Krok 1: Registrace
+
+1. Navštivte `https://platform.minimaxi.com` (domácí) nebo `https://api.minimaxi.chat` (mezinárodní)
+2. Zaregistrujte se pomocí telefonního čísla (domácí) nebo e-mailu (mezinárodní)
+3. Proveďte ověření
+
+### Krok 2: Získání klíče API
+
+1. Přihlaste se na platformu MiniMax
+2. Přejděte na stránku **API Keys**
+3. Vytvořte nový klíč API
+4. Zkopírujte a uložte
+
+### Krok 3: Výběr koncového bodu
+
+MiniMax nabízí dvě možnosti koncových bodů:
+- **Domácí koncový bod**: pro uživatele v pevninské Číně
+- **Mezinárodní koncový bod**: pro mezinárodní uživatele
+
+Vyberte vhodný koncový bod podle vaší lokace.
+
+## Dostupné modely
+
+- **MiniMax-M2**: vlajkový model, hluboké odvozování (kontext 245K)
+- **abab6.5s-chat**: rychlý a ekonomický (kontext 245K)
+- **MiniMax-Text-01**: agentní model s dlouhým dosahem (kontext 1M)
+- **abab6.5g-chat**: inference vysokou rychlostí (kontext 8K)
+- **abab6.5t-chat**: nízká latence, bez volání nástrojů (kontext 8K)
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **MiniMax** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API MiniMax
+3. Nastavte **Model** na požadovaný název modelu
+4. Nastavte **Koncový bod** na `domestic` (domácí) nebo `international` (mezinárodní)
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Způsob fakturace
+
+MiniMax fakturuje podle spotřeby, sazby se liší podle modelu. Aktuální ceny naleznete na platformě.
+
+## Časté otázky
+
+1. Potvrďte, že klíč API je správný
+2. Ujistěte se, že byl vybrán správný koncový bod (domácí/mezinárodní)
+3. Zkontrolujte, zda je název modelu platný
+4. Ověřte, že zůstatek na účtu je dostatečný
+";
+
+  public override string ErnieSetup => @"
+# Průvodce nastavením platformy Baidu ERNIE (Qianfan)
+
+## Co je Baidu ERNIE?
+
+Baidu ERNIE je řada velkých jazykových modelů společnosti Baidu, přístupná prostřednictvím platformy Qianfan. Nabízí výkonné schopnosti porozumění a generování čínštiny.
+
+**Výhody:**
+- Vynikající porozumění čínštině
+- Bohatá integrace s ekosystémem služeb Baidu
+- Více velikostí modelů pro různé scénáře
+- Podpora multimodálních úloh
+- Stabilní a spolehlivá cloudová infrastruktura
+
+## Začínáme
+
+### Krok 1: Registrace v Baidu Cloud
+
+1. Navštivte `https://qianfan.cloud.baidu.com`
+2. Přihlaste se pomocí účtu Baidu
+3. Proveďte ověření identity
+
+### Krok 2: Získání klíče API
+
+1. Přihlaste se na platformu Qianfan
+2. Přejděte na **Správa aplikací** → **Vytvořit aplikaci**
+3. Vyplňte informace o aplikaci a vytvořte ji
+4. Zkopírujte **API Key** a **Secret Key**
+5. Poznámka: Silicon Life používá přímo klíč API Qianfan
+
+### Krok 3: Aktivace modelů
+
+Na platformě Qianfan přejděte na **Správa modelů** a aktivujte modely, které chcete používat.
+
+## Dostupné modely
+
+- **ernie-4.5-turbo-128k**: vlajkový model (kontext 128K)
+- **ernie-4.0-turbo-8k**: model Turbo (kontext 8K)
+- **ernie-4.0-turbo-8k-latest**: nejnovější Turbo (kontext 8K)
+- **ernie-speed-pro-128k**: model Speed Pro (kontext 128K)
+- **ernie-speed-128k**: model Speed (kontext 128K)
+- **ernie-speed-8k**: model Speed (kontext 8K)
+- **ernie-lite-pro-128k**: model Lite Pro (kontext 128K)
+- **ernie-lite-8k**: model Lite (kontext 8K)
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **Baidu ERNIE** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API Qianfan
+3. Nastavte **Model** na název aktivovaného modelu ERNIE
+4. Nastavte **Koncový bod** na adresu API Qianfan (ponechte prázdné pro výchozí hodnotu)
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Způsob fakturace
+
+- Řady ERNIE Speed a Lite mají bezplatné kvóty
+- Placené modely fakturovány podle spotřeby
+- Podrobnosti na `https://qianfan.cloud.baidu.com/pricing`
+
+## Časté otázky
+
+1. Potvrďte, že klíč API je správný
+2. Ujistěte se, že odpovídající model byl aktivován na platformě Qianfan
+3. Zkontrolujte, zda bezplatná kvóta není vyčerpána
+4. U placených modelů potvrďte dostatečný zůstatek na účtu
+5. Ujistěte se, že bylo dokončeno ověření identity
+";
+
+  public override string HunyuanSetup => @"
+# Průvodce nastavením modelu Tencent Hunyuan
+
+## Co je Tencent Hunyuan?
+
+Tencent Hunyuan je řada velkých jazykových modelů vyvinutá společností Tencent, přístupná prostřednictvím platformy Tencent Cloud. Nabízí výkonné čínsko-anglické bilingvní schopnosti a multimodální podporu.
+
+**Výhody:**
+- Vynikající čínsko-anglické bilingvní schopnosti
+- Podpora multimodálních modelů (text, obraz)
+- Založena na infrastruktuře Tencent Cloud
+- Formát API kompatibilní s OpenAI
+- Podpora dlouhých oken kontextu
+
+## Začínáme
+
+### Krok 1: Registrace v Tencent Cloud
+
+1. Navštivte `https://cloud.tencent.com`
+2. Přihlaste se pomocí účtu QQ nebo WeChat
+3. Proveďte ověření identity
+
+### Krok 2: Aktivace služby Hunyuan
+
+1. Přejděte do **Konzole Tencent Cloud**
+2. Vyhledejte **Hunyuan** nebo **Knowledge Engine velkých modelů (LKE)**
+3. Aktivujte službu
+
+### Krok 3: Získání klíče API
+
+1. V konzole Tencent Cloud přejděte na **Správa klíčů API**
+2. Vytvořte nový klíč API (SecretId a SecretKey)
+3. Poznámka: Silicon Life používá přímo klíč API
+
+## Dostupné modely
+
+- **hunyuan-turbos-latest**: Turbo S, vysoká rychlost (kontext 256K)
+- **hunyuan-turbo-latest**: Turbo, vyvážený výkon (kontext 256K)
+- **hunyuan-large-latest**: Large, dlouhý kontext (kontext 256K)
+- **hunyuan-standard-latest**: Standard (kontext 256K)
+- **hunyuan-lite-latest**: Lite, vynikající poměr cena/výkon (kontext 256K)
+- **hunyuan-standard-256k**: model s dlouhým dosahem (kontext 256K)
+- **hunyuan-function-call**: model pro volání funkcí (kontext 8K)
+
+## Konfigurace v Silicon Life
+
+1. Vyberte **Tencent Hunyuan** jako typ AI klienta
+2. Nastavte **Klíč API** na svůj klíč API Tencent Cloud
+3. Nastavte **Model** na požadovaný název modelu Hunyuan
+4. Nastavte **Koncový bod** na adresu API (ponechte prázdné pro výchozí hodnotu)
+5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
+
+## Způsob fakturace
+
+Tencent Hunyuan fakturuje podle spotřeby, sazby se liší podle modelu. Podrobnosti o cenách na `https://cloud.tencent.com/document/product/1729`.
+
+## Časté otázky
+
+1. Potvrďte, že klíč API je správný
+2. Ujistěte se, že služba Hunyuan byla aktivována
+3. Zkontrolujte, zda je název modelu platný
+4. Ověřte, že zůstatek na účtu je dostatečný
+5. Ujistěte se, že bylo dokončeno ověření identity
 ";
 
   public override string AIClients => @"

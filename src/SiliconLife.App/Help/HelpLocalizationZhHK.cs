@@ -35,6 +35,16 @@ public class HelpLocalizationZhHK : HelpLocalizationBase
     public override string OllamaSetup_Title => "Ollama 安裝與模型下載";
     public override string BailianDashScope_Title => "阿里雲百煉平台使用指南";
     public override string VolcengineArk_Title => "火山方舟引擎使用指南";
+    public override string HerdsmanSetup_Title => "Herdsman 推理引擎使用指南";
+    public override string LongCatSetup_Title => "美團 LongCat 大模型使用指南";
+    public override string QiniuAISetup_Title => "七牛雲 AI 大模型使用指南";
+    public override string DeepSeekSetup_Title => "DeepSeek AI 平台使用指南";
+    public override string ZhipuSetup_Title => "智譜 AI（GLM）平台使用指南";
+    public override string MoonshotSetup_Title => "月之暗面（Kimi）平台使用指南";
+    public override string SiliconFlowSetup_Title => "SiliconFlow AI 推理平台使用指南";
+    public override string MiniMaxSetup_Title => "MiniMax AI 平台使用指南";
+    public override string ErnieSetup_Title => "百度文心（千帆）平台使用指南";
+    public override string HunyuanSetup_Title => "騰訊混元大模型使用指南";
     public override string AIClients_Title => "AI 客戶端配置";
 
     public override string BeingSoul_Title => "靈魂文件";
@@ -62,6 +72,36 @@ public class HelpLocalizationZhHK : HelpLocalizationBase
 
     public override string[] VolcengineArk_Tags =>
         new[] { "火山方舟", "Volcengine", "Ark", "豆包", "字節跳動", "雲端AI", "API", "配置", "模型" };
+
+    public override string[] HerdsmanSetup_Tags =>
+        new[] { "Herdsman", "推理", "引擎", "本地AI", "API", "配置", "模型" };
+
+    public override string[] LongCatSetup_Tags =>
+        new[] { "LongCat", "美團", "雲端AI", "API", "配置", "模型", "大模型" };
+
+    public override string[] QiniuAISetup_Tags =>
+        new[] { "七牛", "雲端AI", "API", "配置", "模型", "推理" };
+
+    public override string[] DeepSeekSetup_Tags =>
+        new[] { "DeepSeek", "AI", "API", "配置", "模型", "推理", "程式設計" };
+
+    public override string[] ZhipuSetup_Tags =>
+        new[] { "智譜", "GLM", "AI", "API", "配置", "模型", "程式設計", "智能體" };
+
+    public override string[] MoonshotSetup_Tags =>
+        new[] { "月之暗面", "Kimi", "AI", "API", "配置", "模型", "長上下文" };
+
+    public override string[] SiliconFlowSetup_Tags =>
+        new[] { "SiliconFlow", "AI", "推理", "API", "配置", "模型", "開源" };
+
+    public override string[] MiniMaxSetup_Tags =>
+        new[] { "MiniMax", "AI", "API", "配置", "模型", "多模態", "智能體" };
+
+    public override string[] ErnieSetup_Tags =>
+        new[] { "百度", "文心", "ERNIE", "千帆", "AI", "API", "配置", "模型" };
+
+    public override string[] HunyuanSetup_Tags =>
+        new[] { "騰訊", "混元", "Hunyuan", "AI", "API", "配置", "模型", "多模態" };
 
     public override string[] AIClients_Tags =>
         new[] { "AI客戶端", "AI服務", "模型", "配置", "本地", "雲端", "Ollama", "DashScope", "設定" };
@@ -2353,6 +2393,627 @@ ollama pull qwen3.5
 5. 推理接入點是否處於運行狀態？
 
 祝您使用愉快！
+";
+
+    public override string HerdsmanSetup => @"
+# Herdsman 推理引擎使用指南
+
+## 什麼是 Herdsman？
+
+Herdsman 是一個輕量級本地推理引擎，專為在自有硬體上執行大語言模型而設計。它提供 OpenAI 相容的 API 介面，可輕鬆與硅基生命整合。
+
+**優勢：**
+- 完全本地執行，保護隱私
+- OpenAI 相容 API 格式
+- 支援多種開源模型
+- 資源佔用低
+- 模型下載後無需網路連接
+
+## 安裝步驟
+
+### 第一步：下載安裝
+
+訪問 Herdsman 發布頁面，下載適合你作業系統的版本：
+- Windows：下載 `.zip` 檔案並解壓
+- Linux：下載 `.tar.gz` 檔案並解壓
+- macOS：下載 `.dmg` 檔案並安裝
+
+### 第二步：啟動服務
+
+解壓後執行 Herdsman 可執行檔：
+- Windows：雙擊 `herdsman.exe` 或從命令列執行
+- Linux/macOS：`./herdsman --serve`
+
+服務預設在 `8080` 連接埠啟動。存取 `http://localhost:8080/v1/models` 驗證是否正常執行。
+
+### 第三步：下載模型
+
+使用 Herdsman CLI 下載模型：
+```
+herdsman pull <模型名稱>
+```
+
+## 在硅基生命中配置
+
+1. 選擇 **Herdsman** 作為 AI 客戶端類型
+2. 設定 **Herdsman 端點** 為你的 Herdsman 服務地址（預設：`http://localhost:8080`）
+3. 設定 **模型** 為已下載的模型名稱
+4. **上下文視窗 Tokens** 留空可自動偵測
+
+## 可用模型
+
+Herdsman 支援任何 GGUF 格式的模型，常用選擇包括：
+- Llama 系列
+- Qwen 系列
+- Mistral 系列
+
+## 常見問題
+
+1. 啟動硅基生命前確保 Herdsman 服務正在執行
+2. 檢查端點 URL 是否正確且可存取
+3. 確認模型名稱與已下載的模型匹配
+4. 檢查系統資源（記憶體/GPU）是否充足
+";
+
+    public override string LongCatSetup => @"
+# 美團 LongCat 大模型使用指南
+
+## 什麼是 LongCat？
+
+LongCat 是美團自研的大語言模型服務平台，透過 OpenAI 相容的 API 介面提供強大的 AI 能力。
+
+**優勢：**
+- 美團自研，中文理解能力強
+- OpenAI 相容 API 格式
+- 針對業務場景最佳化
+- 支援長上下文視窗
+- 雲端執行，無需本地硬體
+
+## 開始使用
+
+### 第一步：註冊帳號
+
+訪問 LongCat 開放平台註冊：
+- 網址：`https://longcat.sensetime.com`
+- 使用手機號或信箱註冊
+- 完成實名認證
+
+### 第二步：取得 API Key
+
+1. 登入 LongCat 平台
+2. 進入 **API 管理** → **API Keys**
+3. 點擊 **建立 API Key**
+4. 複製並妥善保存你的 API 密鑰
+
+### 第三步：查看可用模型
+
+在平台的 **模型列表** 中查看可用模型。
+
+## 在硅基生命中配置
+
+1. 選擇 **LongCat** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的 LongCat API Key
+3. 設定 **端點** 為 LongCat API 地址（預設端點已預配置）
+4. 設定 **模型** 為所需模型名稱
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 計費方式
+
+LongCat 按 Token 用量付費。查看平台了解目前定價。
+
+## 常見問題
+
+1. 確認 API 密鑰正確且有效
+2. 確保帳戶餘額充足
+3. 檢查模型名稱是否有效
+4. 驗證與 LongCat API 端點的網路連接
+";
+
+    public override string QiniuAISetup => @"
+# 七牛雲 AI 大模型使用指南
+
+## 什麼是七牛雲 AI？
+
+七牛雲 AI 是七牛雲提供的大模型推理服務，透過 API 介面提供高效能的 AI 能力。
+
+**優勢：**
+- 高效能推理，低延遲
+- OpenAI 相容 API 格式
+- 支援多種主流模型
+- 雲端自動擴縮容
+- 可靠的雲端基礎設施
+
+## 開始使用
+
+### 第一步：註冊七牛雲帳號
+
+1. 訪問 `https://www.qiniu.com`
+2. 註冊並完成帳號認證
+3. 開通 AI 推理服務
+
+### 第二步：取得 API Key
+
+1. 登入七牛雲控制台
+2. 進入 **AI 服務** → **API 管理**
+3. 建立或查看你的 API 密鑰
+4. 複製 API 密鑰和端點 URL
+
+### 第三步：查看可用模型
+
+在控制台的 AI 服務部分查看可用模型。
+
+## 在硅基生命中配置
+
+1. 選擇 **Qiniu AI** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的七牛雲 API Key
+3. 設定 **端點** 為推理服務 API 地址
+4. 設定 **模型** 為所需模型名稱
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 計費方式
+
+七牛雲 AI 按用量付費。查看平台了解詳細定價資訊。
+
+## 常見問題
+
+1. 確保 API 密鑰和端點正確
+2. 驗證帳戶餘額或配額充足
+3. 檢查模型名稱是否受支援
+4. 確認與七牛雲 API 的網路連接
+";
+
+    public override string DeepSeekSetup => @"
+# DeepSeek AI 平台使用指南
+
+## 什麼是 DeepSeek？
+
+DeepSeek 是一家專注於高效能大語言模型研發的 AI 公司，以其卓越的推理和程式設計能力著稱。DeepSeek API 提供與其模型相容 OpenAI 格式的介面。
+
+**優勢：**
+- 卓越的推理和數學能力
+- 出色的程式碼生成與理解
+- OpenAI 相容 API 格式
+- 價格極具競爭力
+- 支援長上下文視窗（128K）
+
+## 開始使用
+
+### 第一步：註冊帳號
+
+1. 訪問 `https://platform.deepseek.com`
+2. 使用信箱或手機號註冊
+3. 完成帳號驗證
+
+### 第二步：取得 API Key
+
+1. 登入 DeepSeek 平台
+2. 進入 **API Keys** 頁面
+3. 點擊 **建立 API Key**
+4. 複製並妥善保存你的 API 密鑰
+
+### 第三步：儲值餘額
+
+DeepSeek 採用預付費模式。使用 API 前需先儲值。
+
+## 可用模型
+
+- **deepseek-v4-flash**：最新旗艦模型，頂級推理能力（128K 上下文）
+- **deepseek-chat**：通用對話均衡模型（64K 上下文）
+
+## 在硅基生命中配置
+
+1. 選擇 **DeepSeek** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的 DeepSeek API Key
+3. 設定 **模型** 為所需模型名稱（如 `deepseek-v4-flash`）
+4. 設定 **端點** 為 DeepSeek API 地址（預設：`https://api.deepseek.com`，留空使用預設值）
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 計費方式
+
+DeepSeek 採用按量付費：
+- 輸入 Token 和輸出 Token 分別計費
+- 查看 `https://api-docs.deepseek.com` 了解目前費率
+
+## 常見問題
+
+1. 確認 API 密鑰正確
+2. 確保帳戶餘額充足
+3. 檢查模型名稱是否有效
+4. 如使用自訂端點，請驗證端點 URL
+";
+
+    public override string ZhipuSetup => @"
+# 智譜 AI（GLM）平台使用指南
+
+## 什麼是智譜 AI？
+
+智譜 AI 是中國領先的 AI 公司，開發了 GLM（通用語言模型）系列。智譜開放平台提供 API 介面存取其強大模型，相容 OpenAI 格式。
+
+**優勢：**
+- GLM 系列模型，中英雙語能力強
+- 優秀的程式設計和智能體能力
+- OpenAI 相容 API 格式
+- 部分模型提供免費額度
+- 支援多模態任務
+
+## 開始使用
+
+### 第一步：註冊帳號
+
+1. 訪問 `https://open.bigmodel.cn`
+2. 使用手機號註冊
+3. 完成實名認證
+
+### 第二步：取得 API Key
+
+1. 登入智譜開放平台
+2. 進入 **API 管理** → **API Keys**
+3. 建立新的 API 密鑰
+4. 複製並保存你的 API 密鑰
+
+### 第三步：查看免費額度
+
+新使用者可獲得 GLM-4-Flash 的免費 Token。在 **計費管理** 中查看詳情。
+
+## 可用模型
+
+- **glm-5.1-plus**：旗艦模型，深度推理（128K 上下文）
+- **glm-5.1**：高性價比，效能強勁（128K 上下文）
+- **glm-5.1-flash**：快速且經濟（128K 上下文）
+- **glm-4-flash**：免費模型（128K 上下文）
+- **glm-4-flashx**：超快速度，低成本（128K 上下文）
+- **glm-4-air**：輕量級，高性價比（128K 上下文）
+- **glm-4-airx**：輕量級，高速度（8K 上下文）
+- **glm-4-long**：長上下文，100 萬 Token（1M 上下文）
+- **glm-4-plus**：穩定旗艦模型（128K 上下文）
+- **codegeex-4**：程式碼生成模型（128K 上下文）
+
+## 在硅基生命中配置
+
+1. 選擇 **Zhipu GLM** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的智譜 API Key
+3. 設定 **模型** 為所需模型名稱
+4. 設定 **端點** 為 API 地址（留空使用預設值）
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 計費方式
+
+- GLM-4-Flash 免費
+- 其他模型按量付費
+- 查看 `https://open.bigmodel.cn/pricing` 了解詳情
+
+## 常見問題
+
+1. 確認 API 密鑰正確
+2. 檢查免費額度是否用盡
+3. 確保模型名稱與可用模型匹配
+4. 驗證與智譜 API 的網路連接
+";
+
+    public override string MoonshotSetup => @"
+# 月之暗面（Kimi）平台使用指南
+
+## 什麼是月之暗面？
+
+月之暗面是 Kimi 背後的 AI 公司，Kimi 是中國最受歡迎的 AI 助手之一。月之暗面平台提供 API 介面存取 Kimi 系列模型，以超長上下文視窗支援著稱。
+
+**優勢：**
+- 超長上下文視窗支援（最高 200 萬 Token）
+- 優秀的中文理解能力
+- OpenAI 相容 API 格式
+- 強大的文件處理能力
+- 價格有競爭力
+
+## 開始使用
+
+### 第一步：註冊帳號
+
+1. 訪問 `https://platform.moonshot.cn`
+2. 使用手機號註冊
+3. 完成實名認證
+
+### 第二步：取得 API Key
+
+1. 登入月之暗面平台
+2. 進入 **API Key 管理**
+3. 建立新的 API 密鑰
+4. 複製並妥善保存
+
+### 第三步：儲值餘額
+
+為帳戶儲值。新使用者可能獲得免費體驗 Token。
+
+## 可用模型
+
+- **kimi-latest**：最新旗艦模型，深度推理（256K 上下文）
+- **moonshot-v1-128k**：標準模型，長上下文（128K 上下文）
+- **moonshot-v1-32k**：標準模型（32K 上下文）
+- **moonshot-v1-8k**：標準模型，經濟實惠（8K 上下文）
+- **moonshot-v1-200k**：長程模型（200K 上下文）
+- **moonshot-v1-auto**：根據輸入長度自動選擇模型（192K 上下文）
+
+## 在硅基生命中配置
+
+1. 選擇 **Moonshot Kimi** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的月之暗面 API Key
+3. 設定 **模型** 為所需模型名稱
+4. 設定 **端點** 為 API 地址（留空使用預設值）
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 計費方式
+
+月之暗面按 Token 用量付費，不同模型費率不同。查看 `https://platform.moonshot.cn/docs/pricing` 了解詳情。
+
+## 常見問題
+
+1. 確認 API 密鑰正確
+2. 確保帳戶餘額充足
+3. 檢查模型名稱是否有效
+4. 處理長文件時，確保模型支援所需上下文長度
+";
+
+    public override string SiliconFlowSetup => @"
+# SiliconFlow AI 推理平台使用指南
+
+## 什麼是 SiliconFlow？
+
+SiliconFlow 是一個雲端 AI 推理平台，透過統一的 OpenAI 相容 API 提供對多種開源和商業大語言模型的存取。
+
+**優勢：**
+- 可存取眾多開源模型（Qwen、DeepSeek、Llama 等）
+- 所有模型統一 OpenAI 相容 API
+- 最佳化加速，推理速度快
+- 部分模型提供免費額度
+- 無需本地硬體
+
+## 開始使用
+
+### 第一步：註冊帳號
+
+1. 訪問 `https://siliconflow.cn`
+2. 使用手機號或 GitHub 帳號註冊
+3. 完成帳號設定
+
+### 第二步：取得 API Key
+
+1. 登入 SiliconFlow 平台
+2. 進入 **API Keys** 頁面
+3. 建立新的 API 密鑰
+4. 複製並保存
+
+### 第三步：瀏覽可用模型
+
+SiliconFlow 託管了大量模型。在 **模型庫** 中查看所有可用選項和定價。
+
+## 在硅基生命中配置
+
+1. 選擇 **SiliconFlow** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的 SiliconFlow API Key
+3. 設定 **模型** 為所需模型名稱（如 `deepseek-ai/DeepSeek-V3`）
+4. 設定 **端點** 為 API 地址（留空使用預設值）
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 可用模型
+
+SiliconFlow 提供豐富的模型選擇，包括：
+- DeepSeek 系列（V3、R1 等）
+- Qwen 系列
+- Llama 系列
+- GLM 系列
+- 以及更多開源模型
+
+查看平台模型庫取得完整列表。
+
+## 計費方式
+
+- 部分模型（如 Qwen2.5-7B-Instruct）免費
+- 付費模型按量計費
+- 查看 `https://siliconflow.cn/pricing` 了解詳情
+
+## 常見問題
+
+1. 確認 API 密鑰正確
+2. 確保模型名稱格式正確（如 `廠商/模型名`）
+3. 付費模型檢查帳戶餘額
+4. 驗證與 SiliconFlow API 的網路連接
+";
+
+    public override string MiniMaxSetup => @"
+# MiniMax AI 平台使用指南
+
+## 什麼是 MiniMax？
+
+MiniMax 是一家 AI 公司，提供在對話、推理和多模態任務方面能力強大的大語言模型。MiniMax 平台提供 API 介面存取其模型。
+
+**優勢：**
+- 強大的對話和推理能力
+- 多模態模型支援
+- OpenAI 相容 API 格式
+- 支援國內和國際端點
+- 提供智能體最佳化模型
+
+## 開始使用
+
+### 第一步：註冊帳號
+
+1. 訪問 `https://platform.minimaxi.com`（國內）或 `https://api.minimaxi.chat`（國際）
+2. 使用手機號（國內）或信箱（國際）註冊
+3. 完成驗證
+
+### 第二步：取得 API Key
+
+1. 登入 MiniMax 平台
+2. 進入 **API Keys** 頁面
+3. 建立新的 API 密鑰
+4. 複製並保存
+
+### 第三步：選擇端點
+
+MiniMax 提供兩種端點選項：
+- **國內端點**：適用於中國大陸使用者
+- **國際端點**：適用於海外使用者
+
+根據你的所在地選擇合適的端點。
+
+## 可用模型
+
+- **MiniMax-M2**：旗艦模型，深度推理（245K 上下文）
+- **abab6.5s-chat**：快速且經濟（245K 上下文）
+- **MiniMax-Text-01**：長程智能體模型（1M 上下文）
+- **abab6.5g-chat**：高速推理（8K 上下文）
+- **abab6.5t-chat**：低延遲，無工具調用（8K 上下文）
+
+## 在硅基生命中配置
+
+1. 選擇 **MiniMax** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的 MiniMax API Key
+3. 設定 **模型** 為所需模型名稱
+4. 設定 **端點** 為 `domestic`（國內）或 `international`（國際）
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 計費方式
+
+MiniMax 按量付費，不同模型費率不同。查看平台了解目前定價。
+
+## 常見問題
+
+1. 確認 API 密鑰正確
+2. 確保選擇了正確的端點（國內/國際）
+3. 檢查模型名稱是否有效
+4. 驗證帳戶餘額充足
+";
+
+    public override string ErnieSetup => @"
+# 百度文心（千帆）平台使用指南
+
+## 什麼是百度文心？
+
+百度文心（ERNIE）是百度的大語言模型系列，可透過千帆大模型平台存取。它提供強大的中文理解和生成能力。
+
+**優勢：**
+- 中文理解能力強
+- 與百度服務生態整合豐富
+- 多種模型尺寸適配不同場景
+- 支援多模態任務
+- 穩定可靠的雲端基礎設施
+
+## 開始使用
+
+### 第一步：註冊百度雲帳號
+
+1. 訪問 `https://qianfan.cloud.baidu.com`
+2. 使用百度帳號登入
+3. 完成實名認證
+
+### 第二步：取得 API Key
+
+1. 登入千帆平台
+2. 進入 **應用管理** → **建立應用**
+3. 填寫應用資訊並建立
+4. 複製 **API Key** 和 **Secret Key**
+5. 注意：硅基生命直接使用千帆的 API Key
+
+### 第三步：開通模型
+
+在千帆平台進入 **模型管理**，開通需要使用的模型。
+
+## 可用模型
+
+- **ernie-4.5-turbo-128k**：旗艦模型（128K 上下文）
+- **ernie-4.0-turbo-8k**：Turbo 模型（8K 上下文）
+- **ernie-4.0-turbo-8k-latest**：最新 Turbo（8K 上下文）
+- **ernie-speed-pro-128k**：Speed Pro 模型（128K 上下文）
+- **ernie-speed-128k**：Speed 模型（128K 上下文）
+- **ernie-speed-8k**：Speed 模型（8K 上下文）
+- **ernie-lite-pro-128k**：Lite Pro 模型（128K 上下文）
+- **ernie-lite-8k**：Lite 模型（8K 上下文）
+
+## 在硅基生命中配置
+
+1. 選擇 **百度 ERNIE** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的千帆 API Key
+3. 設定 **模型** 為已開通的 ERNIE 模型名稱
+4. 設定 **端點** 為千帆 API 地址（留空使用預設值）
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 計費方式
+
+- ERNIE Speed 和 Lite 系列有免費額度
+- 付費模型按量計費
+- 查看 `https://qianfan.cloud.baidu.com/pricing` 了解詳情
+
+## 常見問題
+
+1. 確認 API 密鑰正確
+2. 確保已在千帆平台開通對應模型
+3. 檢查免費額度是否用盡
+4. 付費模型確認帳戶餘額充足
+5. 確保已完成實名認證
+";
+
+    public override string HunyuanSetup => @"
+# 騰訊混元大模型使用指南
+
+## 什麼是騰訊混元？
+
+騰訊混元是騰訊自研的大語言模型系列，可透過騰訊雲平台存取。它提供強大的中英雙語能力和多模態支援。
+
+**優勢：**
+- 中英雙語能力強
+- 多模態模型支援（文字、影像）
+- 依託騰訊雲端基礎設施
+- OpenAI 相容 API 格式
+- 支援長上下文視窗
+
+## 開始使用
+
+### 第一步：註冊騰訊雲帳號
+
+1. 訪問 `https://cloud.tencent.com`
+2. 使用 QQ 或微信帳號登入
+3. 完成實名認證
+
+### 第二步：開通混元服務
+
+1. 進入 **騰訊雲控制台**
+2. 搜尋 **混元** 或 **大模型知識引擎（LKE）**
+3. 開通服務
+
+### 第三步：取得 API Key
+
+1. 在騰訊雲控制台進入 **API 密鑰管理**
+2. 建立新的 API 密鑰（SecretId 和 SecretKey）
+3. 注意：硅基生命直接使用 API 密鑰
+
+## 可用模型
+
+- **hunyuan-turbos-latest**：Turbo S，高速（256K 上下文）
+- **hunyuan-turbo-latest**：Turbo，效能均衡（256K 上下文）
+- **hunyuan-large-latest**：Large，長上下文（256K 上下文）
+- **hunyuan-standard-latest**：Standard（256K 上下文）
+- **hunyuan-lite-latest**：Lite，高性價比（256K 上下文）
+- **hunyuan-standard-256k**：長程模型（256K 上下文）
+- **hunyuan-function-call**：函式調用模型（8K 上下文）
+
+## 在硅基生命中配置
+
+1. 選擇 **騰訊混元** 作為 AI 客戶端類型
+2. 設定 **API 密鑰** 為你的騰訊雲 API Key
+3. 設定 **模型** 為所需混元模型名稱
+4. 設定 **端點** 為 API 地址（留空使用預設值）
+5. **上下文視窗 Tokens** 留空可自動偵測
+
+## 計費方式
+
+騰訊混元按量付費，不同模型費率不同。查看 `https://cloud.tencent.com/document/product/1729` 了解定價詳情。
+
+## 常見問題
+
+1. 確認 API 密鑰正確
+2. 確保已開通混元服務
+3. 檢查模型名稱是否有效
+4. 驗證帳戶餘額充足
+5. 確保已完成實名認證
 ";
 
     public override string AIClients => @"

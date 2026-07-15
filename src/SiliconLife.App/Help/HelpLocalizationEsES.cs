@@ -36,6 +36,16 @@ public class HelpLocalizationEsES : HelpLocalizationBase
   public override string OllamaSetup_Title => "Instalación de Ollama y Descarga de Modelos";
   public override string BailianDashScope_Title => "Guía de Uso de la Plataforma Alibaba Cloud Bailian";
   public override string VolcengineArk_Title => "Guía de Uso de la Plataforma Volcengine Ark";
+  public override string HerdsmanSetup_Title => "Guía de configuración del motor de inferencia Herdsman";
+  public override string LongCatSetup_Title => "Guía de configuración del modelo LongCat de Meituan";
+  public override string QiniuAISetup_Title => "Guía de configuración de Qiniu Cloud AI";
+  public override string DeepSeekSetup_Title => "Guía de configuración de la plataforma DeepSeek AI";
+  public override string ZhipuSetup_Title => "Guía de configuración de la plataforma Zhipu AI (GLM)";
+  public override string MoonshotSetup_Title => "Guía de configuración de la plataforma Moonshot (Kimi)";
+  public override string SiliconFlowSetup_Title => "Guía de configuración de la plataforma de inferencia SiliconFlow AI";
+  public override string MiniMaxSetup_Title => "Guía de configuración de la plataforma MiniMax AI";
+  public override string ErnieSetup_Title => "Guía de configuración de la plataforma Baidu ERNIE (Qianfan)";
+  public override string HunyuanSetup_Title => "Guía de configuración del modelo Tencent Hunyuan";
   public override string AIClients_Title => "Configuración de Cliente de IA";
 
   public override string BeingSoul_Title => "Archivo de Alma";
@@ -103,6 +113,36 @@ public class HelpLocalizationEsES : HelpLocalizationBase
 
   public override string[] VolcengineArk_Tags => new[]
     { "Volcengine", "Ark", "Doubao", "ByteDance", "IA en la nube", "API", "configuración", "modelo" };
+
+  public override string[] HerdsmanSetup_Tags => new[]
+    { "Herdsman", "inferencia", "motor", "IA local", "API", "configuración", "modelo" };
+
+  public override string[] LongCatSetup_Tags => new[]
+    { "LongCat", "Meituan", "IA en la nube", "API", "configuración", "modelo", "gran modelo" };
+
+  public override string[] QiniuAISetup_Tags => new[]
+    { "Qiniu", "IA en la nube", "API", "configuración", "modelo", "inferencia" };
+
+  public override string[] DeepSeekSetup_Tags => new[]
+    { "DeepSeek", "AI", "API", "configuración", "modelo", "razonamiento", "código" };
+
+  public override string[] ZhipuSetup_Tags => new[]
+    { "Zhipu", "GLM", "AI", "API", "configuración", "modelo", "código", "agente" };
+
+  public override string[] MoonshotSetup_Tags => new[]
+    { "Moonshot", "Kimi", "AI", "API", "configuración", "modelo", "contexto largo" };
+
+  public override string[] SiliconFlowSetup_Tags => new[]
+    { "SiliconFlow", "AI", "inferencia", "API", "configuración", "modelo", "código abierto" };
+
+  public override string[] MiniMaxSetup_Tags => new[]
+    { "MiniMax", "AI", "API", "configuración", "modelo", "multimodal", "agente" };
+
+  public override string[] ErnieSetup_Tags => new[]
+    { "Baidu", "ERNIE", "Qianfan", "AI", "API", "configuración", "modelo" };
+
+  public override string[] HunyuanSetup_Tags => new[]
+    { "Tencent", "Hunyuan", "AI", "API", "configuración", "modelo", "multimodal" };
 
   public override string[] AIClients_Tags => new[]
     { "cliente de IA", "servicio de IA", "modelo", "configuración", "local", "nube", "Ollama", "DashScope", "ajustes" };
@@ -2500,6 +2540,627 @@ Volcengine Ark utiliza facturación **de pago por uso**:
 5. ¿El punto de conexión está en ejecución?
 
 ¡Disfrute usando el sistema!
+";
+
+  public override string HerdsmanSetup => @"
+# Guía de configuración del motor de inferencia Herdsman
+
+## ¿Qué es Herdsman?
+
+Herdsman es un motor de inferencia local ligero, diseñado para ejecutar grandes modelos de lenguaje en su propio hardware. Proporciona una API compatible con OpenAI, que se integra fácilmente con Silicon Life.
+
+**Ventajas:**
+- Funcionamiento completamente local, protege la privacidad
+- Formato de API compatible con OpenAI
+- Soporte para múltiples modelos de código abierto
+- Bajo consumo de recursos
+- Sin conexión de red necesaria tras la descarga de modelos
+
+## Pasos de instalación
+
+### Paso 1: Descarga e instalación
+
+Visite la página de publicación de Herdsman y descargue la versión adecuada para su sistema operativo:
+- Windows: descargue el archivo `.zip` y descomprímalo
+- Linux: descargue el archivo `.tar.gz` y descomprímalo
+- macOS: descargue el archivo `.dmg` e instálelo
+
+### Paso 2: Inicio del servicio
+
+Tras la descompresión, ejecute el archivo ejecutable de Herdsman:
+- Windows: doble clic en `herdsman.exe` o ejecútelo desde la línea de comandos
+- Linux/macOS: `./herdsman --serve`
+
+El servicio se inicia por defecto en el puerto `8080`. Acceda a `http://localhost:8080/v1/models` para verificar su funcionamiento.
+
+### Paso 3: Descarga de modelos
+
+Utilice la CLI de Herdsman para descargar modelos:
+```
+herdsman pull <nombre_del_modelo>
+```
+
+## Configuración en Silicon Life
+
+1. Seleccione **Herdsman** como tipo de cliente IA
+2. Establezca el **Punto de conexión de Herdsman** en la dirección de su servicio Herdsman (predeterminado: `http://localhost:8080`)
+3. Establezca el **Modelo** en el nombre del modelo descargado
+4. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modelos disponibles
+
+Herdsman soporta cualquier modelo en formato GGUF, incluyendo:
+- Serie Llama
+- Serie Qwen
+- Serie Mistral
+
+## Preguntas frecuentes
+
+1. Asegúrese de que el servicio Herdsman esté en ejecución antes de iniciar Silicon Life
+2. Verifique que la URL del punto de conexión sea correcta y accesible
+3. Confirme que el nombre del modelo coincida con el modelo descargado
+4. Verifique que los recursos del sistema (memoria/GPU) sean suficientes
+";
+
+  public override string LongCatSetup => @"
+# Guía de configuración del modelo LongCat de Meituan
+
+## ¿Qué es LongCat?
+
+LongCat es una plataforma de grandes modelos de lenguaje desarrollada por Meituan, que ofrece potentes capacidades de IA a través de una API compatible con OpenAI.
+
+**Ventajas:**
+- Desarrollado por Meituan, excelente comprensión del chino
+- Formato de API compatible con OpenAI
+- Optimizado para escenarios de negocio
+- Soporte para ventanas de contexto largas
+- Ejecución en la nube, sin hardware local necesario
+
+## Primeros pasos
+
+### Paso 1: Registro
+
+Visite la plataforma abierta de LongCat para registrarse:
+- URL: `https://longcat.sensetime.com`
+- Regístrese con número de teléfono o correo electrónico
+- Complete la autenticación de identidad
+
+### Paso 2: Obtener la clave API
+
+1. Inicie sesión en la plataforma LongCat
+2. Vaya a **Gestión de API** → **API Keys**
+3. Haga clic en **Crear API Key**
+4. Copie y guarde cuidadosamente su clave API
+
+### Paso 3: Ver modelos disponibles
+
+Consulte los modelos disponibles en la sección **Lista de modelos** de la plataforma.
+
+## Configuración en Silicon Life
+
+1. Seleccione **LongCat** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de LongCat
+3. Establezca el **Punto de conexión** en la dirección API de LongCat (el punto de conexión predeterminado está preconfigurado)
+4. Establezca el **Modelo** en el nombre del modelo deseado
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modo de facturación
+
+LongCat factura por uso de Tokens. Consulte la plataforma para conocer los precios actuales.
+
+## Preguntas frecuentes
+
+1. Confirme que la clave API sea correcta y válida
+2. Asegúrese de que el saldo de la cuenta sea suficiente
+3. Verifique que el nombre del modelo sea válido
+4. Verifique la conexión de red al punto de conexión API de LongCat
+";
+
+  public override string QiniuAISetup => @"
+# Guía de configuración de Qiniu Cloud AI
+
+## ¿Qué es Qiniu Cloud AI?
+
+Qiniu Cloud AI es un servicio de inferencia de grandes modelos proporcionado por Qiniu Cloud, que ofrece capacidades de IA de alto rendimiento a través de una interfaz API.
+
+**Ventajas:**
+- Inferencia de alto rendimiento, baja latencia
+- Formato de API compatible con OpenAI
+- Soporte para múltiples modelos populares
+- Escalado automático en la nube
+- Infraestructura en la nube fiable
+
+## Primeros pasos
+
+### Paso 1: Registro en Qiniu Cloud
+
+1. Visite `https://www.qiniu.com`
+2. Regístrese y complete la verificación de la cuenta
+3. Active el servicio de inferencia de IA
+
+### Paso 2: Obtener la clave API
+
+1. Inicie sesión en la consola de Qiniu Cloud
+2. Vaya a **Servicios de IA** → **Gestión de API**
+3. Cree o vea su clave API
+4. Copie la clave API y la URL del punto de conexión
+
+### Paso 3: Ver modelos disponibles
+
+Consulte los modelos disponibles en la sección de Servicios de IA de la consola.
+
+## Configuración en Silicon Life
+
+1. Seleccione **Qiniu AI** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de Qiniu Cloud
+3. Establezca el **Punto de conexión** en la dirección API del servicio de inferencia
+4. Establezca el **Modelo** en el nombre del modelo deseado
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modo de facturación
+
+Qiniu Cloud AI factura por uso. Consulte la plataforma para información detallada de precios.
+
+## Preguntas frecuentes
+
+1. Asegúrese de que la clave API y el punto de conexión sean correctos
+2. Verifique que el saldo o la cuota de la cuenta sean suficientes
+3. Compruebe que el nombre del modelo sea compatible
+4. Confirme la conexión de red a la API de Qiniu Cloud
+";
+
+  public override string DeepSeekSetup => @"
+# Guía de configuración de la plataforma DeepSeek AI
+
+## ¿Qué es DeepSeek?
+
+DeepSeek es una empresa de IA especializada en el desarrollo de grandes modelos de lenguaje de alto rendimiento, reconocida por sus excepcionales capacidades de razonamiento y programación. La API de DeepSeek proporciona una interfaz compatible con OpenAI.
+
+**Ventajas:**
+- Excepcionales capacidades de razonamiento y matemáticas
+- Excelente generación y comprensión de código
+- Formato de API compatible con OpenAI
+- Precios muy competitivos
+- Soporte para ventanas de contexto largas (128K)
+
+## Primeros pasos
+
+### Paso 1: Registro
+
+1. Visite `https://platform.deepseek.com`
+2. Regístrese con correo electrónico o número de teléfono
+3. Complete la verificación de la cuenta
+
+### Paso 2: Obtener la clave API
+
+1. Inicie sesión en la plataforma DeepSeek
+2. Vaya a la página **API Keys**
+3. Haga clic en **Crear API Key**
+4. Copie y guarde cuidadosamente su clave API
+
+### Paso 3: Recargar saldo
+
+DeepSeek utiliza un modelo de prepago. Debe recargar saldo antes de usar la API.
+
+## Modelos disponibles
+
+- **deepseek-v4-flash**: modelo insignia más reciente, capacidades de razonamiento de primer nivel (contexto 128K)
+- **deepseek-chat**: modelo de conversación equilibrado (contexto 64K)
+
+## Configuración en Silicon Life
+
+1. Seleccione **DeepSeek** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de DeepSeek
+3. Establezca el **Modelo** en el nombre del modelo deseado (ej. `deepseek-v4-flash`)
+4. Establezca el **Punto de conexión** en la dirección API de DeepSeek (predeterminado: `https://api.deepseek.com`, dejar vacío para el valor predeterminado)
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modo de facturación
+
+DeepSeek utiliza facturación por uso:
+- Los Tokens de entrada y de salida se facturan por separado
+- Consulte `https://api-docs.deepseek.com` para las tarifas actuales
+
+## Preguntas frecuentes
+
+1. Confirme que la clave API sea correcta
+2. Asegúrese de que el saldo de la cuenta sea suficiente
+3. Verifique que el nombre del modelo sea válido
+4. Si utiliza un punto de conexión personalizado, verifique la URL del punto de conexión
+";
+
+  public override string ZhipuSetup => @"
+# Guía de configuración de la plataforma Zhipu AI (GLM)
+
+## ¿Qué es Zhipu AI?
+
+Zhipu AI es una empresa de IA líder en China, desarrolladora de la serie GLM (General Language Model). La plataforma abierta de Zhipu proporciona acceso API a sus potentes modelos, compatible con OpenAI.
+
+**Ventajas:**
+- Serie de modelos GLM, excelentes capacidades bilingües chino-inglés
+- Excelentes capacidades de programación y agente
+- Formato de API compatible con OpenAI
+- Cuotas gratuitas para algunos modelos
+- Soporte para tareas multimodales
+
+## Primeros pasos
+
+### Paso 1: Registro
+
+1. Visite `https://open.bigmodel.cn`
+2. Regístrese con su número de teléfono
+3. Complete la autenticación de identidad
+
+### Paso 2: Obtener la clave API
+
+1. Inicie sesión en la plataforma abierta de Zhipu
+2. Vaya a **Gestión de API** → **API Keys**
+3. Cree una nueva clave API
+4. Copie y guarde su clave API
+
+### Paso 3: Ver cuotas gratuitas
+
+Los nuevos usuarios pueden obtener Tokens gratuitos para GLM-4-Flash. Consulte los detalles en **Gestión de facturación**.
+
+## Modelos disponibles
+
+- **glm-5.1-plus**: modelo insignia, razonamiento profundo (contexto 128K)
+- **glm-5.1**: excelente relación calidad-precio, rendimiento potente (contexto 128K)
+- **glm-5.1-flash**: rápido y económico (contexto 128K)
+- **glm-4-flash**: modelo gratuito (contexto 128K)
+- **glm-4-flashx**: velocidad ultra rápida, bajo coste (contexto 128K)
+- **glm-4-air**: ligero, excelente relación calidad-precio (contexto 128K)
+- **glm-4-airx**: ligero, alta velocidad (contexto 8K)
+- **glm-4-long**: contexto largo, 1 millón de Tokens (contexto 1M)
+- **glm-4-plus**: modelo insignia estable (contexto 128K)
+- **codegeex-4**: modelo de generación de código (contexto 128K)
+
+## Configuración en Silicon Life
+
+1. Seleccione **Zhipu GLM** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de Zhipu
+3. Establezca el **Modelo** en el nombre del modelo deseado
+4. Establezca el **Punto de conexión** en la dirección API (dejar vacío para el valor predeterminado)
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modo de facturación
+
+- GLM-4-Flash es gratuito
+- Otros modelos se facturan por uso
+- Consulte `https://open.bigmodel.cn/pricing` para más detalles
+
+## Preguntas frecuentes
+
+1. Confirme que la clave API sea correcta
+2. Verifique si la cuota gratuita está agotada
+3. Asegúrese de que el nombre del modelo coincida con los modelos disponibles
+4. Verifique la conexión de red a la API de Zhipu
+";
+
+  public override string MoonshotSetup => @"
+# Guía de configuración de la plataforma Moonshot (Kimi)
+
+## ¿Qué es Moonshot?
+
+Moonshot es la empresa detrás de Kimi, uno de los asistentes de IA más populares en China. La plataforma Moonshot proporciona acceso API a los modelos Kimi, reconocidos por su soporte de ventanas de contexto ultralargas.
+
+**Ventajas:**
+- Soporte para ventanas de contexto ultralargas (hasta 2 millones de Tokens)
+- Excelente comprensión del chino
+- Formato de API compatible con OpenAI
+- Potentes capacidades de procesamiento de documentos
+- Precios competitivos
+
+## Primeros pasos
+
+### Paso 1: Registro
+
+1. Visite `https://platform.moonshot.cn`
+2. Regístrese con su número de teléfono
+3. Complete la autenticación de identidad
+
+### Paso 2: Obtener la clave API
+
+1. Inicie sesión en la plataforma Moonshot
+2. Vaya a **Gestión de claves API**
+3. Cree una nueva clave API
+4. Copie y guárdela cuidadosamente
+
+### Paso 3: Recargar saldo
+
+Recargue su cuenta. Los nuevos usuarios pueden recibir Tokens de prueba gratuitos.
+
+## Modelos disponibles
+
+- **kimi-latest**: modelo insignia más reciente, razonamiento profundo (contexto 256K)
+- **moonshot-v1-128k**: modelo estándar, contexto largo (contexto 128K)
+- **moonshot-v1-32k**: modelo estándar (contexto 32K)
+- **moonshot-v1-8k**: modelo estándar, económico (contexto 8K)
+- **moonshot-v1-200k**: modelo de largo alcance (contexto 200K)
+- **moonshot-v1-auto**: selección automática de modelo según la longitud de entrada (contexto 192K)
+
+## Configuración en Silicon Life
+
+1. Seleccione **Moonshot Kimi** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de Moonshot
+3. Establezca el **Modelo** en el nombre del modelo deseado
+4. Establezca el **Punto de conexión** en la dirección API (dejar vacío para el valor predeterminado)
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modo de facturación
+
+Moonshot factura por uso de Tokens, las tarifas varían según el modelo. Consulte `https://platform.moonshot.cn/docs/pricing` para más detalles.
+
+## Preguntas frecuentes
+
+1. Confirme que la clave API sea correcta
+2. Asegúrese de que el saldo de la cuenta sea suficiente
+3. Verifique que el nombre del modelo sea válido
+4. Al procesar documentos largos, asegúrese de que el modelo soporte la longitud de contexto requerida
+";
+
+  public override string SiliconFlowSetup => @"
+# Guía de configuración de la plataforma de inferencia SiliconFlow AI
+
+## ¿Qué es SiliconFlow?
+
+SiliconFlow es una plataforma de inferencia de IA en la nube que ofrece acceso unificado a través de una API compatible con OpenAI a una variedad de modelos de lenguaje grandes de código abierto y comerciales.
+
+**Ventajas:**
+- Acceso a numerosos modelos de código abierto (Qwen, DeepSeek, Llama, etc.)
+- API compatible con OpenAI unificada para todos los modelos
+- Aceleración optimizada, alta velocidad de inferencia
+- Cuotas gratuitas para algunos modelos
+- Sin hardware local necesario
+
+## Primeros pasos
+
+### Paso 1: Registro
+
+1. Visite `https://siliconflow.cn`
+2. Regístrese con número de teléfono o cuenta de GitHub
+3. Complete la configuración de la cuenta
+
+### Paso 2: Obtener la clave API
+
+1. Inicie sesión en la plataforma SiliconFlow
+2. Vaya a la página **API Keys**
+3. Cree una nueva clave API
+4. Copie y guárdela
+
+### Paso 3: Explorar modelos disponibles
+
+SiliconFlow aloja una gran cantidad de modelos. Consulte todas las opciones y precios disponibles en la **Biblioteca de modelos**.
+
+## Configuración en Silicon Life
+
+1. Seleccione **SiliconFlow** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de SiliconFlow
+3. Establezca el **Modelo** en el nombre del modelo deseado (ej. `deepseek-ai/DeepSeek-V3`)
+4. Establezca el **Punto de conexión** en la dirección API (dejar vacío para el valor predeterminado)
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modelos disponibles
+
+SiliconFlow ofrece una amplia selección de modelos, incluyendo:
+- Serie DeepSeek (V3, R1, etc.)
+- Serie Qwen
+- Serie Llama
+- Serie GLM
+- Y más modelos de código abierto
+
+Consulte la biblioteca de modelos de la plataforma para la lista completa.
+
+## Modo de facturación
+
+- Algunos modelos (como Qwen2.5-7B-Instruct) son gratuitos
+- Los modelos de pago se facturan por uso
+- Consulte `https://siliconflow.cn/pricing` para más detalles
+
+## Preguntas frecuentes
+
+1. Confirme que la clave API sea correcta
+2. Asegúrese de que el formato del nombre del modelo sea correcto (ej. `fabricante/nombre_del_modelo`)
+3. Para modelos de pago, verifique el saldo de la cuenta
+4. Verifique la conexión de red a la API de SiliconFlow
+";
+
+  public override string MiniMaxSetup => @"
+# Guía de configuración de la plataforma MiniMax AI
+
+## ¿Qué es MiniMax?
+
+MiniMax es una empresa de IA que ofrece grandes modelos de lenguaje con potentes capacidades en diálogo, razonamiento y tareas multimodales. La plataforma MiniMax proporciona acceso API a sus modelos.
+
+**Ventajas:**
+- Potentes capacidades de diálogo y razonamiento
+- Soporte para modelos multimodales
+- Formato de API compatible con OpenAI
+- Soporte para puntos de conexión nacionales e internacionales
+- Modelos optimizados para agentes
+
+## Primeros pasos
+
+### Paso 1: Registro
+
+1. Visite `https://platform.minimaxi.com` (nacional) o `https://api.minimaxi.chat` (internacional)
+2. Regístrese con número de teléfono (nacional) o correo electrónico (internacional)
+3. Complete la verificación
+
+### Paso 2: Obtener la clave API
+
+1. Inicie sesión en la plataforma MiniMax
+2. Vaya a la página **API Keys**
+3. Cree una nueva clave API
+4. Copie y guárdela
+
+### Paso 3: Elegir punto de conexión
+
+MiniMax ofrece dos opciones de punto de conexión:
+- **Punto de conexión nacional**: para usuarios en China continental
+- **Punto de conexión internacional**: para usuarios internacionales
+
+Elija el punto de conexión apropiado según su ubicación.
+
+## Modelos disponibles
+
+- **MiniMax-M2**: modelo insignia, razonamiento profundo (contexto 245K)
+- **abab6.5s-chat**: rápido y económico (contexto 245K)
+- **MiniMax-Text-01**: modelo agente de largo alcance (contexto 1M)
+- **abab6.5g-chat**: inferencia de alta velocidad (contexto 8K)
+- **abab6.5t-chat**: baja latencia, sin llamadas a herramientas (contexto 8K)
+
+## Configuración en Silicon Life
+
+1. Seleccione **MiniMax** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de MiniMax
+3. Establezca el **Modelo** en el nombre del modelo deseado
+4. Establezca el **Punto de conexión** en `domestic` (nacional) o `international` (internacional)
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modo de facturación
+
+MiniMax factura por uso, las tarifas varían según el modelo. Consulte la plataforma para conocer los precios actuales.
+
+## Preguntas frecuentes
+
+1. Confirme que la clave API sea correcta
+2. Asegúrese de haber elegido el punto de conexión correcto (nacional/internacional)
+3. Verifique que el nombre del modelo sea válido
+4. Verifique que el saldo de la cuenta sea suficiente
+";
+
+  public override string ErnieSetup => @"
+# Guía de configuración de la plataforma Baidu ERNIE (Qianfan)
+
+## ¿Qué es Baidu ERNIE?
+
+Baidu ERNIE es la serie de grandes modelos de lenguaje de Baidu, accesible a través de la plataforma Qianfan. Ofrece potentes capacidades de comprensión y generación en chino.
+
+**Ventajas:**
+- Excelente comprensión del chino
+- Rica integración con el ecosistema de servicios de Baidu
+- Múltiples tamaños de modelo para diferentes escenarios
+- Soporte para tareas multimodales
+- Infraestructura en la nube estable y fiable
+
+## Primeros pasos
+
+### Paso 1: Registro en Baidu Cloud
+
+1. Visite `https://qianfan.cloud.baidu.com`
+2. Inicie sesión con su cuenta de Baidu
+3. Complete la autenticación de identidad
+
+### Paso 2: Obtener la clave API
+
+1. Inicie sesión en la plataforma Qianfan
+2. Vaya a **Gestión de aplicaciones** → **Crear aplicación**
+3. Rellene la información de la aplicación y créela
+4. Copie la **API Key** y la **Secret Key**
+5. Nota: Silicon Life utiliza directamente la clave API de Qianfan
+
+### Paso 3: Activar modelos
+
+En la plataforma Qianfan, vaya a **Gestión de modelos** y active los modelos que desea usar.
+
+## Modelos disponibles
+
+- **ernie-4.5-turbo-128k**: modelo insignia (contexto 128K)
+- **ernie-4.0-turbo-8k**: modelo Turbo (contexto 8K)
+- **ernie-4.0-turbo-8k-latest**: Turbo más reciente (contexto 8K)
+- **ernie-speed-pro-128k**: modelo Speed Pro (contexto 128K)
+- **ernie-speed-128k**: modelo Speed (contexto 128K)
+- **ernie-speed-8k**: modelo Speed (contexto 8K)
+- **ernie-lite-pro-128k**: modelo Lite Pro (contexto 128K)
+- **ernie-lite-8k**: modelo Lite (contexto 8K)
+
+## Configuración en Silicon Life
+
+1. Seleccione **Baidu ERNIE** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de Qianfan
+3. Establezca el **Modelo** en el nombre del modelo ERNIE activado
+4. Establezca el **Punto de conexión** en la dirección API de Qianfan (dejar vacío para el valor predeterminado)
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modo de facturación
+
+- Las series ERNIE Speed y Lite tienen cuotas gratuitas
+- Los modelos de pago se facturan por uso
+- Consulte `https://qianfan.cloud.baidu.com/pricing` para más detalles
+
+## Preguntas frecuentes
+
+1. Confirme que la clave API sea correcta
+2. Asegúrese de haber activado el modelo correspondiente en la plataforma Qianfan
+3. Verifique si la cuota gratuita está agotada
+4. Para modelos de pago, confirme que el saldo de la cuenta sea suficiente
+5. Asegúrese de haber completado la autenticación de identidad
+";
+
+  public override string HunyuanSetup => @"
+# Guía de configuración del modelo Tencent Hunyuan
+
+## ¿Qué es Tencent Hunyuan?
+
+Tencent Hunyuan es la serie de grandes modelos de lenguaje desarrollada por Tencent, accesible a través de la plataforma Tencent Cloud. Ofrece potentes capacidades bilingües chino-inglés y soporte multimodal.
+
+**Ventajas:**
+- Excelentes capacidades bilingües chino-inglés
+- Soporte para modelos multimodales (texto, imagen)
+- Basada en la infraestructura de Tencent Cloud
+- Formato de API compatible con OpenAI
+- Soporte para ventanas de contexto largas
+
+## Primeros pasos
+
+### Paso 1: Registro en Tencent Cloud
+
+1. Visite `https://cloud.tencent.com`
+2. Inicie sesión con su cuenta de QQ o WeChat
+3. Complete la autenticación de identidad
+
+### Paso 2: Activar el servicio Hunyuan
+
+1. Acceda a la **Consola de Tencent Cloud**
+2. Busque **Hunyuan** o **Motor de conocimiento de grandes modelos (LKE)**
+3. Active el servicio
+
+### Paso 3: Obtener la clave API
+
+1. En la consola de Tencent Cloud, vaya a **Gestión de claves API**
+2. Cree una nueva clave API (SecretId y SecretKey)
+3. Nota: Silicon Life utiliza directamente la clave API
+
+## Modelos disponibles
+
+- **hunyuan-turbos-latest**: Turbo S, alta velocidad (contexto 256K)
+- **hunyuan-turbo-latest**: Turbo, rendimiento equilibrado (contexto 256K)
+- **hunyuan-large-latest**: Large, contexto largo (contexto 256K)
+- **hunyuan-standard-latest**: Standard (contexto 256K)
+- **hunyuan-lite-latest**: Lite, excelente relación calidad-precio (contexto 256K)
+- **hunyuan-standard-256k**: modelo de largo alcance (contexto 256K)
+- **hunyuan-function-call**: modelo de llamada a funciones (contexto 8K)
+
+## Configuración en Silicon Life
+
+1. Seleccione **Tencent Hunyuan** como tipo de cliente IA
+2. Establezca la **Clave API** en su clave API de Tencent Cloud
+3. Establezca el **Modelo** en el nombre del modelo Hunyuan deseado
+4. Establezca el **Punto de conexión** en la dirección API (dejar vacío para el valor predeterminado)
+5. Deje la **Ventana de contexto Tokens** vacía para detección automática
+
+## Modo de facturación
+
+Tencent Hunyuan factura por uso, las tarifas varían según el modelo. Consulte `https://cloud.tencent.com/document/product/1729` para detalles de precios.
+
+## Preguntas frecuentes
+
+1. Confirme que la clave API sea correcta
+2. Asegúrese de haber activado el servicio Hunyuan
+3. Verifique que el nombre del modelo sea válido
+4. Verifique que el saldo de la cuenta sea suficiente
+5. Asegúrese de haber completado la autenticación de identidad
 ";
 
   public override string AIClients => @"

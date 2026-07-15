@@ -35,6 +35,16 @@ public class HelpLocalizationJaJP : HelpLocalizationBase
     public override string OllamaSetup_Title => "Ollama インストールとモデルダウンロード";
     public override string BailianDashScope_Title => "アリババクラウド百錬プラットフォーム使用ガイド";
     public override string VolcengineArk_Title => "Volcengine Ark プラットフォーム使用ガイド";
+    public override string HerdsmanSetup_Title => "Herdsman 推論エンジンセットアップガイド";
+    public override string LongCatSetup_Title => "美団 LongCat 大モデル使用ガイド";
+    public override string QiniuAISetup_Title => "七牛雲 AI 大モデル使用ガイド";
+    public override string DeepSeekSetup_Title => "DeepSeek AI プラットフォームセットアップガイド";
+    public override string ZhipuSetup_Title => "智譜 AI（GLM）プラットフォーム使用ガイド";
+    public override string MoonshotSetup_Title => "月之暗面（Kimi）プラットフォーム使用ガイド";
+    public override string SiliconFlowSetup_Title => "SiliconFlow AI 推論プラットフォーム使用ガイド";
+    public override string MiniMaxSetup_Title => "MiniMax AI プラットフォーム使用ガイド";
+    public override string ErnieSetup_Title => "百度文心（千帆）プラットフォーム使用ガイド";
+    public override string HunyuanSetup_Title => "騰訊混元大モデル使用ガイド";
     public override string AIClients_Title => "AIクライアント設定";
 
     public override string BeingSoul_Title => "ソウルファイル";
@@ -72,6 +82,36 @@ public class HelpLocalizationJaJP : HelpLocalizationBase
 
     public override string[] VolcengineArk_Tags => new[]
         { "Volcengine", "Ark", "Doubao", "ByteDance", "クラウドAI", "API", "設定", "モデル" };
+
+    public override string[] HerdsmanSetup_Tags => new[]
+        { "Herdsman", "推論", "エンジン", "ローカルAI", "API", "設定", "モデル" };
+
+    public override string[] LongCatSetup_Tags => new[]
+        { "LongCat", "美団", "クラウドAI", "API", "設定", "モデル", "大モデル" };
+
+    public override string[] QiniuAISetup_Tags => new[]
+        { "七牛", "クラウドAI", "API", "設定", "モデル", "推論" };
+
+    public override string[] DeepSeekSetup_Tags => new[]
+        { "DeepSeek", "AI", "API", "設定", "モデル", "推論", "コード" };
+
+    public override string[] ZhipuSetup_Tags => new[]
+        { "智譜", "GLM", "AI", "API", "設定", "モデル", "コード", "エージェント" };
+
+    public override string[] MoonshotSetup_Tags => new[]
+        { "月之暗面", "Kimi", "AI", "API", "設定", "モデル", "長文脈" };
+
+    public override string[] SiliconFlowSetup_Tags => new[]
+        { "SiliconFlow", "AI", "推論", "API", "設定", "モデル", "オープンソース" };
+
+    public override string[] MiniMaxSetup_Tags => new[]
+        { "MiniMax", "AI", "API", "設定", "モデル", "マルチモーダル", "エージェント" };
+
+    public override string[] ErnieSetup_Tags => new[]
+        { "百度", "文心", "ERNIE", "千帆", "AI", "API", "設定", "モデル" };
+
+    public override string[] HunyuanSetup_Tags => new[]
+        { "騰訊", "混元", "Hunyuan", "AI", "API", "設定", "モデル", "マルチモーダル" };
 
     public override string[] AIClients_Tags => new[]
         { "AIクライアント", "AIサービス", "モデル", "設定", "ローカル", "クラウド", "Ollama", "DashScope", "構成" };
@@ -2041,6 +2081,627 @@ Volcengine Ark は**従量課金制**を採用：
 5. 推論エンドポイントは実行中ですか？
 
 楽しくお使いください！
+";
+
+    public override string HerdsmanSetup => @"
+# Herdsman 推論エンジンセットアップガイド
+
+## Herdsman とは？
+
+Herdsman は、自有ハードウェア上で大規模言語モデルを実行するために設計された軽量ローカル推論エンジンです。OpenAI 互換の API インターフェースを提供し、シリコンライフと簡単に統合できます。
+
+**利点：**
+- 完全にローカルで実行、プライバシーを保護
+- OpenAI 互換 API 形式
+- 複数のオープンソースモデルをサポート
+- リソース消費が少ない
+- モデルダウンロード後はネットワーク接続不要
+
+## インストール手順
+
+### ステップ 1：ダウンロードとインストール
+
+Herdsman のリリースページにアクセスし、OS に合ったバージョンをダウンロード：
+- Windows：`.zip` ファイルをダウンロードして解凍
+- Linux：`.tar.gz` ファイルをダウンロードして解凍
+- macOS：`.dmg` ファイルをダウンロードしてインストール
+
+### ステップ 2：サービスの起動
+
+解凍後、Herdsman の実行ファイルを実行：
+- Windows：`herdsman.exe` をダブルクリックまたはコマンドラインから実行
+- Linux/macOS：`./herdsman --serve`
+
+サービスはデフォルトで `8080` ポートで起動します。`http://localhost:8080/v1/models` にアクセスして正常に動作しているか確認します。
+
+### ステップ 3：モデルのダウンロード
+
+Herdsman CLI を使用してモデルをダウンロード：
+```
+herdsman pull <モデル名>
+```
+
+## シリコンライフでの設定
+
+1. **Herdsman** を AI クライアントタイプとして選択
+2. **Herdsman エンドポイント** を Herdsman サービスのアドレスに設定（デフォルト：`http://localhost:8080`）
+3. **モデル** をダウンロード済みのモデル名に設定
+4. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 利用可能なモデル
+
+Herdsman は GGUF 形式のモデルをサポートします。一般的な選択肢：
+- Llama シリーズ
+- Qwen シリーズ
+- Mistral シリーズ
+
+## よくある質問
+
+1. シリコンライフ起動前に Herdsman サービスが実行中であることを確認
+2. エンドポイント URL が正しくアクセス可能か確認
+3. モデル名がダウンロード済みモデルと一致しているか確認
+4. システムリソース（メモリ/GPU）が十分か確認
+";
+
+    public override string LongCatSetup => @"
+# 美団 LongCat 大モデル使用ガイド
+
+## LongCat とは？
+
+LongCat は美団が独自開発した大規模言語モデルサービスプラットフォームで、OpenAI 互換の API インターフェースを通じて強力な AI 機能を提供します。
+
+**利点：**
+- 美団独自開発、中国語理解力が高い
+- OpenAI 互換 API 形式
+- ビジネスシーン向けに最適化
+- 長いコンテキストウィンドウをサポート
+- クラウドで実行、ローカルハードウェア不要
+
+## はじめに
+
+### ステップ 1：アカウント登録
+
+LongCat オープンプラットフォームにアクセスして登録：
+- URL：`https://longcat.sensetime.com`
+- 電話番号またはメールで登録
+- 実名認証を完了
+
+### ステップ 2：API Key の取得
+
+1. LongCat プラットフォームにログイン
+2. **API 管理** → **API Keys** に進む
+3. **API Key 作成** をクリック
+4. API キーをコピーして安全に保管
+
+### ステップ 3：利用可能なモデルの確認
+
+プラットフォームの **モデルリスト** で利用可能なモデルを確認。
+
+## シリコンライフでの設定
+
+1. **LongCat** を AI クライアントタイプとして選択
+2. **API キー** を LongCat API Key に設定
+3. **エンドポイント** を LongCat API アドレスに設定（デフォルトエンドポイントは事前設定済み）
+4. **モデル** を目的のモデル名に設定
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 課金方式
+
+LongCat は Token 使用量に基づく従量課金。プラットフォームで現在の料金を確認。
+
+## よくある質問
+
+1. API キーが正しく有効であることを確認
+2. アカウント残高が十分であることを確認
+3. モデル名が有効か確認
+4. LongCat API エンドポイントとのネットワーク接続を確認
+";
+
+    public override string QiniuAISetup => @"
+# 七牛雲 AI 大モデル使用ガイド
+
+## 七牛雲 AI とは？
+
+七牛雲 AI は七牛雲が提供する大規模モデル推論サービスで、API インターフェースを通じて高性能な AI 機能を提供します。
+
+**利点：**
+- 高性能推論、低レイテンシ
+- OpenAI 互換 API 形式
+- 複数の主要モデルをサポート
+- クラウドで自動スケーリング
+- 信頼性の高いクラウドインフラ
+
+## はじめに
+
+### ステップ 1：七牛雲アカウント登録
+
+1. `https://www.qiniu.com` にアクセス
+2. 登録してアカウント認証を完了
+3. AI 推論サービスを開通
+
+### ステップ 2：API Key の取得
+
+1. 七牛雲コンソールにログイン
+2. **AI サービス** → **API 管理** に進む
+3. API キーを作成または確認
+4. API キーとエンドポイント URL をコピー
+
+### ステップ 3：利用可能なモデルの確認
+
+コンソールの AI サービスセクションで利用可能なモデルを確認。
+
+## シリコンライフでの設定
+
+1. **Qiniu AI** を AI クライアントタイプとして選択
+2. **API キー** を七牛雲 API Key に設定
+3. **エンドポイント** を推論サービス API アドレスに設定
+4. **モデル** を目的のモデル名に設定
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 課金方式
+
+七牛雲 AI は使用量に基づく従量課金。プラットフォームで詳細な料金情報を確認。
+
+## よくある質問
+
+1. API キーとエンドポイントが正しいことを確認
+2. アカウント残高またはクォータが十分であることを確認
+3. モデル名がサポートされているか確認
+4. 七牛雲 API とのネットワーク接続を確認
+";
+
+    public override string DeepSeekSetup => @"
+# DeepSeek AI プラットフォームセットアップガイド
+
+## DeepSeek とは？
+
+DeepSeek は高性能な大規模言語モデルの研究開発に特化した AI 企業で、卓越した推論とコード能力で知られています。DeepSeek API は OpenAI 互換形式のインターフェースを提供します。
+
+**利点：**
+- 卓越した推論と数学能力
+- 優れたコード生成と理解
+- OpenAI 互換 API 形式
+- 非常に競争力のある価格
+- 長いコンテキストウィンドウをサポート（128K）
+
+## はじめに
+
+### ステップ 1：アカウント登録
+
+1. `https://platform.deepseek.com` にアクセス
+2. メールまたは電話番号で登録
+3. アカウント認証を完了
+
+### ステップ 2：API Key の取得
+
+1. DeepSeek プラットフォームにログイン
+2. **API Keys** ページに進む
+3. **API Key 作成** をクリック
+4. API キーをコピーして安全に保管
+
+### ステップ 3：残高のチャージ
+
+DeepSeek は前払いモデルを採用。API 使用前にチャージが必要。
+
+## 利用可能なモデル
+
+- **deepseek-v4-flash**：最新フラッグシップモデル、トップクラスの推論能力（128K コンテキスト）
+- **deepseek-chat**：汎用対話バランスモデル（64K コンテキスト）
+
+## シリコンライフでの設定
+
+1. **DeepSeek** を AI クライアントタイプとして選択
+2. **API キー** を DeepSeek API Key に設定
+3. **モデル** を目的のモデル名に設定（例：`deepseek-v4-flash`）
+4. **エンドポイント** を DeepSeek API アドレスに設定（デフォルト：`https://api.deepseek.com`、空欄でデフォルト値を使用）
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 課金方式
+
+DeepSeek は従量課金：
+- 入力 Token と出力 Token はそれぞれ別料金
+- `https://api-docs.deepseek.com` で現在の料金を確認
+
+## よくある質問
+
+1. API キーが正しいことを確認
+2. アカウント残高が十分であることを確認
+3. モデル名が有効か確認
+4. カスタムエンドポイントを使用する場合、エンドポイント URL を確認
+";
+
+    public override string ZhipuSetup => @"
+# 智譜 AI（GLM）プラットフォーム使用ガイド
+
+## 智譜 AI とは？
+
+智譜 AI は中国を代表する AI 企業で、GLM（General Language Model）シリーズを開発しています。智譜オープンプラットフォームは API インターフェースを通じて強力なモデルへのアクセスを提供し、OpenAI 互換形式です。
+
+**利点：**
+- GLM シリーズモデル、中国語・英語両方に強い
+- 優れたコードとエージェント能力
+- OpenAI 互換 API 形式
+- 一部モデルに無料枠を提供
+- マルチモーダルタスクをサポート
+
+## はじめに
+
+### ステップ 1：アカウント登録
+
+1. `https://open.bigmodel.cn` にアクセス
+2. 電話番号で登録
+3. 実名認証を完了
+
+### ステップ 2：API Key の取得
+
+1. 智譜オープンプラットフォームにログイン
+2. **API 管理** → **API Keys** に進む
+3. 新しい API キーを作成
+4. API キーをコピーして保存
+
+### ステップ 3：無料枠の確認
+
+新規ユーザーは GLM-4-Flash の無料 Token を入手可能。**課金管理** で詳細を確認。
+
+## 利用可能なモデル
+
+- **glm-5.1-plus**：フラッグシップモデル、深い推論（128K コンテキスト）
+- **glm-5.1**：高コストパフォーマンス、強力な性能（128K コンテキスト）
+- **glm-5.1-flash**：高速で経済的（128K コンテキスト）
+- **glm-4-flash**：無料モデル（128K コンテキスト）
+- **glm-4-flashx**：超高速、低コスト（128K コンテキスト）
+- **glm-4-air**：軽量、高コストパフォーマンス（128K コンテキスト）
+- **glm-4-airx**：軽量、高速（8K コンテキスト）
+- **glm-4-long**：長文脈、100 万 Token（1M コンテキスト）
+- **glm-4-plus**：安定フラッグシップモデル（128K コンテキスト）
+- **codegeex-4**：コード生成モデル（128K コンテキスト）
+
+## シリコンライフでの設定
+
+1. **Zhipu GLM** を AI クライアントタイプとして選択
+2. **API キー** を智譜 API Key に設定
+3. **モデル** を目的のモデル名に設定
+4. **エンドポイント** を API アドレスに設定（空欄でデフォルト値を使用）
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 課金方式
+
+- GLM-4-Flash は無料
+- その他のモデルは従量課金
+- `https://open.bigmodel.cn/pricing` で詳細を確認
+
+## よくある質問
+
+1. API キーが正しいことを確認
+2. 無料枠が使い切っていないか確認
+3. モデル名が利用可能なモデルと一致しているか確認
+4. 智譜 API とのネットワーク接続を確認
+";
+
+    public override string MoonshotSetup => @"
+# 月之暗面（Kimi）プラットフォーム使用ガイド
+
+## 月之暗面とは？
+
+月之暗面は Kimi を開発する AI 企業で、Kimi は中国で最も人気のある AI アシスタントの一つです。月之暗面プラットフォームは API インターフェースを通じて Kimi シリーズモデルへのアクセスを提供し、超長コンテキストウィンドウサポートで知られています。
+
+**利点：**
+- 超長コンテキストウィンドウサポート（最大 200 万 Token）
+- 優れた中国語理解能力
+- OpenAI 互換 API 形式
+- 強力なドキュメント処理能力
+- 競争力のある価格
+
+## はじめに
+
+### ステップ 1：アカウント登録
+
+1. `https://platform.moonshot.cn` にアクセス
+2. 電話番号で登録
+3. 実名認証を完了
+
+### ステップ 2：API Key の取得
+
+1. 月之暗面プラットフォームにログイン
+2. **API Key 管理** に進む
+3. 新しい API キーを作成
+4. コピーして安全に保管
+
+### ステップ 3：残高のチャージ
+
+アカウントにチャージします。新規ユーザーは無料体験 Token を入手できる場合があります。
+
+## 利用可能なモデル
+
+- **kimi-latest**：最新フラッグシップモデル、深い推論（256K コンテキスト）
+- **moonshot-v1-128k**：標準モデル、長文脈（128K コンテキスト）
+- **moonshot-v1-32k**：標準モデル（32K コンテキスト）
+- **moonshot-v1-8k**：標準モデル、経済的（8K コンテキスト）
+- **moonshot-v1-200k**：長距離モデル（200K コンテキスト）
+- **moonshot-v1-auto**：入力長に応じて自動選択（192K コンテキスト）
+
+## シリコンライフでの設定
+
+1. **Moonshot Kimi** を AI クライアントタイプとして選択
+2. **API キー** を月之暗面 API Key に設定
+3. **モデル** を目的のモデル名に設定
+4. **エンドポイント** を API アドレスに設定（空欄でデフォルト値を使用）
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 課金方式
+
+月之暗面は Token 使用量に基づく従量課金、モデルごとに料金が異なります。`https://platform.moonshot.cn/docs/pricing` で詳細を確認。
+
+## よくある質問
+
+1. API キーが正しいことを確認
+2. アカウント残高が十分であることを確認
+3. モデル名が有効か確認
+4. 長いドキュメントを処理する際、モデルが必要なコンテキスト長をサポートしているか確認
+";
+
+    public override string SiliconFlowSetup => @"
+# SiliconFlow AI 推論プラットフォーム使用ガイド
+
+## SiliconFlow とは？
+
+SiliconFlow はクラウド AI 推論プラットフォームで、統一された OpenAI 互換 API を通じて多数のオープンソースおよび商用大規模言語モデルへのアクセスを提供します。
+
+**利点：**
+- 多数のオープンソースモデルにアクセス可能（Qwen、DeepSeek、Llama 等）
+- すべてのモデルで統一 OpenAI 互換 API
+- 最適化による高速推論
+- 一部モデルに無料枠を提供
+- ローカルハードウェア不要
+
+## はじめに
+
+### ステップ 1：アカウント登録
+
+1. `https://siliconflow.cn` にアクセス
+2. 電話番号または GitHub アカウントで登録
+3. アカウント設定を完了
+
+### ステップ 2：API Key の取得
+
+1. SiliconFlow プラットフォームにログイン
+2. **API Keys** ページに進む
+3. 新しい API キーを作成
+4. コピーして保存
+
+### ステップ 3：利用可能なモデルの閲覧
+
+SiliconFlow は多数のモデルをホストしています。**モデルライブラリ** で利用可能なすべてのオプションと料金を確認。
+
+## シリコンライフでの設定
+
+1. **SiliconFlow** を AI クライアントタイプとして選択
+2. **API キー** を SiliconFlow API Key に設定
+3. **モデル** を目的のモデル名に設定（例：`deepseek-ai/DeepSeek-V3`）
+4. **エンドポイント** を API アドレスに設定（空欄でデフォルト値を使用）
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 利用可能なモデル
+
+SiliconFlow は豊富なモデル選択肢を提供：
+- DeepSeek シリーズ（V3、R1 等）
+- Qwen シリーズ
+- Llama シリーズ
+- GLM シリーズ
+- その他多数のオープンソースモデル
+
+プラットフォームのモデルライブラリで完全なリストを確認。
+
+## 課金方式
+
+- 一部モデル（例：Qwen2.5-7B-Instruct）は無料
+- 有料モデルは従量課金
+- `https://siliconflow.cn/pricing` で詳細を確認
+
+## よくある質問
+
+1. API キーが正しいことを確認
+2. モデル名の形式が正しいことを確認（例：`ベンダー/モデル名`）
+3. 有料モデルのアカウント残高を確認
+4. SiliconFlow API とのネットワーク接続を確認
+";
+
+    public override string MiniMaxSetup => @"
+# MiniMax AI プラットフォーム使用ガイド
+
+## MiniMax とは？
+
+MiniMax は対話、推論、マルチモーダルタスクにおいて強力な大規模言語モデルを提供する AI 企業です。MiniMax プラットフォームは API インターフェースを通じてモデルへのアクセスを提供します。
+
+**利点：**
+- 強力な対話と推論能力
+- マルチモーダルモデルサポート
+- OpenAI 互換 API 形式
+- 国内および国際エンドポイントをサポート
+- エージェント最適化モデルを提供
+
+## はじめに
+
+### ステップ 1：アカウント登録
+
+1. `https://platform.minimaxi.com`（国内）または `https://api.minimaxi.chat`（国際）にアクセス
+2. 電話番号（国内）またはメール（国際）で登録
+3. 認証を完了
+
+### ステップ 2：API Key の取得
+
+1. MiniMax プラットフォームにログイン
+2. **API Keys** ページに進む
+3. 新しい API キーを作成
+4. コピーして保存
+
+### ステップ 3：エンドポイントの選択
+
+MiniMax は 2 種類のエンドポイントオプションを提供：
+- **国内エンドポイント**：中国本土ユーザー向け
+- **国際エンドポイント**：海外ユーザー向け
+
+所在地に応じて適切なエンドポイントを選択。
+
+## 利用可能なモデル
+
+- **MiniMax-M2**：フラッグシップモデル、深い推論（245K コンテキスト）
+- **abab6.5s-chat**：高速で経済的（245K コンテキスト）
+- **MiniMax-Text-01**：長距離エージェントモデル（1M コンテキスト）
+- **abab6.5g-chat**：高速推論（8K コンテキスト）
+- **abab6.5t-chat**：低レイテンシ、ツール呼び出しなし（8K コンテキスト）
+
+## シリコンライフでの設定
+
+1. **MiniMax** を AI クライアントタイプとして選択
+2. **API キー** を MiniMax API Key に設定
+3. **モデル** を目的のモデル名に設定
+4. **エンドポイント** を `domestic`（国内）または `international`（国際）に設定
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 課金方式
+
+MiniMax は従量課金、モデルごとに料金が異なります。プラットフォームで現在の料金を確認。
+
+## よくある質問
+
+1. API キーが正しいことを確認
+2. 正しいエンドポイント（国内/国際）を選択しているか確認
+3. モデル名が有効か確認
+4. アカウント残高が十分であることを確認
+";
+
+    public override string ErnieSetup => @"
+# 百度文心（千帆）プラットフォーム使用ガイド
+
+## 百度文心とは？
+
+百度文心（ERNIE）は百度の大規模言語モデルシリーズで、千帆大モデルプラットフォームを通じてアクセスできます。強力な中国語理解と生成能力を提供します。
+
+**利点：**
+- 中国語理解能力が高い
+- 百度サービスエコシステムとの豊富な統合
+- 複数のモデルサイズで様々なシーンに対応
+- マルチモーダルタスクをサポート
+- 安定した信頼性の高いクラウドインフラ
+
+## はじめに
+
+### ステップ 1：百度雲アカウント登録
+
+1. `https://qianfan.cloud.baidu.com` にアクセス
+2. 百度アカウントでログイン
+3. 実名認証を完了
+
+### ステップ 2：API Key の取得
+
+1. 千帆プラットフォームにログイン
+2. **アプリ管理** → **アプリ作成** に進む
+3. アプリ情報を入力して作成
+4. **API Key** と **Secret Key** をコピー
+5. 注意：シリコンライフは千帆の API Key を直接使用
+
+### ステップ 3：モデルの開通
+
+千帆プラットフォームの **モデル管理** で、使用するモデルを開通。
+
+## 利用可能なモデル
+
+- **ernie-4.5-turbo-128k**：フラッグシップモデル（128K コンテキスト）
+- **ernie-4.0-turbo-8k**：Turbo モデル（8K コンテキスト）
+- **ernie-4.0-turbo-8k-latest**：最新 Turbo（8K コンテキスト）
+- **ernie-speed-pro-128k**：Speed Pro モデル（128K コンテキスト）
+- **ernie-speed-128k**：Speed モデル（128K コンテキスト）
+- **ernie-speed-8k**：Speed モデル（8K コンテキスト）
+- **ernie-lite-pro-128k**：Lite Pro モデル（128K コンテキスト）
+- **ernie-lite-8k**：Lite モデル（8K コンテキスト）
+
+## シリコンライフでの設定
+
+1. **百度 ERNIE** を AI クライアントタイプとして選択
+2. **API キー** を千帆 API Key に設定
+3. **モデル** を開通済みの ERNIE モデル名に設定
+4. **エンドポイント** を千帆 API アドレスに設定（空欄でデフォルト値を使用）
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 課金方式
+
+- ERNIE Speed と Lite シリーズに無料枠あり
+- 有料モデルは従量課金
+- `https://qianfan.cloud.baidu.com/pricing` で詳細を確認
+
+## よくある質問
+
+1. API キーが正しいことを確認
+2. 千帆プラットフォームで対応モデルを開通済みか確認
+3. 無料枠が使い切っていないか確認
+4. 有料モデルのアカウント残高が十分であることを確認
+5. 実名認証が完了していることを確認
+";
+
+    public override string HunyuanSetup => @"
+# 騰訊混元大モデル使用ガイド
+
+## 騰訊混元とは？
+
+騰訊混元は騰訊が独自開発した大規模言語モデルシリーズで、騰訊雲プラットフォームを通じてアクセスできます。強力な中国語・英語バイリンガル能力とマルチモーダルサポートを提供します。
+
+**利点：**
+- 中国語・英語バイリンガル能力が高い
+- マルチモーダルモデルサポート（テキスト、画像）
+- 騰訊雲インフラに基盤
+- OpenAI 互換 API 形式
+- 長いコンテキストウィンドウをサポート
+
+## はじめに
+
+### ステップ 1：騰訊雲アカウント登録
+
+1. `https://cloud.tencent.com` にアクセス
+2. QQ または微信アカウントでログイン
+3. 実名認証を完了
+
+### ステップ 2：混元サービスの開通
+
+1. **騰訊雲コンソール** に進む
+2. **混元** または **大モデル知識エンジン（LKE）** を検索
+3. サービスを開通
+
+### ステップ 3：API Key の取得
+
+1. 騰訊雲コンソールの **API キー管理** に進む
+2. 新しい API キーを作成（SecretId と SecretKey）
+3. 注意：シリコンライフは API キーを直接使用
+
+## 利用可能なモデル
+
+- **hunyuan-turbos-latest**：Turbo S、高速（256K コンテキスト）
+- **hunyuan-turbo-latest**：Turbo、バランス型（256K コンテキスト）
+- **hunyuan-large-latest**：Large、長文脈（256K コンテキスト）
+- **hunyuan-standard-latest**：Standard（256K コンテキスト）
+- **hunyuan-lite-latest**：Lite、高コストパフォーマンス（256K コンテキスト）
+- **hunyuan-standard-256k**：長距離モデル（256K コンテキスト）
+- **hunyuan-function-call**：関数呼び出しモデル（8K コンテキスト）
+
+## シリコンライフでの設定
+
+1. **騰訊混元** を AI クライアントタイプとして選択
+2. **API キー** を騰訊雲 API Key に設定
+3. **モデル** を目的の混元モデル名に設定
+4. **エンドポイント** を API アドレスに設定（空欄でデフォルト値を使用）
+5. **コンテキストウィンドウ Tokens** は空欄で自動検出
+
+## 課金方式
+
+騰訊混元は従量課金、モデルごとに料金が異なります。`https://cloud.tencent.com/document/product/1729` で料金詳細を確認。
+
+## よくある質問
+
+1. API キーが正しいことを確認
+2. 混元サービスが開通済みであることを確認
+3. モデル名が有効か確認
+4. アカウント残高が十分であることを確認
+5. 実名認証が完了していることを確認
 ";
 
     public override string AIClients => @"
