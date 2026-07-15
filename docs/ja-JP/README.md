@@ -38,6 +38,13 @@
   - **Herdsman** — 認証不要の推論エンジン、OpenAI API 形式互換
   - **Meituan LongCat** — 美団独自開発大規模モデル、OpenAI API 形式互換、API キー認証
   - **Qiniu Cloud AI** — 七牛クラウド大規模モデル推論サービス、OpenAI API 形式互換、API キー認証
+  - **DeepSeek** — 思考モード対応、1M コンテキスト、OpenAI API 互換
+  - **智谱AI（GLM）** — 思考モード対応、モデル別ビジョン、1M コンテキスト、OpenAI API 互換
+  - **百度千帆（Ernie）** — 131K コンテキスト、モデル別ビジョン、OpenAI API 互換
+  - **騰訊混元（Hunyuan）** — TokenHub + レガシーデュアルエンドポイント、262K コンテキスト
+  - **MiniMax** — 国内/国際エンドポイント、1M コンテキスト、OpenAI API 互換
+  - **月之暗面（Kimi/Moonshot）** — 思考モード対応、262K コンテキスト、OpenAI API 互換
+  - **硅基流動（SiliconFlow）** — 動的モデルリスト、1M コンテキスト、OpenAI API 互換
 - **32種類のカレンダーシステム** — グレゴリオ暦、農暦、イスラム暦、ヘブライ暦、日本暦、ペルシャ暦、マヤ暦、中国歴史暦法など、世界の主要暦法を網羅
 - **ナレッジネットワークシステム** — 三つ組（主体・関係・客体）ベースのナレッジグラフ、保存・検索・パス発見をサポート
 - **プロジェクトワークスペース** — プロジェクトスペース管理、プロジェクトの作成/アーカイブ/破棄、ロール割り当て、ワークノート、タスク追跡、ツールパーミッション分離をサポート
@@ -122,7 +129,7 @@
 | ランタイム | .NET 9 | .NET 9（Windows/macOS/Linux） |
 | プログラミング言語 | C# | C# |
 | アプリケーションタイプ | コンソールアプリケーション | デスクトップアプリケーション（Windows/macOS システムトレイ / Linux ステータスウィンドウ） |
-| AI 統合 | Ollama（ローカル）、阿里雲百炼（クラウド）、火山エンジンArk（クラウド）、Herdsman、Meituan LongCat、Qiniu Cloud AI | Ollama（ローカル）、阿里雲百炼（クラウド）、火山エンジンArk（クラウド）、Herdsman、Meituan LongCat、Qiniu Cloud AI |
+| AI 統合 | Ollama、阿里雲百炼、火山エンジンArk、Herdsman、LongCat、QiniuAI、DeepSeek、智谱AI、百度千帆、騰訊混元、MiniMax、月之暗面、硅基流動 | Ollama、阿里雲百炼、火山エンジンArk、Herdsman、LongCat、QiniuAI、DeepSeek、智谱AI、百度千帆、騰訊混元、MiniMax、月之暗面、硅基流動 |
 | データストレージ | ファイルシステム（JSON + 時間インデックスディレクトリ） | SpeedyPack（.spk フォーマット、メモリマップ + 非同期永続化） |
 | Web サーバー | HttpListener（.NET 内蔵） | HttpListener（.NET 内蔵） |
 | 動的コンパイル | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -160,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # グローバルサービスロケーター
 │   │
 │   ├── SiliconLife.Common/                # 共有実装（両バージョン共通）
-│   │   ├── AI/                            # AI クライアントとファクトリー（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI）
+│   │   ├── AI/                            # AI クライアントとファクトリー（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI、DeepSeek、Zhipu、Ernie、Hunyuan、MiniMax、Moonshot、SiliconFlow）
 │   │   ├── Calendar/                      # 32種類のカレンダー実装
 │   │   ├── Localization/                  # ローカリゼーションベースクラスと34種類の言語/地域バリアント実装
 │   │   ├── Resources/                     # 共有リソースファイル
@@ -263,6 +270,13 @@ SiliconLifeCollective.sln
   - **Ollama**：[Ollama をインストール](https://ollama.com)してモデルをプル（例：`ollama pull llama3`）
   - **阿里雲百炼**：[百炼コンソール](https://bailian.console.aliyun.com/)から API キーを取得
   - **火山エンジン Ark**：[火山エンジンコンソール](https://console.volcengine.com/ark)から API キーを取得
+  - **DeepSeek**：[DeepSeek プラットフォーム](https://platform.deepseek.com/)から API キーを取得
+  - **智谱AI**：[智谱AI オープンプラットフォーム](https://open.bigmodel.cn/)から API キーを取得
+  - **百度千帆**：[百度千帆コンソール](https://qianfan.baidubce.com/)から API キーを取得
+  - **騰訊混元**：[騰訊混元コンソール](https://cloud.tencent.com/product/hunyuan)から API キーを取得
+  - **MiniMax**：[MiniMax プラットフォーム](https://platform.minimaxi.com/)から API キーを取得
+  - **月之暗面**：[月之暗面プラットフォーム](https://platform.moonshot.cn/)から API キーを取得
+  - **硅基流動**：[硅基流動クラウド](https://cloud.siliconflow.cn/)から API キーを取得
 
 ### プロジェクトのビルド
 

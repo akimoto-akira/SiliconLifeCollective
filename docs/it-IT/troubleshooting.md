@@ -102,6 +102,21 @@ HTTP 404: Endpoint not found
 3. Conferma che il parametro Model utilizzi l'ID del punto di accesso all'inferenza (es. `ep-20241212123456-abcde`), non il nome del modello
 4. Verifica che l'account abbia accesso al punto di accesso
 
+#### Problema: Connessione client AI cloud fallita (DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow)
+
+**Sintomi**:
+```
+HTTP 401: Unauthorized
+oppure
+HTTP 404: Model not found
+```
+
+**Soluzione**:
+1. Verifica che la chiave API sia corretta e attiva
+2. Controlla che il nome del modello sia valido per la piattaforma scelta
+3. Verifica che l'account abbia accesso al modello richiesto
+4. Per SiliconFlow: utilizza l'interfaccia `/models` per ottenere la lista dinamica dei modelli disponibili
+
 ---
 
 ### Problemi di Runtime

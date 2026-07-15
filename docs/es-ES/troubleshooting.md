@@ -102,6 +102,29 @@ HTTP 404: Endpoint not found
 3. Confirmar que el parámetro Model use el ID del punto de acceso de inferencia (por ejemplo, `ep-20241212123456-abcde`), no el nombre del modelo
 4. Comprobar que la cuenta tenga acceso al punto de acceso
 
+#### Problema: Fallo de conexión con DeepSeek / Zhipu / Ernie / Hunyuan / MiniMax / Moonshot / SiliconFlow
+
+**Síntomas**:
+```
+HTTP 401: Unauthorized
+o
+HTTP 404: Model not found
+```
+
+**Solución**:
+1. Verificar que la clave API sea correcta
+2. Comprobar que el endpoint sea accesible desde su red
+3. Verificar que el nombre del modelo sea válido:
+   - DeepSeek: `deepseek-v4-flash`, `deepseek-v4-pro`
+   - Zhipu: `glm-4-flash` (gratuito), `glm-5`, `glm-4-long` (1M)
+   - Ernie: `ernie-5.1`, `ernie-speed-128k` (gratuito), `ernie-tiny-8k` (gratuito)
+   - Hunyuan: `hy3` (TokenHub), otros modelos (Legacy)
+   - MiniMax: `MiniMax-M3`, `MiniMax-M2.7`, endpoint `domestic`/`international`
+   - Moonshot: `kimi-k2.6`, `kimi-k2.7-code`
+   - SiliconFlow: Lista dinámica — usar API `/models` para ver modelos disponibles
+4. Para Hunyuan: Verificar que el endpoint coincida con el modelo (hy3/hy3-preview → TokenHub, otros → Legacy)
+5. Para MiniMax: Verificar que el endpoint seleccionado (`domestic`/`international`) sea accesible
+
 ---
 
 ### Problemas en Tiempo de Ejecución

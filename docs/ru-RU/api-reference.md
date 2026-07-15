@@ -593,6 +593,41 @@ data: {"type": "complete", "sessionId": "uuid"}
       "apiKey": "...",
       "endpoint": "...",
       "model": "..."
+    },
+    "DeepSeek": {
+      "apiKey": "...",
+      "endpoint": "https://api.deepseek.com",
+      "model": "deepseek-v4-flash"
+    },
+    "Zhipu": {
+      "apiKey": "...",
+      "endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "model": "glm-4-flash"
+    },
+    "Ernie": {
+      "apiKey": "...",
+      "endpoint": "https://qianfan.baidubce.com/v2",
+      "model": "ernie-5.1"
+    },
+    "Hunyuan": {
+      "apiKey": "...",
+      "endpoint": "https://tokenhub.tencentmaas.com/v1",
+      "model": "hy3"
+    },
+    "MiniMax": {
+      "apiKey": "...",
+      "endpoint": "https://api.minimaxi.com/v1",
+      "model": "MiniMax-M3"
+    },
+    "Moonshot": {
+      "apiKey": "...",
+      "endpoint": "https://api.moonshot.cn/v1",
+      "model": "kimi-k2.6"
+    },
+    "SiliconFlow": {
+      "apiKey": "...",
+      "endpoint": "https://api.siliconflow.cn/v1",
+      "model": "deepseek-ai/DeepSeek-V3.2"
     }
   }
 }

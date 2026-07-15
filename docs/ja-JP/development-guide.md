@@ -284,7 +284,7 @@ public class MyCustomSkin : ISkin
 
 ```
 SiliconLife.Common/
-├── AI/                    # AI クライアントとファクトリー実装
+├── AI/                    # AI クライアントとファクトリー実装（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI、DeepSeek、Zhipu、Ernie、Hunyuan、MiniMax、Moonshot、SiliconFlow）
 ├── Calendar/              # 32種類のカレンダー実装
 ├── Localization/          # ローカリゼーションベースクラスと34種類の言語変種実装
 ├── Security/              # パーミッションマネージャー

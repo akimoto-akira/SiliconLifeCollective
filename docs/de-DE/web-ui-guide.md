@@ -127,6 +127,13 @@ KI-Backends konfigurieren:
 - Herdsman (lokal/Cloud, keine Authentifizierung)
 - Meituan LongCat (Cloud)
 - Qiniu Cloud AI (Cloud)
+- DeepSeek (Cloud, Thinking-Modus, 1M Kontext)
+- Zhipu AI / GLM (Cloud, Thinking, Vision, kostenloses Modell, 1M Kontext)
+- Baidu Qianfan / ERNIE (Cloud, 131K Kontext, kostenlose Modelle)
+- Tencent Hunyuan (Cloud, Dual-Endpunkte, 262K Kontext)
+- MiniMax (Cloud, Thinking, Vision M3, 1M Kontext)
+- Moonshot / Kimi (Cloud, Thinking, Vision, 262K Kontext)
+- SiliconFlow (Cloud, Modell-Aggregator, 100+ Modelle, 1M Kontext)
 - Benutzerdefinierter Client
 
 ### Speichereinstellungen

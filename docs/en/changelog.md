@@ -61,6 +61,22 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ## [Unreleased]
 
+### 2026-07-15
+
+#### New Features
+- Implement 7 new AI clients: DeepSeekClient, ZhipuClient (GLM), ErnieClient (Baidu/Qianfan), HunyuanClient (Tencent), MiniMaxClient, MoonshotClient (Kimi), SiliconFlowClient
+  - **DeepSeekClient** — OpenAI-compatible API, thinking mode (reasoning_content), reasoning effort control, up to 1M context window
+  - **ZhipuClient** — OpenAI-compatible API, thinking mode (GLM-5 series), vision by model (glm-4v/glm-5v), free model (glm-4-flash), up to 1M context window
+  - **ErnieClient** — Qianfan v2 OpenAI-compatible API, free models (ernie-speed, ernie-tiny), vision (ernie-5 series), up to 131K context window
+  - **HunyuanClient** — Dual endpoints (TokenHub + Legacy), thinking mode (hy3 series), up to 262K context window
+  - **MiniMaxClient** — Thinking mode with reasoning_split, M3 native multimodal, up to 1M context window
+  - **MoonshotClient** — Thinking mode (kimi-k2.7 with keep=all), multimodal, up to 262K context window
+  - **SiliconFlowClient** — Dynamic model list aggregation (100+ open-source models), reasoning content, up to 1M context window
+- Mark Yi (01.AI / 零一万物) as ⚠️ Deprecated (stopped new user registration)
+
+#### Documentation
+- Update en/ documentation to reflect 7 new AI client implementations (architecture, getting-started, api-reference, development-guide, README)
+
 ### 2026-05-26
 
 #### New Features

@@ -593,6 +593,45 @@ Retorna la página de la interfaz de configuración del sistema.
       "apiKey": "...",
       "endpoint": "...",
       "model": "..."
+    },
+    "DeepSeek": {
+      "apiKey": "...",
+      "endpoint": "https://api.deepseek.com",
+      "model": "deepseek-v4-flash",
+      "thinkingEnabled": true,
+      "reasoningEffort": "high"
+    },
+    "Zhipu": {
+      "apiKey": "...",
+      "endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "model": "glm-4-flash",
+      "thinkingEnabled": false
+    },
+    "Ernie": {
+      "apiKey": "...",
+      "endpoint": "https://qianfan.baidubce.com/v2",
+      "model": "ernie-5.1"
+    },
+    "Hunyuan": {
+      "apiKey": "...",
+      "endpoint": "https://tokenhub.tencentmaas.com/v1",
+      "model": "hy3",
+      "thinkingEnabled": false
+    },
+    "MiniMax": {
+      "apiKey": "...",
+      "endpoint": "domestic",
+      "model": "MiniMax-M3"
+    },
+    "Moonshot": {
+      "apiKey": "...",
+      "endpoint": "https://api.moonshot.cn/v1",
+      "model": "kimi-k2.6"
+    },
+    "SiliconFlow": {
+      "apiKey": "...",
+      "endpoint": "https://api.siliconflow.cn/v1",
+      "model": "deepseek-ai/DeepSeek-V3.2"
     }
   }
 }

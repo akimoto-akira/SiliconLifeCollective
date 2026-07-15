@@ -102,6 +102,103 @@ HTTP 404: Endpoint not found
 3. Upewnij się, że parametr Model używa ID punktu dostępowego wnioskowania (np. `ep-20241212123456-abcde`), a nie nazwy modelu
 4. Sprawdź, czy konto ma dostęp do tego punktu dostępowego
 
+#### Problem: błąd połączenia DeepSeek
+
+**Objawy**:
+```
+HTTP 401: Unauthorized
+lub
+DeepSeek connection error
+```
+
+**Rozwiązanie**:
+1. Zweryfikuj poprawność klucza API na [platformie DeepSeek](https://platform.deepseek.com/)
+2. Sprawdź, czy endpoint to `https://api.deepseek.com` (bez końcowego ukośnika)
+3. Upewnij się, że nazwa modelu jest poprawna (np. `deepseek-v4-flash`, `deepseek-v4-pro`)
+
+#### Problem: błąd połączenia Zhipu AI (GLM)
+
+**Objawy**:
+```
+HTTP 401: Unauthorized
+lub
+Zhipu connection error
+```
+
+**Rozwiązanie**:
+1. Zweryfikuj poprawność klucza API na [platformie Zhipu](https://open.bigmodel.cn/)
+2. Sprawdź, czy endpoint to `https://open.bigmodel.cn/api/paas/v4`
+3. Tryb thinking jest obsługiwany tylko przez modele serii GLM-5
+
+#### Problem: błąd połączenia Ernie (Baidu Qianfan)
+
+**Objawy**:
+```
+HTTP 401: Unauthorized
+lub
+Ernie connection error
+```
+
+**Rozwiązanie**:
+1. Zweryfikuj poprawność klucza API na [konsoli Qianfan](https://qianfan.baidubce.com/)
+2. Sprawdź, czy endpoint to `https://qianfan.baidubce.com/v2`
+3. Darmowe modele `ernie-speed` i `ernie-tiny` nie wymagają płatnego planu
+
+#### Problem: błąd połączenia Hunyuan (Tencent)
+
+**Objawy**:
+```
+HTTP 401: Unauthorized
+lub
+Hunyuan connection error
+```
+
+**Rozwiązanie**:
+1. Zweryfikuj poprawność klucza API na [konsoli Hunyuan](https://hunyuan.tencent.com/)
+2. Sprawdź, czy endpoint jest poprawny — zalecany: `https://tokenhub.tencentmaas.com/v1`, alternatywny (Legacy): `https://api.hunyuan.cloud.tencent.com/v1`
+3. Tryb thinking jest obsługiwany tylko przez modele serii hy3 i hy-2.0
+
+#### Problem: błąd połączenia MiniMax
+
+**Objawy**:
+```
+HTTP 401: Unauthorized
+lub
+MiniMax connection error
+```
+
+**Rozwiązanie**:
+1. Zweryfikuj poprawność klucza API na [platformie MiniMax](https://www.minimaxi.com/)
+2. Sprawdź, czy endpoint to `https://api.minimaxi.com/v1`
+
+#### Problem: błąd połączenia Moonshot (Kimi)
+
+**Objawy**:
+```
+HTTP 401: Unauthorized
+lub
+Moonshot connection error
+```
+
+**Rozwiązanie**:
+1. Zweryfikuj poprawność klucza API na [platformie Moonshot](https://platform.moonshot.cn/)
+2. Sprawdź, czy endpoint to `https://api.moonshot.cn/v1`
+3. Wizja jest obsługiwana przez modele serii kimi-k2.5 i nowsze
+
+#### Problem: błąd połączenia SiliconFlow
+
+**Objawy**:
+```
+HTTP 401: Unauthorized
+lub
+SiliconFlow connection error
+```
+
+**Rozwiązanie**:
+1. Zweryfikuj poprawność klucza API na [platformie SiliconFlow](https://siliconflow.cn/)
+2. Sprawdź, czy endpoint to `https://api.siliconflow.cn/v1`
+3. Nazwy modeli zawierają prefiks dostawcy (np. `deepseek-ai/DeepSeek-V3.2`)
+
 ---
 
 ### Problemy w czasie wykonywania

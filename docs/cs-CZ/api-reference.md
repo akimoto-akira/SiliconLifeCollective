@@ -593,6 +593,39 @@ Vrací stránku rozhraní pro konfiguraci systému.
       "apiKey": "...",
       "endpoint": "...",
       "model": "..."
+    },
+    "DeepSeek": {
+      "apiKey": "...",
+      "model": "deepseek-v4-flash",
+      "thinkingEnabled": true,
+      "reasoningEffort": "high"
+    },
+    "Zhipu": {
+      "apiKey": "...",
+      "model": "glm-4-flash",
+      "thinkingEnabled": false
+    },
+    "Ernie": {
+      "apiKey": "bce-v3/...",
+      "model": "ernie-5.1"
+    },
+    "Hunyuan": {
+      "apiKey": "...",
+      "model": "hy3",
+      "thinkingEnabled": false
+    },
+    "MiniMax": {
+      "apiKey": "...",
+      "model": "MiniMax-M3",
+      "endpoint": "domestic"
+    },
+    "Moonshot": {
+      "apiKey": "...",
+      "model": "kimi-k2.6"
+    },
+    "SiliconFlow": {
+      "apiKey": "...",
+      "model": "deepseek-ai/DeepSeek-V3.2"
     }
   }
 }

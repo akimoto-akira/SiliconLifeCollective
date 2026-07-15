@@ -315,6 +315,90 @@ El sistema soporta múltiples backends de IA a través de la interfaz `IAIClient
 - **Funcionalidades**: Streaming, llamadas a herramientas
 - **Configuración**: `apiKey`, `endpoint`, `model`
 
+### DeepSeekClient (DeepSeek)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas, modo thinking (reasoning_content), control de esfuerzo de razonamiento
+- **Endpoint por defecto**: `https://api.deepseek.com`
+- **Ventana de contexto máxima**: 1M tokens (1.048.576)
+- **Modelos**: `deepseek-v4-flash` (1M, alta velocidad), `deepseek-v4-pro` (1M, razonamiento insignia)
+- **Configuración**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`, `thinkingEnabled`, `reasoningEffort`
+- **Características**: Modo thinking con `reasoning_content` y `reasoning_effort` configurable; visión no soportada
+
+### ZhipuClient (Zhipu AI / GLM)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas, modo thinking (solo serie GLM-5), visión por modelo
+- **Endpoint por defecto**: `https://open.bigmodel.cn/api/paas/v4`
+- **Ventana de contexto máxima**: 1M tokens (1.048.576)
+- **Modelos**: `glm-4-flash` (gratuito, 128K), `glm-4-long` (1M), `glm-5` (128K, agente de código), `glm-5.1` (128K, agente de largo alcance), entre otros
+- **Configuración**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`, `thinkingEnabled`
+- **Características**: Modelo gratuito `glm-4-flash` recomendado para depuración; visión soportada en modelos `glm-4v*`/`glm-5v*`; modo thinking habilitado automáticamente para serie GLM-5
+
+### ErnieClient (Baidu Qianfan / Wenxin)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API Qianfan v2 compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas, visión por modelo
+- **Endpoint por defecto**: `https://qianfan.baidubce.com/v2`
+- **Ventana de contexto máxima**: 131K tokens (131.072)
+- **Modelos**: `ernie-5.1` (insignia, 128K, multimodal), `ernie-speed-128k` (gratuito), `ernie-tiny-8k` (gratuito), entre otros
+- **Configuración**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+- **Características**: Modelos gratuitos disponibles para depuración (`ernie-speed`, `ernie-tiny`); visión soportada en `ernie-5.1`
+
+### HunyuanClient (Tencent Hunyuan)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas, modo thinking (reasoning_content)
+- **Endpoints**: Doble endpoint — TokenHub (recomendado): `https://tokenhub.tencentmaas.com/v1`; Legacy: `https://api.hunyuan.cloud.tencent.com/v1`
+- **Ventana de contexto máxima**: 262K tokens (262.144)
+- **Modelos**: `hy3` (TokenHub, 256K, recomendado), `hunyuan-lite` (gratuito, sin llamadas a herramientas), `hunyuan-turbos-latest`, `hunyuan-t1-latest`, entre otros
+- **Configuración**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`, `thinkingEnabled`
+- **Características**: Selección automática de endpoint según modelo (hy3/hy3-preview → TokenHub, otros → Legacy); modo thinking para serie hy3
+
+### MiniMaxClient (MiniMax)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas, modo thinking con reasoning_split, multimodal (M3)
+- **Endpoints**: Nacional: `https://api.minimaxi.com/v1`; Internacional: `https://api.minimax.io/v1`
+- **Ventana de contexto máxima**: 1M tokens (1.048.576)
+- **Modelos**: `MiniMax-M3` (insignia, 1M, multimodal, recomendado), `MiniMax-M2.7` (192K, código/agente), `MiniMax-M2.5` (200K, agente SOTA), entre otros
+- **Configuración**: `apiKey`, `endpoint` (domestic/international), `model`, `contextWindowTokens`
+- **Características**: M3 soporta multimodal nativo (imagen + vídeo); `reasoning_split` siempre activo para separar razonamiento
+
+### MoonshotClient (Moonshot / Kimi)
+
+- **Tipo**: Servicio de IA en la nube
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas, modo thinking (reasoning_content), multimodal
+- **Endpoint por defecto**: `https://api.moonshot.cn/v1`
+- **Ventana de contexto máxima**: 262K tokens (262.144)
+- **Modelos**: `kimi-k2.6` (insignia, 256K, multimodal, recomendado), `kimi-k2.7-code` (código, thinking forzado), `moonshot-v1-128k`, entre otros
+- **Configuración**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+- **Características**: K2.7-code fuerza modo thinking con `keep=all`; visión soportada en modelos con sufijo `vision`
+
+### SiliconFlowClient (SiliconFlow / SiliconCloud)
+
+- **Tipo**: Servicio de IA en la nube (agregador)
+- **Protocolo**: API compatible con OpenAI
+- **Autenticación**: Bearer token (clave API)
+- **Funcionalidades**: Streaming, llamadas a herramientas, contenido de razonamiento
+- **Endpoint por defecto**: `https://api.siliconflow.cn/v1`
+- **Ventana de contexto máxima**: 1M tokens (1.048.576)
+- **Modelos**: Lista dinámica obtenida vía API `/models` en tiempo de ejecución; fallback a lista curada de 11 modelos (DeepSeek, Qwen, GLM, Kimi, Step, MiniMax, etc.)
+- **Configuración**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+- **Características**: Agrega 100+ modelos de código abierto de múltiples proveedores; lista de modelos obtenida dinámicamente con fallback; visión soportada en modelos con sufijo `vision`
+
 ### Interfaz de capacidades IAIClient
 
 La interfaz `IAIClient` define las capacidades de cada cliente de IA, permitiendo al `ContextManager` adaptar su comportamiento:
@@ -337,6 +421,13 @@ Cada tipo de cliente de IA tiene una implementación de fábrica correspondiente
 - `HerdsmanClientFactory` — Crea instancias de HerdsmanClient
 - `LongCatClientFactory` — Crea instancias de LongCatClient
 - `QiniuAIClientFactory` — Crea instancias de QiniuAIClient
+- `DeepSeekClientFactory` — Crea instancias de DeepSeekClient
+- `ZhipuClientFactory` — Crea instancias de ZhipuClient
+- `ErnieClientFactory` — Crea instancias de ErnieClient
+- `HunyuanClientFactory` — Crea instancias de HunyuanClient
+- `MiniMaxClientFactory` — Crea instancias de MiniMaxClient
+- `MoonshotClientFactory` — Crea instancias de MoonshotClient
+- `SiliconFlowClientFactory` — Crea instancias de SiliconFlowClient
 
 Las fábricas proporcionan:
 - `CreateClient(Dictionary<string, object> config)` — Instancia un cliente desde la configuración
@@ -360,18 +451,18 @@ Las fábricas proporcionan:
 |------|------|------|------|
 | Ollama | ✅ | Local | Servicio de IA local, soporta despliegue de modelos locales |
 | DashScope (Bailian de Alibaba Cloud) | ✅ | Nube | Servicio de IA Bailian de Alibaba Cloud, soporta despliegue multirregión |
-| Baidu Qianfan (Wenxin) | 📋 | Nube | Servicio de IA Wenxin de Baidu |
-| Zhipu AI (GLM) | 📋 | Nube | Servicio de IA Zhipu Qingyan |
-| Moonshot (Kimi) | 📋 | Nube | Servicio de IA Kimi de Moonshot |
+| Baidu Qianfan (Wenxin) | ✅ | Nube | Servicio de IA Wenxin de Baidu, API Qianfan v2 compatible con OpenAI, modelos gratuitos disponibles |
+| Zhipu AI (GLM) | ✅ | Nube | Servicio de IA Zhipu Qingyan, soporta modo thinking y visión por modelo, modelo gratuito glm-4-flash |
+| Moonshot (Kimi) | ✅ | Nube | Servicio de IA Kimi de Moonshot, soporta modo thinking y multimodal |
 | Volcengine Ark Doubao | ✅ | Nube | Servicio de IA Doubao de ByteDance |
 | Herdsman | ✅ | Local/Nube | Motor de inferencia sin autenticación, compatible con el formato API OpenAI |
 | Meituan LongCat | ✅ | Nube | Gran modelo de desarrollo propio de Meituan, compatible con el formato API OpenAI, autenticación por clave API |
 | Qiniu Cloud AI | ✅ | Nube | Servicio de IA en la nube de Qiniu, autenticación por clave API |
-| DeepSeek (conexión directa) | 📋 | Nube | Servicio de IA DeepSeek |
+| DeepSeek (conexión directa) | ✅ | Nube | Servicio de IA DeepSeek, soporta modo thinking, ventana de contexto 1M |
 | 01.AI (Yi) | ⚠️ | Nube | Servicio de IA 01.AI (Obsoleto: registro de nuevos usuarios suspendido) |
-| Tencent Hunyuan | 📋 | Nube | Servicio de IA Hunyuan de Tencent |
-| SiliconFlow | 📋 | Nube | Servicio de IA SiliconFlow |
-| MiniMax | 📋 | Nube | Servicio de IA MiniMax |
+| Tencent Hunyuan | ✅ | Nube | Servicio de IA Hunyuan de Tencent, doble endpoint TokenHub+Legacy, ventana de contexto 262K |
+| SiliconFlow | ✅ | Nube | Servicio de IA SiliconFlow, agrega 100+ modelos de código abierto, lista dinámica de modelos |
+| MiniMax | ✅ | Nube | Servicio de IA MiniMax, soporta modo thinking, ventanas nacional/internacional |
 | OpenAI | 💡 | Nube | Servicio API de OpenAI (serie GPT) |
 | Anthropic | 💡 | Nube | Servicio de IA Claude de Anthropic |
 | Google DeepMind | 💡 | Nube | Servicio de IA Gemini de Google |

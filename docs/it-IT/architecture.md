@@ -291,6 +291,70 @@ Il sistema supporta multipli backend AI tramite l'interfaccia `IAIClient`:
 - **Configurazione**: `apiKey`, `endpoint`, `model`
 - **Caratteristiche**: Servizio AI di ByteDance, supporta vari modelli Doubao
 
+### DeepSeekClient
+
+- **Tipo**: Servizio AI cloud
+- **Protocollo**: API compatibile OpenAI (`https://api.deepseek.com`)
+- **Autenticazione**: Bearer token (chiave API)
+- **Funzionalità**: Streaming, chiamate strumento, modalità thinking (reasoning_content), parametro reasoning_effort
+- **Finestra di contesto**: 1.048.576 token
+- **Configurazione**: `apiKey`, `model`
+
+### ZhipuClient (GLM)
+
+- **Tipo**: Servizio AI cloud
+- **Protocollo**: API compatibile OpenAI (`https://open.bigmodel.cn/api/paas/v4`)
+- **Autenticazione**: Bearer token (chiave API)
+- **Funzionalità**: Streaming, chiamate strumento, modalità thinking, supporto visione per modello
+- **Finestra di contesto**: 1.048.576 token
+- **Configurazione**: `apiKey`, `model`
+
+### ErnieClient (Baidu Qianfan/Wenxin Yiyan)
+
+- **Tipo**: Servizio AI cloud
+- **Protocollo**: API compatibile OpenAI (`https://qianfan.baidubce.com/v2`)
+- **Autenticazione**: Bearer token (chiave API)
+- **Funzionalità**: Streaming, chiamate strumento, supporto visione per modello
+- **Finestra di contesto**: 131.072 token
+- **Configurazione**: `apiKey`, `model`
+
+### HunyuanClient (Tencent Hunyuan)
+
+- **Tipo**: Servizio AI cloud
+- **Protocollo**: API compatibile OpenAI (endpoint doppio: TokenHub raccomandato + Legacy `https://api.hunyuan.cloud.tencent.com/v1`)
+- **Autenticazione**: Bearer token (chiave API)
+- **Funzionalità**: Streaming, chiamate strumento per modello, nessun supporto visione
+- **Finestra di contesto**: 262.144 token
+- **Modelli supportati**: hy3 (raccomandato), hy3-preview
+- **Configurazione**: `apiKey`, `model`
+
+### MiniMaxClient
+
+- **Tipo**: Servizio AI cloud
+- **Protocollo**: API compatibile OpenAI (`https://api.minimaxi.com/v1`)
+- **Autenticazione**: Bearer token (chiave API)
+- **Funzionalità**: Streaming, chiamate strumento, supporto visione per modello
+- **Finestra di contesto**: 1.048.576 token
+- **Configurazione**: `apiKey`, `model`
+
+### MoonshotClient (Kimi)
+
+- **Tipo**: Servizio AI cloud
+- **Protocollo**: API compatibile OpenAI (`https://api.moonshot.cn/v1`)
+- **Autenticazione**: Bearer token (chiave API)
+- **Funzionalità**: Streaming, chiamate strumento, supporto visione per modello
+- **Finestra di contesto**: 262.144 token
+- **Configurazione**: `apiKey`, `model`
+
+### SiliconFlowClient
+
+- **Tipo**: Servizio AI cloud (piattaforma di aggregazione)
+- **Protocollo**: API compatibile OpenAI (`https://api.siliconflow.cn/v1`)
+- **Autenticazione**: Bearer token (chiave API)
+- **Funzionalità**: Streaming, chiamate strumento, supporto visione per modello, lista dinamica dei modelli disponibili (interfaccia /models)
+- **Finestra di contesto**: 1.048.576 token
+- **Configurazione**: `apiKey`, `model`
+
 ### Pattern Factory dei Client
 
 Ogni tipo di client AI ha una corrispondente implementazione factory `IAIClientFactory`:
@@ -301,6 +365,13 @@ Ogni tipo di client AI ha una corrispondente implementazione factory `IAIClientF
 - `HerdsmanClientFactory` — Crea istanze di HerdsmanClient
 - `LongCatClientFactory` — Crea istanze di LongCatClient
 - `QiniuAIClientFactory` — Crea istanze di QiniuAIClient
+- `DeepSeekClientFactory` — Crea istanze di DeepSeekClient
+- `ZhipuClientFactory` — Crea istanze di ZhipuClient
+- `ErnieClientFactory` — Crea istanze di ErnieClient
+- `HunyuanClientFactory` — Crea istanze di HunyuanClient
+- `MiniMaxClientFactory` — Crea istanze di MiniMaxClient
+- `MoonshotClientFactory` — Crea istanze di MoonshotClient
+- `SiliconFlowClientFactory` — Crea istanze di SiliconFlowClient
 
 La factory fornisce:
 - `CreateClient(Dictionary<string, object> config)` — Istanzia un client dalla configurazione
@@ -336,18 +407,18 @@ L'interfaccia `IAIClient` definisce gli attributi di dichiarazione delle capacit
 |------|------|------|------|
 | Ollama | ✅ | Locale | Servizio AI locale, supporta distribuzione di modelli locali |
 | DashScope (Alibaba Cloud Bailian) | ✅ | Cloud | Servizio AI Alibaba Cloud Bailian, supporta distribuzione multi-regione |
-| Baidu Qianfan (Wenxin Yiyan) | 📋 | Cloud | Servizio AI Baidu Wenxin Yiyan |
-| Zhipu AI (GLM) | 📋 | Cloud | Servizio AI Zhipu Qingyan |
-| Moonshot (Kimi) | 📋 | Cloud | Servizio AI Moonshot Kimi |
+| Baidu Qianfan (Wenxin Yiyan) | ✅ | Cloud | Servizio AI Baidu Wenxin Yiyan — ErnieClient |
+| Zhipu AI (GLM) | ✅ | Cloud | Servizio AI Zhipu Qingyan — ZhipuClient |
+| Moonshot (Kimi) | ✅ | Cloud | Servizio AI Moonshot Kimi — MoonshotClient |
 | Volcengine Ark Doubao | ✅ | Cloud | Servizio AI ByteDance Doubao |
 | Herdsman | ✅ | Locale/Cloud | Motore di inferenza senza autenticazione, compatibile con il formato API OpenAI |
 | Meituan LongCat | ✅ | Cloud | Modello di grandi dimensioni sviluppato autonomamente da Meituan, compatibile con il formato API OpenAI, autenticazione con chiave API |
 | Qiniu Cloud AI | ✅ | Cloud | Servizio di inferenza di modelli di grandi dimensioni di Qiniu Cloud, compatibile con il formato API OpenAI, autenticazione con chiave API |
-| DeepSeek (Connessione diretta) | 📋 | Cloud | Servizio AI DeepSeek |
+| DeepSeek (Connessione diretta) | ✅ | Cloud | Servizio AI DeepSeek — DeepSeekClient, supporta modalità thinking |
 | 01.AI | ⚠️ | Cloud | Servizio AI 01.AI (Deprecato: registrazione nuovi utenti interrotta) |
-| Tencent Hunyuan | 📋 | Cloud | Servizio AI Tencent Hunyuan |
-| SiliconFlow | 📋 | Cloud | Servizio AI SiliconFlow |
-| MiniMax | 📋 | Cloud | Servizio AI MiniMax |
+| Tencent Hunyuan | ✅ | Cloud | Servizio AI Tencent Hunyuan — HunyuanClient, endpoint doppio TokenHub/Legacy |
+| SiliconFlow | ✅ | Cloud | Servizio AI SiliconFlow — SiliconFlowClient, lista dinamica modelli |
+| MiniMax | ✅ | Cloud | Servizio AI MiniMax — MiniMaxClient |
 | OpenAI | 💡 | Cloud | Servizio API OpenAI (serie GPT) |
 | Anthropic | 💡 | Cloud | Servizio AI Anthropic Claude |
 | Google DeepMind | 💡 | Cloud | Servizio AI Google Gemini |

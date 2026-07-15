@@ -284,7 +284,7 @@ public class MyCustomSkin : ISkin
 
 ```
 SiliconLife.Common/
-├── AI/                    # Implementace AI klientů a továren
+├── AI/                    # Implementace AI klientů a továren (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow)
 ├── Calendar/              # 32 implementací kalendáře
 ├── Localization/          # Základ lokalizace a 34 jazykových variant
 ├── Security/              # Správce oprávnění

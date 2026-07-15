@@ -36,6 +36,13 @@
 - **牧馬人推理引擎**（可選，本地/雲端推理） - 無需認證，相容 OpenAI API 格式
 - **美團 LongCat API 金鑰**（可選，用於雲端 AI） - API Key 認證
 - **七牛雲 AI API 金鑰**（可選，用於雲端 AI） - API Key 認證
+- **DeepSeek API 金鑰**（可選，用於雲端 AI） - [申請](https://platform.deepseek.com/)
+- **智譜 AI API 金鑰**（可選，用於雲端 AI） - [申請](https://open.bigmodel.cn/)
+- **百度千帆 API 金鑰**（可選，用於雲端 AI） - [申請](https://qianfan.baidubce.com/)
+- **騰訊混元 API 金鑰**（可選，用於雲端 AI） - [申請](https://cloud.tencent.com/product/hunyuan)
+- **MiniMax API 金鑰**（可選，用於雲端 AI） - [申請](https://api.minimaxi.com/)
+- **月之暗面 API 金鑰**（可選，用於雲端 AI） - [申請](https://platform.moonshot.cn/)
+- **矽基流動 API 金鑰**（可選，用於雲端 AI） - [申請](https://siliconflow.cn/)
 
 ## 快速開始
 
@@ -143,6 +150,111 @@ dotnet build
   }
 }
 ```
+
+#### 選項 G：DeepSeek（雲端）
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "your-api-key-here",
+      "Model": "deepseek-chat"
+    }
+  }
+}
+```
+
+> **特點**：支援 thinking 模式（reasoning_content），1,048,576 上下文視窗。
+
+#### 選項 H：智譜 GLM（雲端）
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "your-api-key-here",
+      "Model": "glm-4-plus"
+    }
+  }
+}
+```
+
+> **特點**：支援 thinking 模式，按模型判斷視覺支援，1,048,576 上下文視窗。
+
+#### 選項 I：百度千帆/文心一言（雲端）
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "your-api-key-here",
+      "Model": "ernie-4.0-8k"
+    }
+  }
+}
+```
+
+> **特點**：百度千帆平臺，131,072 上下文視窗。
+
+#### 選項 J：騰訊混元（雲端）
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "your-api-key-here",
+      "Model": "hy3"
+    }
+  }
+}
+```
+
+> **特點**：雙端點（TokenHub 推薦 / Legacy），推薦 hy3 模型，262,144 上下文視窗。
+
+#### 選項 K：MiniMax（雲端）
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "your-api-key-here",
+      "Model": "MiniMax-Text-01"
+    }
+  }
+}
+```
+
+> **特點**：1,048,576 上下文視窗。
+
+#### 選項 L：月之暗面 Kimi（雲端）
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "your-api-key-here",
+      "Model": "moonshot-v1-auto"
+    }
+  }
+}
+```
+
+> **特點**：262,144 上下文視窗。
+
+#### 選項 M：矽基流動（雲端）
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "your-api-key-here",
+      "Model": "Qwen/Qwen2.5-7B-Instruct"
+    }
+  }
+}
+```
+
+> **特點**：聚合平臺，支援動態取得可用模型清單，1,048,576 上下文視窗。
 
 ### 4. 執行應用程式
 

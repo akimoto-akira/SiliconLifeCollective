@@ -290,6 +290,87 @@ Markdown-файл (`soul.md`), хранящийся в каталоге данн
 - **Конфигурация**: `apiKey`, `endpoint`, `model`
 - **Особенности**: AI-сервис ByteDance, поддержка различных моделей Doubao
 
+### DeepSeekClient (DeepSeek)
+
+- **Тип**: облачный AI-сервис
+- **Протокол**: API, совместимый с OpenAI (`/chat/completions`)
+- **Аутентификация**: Bearer token (API-ключ)
+- **Endpoint**: `https://api.deepseek.com`
+- **Функции**: потоковая передача, вызов инструментов, режим thinking (reasoning_content), управление reasoning_effort
+- **Контекстное окно**: до 1M токенов (deepseek-v4), 131K для остальных моделей
+- **Модель по умолчанию**: `deepseek-v4-flash`
+- **Конфигурация**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`, `reasoningEffort`
+
+### ZhipuClient (智谱 GLM)
+
+- **Тип**: облачный AI-сервис
+- **Протокол**: API, совместимый с OpenAI (`/chat/completions`)
+- **Аутентификация**: Bearer token (API-ключ)
+- **Endpoint**: `https://open.bigmodel.cn/api/paas/v4`
+- **Функции**: потоковая передача, вызов инструментов, режим thinking (только GLM-5), vision (glm-4v/glm-5v)
+- **Контекстное окно**: 1M для glm-5.2/glm-4-long, 204K для glm-4.7/glm-4.6, 131K для остальных
+- **Модель по умолчанию**: `glm-4-flash` (бесплатная)
+- **Конфигурация**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`
+
+### ErnieClient (Baidu/Qianfan)
+
+- **Тип**: облачный AI-сервис
+- **Протокол**: Qianfan v2 OpenAI-совместимый API (`/chat/completions`)
+- **Аутентификация**: Bearer token (API-ключ)
+- **Endpoint**: `https://qianfan.baidubce.com/v2`
+- **Функции**: потоковая передача, вызов инструментов, vision (ernie-5)
+- **Контекстное окно**: 131K для ernie-5, 8K для ernie-4/3.5/speed/tiny
+- **Модель по умолчанию**: `ernie-5.1`
+- **Бесплатные модели**: `ernie-speed`, `ernie-tiny`
+- **Конфигурация**: `apiKey`, `endpoint`, `model`
+
+### HunyuanClient (Tencent)
+
+- **Тип**: облачный AI-сервис
+- **Протокол**: API, совместимый с OpenAI (`/chat/completions`)
+- **Аутентификация**: Bearer token (API-ключ)
+- **Endpoint**: двойной endpoint
+  - **TokenHub** (рекомендуется): `https://tokenhub.tencentmaas.com/v1`
+  - **Legacy**: `https://api.hunyuan.cloud.tencent.com/v1`
+- **Функции**: потоковая передача, вызов инструментов (hy3/hunyuan-turbos/hunyuan-t1), режим thinking (hy3/hy-2.0)
+- **Контекстное окно**: 262K для hy3/hunyuan-lite/hunyuan-t1, 131K для hunyuan-turbos/a13b
+- **Модель по умолчанию**: `hy3`
+- **Конфигурация**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`
+
+### MiniMaxClient
+
+- **Тип**: облачный AI-сервис
+- **Протокол**: API, совместимый с OpenAI (`/chat/completions`)
+- **Аутентификация**: Bearer token (API-ключ)
+- **Endpoint**: `https://api.minimaxi.com/v1`
+- **Функции**: потоковая передача, вызов инструментов, режим thinking с reasoning_split, multimodal (M3: изображение + видео)
+- **Контекстное окно**: 1M для M3/M1, 196K для M2.7/M2, 204K для M2.5/M2.1
+- **Модель по умолчанию**: `MiniMax-M3`
+- **Конфигурация**: `apiKey`, `endpoint`, `model`
+
+### MoonshotClient (Kimi)
+
+- **Тип**: облачный AI-сервис
+- **Протокол**: API, совместимый с OpenAI (`/chat/completions`)
+- **Аутентификация**: Bearer token (API-ключ)
+- **Endpoint**: `https://api.moonshot.cn/v1`
+- **Функции**: потоковая передача, вызов инструментов, режим thinking (kimi-k2.7), vision (kimi-k2.5/k2.6/k2.7)
+- **Контекстное окно**: 262K для kimi-k2, 131K для v1-128k
+- **Модель по умолчанию**: `kimi-k2.6`
+- **Конфигурация**: `apiKey`, `endpoint`, `model`
+
+### SiliconFlowClient
+
+- **Тип**: облачный AI-сервис (агрегатор моделей)
+- **Протокол**: API, совместимый с OpenAI (`/chat/completions`)
+- **Аутентификация**: Bearer token (API-ключ)
+- **Endpoint**: `https://api.siliconflow.cn/v1`
+- **Функции**: потоковая передача, вызов инструментов, содержимое рассуждений (reasoning_content)
+- **Контекстное окно**: до 1M токенов (зависит от модели)
+- **Модель по умолчанию**: `deepseek-ai/DeepSeek-V3.2`
+- **Особенности**: агрегирует 100+ моделей открытого исходного кода от нескольких провайдеров, динамический список моделей, поддержка префикса `pro/` для профессиональных моделей
+- **Конфигурация**: `apiKey`, `endpoint`, `model`
+
 ### Паттерн фабрики клиентов
 
 Каждый тип AI-клиента имеет соответствующую реализацию фабрики `IAIClientFactory`:
@@ -300,6 +381,13 @@ Markdown-файл (`soul.md`), хранящийся в каталоге данн
 - `HerdsmanClientFactory` — создаёт экземпляры HerdsmanClient
 - `LongCatClientFactory` — создаёт экземпляры LongCatClient
 - `QiniuAIClientFactory` — создаёт экземпляры QiniuAIClient
+- `DeepSeekClientFactory` — создаёт экземпляры DeepSeekClient
+- `ZhipuClientFactory` — создаёт экземпляры ZhipuClient
+- `ErnieClientFactory` — создаёт экземпляры ErnieClient
+- `HunyuanClientFactory` — создаёт экземпляры HunyuanClient
+- `MiniMaxClientFactory` — создаёт экземпляры MiniMaxClient
+- `MoonshotClientFactory` — создаёт экземпляры MoonshotClient
+- `SiliconFlowClientFactory` — создаёт экземпляры SiliconFlowClient
 
 Фабрика предоставляет:
 - `CreateClient(Dictionary<string, object> config)` — создание экземпляра клиента из конфигурации
@@ -335,18 +423,18 @@ Markdown-файл (`soul.md`), хранящийся в каталоге данн
 |------|------|------|------|
 | Ollama | ✅ | Локальный | Локальный AI-сервис, поддержка локального развёртывания моделей |
 | DashScope (Alibaba Cloud Bailian) | ✅ | Облачный | AI-сервис Alibaba Cloud Bailian, поддержка развёртывания в нескольких регионах |
-| Baidu Qianfan (Wenxin Yiyan) | 📋 | Облачный | AI-сервис Baidu Wenxin Yiyan |
-| Zhipu AI (GLM) | 📋 | Облачный | AI-сервис Zhipu Qingyan |
-| Moonshot (Kimi) | 📋 | Облачный | AI-сервис Moonshot Kimi |
+| Baidu Qianfan (ErnieClient) | ✅ | Облачный | AI-сервис Baidu Wenxin Yiyan, Qianfan v2 OpenAI-совместимый API, 131K контекст |
+| Zhipu AI (GLM) | ✅ | Облачный | AI-сервис Zhipu Qingyan, режим thinking, vision по модели, 1M контекст |
+| Moonshot (Kimi) | ✅ | Облачный | AI-сервис Moonshot Kimi, режим thinking, multimodal, 262K контекст |
 | Volcengine Ark Doubao | ✅ | Облачный | AI-сервис ByteDance Doubao |
 | Herdsman | ✅ | Локальный/Облачный | Движок вывода без аутентификации, совместимый с форматом OpenAI API |
 | Meituan LongCat | ✅ | Облачный | Собственная большая модель Meituan, совместимая с форматом OpenAI API, аутентификация по API Key |
 | Qiniu Cloud AI | ✅ | Облачный | Сервис вывода большой модели Qiniu Cloud, совместимый с форматом OpenAI API, аутентификация по API Key |
-| DeepSeek (прямое подключение) | 📋 | Облачный | AI-сервис DeepSeek |
-| 01.AI (Yi) | ⚠️ | Облачный | AI-сервис 01.AI (Устарело: регистрация новых пользователей остановлена) |
-| Tencent Hunyuan | 📋 | Облачный | AI-сервис Tencent Hunyuan |
-| SiliconFlow | 📋 | Облачный | AI-сервис SiliconFlow |
-| MiniMax | 📋 | Облачный | AI-сервис MiniMax |
+| DeepSeek (прямое подключение) | ✅ | Облачный | AI-сервис DeepSeek, режим thinking, 1M контекст |
+| 01.AI (Yi) | ⚠️ | Облачный | AI-сервис 01.AI (Устарело: регистрация новых пользователей закрыта) |
+| Tencent Hunyuan | ✅ | Облачный | AI-сервис Tencent Hunyuan, двойной endpoint (TokenHub + Legacy), 262K контекст |
+| SiliconFlow | ✅ | Облачный | AI-сервис SiliconFlow, динамический список моделей, 1M контекст |
+| MiniMax | ✅ | Облачный | AI-сервис MiniMax, thinking с reasoning_split, multimodal (M3), 1M контекст |
 | OpenAI | 💡 | Облачный | OpenAI API (серия GPT) |
 | Anthropic | 💡 | Облачный | AI-сервис Anthropic Claude |
 | Google DeepMind | 💡 | Облачный | AI-сервис Google Gemini |

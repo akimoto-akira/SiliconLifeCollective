@@ -61,6 +61,22 @@ Les deux versions partagent les mêmes interfaces et fonctionnalités, ne diffé
 
 ## [Non publié]
 
+### 2026-05-27
+
+#### Nouvelles fonctionnalités
+- Implémentation de 7 nouveaux clients IA, portant le total à 13 backends IA pris en charge :
+  - **DeepSeekClient** — Service IA DeepSeek, mode thinking activé par défaut, contrôle de l'effort de raisonnement, 1M contexte (`https://api.deepseek.com`)
+  - **ZhipuClient (GLM)** — Service IA Zhipu GLM, mode thinking (GLM-5), vision par modèle, modèle gratuit `glm-4-flash`, 1M contexte (`https://open.bigmodel.cn/api/paas/v4`)
+  - **ErnieClient (Baidu/Qianfan)** — Service IA Baidu ERNIE, 131K contexte, modèles gratuits `ernie-speed`/`ernie-tiny` (`https://qianfan.baidubce.com/v2`)
+  - **HunyuanClient (Tencent)** — Service IA Tencent Hunyuan, double endpoint TokenHub + Legacy, mode thinking, 262K contexte (`https://tokenhub.tencentmaas.com/v1` / `https://api.hunyuan.cloud.tencent.com/v1`)
+  - **MiniMaxClient** — Service IA MiniMax, multimodal natif M3 (image + vidéo), mode thinking adaptatif, 1M contexte (`https://api.minimaxi.com/v1`)
+  - **MoonshotClient (Kimi)** — Service IA Moonshot Kimi, mode thinking, vision, 262K contexte (`https://api.moonshot.cn/v1`)
+  - **SiliconFlowClient** — Service IA SiliconFlow, agrégateur de 100+ modèles open source, liste de modèles dynamique, 1M contexte (`https://api.siliconflow.cn/v1`)
+- Marquage de 01.AI (Yi) comme obsolète (⚠️) : inscription des nouveaux utilisateurs arrêtée
+
+#### Documentation
+- Mise à jour de la documentation française (fr-FR) pour refléter les 7 nouveaux clients IA
+
 ### 2026-05-26
 
 #### Nouvelles fonctionnalités

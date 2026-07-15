@@ -37,6 +37,13 @@
   - **Herdsman** — silnik wnioskowania bez autoryzacji, kompatybilny z formatem OpenAI API
   - **Meituan LongCat** — autorski duży model Meituan, kompatybilny z formatem OpenAI API, autoryzacja przez klucz API
   - **Qiniu Cloud AI** — chmurowa usługa wnioskowania dużych modeli Qiniu Cloud, kompatybilna z formatem OpenAI API, autoryzacja przez klucz API
+  - **DeepSeek** — chmurowa usługa AI, tryb thinking z łańcuchem rozumowania, okno kontekstu 1M tokenów
+  - **Zhipu AI (GLM)** — chmurowa usługa AI, tryb thinking (seria GLM-5), wizja wg modelu, okno kontekstu 1M tokenów
+  - **Ernie (Baidu Qianfan)** — chmurowa usługa AI Baidu Wenxin, API kompatybilne z OpenAI, okno kontekstu 131K tokenów
+  - **Hunyuan (Tencent)** — chmurowa usługa AI Tencent, podwójny endpoint (TokenHub + Legacy), okno kontekstu 262K tokenów
+  - **MiniMax** — chmurowa usługa AI, adaptacyjny tryb thinking, okno kontekstu 1M tokenów
+  - **Moonshot (Kimi)** — chmurowa usługa AI Moonshot Kimi, tryb thinking, okno kontekstu 262K tokenów
+  - **SiliconFlow** — chmurowa usługa AI (agregator), dynamiczna lista ponad 100 modeli, okno kontekstu do 1M tokenów
 - **32 systemy kalendarzowe** — pełne pokrycie głównych kalendarzy świata, w tym gregoriański, chiński księżycowy, islamski, hebrajski, japoński, perski, majański, chińskie kalendarze historyczne itp.
 - **System Sieci Wiedzy** — graf wiedzy oparty na trójkach (podmiot-relacja-obiekt), obsługujący przechowywanie, zapytania i odkrywanie ścieżek
 - **Przestrzeń projektowa** — zarządzanie przestrzenią projektową, obsługa tworzenia/archiwizacji/niszczenia projektów, przypisywania ról, notatek pracy, śledzenia zadań i izolacji uprawnień narzędzi
@@ -121,7 +128,7 @@ Projekt oferuje dwie wersje implementacji, spełniające różne potrzeby scenar
 | Środowisko uruchomieniowe | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Język programowania | C# | C# |
 | Typ aplikacji | Aplikacja konsolowa | Aplikacja desktopowa (Windows/macOS zasobnik systemowy / Linux okno statusu) |
-| Integracja AI | Ollama (lokalna), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (lokalna), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura), Herdsman, Meituan LongCat, Qiniu Cloud AI |
+| Integracja AI | Ollama (lokalna), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI GLM, Ernie Baidu Qianfan, Tencent Hunyuan, MiniMax, Moonshot Kimi, SiliconFlow | Ollama (lokalna), Alibaba Cloud Bailian (chmura), Volcengine Ark (chmura), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI GLM, Ernie Baidu Qianfan, Tencent Hunyuan, MiniMax, Moonshot Kimi, SiliconFlow |
 | Przechowywanie danych | System plików (JSON + katalogi indeksowane czasowo) | SpeedyPack (format .spk, mapowanie pamięci + asynchroniczna trwałość) |
 | Serwer Web | HttpListener (wbudowany w .NET) | HttpListener (wbudowany w .NET) |
 | Kompilacja dynamiczna | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -159,7 +166,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Globalny lokalizator usług
 │   │
 │   ├── SiliconLife.Common/                # Współdzielone implementacje (wspólne dla obu wersji)
-│   │   ├── AI/                            # Klienci AI i fabryki (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
+│   │   ├── AI/                            # Klienci AI i fabryki (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow)
 │   │   ├── Calendar/                      # 32 implementacje kalendarzy
 │   │   ├── Localization/                  # Baza lokalizacji i 34 implementacje wariantów językowych/regionalnych
 │   │   ├── Resources/                     # Współdzielone pliki zasobów

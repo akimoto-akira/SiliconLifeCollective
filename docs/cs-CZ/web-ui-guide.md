@@ -127,6 +127,13 @@ Konfigurace AI backendu:
 - Herdsman (lokální/cloud, bez autentizace)
 - Meituan LongCat (cloud)
 - Qiniu Cloud AI (cloud)
+- DeepSeek (cloud, thinking mode, 1M kontext)
+- Zhipu AI / GLM (cloud, thinking, vision, 1M kontext)
+- Baidu Qianfan / Ernie (cloud, bezplatné modely, 131K kontext)
+- Tencent Hunyuan (cloud, duální endpoint, 262K kontext)
+- MiniMax (cloud, domácí/mezinárodní endpoint, 1M kontext)
+- Moonshot / Kimi (cloud, thinking, multimodální, 262K kontext)
+- SiliconFlow (cloud, agregátor 100+ modelů, 1M kontext)
 - Vlastní klienti
 
 ### Nastavení úložiště

@@ -36,6 +36,13 @@ Dieses Projekt bietet zwei Implementierungsversionen:
 - **Herdsman** (optional, lokale/Cloud-Inferenz-Engine) — Keine Authentifizierung, kompatibel mit OpenAI-API-Format
 - **Meituan LongCat API-Schlüssel** (optional, für Cloud-KI) — API-Schlüssel-Authentifizierung
 - **Qiniu Cloud AI API-Schlüssel** (optional, für Cloud-KI) — API-Schlüssel-Authentifizierung
+- **DeepSeek API-Schlüssel** (optional, für Cloud-KI) — [Beantragen](https://platform.deepseek.com/)
+- **Zhipu AI API-Schlüssel** (optional, für Cloud-KI) — [Beantragen](https://open.bigmodel.cn/)
+- **Baidu Qianfan API-Schlüssel** (optional, für Cloud-KI) — [Beantragen](https://qianfan.baidubce.com/)
+- **Tencent Hunyuan API-Schlüssel** (optional, für Cloud-KI) — [Beantragen](https://console.cloud.tencent.com/hunyuan)
+- **MiniMax API-Schlüssel** (optional, für Cloud-KI) — [Beantragen](https://platform.minimaxi.com/)
+- **Moonshot (Kimi) API-Schlüssel** (optional, für Cloud-KI) — [Beantragen](https://platform.moonshot.cn/)
+- **SiliconFlow API-Schlüssel** (optional, für Cloud-KI) — [Beantragen](https://cloud.siliconflow.cn/)
 
 ## Schnellstart
 
@@ -143,6 +150,118 @@ Bearbeiten Sie `src/SiliconLife.Default/Config/DefaultConfigData.cs` oder änder
   }
 }
 ```
+
+#### Option G: DeepSeek (Cloud)
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "api-schlüssel",
+      "Endpoint": "https://api.deepseek.com",
+      "Model": "deepseek-v4-flash"
+    }
+  }
+}
+```
+
+> **Funktionen**: Thinking-Modus (reasoning_content), konfigurierbare Schlussfolgerungsstärke, bis zu 1M Tokens Kontext (deepseek-v4-Serie).
+
+#### Option H: Zhipu AI / GLM (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "api-schlüssel",
+      "Endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "Model": "glm-4-flash"
+    }
+  }
+}
+```
+
+> **Funktionen**: Thinking-Modus (GLM-5-Serie), Vision (modellabhängig), kostenloses Modell `glm-4-flash`, bis zu 1M Tokens Kontext.
+
+#### Option I: Baidu Qianfan / ERNIE (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "api-schlüssel",
+      "Endpoint": "https://qianfan.baidubce.com/v2",
+      "Model": "ernie-5.1"
+    }
+  }
+}
+```
+
+> **Funktionen**: Qianfan v2 OpenAI-kompatible API, Vision (ERNIE-5), kostenlose Modelle `ernie-speed`/`ernie-tiny`, bis zu 131K Tokens Kontext.
+
+#### Option J: Tencent Hunyuan (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "api-schlüssel",
+      "Endpoint": "https://tokenhub.tencentmaas.com/v1",
+      "Model": "hy3"
+    }
+  }
+}
+```
+
+> **Funktionen**: Dual-Endpunkte (TokenHub empfohlen + Legacy), Thinking-Modus (hy3, hy-2.0), Werkzeugaufrufe (modellabhängig), bis zu 262K Tokens Kontext.
+
+#### Option K: MiniMax (Cloud)
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "api-schlüssel",
+      "Endpoint": "https://api.minimaxi.com/v1",
+      "Model": "MiniMax-M3"
+    }
+  }
+}
+```
+
+> **Funktionen**: Thinking-Modus mit reasoning_split (adaptiv bei M3), Vision (M3: Bild + Video), bis zu 1M Tokens Kontext.
+
+#### Option L: Moonshot / Kimi (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "api-schlüssel",
+      "Endpoint": "https://api.moonshot.cn/v1",
+      "Model": "kimi-k2.6"
+    }
+  }
+}
+```
+
+> **Funktionen**: Thinking-Modus (kimi-k2.7: enabled+keep=all), Vision (kimi-k2.5+), bis zu 262K Tokens Kontext.
+
+#### Option M: SiliconFlow (Cloud, Modell-Aggregator)
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "api-schlüssel",
+      "Endpoint": "https://api.siliconflow.cn/v1",
+      "Model": "deepseek-ai/DeepSeek-V3.2"
+    }
+  }
+}
+```
+
+> **Funktionen**: Aggregiert 100+ Open-Source-Modelle von mehreren Anbietern, dynamische Modellliste, Reasoning-Inhalte, Vision (modellabhängig), bis zu 1M Tokens Kontext.
 
 ### 4. Anwendung ausführen
 

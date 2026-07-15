@@ -34,6 +34,13 @@
 - **Multiple AI Backend Support**
   - **Ollama** — Local model deployment, using native HTTP API
   - **Alibaba Cloud DashScope (Bailian)** — Cloud AI service, OpenAI API compatible, supporting 13+ models, multi-region deployment
+  - **DeepSeek** — Cloud AI service, thinking mode, reasoning effort control, up to 1M context window
+  - **Zhipu AI (GLM)** — Cloud AI service, thinking mode (GLM-5), vision by model, free model (glm-4-flash), up to 1M context window
+  - **Ernie (Baidu/Qianfan)** — Cloud AI service via Qianfan v2, free models (ernie-speed, ernie-tiny), up to 131K context window
+  - **Tencent Hunyuan** — Cloud AI service, dual endpoints (TokenHub + Legacy), thinking mode, up to 262K context window
+  - **MiniMax** — Cloud AI service, thinking mode with reasoning_split, M3 multimodal, up to 1M context window
+  - **Moonshot (Kimi)** — Cloud AI service, thinking mode, multimodal, up to 262K context window
+  - **SiliconFlow** — Cloud AI service, dynamic model list aggregation (100+ models), up to 1M context window
   - **Volcengine Ark** — ByteDance cloud AI service, supporting streaming and non-streaming modes, built-in rate control
   - **Herdsman** — Authentication-free inference engine, compatible with OpenAI API format
   - **Meituan LongCat** — Meituan's self-developed large model, compatible with OpenAI API format, API key authentication
@@ -122,7 +129,7 @@ This project provides two implementation versions to meet different scenario nee
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programming Language | C# | C# |
 | Application Type | Console application | Desktop application (Windows/macOS system tray / Linux status window) |
-| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (local), Alibaba Cloud DashScope (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
+| AI Integration | Ollama (local), Alibaba Cloud DashScope (cloud), DeepSeek, Zhipu AI (GLM), Ernie/Baidu Qianfan, Tencent Hunyuan, MiniMax, Moonshot/Kimi, SiliconFlow, Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (local), Alibaba Cloud DashScope (cloud), DeepSeek, Zhipu AI (GLM), Ernie/Baidu Qianfan, Tencent Hunyuan, MiniMax, Moonshot/Kimi, SiliconFlow, Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
 | Data Storage | File system (JSON + time-indexed directories) | SpeedyPack (.spk format, memory mapping + asynchronous persistence) |
 | Web Server | HttpListener (.NET built-in) | HttpListener (.NET built-in) |
 | Dynamic Compilation | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -160,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Global service locator
 │   │
 │   ├── SiliconLife.Common/                # Shared implementation (used by both versions)
-│   │   ├── AI/                            # AI clients and factories (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
+│   │   ├── AI/                            # AI clients and factories (Ollama, DashScope, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow, VolcengineArk, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32 calendar implementations
 │   │   ├── Localization/                  # Localization base classes and 34 language/region variant implementations
 │   │   ├── Resources/                     # Shared resource files
@@ -266,6 +273,13 @@ Tool Call → Executor → Permission Manager → [Frequency Cache → Callback 
   - **Herdsman**: No authentication required, compatible with OpenAI API format
   - **Meituan LongCat**: Get API key from Meituan platform
   - **Qiniu Cloud AI**: Get API key from [Qiniu Console](https://portal.qiniu.com/)
+  - **DeepSeek**: Get API key from [DeepSeek Platform](https://platform.deepseek.com/)
+  - **Zhipu AI (GLM)**: Get API key from [Zhipu Open Platform](https://open.bigmodel.cn/)
+  - **Baidu Qianfan**: Get API key from [Qianfan Console](https://console.bce.baidu.com/qianfan/)
+  - **Tencent Hunyuan**: Get API key from [Tencent Cloud](https://cloud.tencent.com/product/hunyuan)
+  - **MiniMax**: Get API key from [MiniMax Platform](https://platform.minimaxi.com/)
+  - **Moonshot (Kimi)**: Get API key from [Moonshot Platform](https://platform.moonshot.cn/)
+  - **SiliconFlow**: Get API key from [SiliconFlow Cloud](https://cloud.siliconflow.cn/)
 
 ### Build the Project
 

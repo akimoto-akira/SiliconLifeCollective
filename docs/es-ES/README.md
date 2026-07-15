@@ -38,6 +38,13 @@
   - **Herdsman** — Motor de inferencia sin autenticación, compatible con el formato API OpenAI
   - **Meituan LongCat** — Gran modelo de desarrollo propio de Meituan, compatible con el formato API OpenAI, autenticación por clave API
   - **Qiniu Cloud AI** — Servicio de IA en la nube de Qiniu, autenticación por clave API
+  - **DeepSeek** — Servicio de IA DeepSeek, soporta modo thinking, ventana de contexto 1M
+  - **Zhipu AI (GLM)** — Servicio de IA Zhipu Qingyan, modo thinking y visión por modelo, modelo gratuito glm-4-flash
+  - **Baidu Qianfan (Wenxin)** — Servicio de IA Wenxin de Baidu, API Qianfan v2, modelos gratuitos disponibles
+  - **Tencent Hunyuan** — Servicio de IA Hunyuan de Tencent, doble endpoint TokenHub+Legacy, ventana de contexto 262K
+  - **MiniMax** — Servicio de IA MiniMax, modo thinking, ventanas nacional/internacional
+  - **Moonshot (Kimi)** — Servicio de IA Kimi de Moonshot, modo thinking y multimodal
+  - **SiliconFlow** — Servicio de IA SiliconFlow, agrega 100+ modelos de código abierto, lista dinámica de modelos
 - **32 sistemas de calendario** — Cobertura completa de los principales calendarios del mundo, incluyendo gregoriano, lunar chino, islámico, hebreo, japonés, persa, maya, calendarios históricos chinos, etc.
 - **Sistema de Red de Conocimiento** — Grafo de conocimiento basado en tripletas (sujeto-relación-objeto), con soporte para almacenamiento, consulta y descubrimiento de rutas
 - **Espacio de trabajo de proyectos** — Gestión de espacios de proyectos, soporta creación/archivado/destrucción de proyectos, asignación de roles, notas de trabajo, seguimiento de tareas y aislamiento de permisos de herramientas
@@ -122,7 +129,7 @@ Este proyecto proporciona dos versiones de implementación para satisfacer difer
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Lenguaje de programación | C# | C# |
 | Tipo de aplicación | Aplicación de consola | Aplicación de escritorio (bandeja del sistema en Windows/macOS / ventana de estado en Linux) |
-| Integración de IA | Ollama (local), Alibaba Cloud Bailian (nube), Volcengine Ark (nube), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (local), Alibaba Cloud Bailian (nube), Volcengine Ark (nube), Herdsman, Meituan LongCat, Qiniu Cloud AI |
+| Integración de IA | Ollama (local), Alibaba Cloud Bailian (nube), Volcengine Ark (nube), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI (GLM), Baidu Qianfan (Wenxin), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow | Ollama (local), Alibaba Cloud Bailian (nube), Volcengine Ark (nube), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI (GLM), Baidu Qianfan (Wenxin), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow |
 | Almacenamiento de datos | Sistema de archivos (JSON + directorio de índice temporal) | SpeedyPack (formato .spk, mapeo en memoria + persistencia asíncrona) |
 | Servidor Web | HttpListener (integrado en .NET) | HttpListener (integrado en .NET) |
 | Compilación dinámica | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -160,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Localizador de servicios global
 │   │
 │   ├── SiliconLife.Common/                # Implementaciones compartidas (usadas por ambas versiones)
-│   │   ├── AI/                            # Clientes y fábricas de IA (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
+│   │   ├── AI/                            # Clientes y fábricas de IA (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow)
 │   │   ├── Calendar/                      # 32 implementaciones de calendario
 │   │   ├── Localization/                  # Clase base de localización y 34 variantes de idioma/región
 │   │   ├── Resources/                     # Archivos de recursos compartidos
@@ -266,6 +273,13 @@ Llamada a herramienta → Ejecutor → Gestor de Permisos → [Caché de frecuen
   - **Herdsman**: Sin autenticación, compatible con el formato API OpenAI
   - **Meituan LongCat**: Obtener una clave API desde la plataforma Meituan
   - **Qiniu Cloud AI**: Obtener una clave API desde la [consola de Qiniu](https://portal.qiniu.com/)
+  - **DeepSeek**: Obtener una clave API desde la [plataforma DeepSeek](https://platform.deepseek.com/)
+  - **Zhipu AI (GLM)**: Obtener una clave API desde la [plataforma BigModel](https://open.bigmodel.cn/)
+  - **Baidu Qianfan (Wenxin)**: Obtener una clave API desde la [consola Qianfan](https://console.bce.baidu.com/qianfan/)
+  - **Tencent Hunyuan**: Obtener una clave API desde la [consola Hunyuan](https://console.cloud.tencent.com/hunyuan/)
+  - **MiniMax**: Obtener una clave API desde la [plataforma MiniMax](https://platform.minimaxi.com/)
+  - **Moonshot (Kimi)**: Obtener una clave API desde la [plataforma Moonshot](https://platform.moonshot.cn/)
+  - **SiliconFlow**: Obtener una clave API desde la [plataforma SiliconFlow](https://cloud.siliconflow.cn/)
 
 ### Construir el Proyecto
 

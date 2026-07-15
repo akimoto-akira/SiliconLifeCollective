@@ -127,6 +127,13 @@ dashboard.onmessage = (event) => {
 - Herdsman (локальный/облачный, без аутентификации)
 - Meituan LongCat (облачный)
 - Qiniu Cloud AI (облачный)
+- DeepSeek (облачный, режим thinking, 1M контекст)
+- Zhipu AI / GLM (облачный, thinking, vision, 1M контекст, бесплатная модель)
+- Baidu Qianfan / Ernie (облачный, 131K контекст, бесплатные модели)
+- Tencent Hunyuan (облачный, двойной endpoint, 262K контекст)
+- MiniMax (облачный, thinking, multimodal M3, 1M контекст)
+- Moonshot / Kimi (облачный, thinking, vision, 262K контекст)
+- SiliconFlow (облачный, агрегатор 100+ моделей, 1M контекст)
 - Пользовательский клиент
 
 ### Настройки хранения

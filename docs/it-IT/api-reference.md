@@ -593,6 +593,34 @@ Restituisce la pagina dell'interfaccia di configurazione del sistema.
       "apiKey": "...",
       "endpoint": "...",
       "model": "..."
+    },
+    "DeepSeek": {
+      "apiKey": "...",
+      "model": "deepseek-chat"
+    },
+    "Zhipu": {
+      "apiKey": "...",
+      "model": "glm-4-plus"
+    },
+    "Ernie": {
+      "apiKey": "...",
+      "model": "ernie-4.0-8k"
+    },
+    "Hunyuan": {
+      "apiKey": "...",
+      "model": "hy3"
+    },
+    "MiniMax": {
+      "apiKey": "...",
+      "model": "MiniMax-Text-01"
+    },
+    "Moonshot": {
+      "apiKey": "...",
+      "model": "moonshot-v1-auto"
+    },
+    "SiliconFlow": {
+      "apiKey": "...",
+      "model": "Qwen/Qwen2.5-7B-Instruct"
     }
   }
 }

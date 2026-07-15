@@ -102,6 +102,102 @@ HTTP 404: Endpoint not found
 3. Confirmer que le paramètre Model utilise l'ID du point de terminaison d'inférence (par ex. `ep-20241212123456-abcde`), et non le nom du modèle
 4. Vérifier que le compte a accès au point de terminaison
 
+#### Problème : Erreur de connexion DeepSeek
+
+**Symptômes** :
+```
+HTTP 401: Unauthorized
+ou
+HTTP 429: Rate limit exceeded
+```
+
+**Solution** :
+1. Vérifier que la clé API est correcte
+2. Vérifier que l'endpoint est correct (`https://api.deepseek.com`)
+3. En cas d'erreur 429, attendre et réessayer (limite de débit atteinte)
+4. Vérifier que le compte dispose de crédits suffisants
+
+#### Problème : Erreur de connexion Zhipu AI (GLM)
+
+**Symptômes** :
+```
+HTTP 401: Unauthorized
+```
+
+**Solution** :
+1. Vérifier que la clé API est correcte
+2. Vérifier que l'endpoint est correct (`https://open.bigmodel.cn/api/paas/v4`)
+3. Vérifier que le modèle est disponible pour votre compte
+
+#### Problème : Erreur de connexion Baidu Qianfan (ERNIE)
+
+**Symptômes** :
+```
+HTTP 401: Unauthorized
+ou
+HTTP 403: Forbidden
+```
+
+**Solution** :
+1. Vérifier que la clé API est correcte
+2. Vérifier que l'endpoint est correct (`https://qianfan.baidubce.com/v2`)
+3. Vérifier que l'application est autorisée à utiliser le modèle demandé
+
+#### Problème : Erreur de connexion Tencent Hunyuan
+
+**Symptômes** :
+```
+HTTP 401: Unauthorized
+```
+
+**Solution** :
+1. Vérifier que la clé API est correcte
+2. Essayer l'autre endpoint : TokenHub (`https://tokenhub.tencentmaas.com/v1`) ou Legacy (`https://api.hunyuan.cloud.tencent.com/v1`)
+3. Vérifier que le modèle est disponible pour votre compte
+
+#### Problème : Erreur de connexion MiniMax
+
+**Symptômes** :
+```
+HTTP 401: Unauthorized
+ou
+base_resp status_code non nul
+```
+
+**Solution** :
+1. Vérifier que la clé API est correcte
+2. Vérifier que l'endpoint est correct (`https://api.minimaxi.com/v1`)
+3. Vérifier le champ `base_resp` dans la réponse pour plus de détails sur l'erreur
+
+#### Problème : Erreur de connexion Moonshot (Kimi)
+
+**Symptômes** :
+```
+HTTP 401: Unauthorized
+ou
+HTTP 429: Rate limit exceeded
+```
+
+**Solution** :
+1. Vérifier que la clé API est correcte
+2. Vérifier que l'endpoint est correct (`https://api.moonshot.cn/v1`)
+3. En cas de timeout, augmenter le délai (les modèles thinking peuvent nécessiter plus de temps)
+
+#### Problème : Erreur de connexion SiliconFlow
+
+**Symptômes** :
+```
+HTTP 401: Unauthorized
+ou
+HTTP 404: Model not found
+```
+
+**Solution** :
+1. Vérifier que la clé API est correcte
+2. Vérifier que l'endpoint est correct (`https://api.siliconflow.cn/v1`)
+3. Vérifier que le nom du modèle inclut le préfixe du fournisseur (par ex. `deepseek-ai/DeepSeek-V3.2`)
+4. Consulter la liste des modèles disponibles sur la plateforme SiliconFlow
+
 ---
 
 ### Problèmes d'exécution

@@ -36,6 +36,13 @@ Questo progetto fornisce due versioni di implementazione:
 - **Herdsman** (opzionale, motore di inferenza locale/cloud) - Senza autenticazione, compatibile con il formato API OpenAI
 - **Chiave API Meituan LongCat** (opzionale, per AI cloud) - Autenticazione con chiave API
 - **Chiave API Qiniu Cloud AI** (opzionale, per AI cloud) - Autenticazione con chiave API
+- **Chiave API DeepSeek** (opzionale, per AI cloud) - [Richiedi](https://platform.deepseek.com/)
+- **Chiave API Zhipu AI** (opzionale, per AI cloud) - [Richiedi](https://open.bigmodel.cn/)
+- **Chiave API Baidu Qianfan** (opzionale, per AI cloud) - [Richiedi](https://qianfan.baidubce.com/)
+- **Chiave API Tencent Hunyuan** (opzionale, per AI cloud) - [Richiedi](https://cloud.tencent.com/product/hunyuan)
+- **Chiave API MiniMax** (opzionale, per AI cloud) - [Richiedi](https://api.minimaxi.com/)
+- **Chiave API Moonshot (Kimi)** (opzionale, per AI cloud) - [Richiedi](https://platform.moonshot.cn/)
+- **Chiave API SiliconFlow** (opzionale, per AI cloud) - [Richiedi](https://cloud.siliconflow.cn/)
 
 ## Inizio Rapido
 
@@ -143,6 +150,111 @@ Modifica `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modifica la con
   }
 }
 ```
+
+#### Opzione G: DeepSeek (Cloud)
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "your-api-key-here",
+      "Model": "deepseek-chat"
+    }
+  }
+}
+```
+
+> **Caratteristiche**: Supporta modalità thinking (reasoning_content), finestra di contesto da 1.048.576 token.
+
+#### Opzione H: Zhipu GLM (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "your-api-key-here",
+      "Model": "glm-4-plus"
+    }
+  }
+}
+```
+
+> **Caratteristiche**: Supporta modalità thinking, supporto visione per modello, finestra di contesto da 1.048.576 token.
+
+#### Opzione I: Baidu Qianfan/Wenxin Yiyan (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "your-api-key-here",
+      "Model": "ernie-4.0-8k"
+    }
+  }
+}
+```
+
+> **Caratteristiche**: Piattaforma Baidu Qianfan, finestra di contesto da 131.072 token.
+
+#### Opzione J: Tencent Hunyuan (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "your-api-key-here",
+      "Model": "hy3"
+    }
+  }
+}
+```
+
+> **Caratteristiche**: Endpoint doppio (TokenHub raccomandato / Legacy), modello raccomandato hy3, finestra di contesto da 262.144 token.
+
+#### Opzione K: MiniMax (Cloud)
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "your-api-key-here",
+      "Model": "MiniMax-Text-01"
+    }
+  }
+}
+```
+
+> **Caratteristiche**: Finestra di contesto da 1.048.576 token.
+
+#### Opzione L: Moonshot Kimi (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "your-api-key-here",
+      "Model": "moonshot-v1-auto"
+    }
+  }
+}
+```
+
+> **Caratteristiche**: Finestra di contesto da 262.144 token.
+
+#### Opzione M: SiliconFlow (Cloud)
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "your-api-key-here",
+      "Model": "Qwen/Qwen2.5-7B-Instruct"
+    }
+  }
+}
+```
+
+> **Caratteristiche**: Piattaforma di aggregazione, lista dinamica dei modelli disponibili, finestra di contesto da 1.048.576 token.
 
 ### 4. Esecuzione dell'applicazione
 

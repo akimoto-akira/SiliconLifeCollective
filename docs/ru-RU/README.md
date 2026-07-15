@@ -37,6 +37,13 @@
   - **Herdsman** — движок вывода без аутентификации, совместимый с форматом OpenAI API
   - **Meituan LongCat** — собственная большая модель Meituan, совместимая с форматом OpenAI API, аутентификация по API Key
   - **Qiniu Cloud AI** — сервис вывода большой модели Qiniu Cloud, совместимый с форматом OpenAI API, аутентификация по API Key
+  - **DeepSeek** — AI-сервис DeepSeek, режим thinking, 1M контекст, аутентификация по API Key
+  - **Zhipu AI (GLM)** — AI-сервис Zhipu Qingyan, режим thinking (GLM-5), vision по модели, 1M контекст, бесплатная модель glm-4-flash
+  - **Baidu Qianfan (Ernie)** — AI-сервис Baidu Wenxin, Qianfan v2 OpenAI-совместимый API, 131K контекст, бесплатные модели
+  - **Tencent Hunyuan** — AI-сервис Tencent Hunyuan, двойной endpoint (TokenHub + Legacy), режим thinking, 262K контекст
+  - **MiniMax** — AI-сервис MiniMax, thinking с reasoning_split, multimodal (M3), 1M контекст
+  - **Moonshot (Kimi)** — AI-сервис Moonshot Kimi, режим thinking, vision, 262K контекст
+  - **SiliconFlow** — агрегатор 100+ моделей открытого исходного кода, динамический список моделей, 1M контекст
 - **Обнаружение возможностей AI-клиента** — интерфейс IAIClient поддерживает объявление потокового режима, вызова инструментов, визуального ввода, аудиоввода, размера контекстного окна и других возможностей; ContextManager адаптивно настраивает поведение на этой основе
 - **32 календарные системы** — полное покрытие основных мировых календарей, включая григорианский, лунный, исламский, еврейский, японский, персидский, майя, китайский исторический и др.
 - **Сеть Знаний** — граф знаний на основе триплетов (субъект-отношение-объект), поддержка хранения, запросов и поиска путей
@@ -122,7 +129,7 @@
 | Среда выполнения | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Язык программирования | C# | C# |
 | Тип приложения | Консольное приложение | Настольное приложение (системный трей Windows/macOS / окно состояния Linux) |
-| AI интеграция | Ollama (локальный), Alibaba Cloud Bailian (облачный), Volcengine Ark (облачный), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (локальный), Alibaba Cloud Bailian (облачный), Volcengine Ark (облачный), Herdsman, Meituan LongCat, Qiniu Cloud AI |
+| AI интеграция | Ollama (локальный), Alibaba Cloud Bailian (облачный), Volcengine Ark (облачный), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (локальный), Alibaba Cloud Bailian (облачный), Volcengine Ark (облачный), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI (GLM), Baidu Qianfan (Ernie), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow |
 | Хранение данных | Файловая система (JSON + каталоги с временным индексом) | SpeedyPack (формат .spk, отображение в памяти + асинхронная персистентность) |
 | Веб-сервер | HttpListener (встроенный в .NET) | HttpListener (встроенный в .NET) |
 | Динамическая компиляция | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -160,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Глобальный Локатор Сервисов
 │   │
 │   ├── SiliconLife.Common/                # Общая реализация (используется обеими версиями)
-│   │   ├── AI/                            # AI-клиенты и фабрики (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
+│   │   ├── AI/                            # AI-клиенты и фабрики (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow)
 │   │   ├── Calendar/                      # 32 реализации календарей
 │   │   ├── Localization/                  # Базовые классы локализации и 34 языковых/региональных варианта
 │   │   ├── Resources/                     # Общие файлы ресурсов

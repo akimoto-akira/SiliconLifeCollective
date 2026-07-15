@@ -61,6 +61,22 @@ Ambas versiones comparten las mismas interfaces y funcionalidades, difiriendo so
 
 ## [No Publicado]
 
+### 2026-07-15
+
+#### Nuevas Funcionalidades
+- Implementación de 7 nuevos clientes de IA en la nube, pasando de estado 📋 Planificado a ✅ Implementado:
+  - **DeepSeekClient** — Endpoint `https://api.deepseek.com`, modo thinking con `reasoning_content`, control de esfuerzo de razonamiento, ventana de contexto 1M
+  - **ZhipuClient (GLM)** — Endpoint `https://open.bigmodel.cn/api/paas/v4`, modo thinking (serie GLM-5), visión por modelo, modelo gratuito glm-4-flash, ventana de contexto 1M
+  - **ErnieClient (Baidu/Qianfan)** — Endpoint `https://qianfan.baidubce.com/v2`, API Qianfan v2 compatible con OpenAI, modelos gratuitos disponibles, ventana de contexto 131K
+  - **HunyuanClient (Tencent)** — Doble endpoint TokenHub (`https://tokenhub.tencentmaas.com/v1`) + Legacy (`https://api.hunyuan.cloud.tencent.com/v1`), modo thinking, ventana de contexto 262K
+  - **MiniMaxClient** — Endpoints nacional (`https://api.minimaxi.com/v1`) e internacional (`https://api.minimax.io/v1`), modo thinking con reasoning_split, multimodal (M3), ventana de contexto 1M
+  - **MoonshotClient (Kimi)** — Endpoint `https://api.moonshot.cn/v1`, modo thinking, multimodal, ventana de contexto 262K
+  - **SiliconFlowClient** — Endpoint `https://api.siliconflow.cn/v1`, lista dinámica de modelos vía API `/models`, agrega 100+ modelos de código abierto, ventana de contexto 1M
+
+#### Documentación
+- Actualizar documentación en español (es-ES): architecture.md, README.md, getting-started.md, api-reference.md, changelog.md reflejando los 7 nuevos clientes implementados
+- Marcar 01.AI (Yi) como ⚠️ Obsoleto (registro de nuevos usuarios cerrado)
+
 ### 2026-05-26
 
 #### Nuevas Funcionalidades

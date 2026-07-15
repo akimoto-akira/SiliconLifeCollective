@@ -37,6 +37,13 @@
   - **牧馬人推理引擎（Herdsman）** — 無需認證的推理引擎，相容 OpenAI API 格式
   - **美團 LongCat** — 美團自研大模型，相容 OpenAI API 格式，API Key 認證
   - **七牛雲 AI** — 七牛雲大模型推理服務，相容 OpenAI API 格式，API Key 認證
+  - **DeepSeek（直連）** — 深度求索AI服務，支援 thinking 模式，1,048,576 上下文
+  - **智譜 GLM** — 智譜清言AI服務，支援 thinking，按模型判斷視覺，1,048,576 上下文
+  - **百度千帆/文心一言** — 百度千帆平臺，131,072 上下文
+  - **騰訊混元** — 騰訊混元AI服務，雙端點 TokenHub/Legacy，262,144 上下文
+  - **MiniMax** — MiniMax AI服務，1,048,576 上下文
+  - **月之暗面 Kimi** — 月之暗面Kimi AI服務，262,144 上下文
+  - **矽基流動** — 矽基流動聚合平臺，支援動態模型清單，1,048,576 上下文
 - **AI 客戶端能力發現** — IAIClient 介面支援宣告串流模式、工具呼叫、視覺輸入、音訊輸入、上下文視窗大小等能力，ContextManager 據此自適應調整行為
 - **32 種日曆系統** — 全球主要曆法全覆蓋，包括公曆、農曆、伊斯蘭曆、希伯來曆、日本曆、波斯曆、瑪雅曆、中國歷史曆法等
 - **知識網絡系統** — 基於三元組（主體-關係-客體）的知識圖譜，支援儲存、查詢和路徑發現
@@ -122,7 +129,7 @@
 | 執行時期 | .NET 9 | .NET 9（Windows/macOS/Linux） |
 | 程式語言 | C# | C# |
 | 應用類型 | 主控台應用程式 | 桌面應用程式（Windows/macOS 系統匣 / Linux 狀態視窗） |
-| AI 整合 | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端）、牧馬人推理引擎、美團LongCat、七牛雲AI | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端）、牧馬人推理引擎、美團LongCat、七牛雲AI |
+| AI 整合 | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端）、牧馬人推理引擎、美團LongCat、七牛雲AI、DeepSeek、智譜GLM、百度千帆、騰訊混元、MiniMax、月之暗面Kimi、矽基流動 | Ollama（本地）、阿里雲百煉（雲端）、火山引擎Ark（雲端）、牧馬人推理引擎、美團LongCat、七牛雲AI、DeepSeek、智譜GLM、百度千帆、騰訊混元、MiniMax、月之暗面Kimi、矽基流動 |
 | 資料儲存 | 檔案系統（JSON + 時間索引目錄） | SpeedyPack（.spk 格式，記憶體映射 + 非同步持久化） |
 | Web 伺服器 | HttpListener（.NET 內建） | HttpListener（.NET 內建） |
 | 動態編譯 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -160,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # 全域服務定位器
 │   │
 │   ├── SiliconLife.Common/                # 共享實作（兩個版本共用）
-│   │   ├── AI/                            # AI 客戶端與工廠（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI）
+│   │   ├── AI/                            # AI 客戶端與工廠（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI、DeepSeek、Zhipu、Ernie、Hunyuan、MiniMax、Moonshot、SiliconFlow）
 │   │   ├── Calendar/                      # 32 種日曆實作
 │   │   ├── Localization/                  # 在地化基類與 34 種語言/地區變體實作
 │   │   ├── Resources/                     # 共享資源檔案

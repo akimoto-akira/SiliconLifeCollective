@@ -286,6 +286,70 @@
 - **配置**：`apiKey`、`endpoint`、`model`
 - **特点**：字节跳动旗下 AI 服务，支持多种豆包模型
 
+### DeepSeekClient
+
+- **类型**：云端 AI 服务
+- **协议**：兼容 OpenAI 的 API（`https://api.deepseek.com`）
+- **认证**：Bearer token（API 密钥）
+- **功能**：流式传输、工具调用、thinking 模式（reasoning_content）、reasoning_effort 参数
+- **上下文窗口**：1,048,576 tokens
+- **配置**：`apiKey`、`model`
+
+### ZhipuClient（智谱 GLM）
+
+- **类型**：云端 AI 服务
+- **协议**：兼容 OpenAI 的 API（`https://open.bigmodel.cn/api/paas/v4`）
+- **认证**：Bearer token（API 密钥）
+- **功能**：流式传输、工具调用、thinking 模式、按模型判断视觉支持
+- **上下文窗口**：1,048,576 tokens
+- **配置**：`apiKey`、`model`
+
+### ErnieClient（百度千帆/文心一言）
+
+- **类型**：云端 AI 服务
+- **协议**：兼容 OpenAI 的 API（`https://qianfan.baidubce.com/v2`）
+- **认证**：Bearer token（API 密钥）
+- **功能**：流式传输、工具调用、按模型判断视觉支持
+- **上下文窗口**：131,072 tokens
+- **配置**：`apiKey`、`model`
+
+### HunyuanClient（腾讯混元）
+
+- **类型**：云端 AI 服务
+- **协议**：兼容 OpenAI 的 API（双端点：TokenHub 推荐 + Legacy `https://api.hunyuan.cloud.tencent.com/v1`）
+- **认证**：Bearer token（API 密钥）
+- **功能**：流式传输、按模型判断工具调用、不支持视觉
+- **上下文窗口**：262,144 tokens
+- **支持模型**：hy3（推荐）、hy3-preview
+- **配置**：`apiKey`、`model`
+
+### MiniMaxClient
+
+- **类型**：云端 AI 服务
+- **协议**：兼容 OpenAI 的 API（`https://api.minimaxi.com/v1`）
+- **认证**：Bearer token（API 密钥）
+- **功能**：流式传输、工具调用、按模型判断视觉支持
+- **上下文窗口**：1,048,576 tokens
+- **配置**：`apiKey`、`model`
+
+### MoonshotClient（月之暗面/Kimi）
+
+- **类型**：云端 AI 服务
+- **协议**：兼容 OpenAI 的 API（`https://api.moonshot.cn/v1`）
+- **认证**：Bearer token（API 密钥）
+- **功能**：流式传输、工具调用、按模型判断视觉支持
+- **上下文窗口**：262,144 tokens
+- **配置**：`apiKey`、`model`
+
+### SiliconFlowClient（硅基流动）
+
+- **类型**：云端 AI 服务（聚合平台）
+- **协议**：兼容 OpenAI 的 API（`https://api.siliconflow.cn/v1`）
+- **认证**：Bearer token（API 密钥）
+- **功能**：流式传输、工具调用、按模型判断视觉支持、支持动态获取可用模型列表（/models 接口）
+- **上下文窗口**：1,048,576 tokens
+- **配置**：`apiKey`、`model`
+
 ### 客户端工厂模式
 
 每种 AI 客户端类型都有相应的工厂实现 `IAIClientFactory`：
@@ -296,6 +360,13 @@
 - `HerdsmanClientFactory` —— 创建 HerdsmanClient 实例
 - `LongCatClientFactory` —— 创建 LongCatClient 实例
 - `QiniuAIClientFactory` —— 创建 QiniuAIClient 实例
+- `DeepSeekClientFactory` —— 创建 DeepSeekClient 实例
+- `ZhipuClientFactory` —— 创建 ZhipuClient 实例
+- `ErnieClientFactory` —— 创建 ErnieClient 实例
+- `HunyuanClientFactory` —— 创建 HunyuanClient 实例
+- `MiniMaxClientFactory` —— 创建 MiniMaxClient 实例
+- `MoonshotClientFactory` —— 创建 MoonshotClient 实例
+- `SiliconFlowClientFactory` —— 创建 SiliconFlowClient 实例
 
 工厂提供：
 - `CreateClient(Dictionary<string, object> config)` —— 从配置实例化客户端
@@ -331,18 +402,18 @@
 |------|------|------|------|
 | Ollama | ✅ | 本地 | 本地AI服务，支持本地模型部署 |
 | DashScope（阿里云百炼） | ✅ | 云端 | 阿里云百炼AI服务，支持多区域部署 |
-| 百度千帆（文心一言） | 📋 | 云端 | 百度文心一言AI服务 |
-| 智普AI（GLM） | 📋 | 云端 | 智谱清言AI服务 |
-| 月之暗面（Kimi） | 📋 | 云端 | 月之暗面Kimi AI服务 |
+| 百度千帆（文心一言） | ✅ | 云端 | 百度文心一言AI服务 — ErnieClient |
+| 智谱AI（GLM） | ✅ | 云端 | 智谱清言AI服务 — ZhipuClient |
+| 月之暗面（Kimi） | ✅ | 云端 | 月之暗面Kimi AI服务 — MoonshotClient |
 | 火山方舟引擎.豆包 | ✅ | 云端 | 字节跳动豆包AI服务 |
 | 牧马人推理引擎（Herdsman） | ✅ | 本地/云端 | 无需认证的推理引擎，兼容 OpenAI API 格式 |
 | 美团 LongCat | ✅ | 云端 | 美团自研大模型，兼容 OpenAI API 格式，API Key 认证 |
 | 七牛云 AI | ✅ | 云端 | 七牛云大模型推理服务，兼容 OpenAI API 格式，API Key 认证 |
-| DeepSeek（直连） | 📋 | 云端 | 深度求索AI服务 |
+| DeepSeek（直连） | ✅ | 云端 | 深度求索AI服务 — DeepSeekClient，支持 thinking 模式 |
 | 零一万物 | ⚠️ | 云端 | 零一万物AI服务（已废弃：停止新用户注册） |
-| 腾讯混元 | 📋 | 云端 | 腾讯混元AI服务 |
-| 硅基流动 | 📋 | 云端 | 硅基流动AI服务 |
-| MiniMax | 📋 | 云端 | MiniMax AI服务 |
+| 腾讯混元 | ✅ | 云端 | 腾讯混元AI服务 — HunyuanClient，双端点 TokenHub/Legacy |
+| 硅基流动 | ✅ | 云端 | 硅基流动AI服务 — SiliconFlowClient，支持动态模型列表 |
+| MiniMax | ✅ | 云端 | MiniMax AI服务 — MiniMaxClient |
 | OpenAI | 💡 | 云端 | OpenAI API服务（GPT系列） |
 | Anthropic | 💡 | 云端 | Anthropic Claude AI服务 |
 | Google DeepMind | 💡 | 云端 | Google Gemini AI服务 |

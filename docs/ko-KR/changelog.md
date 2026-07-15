@@ -61,6 +61,19 @@
 
 ## [미발표]
 
+### 2026-07-xx
+
+#### 새로운 기능
+- 7개 신규 AI 클라이언트 구현 완료:
+  - **DeepSeekClient** — DeepSeek API 직접 연결, 사고망(thinking) 모드, 1M 컨텍스트 윈도우
+  - **ZhipuClient** — 즈푸 GLM API 연결, 사고망 모드, 비전(모델별), 1M 컨텍스트
+  - **ErnieClient** — 바이두 천판 v2 API 연결, 131K 컨텍스트, 무료 모델 지원
+  - **HunyuanClient** — 텐센트 혼위안 API 연결, TokenHub/레거시 듀얼 엔드포인트, 262K 컨텍스트
+  - **MiniMaxClient** — MiniMax API 연결, 1M 컨텍스트, 멀티모달, 국내/국제 엔드포인트
+  - **MoonshotClient** — 위즈덤 문(Kimi) API 연결, 262K 컨텍스트
+  - **SiliconFlowClient** — 실리콘 플로우 API 연결, 100+ 오픈소스 모델 집합, 동적 모델 목록, 1M 컨텍스트
+- 링이완우(零一万物) 폐기 표시: 신규 사용자 등록 중단
+
 ### 2026-05-26
 
 #### 새로운 기능

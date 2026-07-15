@@ -247,6 +247,13 @@ Každá fáze končí **běžícím, pozorovatelným** systémem. Žádná fáze
 | 10.5.12 | DashScopeClientFactory | Továrna pro vytváření klientů Bailian. Dynamické objevení modelů přes API. Podpora více regionů (Peking, Virginie, Singapur, Hongkong, Frankfurt) |
 | 10.5.13 | Konfigurační systém AI klientů | Konfigurace AI klientů pro každou bytost. Dynamické možnosti konfiguračních klíčů (modely, regiony). Lokalizované zobrazované názvy |
 | 10.5.14 | Rozšíření lokalizace | Lokalizace zjednodušené čínštiny, tradiční čínštiny, angličtiny a japonštiny pro konfigurační možnosti Bailian, názvy modelů a názvy regionů |
+| 10.5.15 | DeepSeekClient | AI klient DeepSeek, thinking mode, reasoning effort, až 1M kontextové okno, endpoint `https://api.deepseek.com` |
+| 10.5.16 | ZhipuClient (GLM) | AI klient Zhipu AI, thinking mode, vision podle modelu, bezplatné modely, až 1M kontext, endpoint `https://open.bigmodel.cn/api/paas/v4` |
+| 10.5.17 | ErnieClient (Baidu/Qianfan) | AI klient Baidu Qianfan v2, bezplatné modely, až 131K kontext, endpoint `https://qianfan.baidubce.com/v2` |
+| 10.5.18 | HunyuanClient (Tencent) | AI klient Tencent Hunyuan, duální endpoint (TokenHub + Legacy), thinking mode, až 262K kontext |
+| 10.5.19 | MiniMaxClient | AI klient MiniMax, domácí/mezinárodní endpoint, adaptivní thinking, multimodální, až 1M kontext |
+| 10.5.20 | MoonshotClient (Kimi) | AI klient Moonshot/Kimi, thinking mode, multimodální, až 262K kontext, endpoint `https://api.moonshot.cn/v1` |
+| 10.5.21 | SiliconFlowClient | AI klient SiliconFlow, agregátor 100+ open-source modelů, dynamické objevení modelů, až 1M kontext, endpoint `https://api.siliconflow.cn/v1` |
 
 **Výstup**: Vylepšené nástroje, pozorovatelnost, pokrytí kalendářů a podpora více AI backendů.
 

@@ -37,6 +37,13 @@
   - **牧马人推理引擎（Herdsman）** — 无需认证的推理引擎，兼容 OpenAI API 格式
   - **美团 LongCat** — 美团自研大模型，兼容 OpenAI API 格式，API Key 认证
   - **七牛云 AI** — 七牛云大模型推理服务，兼容 OpenAI API 格式，API Key 认证
+  - **DeepSeek（直连）** — 深度求索AI服务，支持 thinking 模式，1,048,576 上下文
+  - **智谱 GLM** — 智谱清言AI服务，支持 thinking，按模型判断视觉，1,048,576 上下文
+  - **百度千帆/文心一言** — 百度千帆平台，131,072 上下文
+  - **腾讯混元** — 腾讯混元AI服务，双端点 TokenHub/Legacy，262,144 上下文
+  - **MiniMax** — MiniMax AI服务，1,048,576 上下文
+  - **月之暗面 Kimi** — 月之暗面Kimi AI服务，262,144 上下文
+  - **硅基流动** — 硅基流动聚合平台，支持动态模型列表，1,048,576 上下文
 - **AI 客户端能力发现** — IAIClient 接口支持声明流式模式、工具调用、视觉输入、音频输入、上下文窗口大小等能力，ContextManager 据此自适应调整行为
 - **32 种日历系统** — 全球主要历法全覆盖，包括公历、农历、伊斯兰历、希伯来历、日本历、波斯历、玛雅历、中国历史历法等
 - **知识网络系统** — 基于三元组（主体-关系-客体）的知识图谱，支持存储、查询和路径发现
@@ -121,7 +128,7 @@
 | 运行时 | .NET 9 | .NET 9（Windows/macOS/Linux） |
 | 编程语言 | C# | C# |
 | 应用类型 | 控制台应用程序 | 桌面应用程序（Windows/macOS 系统托盘 / Linux 状态窗口） |
-| AI 集成 | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端）、牧马人推理引擎、美团LongCat、七牛云AI | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端）、牧马人推理引擎、美团LongCat、七牛云AI |
+| AI 集成 | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端）、牧马人推理引擎、美团LongCat、七牛云AI、DeepSeek、智谱GLM、百度千帆、腾讯混元、MiniMax、月之暗面Kimi、硅基流动 | Ollama（本地）、阿里云百炼（云端）、火山引擎Ark（云端）、牧马人推理引擎、美团LongCat、七牛云AI、DeepSeek、智谱GLM、百度千帆、腾讯混元、MiniMax、月之暗面Kimi、硅基流动 |
 | 数据存储 | 文件系统（JSON + 时间索引目录） | SpeedyPack（.spk 格式，内存映射 + 异步持久化） |
 | Web 服务器 | HttpListener（.NET 内置） | HttpListener（.NET 内置） |
 | 动态编译 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -159,7 +166,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # 全局服务定位器
 │   │
 │   ├── SiliconLife.Common/                # 共享实现（两个版本共用）
-│   │   ├── AI/                            # AI 客户端与工厂（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI）
+│   │   ├── AI/                            # AI 客户端与工厂（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI、DeepSeek、Zhipu、Ernie、Hunyuan、MiniMax、Moonshot、SiliconFlow）
 │   │   ├── Calendar/                      # 32 种日历实现
 │   │   ├── Localization/                  # 本地化基类与 34 种语言/地区变体实现
 │   │   ├── Resources/                     # 共享资源文件

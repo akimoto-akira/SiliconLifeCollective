@@ -61,6 +61,19 @@ Obie wersje współdzielą te same interfejsy i funkcjonalności, różnią się
 
 ## [Nieopublikowane]
 
+### 2026-07-09
+
+#### Nowe funkcje
+- Dodanie 7 nowych klientów AI (status 📋→✅):
+  - **DeepSeekClient** — endpoint `https://api.deepseek.com`, tryb thinking, okno kontekstu 1M tokenów
+  - **ZhipuClient (GLM)** — endpoint `https://open.bigmodel.cn/api/paas/v4`, tryb thinking (seria GLM-5), wizja wg modelu, okno kontekstu 1M tokenów
+  - **ErnieClient (Baidu/Qianfan)** — endpoint `https://qianfan.baidubce.com/v2`, okno kontekstu 131K tokenów
+  - **HunyuanClient (Tencent)** — podwójny endpoint (TokenHub + Legacy), okno kontekstu 262K tokenów
+  - **MiniMaxClient** — endpoint `https://api.minimaxi.com/v1`, okno kontekstu 1M tokenów
+  - **MoonshotClient (Kimi)** — endpoint `https://api.moonshot.cn/v1`, okno kontekstu 262K tokenów
+  - **SiliconFlowClient** — endpoint `https://api.siliconflow.cn/v1`, dynamiczna lista modeli, okno kontekstu 1M tokenów
+- 01.AI (Yi) oznaczony jako przestarzały ⚠️ (rejestracja nowych użytkowników wstrzymana)
+
 ### 2026-05-26
 
 #### Nowe funkcje

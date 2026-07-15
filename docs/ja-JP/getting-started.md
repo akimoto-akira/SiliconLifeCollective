@@ -36,6 +36,13 @@
 - **Herdsman**（オプション、ローカル/クラウド推論エンジン） - 認証不要、OpenAI API 形式互換
 - **Meituan LongCat API キー**（オプション、クラウド AI 用） - API キー認証
 - **Qiniu Cloud AI API キー**（オプション、クラウド AI 用） - API キー認証
+- **DeepSeek API キー**（オプション、クラウド AI 用） - [申請](https://platform.deepseek.com/)
+- **智谱AI API キー**（オプション、クラウド AI 用） - [申請](https://open.bigmodel.cn/)
+- **百度千帆 API キー**（オプション、クラウド AI 用） - [申請](https://qianfan.baidubce.com/)
+- **騰訊混元 API キー**（オプション、クラウド AI 用） - [申請](https://cloud.tencent.com/product/hunyuan)
+- **MiniMax API キー**（オプション、クラウド AI 用） - [申請](https://platform.minimaxi.com/)
+- **月之暗面 API キー**（オプション、クラウド AI 用） - [申請](https://platform.moonshot.cn/)
+- **硅基流動 API キー**（オプション、クラウド AI 用） - [申請](https://cloud.siliconflow.cn/)
 
 ## クイックスタート
 
@@ -143,6 +150,116 @@ dotnet build
   }
 }
 ```
+
+#### オプション G：DeepSeek（クラウド）
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "API-キー",
+      "Endpoint": "https://api.deepseek.com",
+      "Model": "deepseek-chat"
+    }
+  }
+}
+```
+
+> **特徴**：思考モード（thinking）対応、1M コンテキストウィンドウ。`deepseek-reasoner` モデルで推論コンテンツを出力可能。
+
+#### オプション H：智谱AI GLM（クラウド）
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "API-キー",
+      "Endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "Model": "glm-4-plus"
+    }
+  }
+}
+```
+
+> **特徴**：思考モード対応、モデル別ビジョン対応、1M コンテキストウィンドウ。
+
+#### オプション I：百度千帆（クラウド）
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "API-キー",
+      "Endpoint": "https://qianfan.baidubce.com/v2",
+      "Model": "ernie-4.0-8k"
+    }
+  }
+}
+```
+
+> **特徴**：131K コンテキストウィンドウ、モデル別ビジョン対応。
+
+#### オプション J：騰訊混元（クラウド）
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "API-キー",
+      "Model": "hy3"
+    }
+  }
+}
+```
+
+> **特徴**：モデル名に基づいて TokenHub とレガシーエンドポイントを自動選択。262K コンテキストウィンドウ。対応モデル：`hy3`（推奨）、`hy3-preview`（Agent）。
+
+#### オプション K：MiniMax（クラウド）
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "API-キー",
+      "Model": "MiniMax-Text-01"
+    }
+  }
+}
+```
+
+> **特徴**：国内/国際エンドポイント自動選択（`endpoint` に `international` を指定で国際エンドポイント）、1M コンテキストウィンドウ。
+
+#### オプション L：月之暗面 Kimi（クラウド）
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "API-キー",
+      "Endpoint": "https://api.moonshot.cn/v1",
+      "Model": "kimi-k2-0711-preview"
+    }
+  }
+}
+```
+
+> **特徴**：思考モード対応、262K コンテキストウィンドウ。
+
+#### オプション M：硅基流動 SiliconFlow（クラウド）
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "API-キー",
+      "Endpoint": "https://api.siliconflow.cn/v1",
+      "Model": "モデル名"
+    }
+  }
+}
+```
+
+> **特徴**：API 経由で動的モデルリストを取得可能、思考モード対応、1M コンテキストウィンドウ。
 
 ### 4. アプリケーションの実行
 

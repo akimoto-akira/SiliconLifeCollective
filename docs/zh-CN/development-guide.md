@@ -281,7 +281,7 @@ public class MyCustomSkin : ISkin
 
 ```
 SiliconLife.Common/
-├── AI/                    # AI 客户端与工厂实现
+├── AI/                    # AI 客户端与工厂实现（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI、DeepSeek、Zhipu、Ernie、Hunyuan、MiniMax、Moonshot、SiliconFlow）
 ├── Calendar/              # 32 种日历实现
 ├── Localization/          # 本地化基类与 34 种语言变体实现
 ├── Security/              # 权限管理器

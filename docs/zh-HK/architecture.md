@@ -286,6 +286,70 @@
 - **設定**：`apiKey`、`endpoint`、`model`
 - **特點**：位元組跳動旗下 AI 服務，支援多種豆包模型
 
+### DeepSeekClient
+
+- **類型**：雲端 AI 服務
+- **協定**：相容 OpenAI 的 API（`https://api.deepseek.com`）
+- **認證**：Bearer token（API 金鑰）
+- **功能**：串流傳輸、工具呼叫、thinking 模式（reasoning_content）、reasoning_effort 參數
+- **上下文視窗**：1,048,576 tokens
+- **設定**：`apiKey`、`model`
+
+### ZhipuClient（智譜 GLM）
+
+- **類型**：雲端 AI 服務
+- **協定**：相容 OpenAI 的 API（`https://open.bigmodel.cn/api/paas/v4`）
+- **認證**：Bearer token（API 金鑰）
+- **功能**：串流傳輸、工具呼叫、thinking 模式、按模型判斷視覺支援
+- **上下文視窗**：1,048,576 tokens
+- **設定**：`apiKey`、`model`
+
+### ErnieClient（百度千帆/文心一言）
+
+- **類型**：雲端 AI 服務
+- **協定**：相容 OpenAI 的 API（`https://qianfan.baidubce.com/v2`）
+- **認證**：Bearer token（API 金鑰）
+- **功能**：串流傳輸、工具呼叫、按模型判斷視覺支援
+- **上下文視窗**：131,072 tokens
+- **設定**：`apiKey`、`model`
+
+### HunyuanClient（騰訊混元）
+
+- **類型**：雲端 AI 服務
+- **協定**：相容 OpenAI 的 API（雙端點：TokenHub 推薦 + Legacy `https://api.hunyuan.cloud.tencent.com/v1`）
+- **認證**：Bearer token（API 金鑰）
+- **功能**：串流傳輸、按模型判斷工具呼叫、不支援視覺
+- **上下文視窗**：262,144 tokens
+- **支援模型**：hy3（推薦）、hy3-preview
+- **設定**：`apiKey`、`model`
+
+### MiniMaxClient
+
+- **類型**：雲端 AI 服務
+- **協定**：相容 OpenAI 的 API（`https://api.minimaxi.com/v1`）
+- **認證**：Bearer token（API 金鑰）
+- **功能**：串流傳輸、工具呼叫、按模型判斷視覺支援
+- **上下文視窗**：1,048,576 tokens
+- **設定**：`apiKey`、`model`
+
+### MoonshotClient（月之暗面/Kimi）
+
+- **類型**：雲端 AI 服務
+- **協定**：相容 OpenAI 的 API（`https://api.moonshot.cn/v1`）
+- **認證**：Bearer token（API 金鑰）
+- **功能**：串流傳輸、工具呼叫、按模型判斷視覺支援
+- **上下文視窗**：262,144 tokens
+- **設定**：`apiKey`、`model`
+
+### SiliconFlowClient（矽基流動）
+
+- **類型**：雲端 AI 服務（聚合平臺）
+- **協定**：相容 OpenAI 的 API（`https://api.siliconflow.cn/v1`）
+- **認證**：Bearer token（API 金鑰）
+- **功能**：串流傳輸、工具呼叫、按模型判斷視覺支援、支援動態取得可用模型清單（/models 介面）
+- **上下文視窗**：1,048,576 tokens
+- **設定**：`apiKey`、`model`
+
 ### 用戶端工廠模式
 
 每種 AI 用戶端類型都有相應的工廠實作 `IAIClientFactory`：
@@ -296,6 +360,13 @@
 - `HerdsmanClientFactory` —— 建立 HerdsmanClient 實例
 - `LongCatClientFactory` —— 建立 LongCatClient 實例
 - `QiniuAIClientFactory` —— 建立 QiniuAIClient 實例
+- `DeepSeekClientFactory` —— 建立 DeepSeekClient 實例
+- `ZhipuClientFactory` —— 建立 ZhipuClient 實例
+- `ErnieClientFactory` —— 建立 ErnieClient 實例
+- `HunyuanClientFactory` —— 建立 HunyuanClient 實例
+- `MiniMaxClientFactory` —— 建立 MiniMaxClient 實例
+- `MoonshotClientFactory` —— 建立 MoonshotClient 實例
+- `SiliconFlowClientFactory` —— 建立 SiliconFlowClient 實例
 
 工廠提供：
 - `CreateClient(Dictionary<string, object> config)` —— 從設定實例化用戶端
@@ -331,18 +402,18 @@
 |------|------|------|------|
 | Ollama | ✅ | 本地 | 本地AI服務，支援本地模型部署 |
 | DashScope（阿里雲百煉） | ✅ | 雲端 | 阿里雲百煉AI服務，支援多區域部署 |
-| 百度千帆（文心一言） | 📋 | 雲端 | 百度文心一言AI服務 |
-| 智普AI（GLM） | 📋 | 雲端 | 智譜清言AI服務 |
-| 月之暗面（Kimi） | 📋 | 雲端 | 月之暗面Kimi AI服務 |
+| 百度千帆（文心一言） | ✅ | 雲端 | 百度文心一言AI服務 — ErnieClient |
+| 智譜AI（GLM） | ✅ | 雲端 | 智譜清言AI服務 — ZhipuClient |
+| 月之暗面（Kimi） | ✅ | 雲端 | 月之暗面Kimi AI服務 — MoonshotClient |
 | 火山方舟引擎.豆包 | ✅ | 雲端 | 位元組跳動豆包AI服務 |
 | 牧馬人推理引擎（Herdsman） | ✅ | 本地/雲端 | 無需認證的推理引擎，相容 OpenAI API 格式 |
 | 美團 LongCat | ✅ | 雲端 | 美團自研大模型，相容 OpenAI API 格式，API Key 認證 |
 | 七牛雲 AI | ✅ | 雲端 | 七牛雲大模型推理服務，相容 OpenAI API 格式，API Key 認證 |
-| DeepSeek（直連） | 📋 | 雲端 | 深度求索AI服務 |
+| DeepSeek（直連） | ✅ | 雲端 | 深度求索AI服務 — DeepSeekClient，支援 thinking 模式 |
 | 零一萬物 | ⚠️ | 雲端 | 零一萬物AI服務（已廢棄：停止新使用者註冊） |
-| 騰訊混元 | 📋 | 雲端 | 騰訊混元AI服務 |
-| 矽基流動 | 📋 | 雲端 | 矽基流動AI服務 |
-| MiniMax | 📋 | 雲端 | MiniMax AI服務 |
+| 騰訊混元 | ✅ | 雲端 | 騰訊混元AI服務 — HunyuanClient，雙端點 TokenHub/Legacy |
+| 矽基流動 | ✅ | 雲端 | 矽基流動AI服務 — SiliconFlowClient，支援動態模型清單 |
+| MiniMax | ✅ | 雲端 | MiniMax AI服務 — MiniMaxClient |
 | OpenAI | 💡 | 雲端 | OpenAI API服務（GPT系列） |
 | Anthropic | 💡 | 雲端 | Anthropic Claude AI服務 |
 | Google DeepMind | 💡 | 雲端 | Google Gemini AI服務 |

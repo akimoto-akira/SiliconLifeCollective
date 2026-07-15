@@ -36,6 +36,13 @@ Tento projekt nabízí dvě implementační verze:
 - **Herdsman** (volitelné, lokální/cloudový inferenční engine) — bez autentizace, kompatibilní s OpenAI API formátem
 - **API klíč Meituan LongCat** (volitelné, pro cloudovou AI) — autentizace API klíčem
 - **API klíč Qiniu Cloud AI** (volitelné, pro cloudovou AI) — autentizace API klíčem
+- **API klíč DeepSeek** (volitelné, pro cloudovou AI) — [Žádost](https://platform.deepseek.com/)
+- **API klíč Zhipu AI** (volitelné, pro cloudovou AI) — [Žádost](https://open.bigmodel.cn/)
+- **API klíč Baidu Qianfan** (volitelné, pro cloudovou AI) — [Žádost](https://qianfan.baidubce.com/)
+- **API klíč Tencent Hunyuan** (volitelné, pro cloudovou AI) — [Žádost](https://hunyuan.tencent.com/)
+- **API klíč MiniMax** (volitelné, pro cloudovou AI) — [Žádost](https://platform.minimaxi.com/)
+- **API klíč Moonshot (Kimi)** (volitelné, pro cloudovou AI) — [Žádost](https://platform.moonshot.cn/)
+- **API klíč SiliconFlow** (volitelné, pro cloudovou AI) — [Žádost](https://cloud.siliconflow.cn/)
 
 ## Rychlý start
 
@@ -143,6 +150,116 @@ Upravte `src/SiliconLife.Default/Config/DefaultConfigData.cs` nebo upravte konfi
   }
 }
 ```
+
+#### Možnost G: DeepSeek (cloud)
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "váš-api-klíč",
+      "Model": "deepseek-v4-flash",
+      "ThinkingEnabled": true,
+      "ReasoningEffort": "high"
+    }
+  }
+}
+```
+
+> **Funkce**: Thinking mode (řetězec myšlenek), reasoning effort, až 1M kontextové okno. Výchozí endpoint: `https://api.deepseek.com`
+
+#### Možnost H: Zhipu AI / GLM (cloud)
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "váš-api-klíč",
+      "Model": "glm-4-flash",
+      "ThinkingEnabled": false
+    }
+  }
+}
+```
+
+> **Funkce**: Thinking mode, vision (podle modelu), bezplatné modely (glm-4-flash, glm-4.7-flash), až 1M kontext. Výchozí endpoint: `https://open.bigmodel.cn/api/paas/v4`
+
+#### Možnost I: Baidu Qianfan / Ernie (cloud)
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "bce-v3/váš-api-klíč",
+      "Model": "ernie-5.1"
+    }
+  }
+}
+```
+
+> **Funkce**: Bezplatné modely (ernie-speed-128k, ernie-tiny-8k), až 131K kontext. Výchozí endpoint: `https://qianfan.baidubce.com/v2`
+
+#### Možnost J: Tencent Hunyuan (cloud)
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "váš-api-klíč",
+      "Model": "hy3",
+      "ThinkingEnabled": false
+    }
+  }
+}
+```
+
+> **Funkce**: Duální endpoint (TokenHub pro hy3/hy3-preview, Legacy pro ostatní modely), thinking mode, bezplatný model (hunyuan-lite), až 262K kontext. Endpoint se automaticky volí podle modelu.
+
+#### Možnost K: MiniMax (cloud)
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "váš-api-klíč",
+      "Model": "MiniMax-M3",
+      "Endpoint": "domestic"
+    }
+  }
+}
+```
+
+> **Funkce**: Domácí (`api.minimaxi.com`) / mezinárodní (`api.minimax.io`) endpoint, thinking mode (adaptivní), multimodální, až 1M kontext. Hodnota `Endpoint` může být `domestic` nebo `international`.
+
+#### Možnost L: Moonshot / Kimi (cloud)
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "váš-api-klíč",
+      "Model": "kimi-k2.6"
+    }
+  }
+}
+```
+
+> **Funkce**: Thinking mode, multimodální, až 262K kontext. Výchozí endpoint: `https://api.moonshot.cn/v1`
+
+#### Možnost M: SiliconFlow (cloud, agregátor)
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "váš-api-klíč",
+      "Model": "deepseek-ai/DeepSeek-V3.2"
+    }
+  }
+}
+```
+
+> **Funkce**: Agreguje 100+ open-source modelů od více dodavatelů. Dynamické objevení dostupných modelů přes API, reasoning obsah, až 1M kontext. Výchozí endpoint: `https://api.siliconflow.cn/v1`
 
 ### 4. Spuštění aplikace
 

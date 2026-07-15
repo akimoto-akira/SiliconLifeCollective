@@ -593,6 +593,39 @@ AI 設定エディタインターフェースを返します。
       "apiKey": "...",
       "endpoint": "...",
       "model": "..."
+    },
+    "DeepSeek": {
+      "apiKey": "...",
+      "endpoint": "https://api.deepseek.com",
+      "model": "..."
+    },
+    "Zhipu": {
+      "apiKey": "...",
+      "endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "model": "..."
+    },
+    "Ernie": {
+      "apiKey": "...",
+      "endpoint": "https://qianfan.baidubce.com/v2",
+      "model": "..."
+    },
+    "Hunyuan": {
+      "apiKey": "...",
+      "model": "hy3"
+    },
+    "MiniMax": {
+      "apiKey": "...",
+      "model": "..."
+    },
+    "Moonshot": {
+      "apiKey": "...",
+      "endpoint": "https://api.moonshot.cn/v1",
+      "model": "..."
+    },
+    "SiliconFlow": {
+      "apiKey": "...",
+      "endpoint": "https://api.siliconflow.cn/v1",
+      "model": "..."
     }
   }
 }

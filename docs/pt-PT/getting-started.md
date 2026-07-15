@@ -36,6 +36,13 @@ Este projecto oferece duas versões de implementação:
 - **Herdsman** (opcional, motor de inferência local/nuvem) - sem autenticação, compatível com o formato OpenAI API
 - **Chave API Meituan LongCat** (opcional, para IA na nuvem) - autenticação por API Key
 - **Chave API Qiniu Cloud AI** (opcional, para IA na nuvem) - autenticação por API Key
+- **Chave API DeepSeek** (opcional, para IA na nuvem) - [Solicitar](https://platform.deepseek.com/)
+- **Chave API Zhipu AI** (opcional, para IA na nuvem) - [Solicitar](https://open.bigmodel.cn/)
+- **Chave API Baidu Qianfan** (opcional, para IA na nuvem) - [Solicitar](https://qianfan.baidubce.com/)
+- **Chave API Tencent Hunyuan** (opcional, para IA na nuvem) - [Solicitar](https://cloud.tencent.com/product/hunyuan)
+- **Chave API MiniMax** (opcional, para IA na nuvem) - [Solicitar](https://api.minimaxi.com/)
+- **Chave API Moonshot** (opcional, para IA na nuvem) - [Solicitar](https://platform.moonshot.cn/)
+- **Chave API SiliconFlow** (opcional, para IA na nuvem) - [Solicitar](https://siliconflow.cn/)
 
 ## Início Rápido
 
@@ -143,6 +150,111 @@ Edite `src/SiliconLife.Default/Config/DefaultConfigData.cs` ou modifique a confi
   }
 }
 ```
+
+#### Opção G: DeepSeek (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "your-api-key-here",
+      "Model": "deepseek-chat"
+    }
+  }
+}
+```
+
+> **Características**: Suporta modo thinking (reasoning_content), janela de contexto de 1.048.576 tokens.
+
+#### Opção H: Zhipu GLM (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "your-api-key-here",
+      "Model": "glm-4-plus"
+    }
+  }
+}
+```
+
+> **Características**: Suporta modo thinking, visão por modelo, janela de contexto de 1.048.576 tokens.
+
+#### Opção I: Baidu Qianfan/Wenxin (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "your-api-key-here",
+      "Model": "ernie-4.0-8k"
+    }
+  }
+}
+```
+
+> **Características**: Plataforma Baidu Qianfan, janela de contexto de 131.072 tokens.
+
+#### Opção J: Tencent Hunyuan (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "your-api-key-here",
+      "Model": "hy3"
+    }
+  }
+}
+```
+
+> **Características**: Duplo endpoint (TokenHub recomendado / Legacy), modelo hy3 recomendado, janela de contexto de 262.144 tokens.
+
+#### Opção K: MiniMax (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "your-api-key-here",
+      "Model": "MiniMax-Text-01"
+    }
+  }
+}
+```
+
+> **Características**: Janela de contexto de 1.048.576 tokens.
+
+#### Opção L: Moonshot/Kimi (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "your-api-key-here",
+      "Model": "moonshot-v1-auto"
+    }
+  }
+}
+```
+
+> **Características**: Janela de contexto de 262.144 tokens.
+
+#### Opção M: SiliconFlow (Nuvem)
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "your-api-key-here",
+      "Model": "Qwen/Qwen2.5-7B-Instruct"
+    }
+  }
+}
+```
+
+> **Características**: Plataforma de agregação, suporta obtenção dinâmica da lista de modelos disponíveis, janela de contexto de 1.048.576 tokens.
 
 ### 4. Executar a Aplicação
 

@@ -36,6 +36,13 @@
 - **Herdsman** (опционально, локальный/облачный движок вывода) - без аутентификации, совместим с форматом OpenAI API
 - **API-ключ Meituan LongCat** (опционально, для облачного AI) - аутентификация по API Key
 - **API-ключ Qiniu Cloud AI** (опционально, для облачного AI) - аутентификация по API Key
+- **API-ключ DeepSeek** (опционально, для облачного AI) - [получить](https://platform.deepseek.com/)
+- **API-ключ Zhipu AI** (опционально, для облачного AI) - [получить](https://open.bigmodel.cn/)
+- **API-ключ Baidu Qianfan** (опционально, для облачного AI) - [получить](https://console.bce.baidu.com/qianfan/)
+- **API-ключ Tencent Hunyuan** (опционально, для облачного AI) - [получить](https://console.cloud.tencent.com/hunyuan/)
+- **API-ключ MiniMax** (опционально, для облачного AI) - [получить](https://platform.minimaxi.com/)
+- **API-ключ Moonshot** (опционально, для облачного AI) - [получить](https://platform.moonshot.cn/)
+- **API-ключ SiliconFlow** (опционально, для облачного AI) - [получить](https://cloud.siliconflow.cn/)
 
 ## Быстрый старт
 
@@ -143,6 +150,122 @@ dotnet build
   }
 }
 ```
+
+#### Вариант G: DeepSeek (облачный)
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.deepseek.com",
+      "Model": "deepseek-v4-flash",
+      "ThinkingEnabled": true,
+      "ReasoningEffort": "high"
+    }
+  }
+}
+```
+
+> **Примечание**: DeepSeek поддерживает режим thinking с reasoning_content. Модель `deepseek-v4-flash` предоставляет контекст до 1M токенов.
+
+#### Вариант H: Zhipu AI / GLM (облачный)
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "Model": "glm-4-flash",
+      "ThinkingEnabled": false
+    }
+  }
+}
+```
+
+> **Примечание**: `glm-4-flash` — бесплатная модель. Режим thinking доступен только для серии GLM-5. Vision поддерживается моделями `glm-4v` и `glm-5v`.
+
+#### Вариант I: Baidu Qianfan / Ernie (облачный)
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://qianfan.baidubce.com/v2",
+      "Model": "ernie-5.1"
+    }
+  }
+}
+```
+
+> **Примечание**: Qianfan v2 использует OpenAI-совместимый API. Модели `ernie-speed` и `ernie-tiny` — бесплатные.
+
+#### Вариант J: Tencent Hunyuan (облачный)
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://tokenhub.tencentmaas.com/v1",
+      "Model": "hy3",
+      "ThinkingEnabled": false
+    }
+  }
+}
+```
+
+> **Доступные endpoints**: `https://tokenhub.tencentmaas.com/v1` (TokenHub, рекомендуется) или `https://api.hunyuan.cloud.tencent.com/v1` (Legacy).
+
+#### Вариант K: MiniMax (облачный)
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.minimaxi.com/v1",
+      "Model": "MiniMax-M3"
+    }
+  }
+}
+```
+
+> **Примечание**: MiniMax M3 поддерживает нативный multimodal ввод (изображение + видео) и режим thinking с reasoning_split. Контекст до 1M токенов.
+
+#### Вариант L: Moonshot / Kimi (облачный)
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.moonshot.cn/v1",
+      "Model": "kimi-k2.6"
+    }
+  }
+}
+```
+
+> **Примечание**: Модели kimi-k2.5/k2.6/k2.7 поддерживают vision. Режим thinking доступен для kimi-k2.7. Контекст до 262K токенов.
+
+#### Вариант M: SiliconFlow (облачный, агрегатор моделей)
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "your-api-key-here",
+      "Endpoint": "https://api.siliconflow.cn/v1",
+      "Model": "deepseek-ai/DeepSeek-V3.2"
+    }
+  }
+}
+```
+
+> **Примечание**: SiliconFlow агрегирует 100+ моделей открытого исходного кода от нескольких провайдеров. Поддерживается префикс `pro/` для профессиональных моделей. Контекст до 1M токенов в зависимости от модели.
 
 ### 4. Запуск приложения
 

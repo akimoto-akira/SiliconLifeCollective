@@ -593,6 +593,34 @@ AI 설정 편집기 인터페이스를 반환합니다.
       "apiKey": "...",
       "endpoint": "...",
       "model": "..."
+    },
+    "DeepSeek": {
+      "apiKey": "...",
+      "model": "deepseek-chat"
+    },
+    "Zhipu": {
+      "apiKey": "...",
+      "model": "glm-4-flash"
+    },
+    "Ernie": {
+      "apiKey": "...",
+      "model": "ernie-4.0-8k"
+    },
+    "Hunyuan": {
+      "apiKey": "...",
+      "model": "hunyuan-t1"
+    },
+    "MiniMax": {
+      "apiKey": "...",
+      "model": "MiniMax-M3"
+    },
+    "Moonshot": {
+      "apiKey": "...",
+      "model": "kimi-k2"
+    },
+    "SiliconFlow": {
+      "apiKey": "...",
+      "model": "Qwen/Qwen3-235B-A22B"
     }
   }
 }

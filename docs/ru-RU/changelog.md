@@ -61,6 +61,22 @@
 
 ## [Неопубликовано]
 
+### Новые AI-клиенты
+
+Реализовано 7 новых AI-клиентов с полным поддержкой потоковой передачи, вызова инструментов и содержимого рассуждений:
+
+| Клиент | Endpoint | Ключевые особенности |
+|------|----------|----------------------|
+| **DeepSeekClient** | `https://api.deepseek.com` | Режим thinking, reasoning_effort, 1M контекст (deepseek-v4) |
+| **ZhipuClient (GLM)** | `https://open.bigmodel.cn/api/paas/v4` | Режим thinking (GLM-5), vision (glm-4v/glm-5v), 1M контекст, бесплатная модель glm-4-flash |
+| **ErnieClient (Baidu/Qianfan)** | `https://qianfan.baidubce.com/v2` | Qianfan v2 OpenAI-совместимый API, 131K контекст, бесплатные модели ernie-speed/ernie-tiny |
+| **HunyuanClient (Tencent)** | TokenHub + Legacy двойной endpoint | Режим thinking (hy3), 262K контекст |
+| **MiniMaxClient** | `https://api.minimaxi.com/v1` | Thinking с reasoning_split, multimodal M3 (изображение + видео), 1M контекст |
+| **MoonshotClient (Kimi)** | `https://api.moonshot.cn/v1` | Режим thinking (kimi-k2.7), vision (kimi-k2.5/k2.6/k2.7), 262K контекст |
+| **SiliconFlowClient** | `https://api.siliconflow.cn/v1` | Агрегатор 100+ моделей, динамический список моделей, 1M контекст |
+
+> **Примечание**: 01.AI (Yi) — статус изменён на ⚠️ устарело (регистрация новых пользователей закрыта).
+
 ### 2026-05-26
 
 #### Новые функции

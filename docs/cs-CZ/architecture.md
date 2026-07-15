@@ -315,6 +315,84 @@ Systém podporuje více AI backendů prostřednictvím rozhraní `IAIClient`:
 - **Funkce**: Streamování, volání nástrojů
 - **Konfigurace**: `apiKey`, `endpoint`, `model`
 
+### DeepSeekClient
+
+- **Typ**: cloudová AI služba
+- **Protokol**: API kompatibilní s OpenAI (`/chat/completions`)
+- **Autentizace**: Bearer token (API klíč)
+- **Endpoint**: `https://api.deepseek.com`
+- **Funkce**: streamování, volání nástrojů, thinking mode (řetězec myšlenek), reasoning effort
+- **Kontextové okno**: až 1M tokenů (DeepSeek-V4)
+- **Podporované modely**: deepseek-v4-flash, deepseek-v4-pro
+- **Konfigurace**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`, `reasoningEffort`, `contextWindowTokens`
+
+### ZhipuClient (GLM)
+
+- **Typ**: cloudová AI služba
+- **Protokol**: API kompatibilní s OpenAI (`/chat/completions`)
+- **Autentizace**: Bearer token (API klíč)
+- **Endpoint**: `https://open.bigmodel.cn/api/paas/v4`
+- **Funkce**: streamování, volání nástrojů, thinking mode, vision (podle modelu — glm-4v*, glm-5v*), bezplatné modely
+- **Kontextové okno**: až 1M tokenů (GLM-4-Long)
+- **Podporované modely**: glm-4-flash (bezplatný), glm-4.7-flash, glm-4-plus, glm-4-long (1M), glm-5, glm-5.1
+- **Konfigurace**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`, `contextWindowTokens`
+
+### ErnieClient (Baidu/Qianfan)
+
+- **Typ**: cloudová AI služba
+- **Protokol**: Qianfan v2 API kompatibilní s OpenAI (`/chat/completions`)
+- **Autentizace**: Bearer token (API klíč, formát `bce-v3/...`)
+- **Endpoint**: `https://qianfan.baidubce.com/v2`
+- **Funkce**: streamování, volání nástrojů, bezplatné modely (ernie-speed, ernie-tiny)
+- **Kontextové okno**: až 131K tokenů
+- **Podporované modely**: ernie-5.1 (vlajková loď), ernie-4.0-turbo, ernie-speed-128k (bezplatný), ernie-tiny-8k (bezplatný)
+- **Konfigurace**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
+### HunyuanClient (Tencent)
+
+- **Typ**: cloudová AI služba
+- **Protokol**: API kompatibilní s OpenAI (`/chat/completions`)
+- **Autentizace**: Bearer token (API klíč)
+- **Endpoint**: duální — TokenHub (`https://tokenhub.tencentmaas.com/v1`, doporučeno) + Legacy (`https://api.hunyuan.cloud.tencent.com/v1`)
+- **Funkce**: streamování, volání nástrojů, thinking mode, automatický výběr endpointu podle modelu
+- **Kontextové okno**: až 262K tokenů
+- **Podporované modely**: hy3 (TokenHub, doporučeno), hunyuan-lite (bezplatný), hunyuan-turbos-latest, hunyuan-t1-latest
+- **Konfigurace**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`, `contextWindowTokens`
+
+### MiniMaxClient
+
+- **Typ**: cloudová AI služba
+- **Protokol**: API kompatibilní s OpenAI (`/chat/completions`)
+- **Autentizace**: Bearer token (API klíč)
+- **Endpoint**: duální — domácí (`https://api.minimaxi.com/v1`) + mezinárodní (`https://api.minimax.io/v1`)
+- **Funkce**: streamování, volání nástrojů, thinking mode (adaptivní), reasoning split, multimodální
+- **Kontextové okno**: až 1M tokenů (MiniMax-M3)
+- **Podporované modely**: MiniMax-M3 (vlajková loď, 1M), MiniMax-M2.7, MiniMax-M2.5, MiniMax-M2
+- **Konfigurace**: `apiKey`, `endpoint` (domácí/mezinárodní), `model`, `contextWindowTokens`
+
+### MoonshotClient (Kimi)
+
+- **Typ**: cloudová AI služba
+- **Protokol**: API kompatibilní s OpenAI (`/chat/completions`)
+- **Autentizace**: Bearer token (API klíč)
+- **Endpoint**: `https://api.moonshot.cn/v1`
+- **Funkce**: streamování, volání nástrojů, thinking mode, multimodální
+- **Kontextové okno**: až 262K tokenů
+- **Podporované modely**: kimi-k2.6 (vlajková loď, multimodální), kimi-k2.5, kimi-k2.7-code, moonshot-v1-128k
+- **Konfigurace**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
+### SiliconFlowClient
+
+- **Typ**: cloudová AI služba (agregátor)
+- **Protokol**: API kompatibilní s OpenAI (`/chat/completions`)
+- **Autentizace**: Bearer token (API klíč)
+- **Endpoint**: `https://api.siliconflow.cn/v1`
+- **Funkce**: streamování, volání nástrojů, reasoning obsah, dynamické objevení modelů přes API
+- **Kontextové okno**: až 1M tokenů
+- **Popis**: Agreguje 100+ open-source modelů od více dodavatelů (DeepSeek, Qwen, GLM, Kimi, Step, MiniMax atd.)
+- **Objevení modelů**: Za běhu načítá dostupné modely z `/models` API; při selhání sítě používá náhradní seznam
+- **Konfigurace**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
 ### Rozhraní schopností IAIClient
 
 Rozhraní `IAIClient` definuje schopnosti každého AI klienta a umožňuje `Správci Kontextu` přizpůsobit své chování:
@@ -337,6 +415,13 @@ Každý typ AI klienta má odpovídající implementaci továrny `IAIClientFacto
 - `HerdsmanClientFactory` — vytváří instance HerdsmanClient
 - `LongCatClientFactory` — vytváří instance LongCatClient
 - `QiniuAIClientFactory` — vytváří instance QiniuAIClient
+- `DeepSeekClientFactory` — vytváří instance DeepSeekClient
+- `ZhipuClientFactory` — vytváří instance ZhipuClient
+- `ErnieClientFactory` — vytváří instance ErnieClient
+- `HunyuanClientFactory` — vytváří instance HunyuanClient
+- `MiniMaxClientFactory` — vytváří instance MiniMaxClient
+- `MoonshotClientFactory` — vytváří instance MoonshotClient
+- `SiliconFlowClientFactory` — vytváří instance SiliconFlowClient
 
 Továrny poskytují:
 - `CreateClient(Dictionary<string, object> config)` — instancuje klienta z konfigurace
@@ -360,18 +445,18 @@ Továrny poskytují:
 |------|------|------|------|
 | Ollama | ✅ | Lokální | Lokální AI služba, podpora lokálního nasazení modelů |
 | DashScope (Alibaba Cloud Bailian) | ✅ | Cloud | Alibaba Cloud Bailian AI služba, podpora nasazení ve více regionech |
-| Baidu Qianfan (Wenxin Yiyan) | 📋 | Cloud | Baidu Wenxin Yiyan AI služba |
-| Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan AI služba |
-| Moonshot (Kimi) | 📋 | Cloud | Moonshot Kimi AI služba |
+| Baidu Qianfan (Wenxin Yiyan) | ✅ | Cloud | Baidu Wenxin Yiyan AI služba (ErnieClient), 131K kontext, bezplatné modely |
+| Zhipu AI (GLM) | ✅ | Cloud | Zhipu Qingyan AI služba, thinking mode, vision podle modelu, 1M kontext |
+| Moonshot (Kimi) | ✅ | Cloud | Moonshot Kimi AI služba, 262K kontext, multimodální |
 | Volcengine Ark.Doubao | ✅ | Cloud | ByteDance Doubao AI služba |
 | Herdsman | ✅ | Lokální/Cloud | Inferenční engine bez autentizace, kompatibilní s OpenAI API formátem |
 | Meituan LongCat | ✅ | Cloud | Vlastní velký model Meituan, kompatibilní s OpenAI API formátem, autentizace API klíčem |
 | Qiniu Cloud AI | ✅ | Cloud | Cloudová AI služba Qiniu, autentizace API klíčem |
-| DeepSeek (přímé připojení) | 📋 | Cloud | DeepSeek AI služba |
+| DeepSeek (přímé připojení) | ✅ | Cloud | DeepSeek AI služba, thinking mode, 1M kontext |
 | 01.AI (Yi) | ⚠️ | Cloud | 01.AI AI služba (Zastaralé: registrace nových uživatelů zastavena) |
-| Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan AI služba |
-| SiliconFlow | 📋 | Cloud | SiliconFlow AI služba |
-| MiniMax | 📋 | Cloud | MiniMax AI služba |
+| Tencent Hunyuan | ✅ | Cloud | Tencent Hunyuan AI služba, duální endpoint (TokenHub + Legacy), 262K kontext |
+| SiliconFlow | ✅ | Cloud | SiliconFlow AI služba, dynamický seznam modelů, 1M kontext |
+| MiniMax | ✅ | Cloud | MiniMax AI služba, domácí/mezinárodní endpoint, 1M kontext |
 | OpenAI | 💡 | Cloud | OpenAI API služba (řada GPT) |
 | Anthropic | 💡 | Cloud | Anthropic Claude AI služba |
 | Google DeepMind | 💡 | Cloud | Google Gemini AI služba |

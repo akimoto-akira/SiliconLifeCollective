@@ -127,6 +127,13 @@ Configura il backend AI:
 - Herdsman (locale/cloud, senza autenticazione)
 - Meituan LongCat (cloud)
 - Qiniu Cloud AI (cloud)
+- DeepSeek (cloud, supporto thinking)
+- Zhipu GLM (cloud, supporto thinking e visione)
+- Baidu Qianfan/Wenxin Yiyan (cloud)
+- Tencent Hunyuan (cloud, endpoint doppio TokenHub/Legacy)
+- MiniMax (cloud)
+- Moonshot Kimi (cloud)
+- SiliconFlow (cloud, lista dinamica modelli)
 - Client personalizzato
 
 ### Impostazioni di Archiviazione

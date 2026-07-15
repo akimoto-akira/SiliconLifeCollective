@@ -290,6 +290,70 @@ O sistema suporta múltiplos backends de IA através da interface `IAIClient`:
 - **Configuração**: `apiKey`, `endpoint`, `model`
 - **Características**: Serviço de IA da ByteDance, suporta múltiplos modelos Doubao
 
+### DeepSeekClient
+
+- **Tipo**: Serviço de IA na nuvem
+- **Protocolo**: API compatível com OpenAI (`https://api.deepseek.com`)
+- **Autenticação**: Bearer token (chave API)
+- **Funcionalidades**: Streaming, chamadas de ferramentas, modo thinking (reasoning_content), parâmetro reasoning_effort
+- **Janela de contexto**: 1.048.576 tokens
+- **Configuração**: `apiKey`, `model`
+
+### ZhipuClient (智谱 GLM)
+
+- **Tipo**: Serviço de IA na nuvem
+- **Protocolo**: API compatível com OpenAI (`https://open.bigmodel.cn/api/paas/v4`)
+- **Autenticação**: Bearer token (chave API)
+- **Funcionalidades**: Streaming, chamadas de ferramentas, modo thinking, suporte a visão por modelo
+- **Janela de contexto**: 1.048.576 tokens
+- **Configuração**: `apiKey`, `model`
+
+### ErnieClient (Baidu Qianfan/Wenxin)
+
+- **Tipo**: Serviço de IA na nuvem
+- **Protocolo**: API compatível com OpenAI (`https://qianfan.baidubce.com/v2`)
+- **Autenticação**: Bearer token (chave API)
+- **Funcionalidades**: Streaming, chamadas de ferramentas, suporte a visão por modelo
+- **Janela de contexto**: 131.072 tokens
+- **Configuração**: `apiKey`, `model`
+
+### HunyuanClient (Tencent Hunyuan)
+
+- **Tipo**: Serviço de IA na nuvem
+- **Protocolo**: API compatível com OpenAI (duplo endpoint: TokenHub recomendado + Legacy `https://api.hunyuan.cloud.tencent.com/v1`)
+- **Autenticação**: Bearer token (chave API)
+- **Funcionalidades**: Streaming, chamadas de ferramentas por modelo, sem suporte a visão
+- **Janela de contexto**: 262.144 tokens
+- **Modelos suportados**: hy3 (recomendado), hy3-preview
+- **Configuração**: `apiKey`, `model`
+
+### MiniMaxClient
+
+- **Tipo**: Serviço de IA na nuvem
+- **Protocolo**: API compatível com OpenAI (`https://api.minimaxi.com/v1`)
+- **Autenticação**: Bearer token (chave API)
+- **Funcionalidades**: Streaming, chamadas de ferramentas, suporte a visão por modelo
+- **Janela de contexto**: 1.048.576 tokens
+- **Configuração**: `apiKey`, `model`
+
+### MoonshotClient (Moonshot/Kimi)
+
+- **Tipo**: Serviço de IA na nuvem
+- **Protocolo**: API compatível com OpenAI (`https://api.moonshot.cn/v1`)
+- **Autenticação**: Bearer token (chave API)
+- **Funcionalidades**: Streaming, chamadas de ferramentas, suporte a visão por modelo
+- **Janela de contexto**: 262.144 tokens
+- **Configuração**: `apiKey`, `model`
+
+### SiliconFlowClient (SiliconFlow)
+
+- **Tipo**: Serviço de IA na nuvem (plataforma de agregação)
+- **Protocolo**: API compatível com OpenAI (`https://api.siliconflow.cn/v1`)
+- **Autenticação**: Bearer token (chave API)
+- **Funcionalidades**: Streaming, chamadas de ferramentas, suporte a visão por modelo, obtenção dinâmica da lista de modelos disponíveis (API /models)
+- **Janela de contexto**: 1.048.576 tokens
+- **Configuração**: `apiKey`, `model`
+
 ### Padrão de Fábrica de Clientes
 
 Cada tipo de cliente de IA tem uma implementação de fábrica correspondente `IAIClientFactory`:
@@ -300,6 +364,13 @@ Cada tipo de cliente de IA tem uma implementação de fábrica correspondente `I
 - `HerdsmanClientFactory` — Cria instâncias de HerdsmanClient
 - `LongCatClientFactory` — Cria instâncias de LongCatClient
 - `QiniuAIClientFactory` — Cria instâncias de QiniuAIClient
+- `DeepSeekClientFactory` — Cria instâncias de DeepSeekClient
+- `ZhipuClientFactory` — Cria instâncias de ZhipuClient
+- `ErnieClientFactory` — Cria instâncias de ErnieClient
+- `HunyuanClientFactory` — Cria instâncias de HunyuanClient
+- `MiniMaxClientFactory` — Cria instâncias de MiniMaxClient
+- `MoonshotClientFactory` — Cria instâncias de MoonshotClient
+- `SiliconFlowClientFactory` — Cria instâncias de SiliconFlowClient
 
 As fábricas fornecem:
 - `CreateClient(Dictionary<string, object> config)` — Instancia o cliente a partir da configuração
@@ -335,18 +406,18 @@ A interface `IAIClient` define propriedades de declaração de capacidades do cl
 |------|------|------|------|
 | Ollama | ✅ | Local | Serviço de IA local, suporta implantação de modelos locais |
 | DashScope (Alibaba Cloud) | ✅ | Nuvem | Serviço de IA Alibaba Cloud DashScope, suporta implantação em múltiplas regiões |
-| Baidu Qianfan (Wenxin) | 📋 | Nuvem | Serviço de IA Baidu Wenxin |
-| Zhipu AI (GLM) | 📋 | Nuvem | Serviço de IA Zhipu Qingyan |
-| Moonshot (Kimi) | 📋 | Nuvem | Serviço de IA Moonshot Kimi |
+| Baidu Qianfan (Wenxin) | ✅ | Nuvem | Serviço de IA Baidu Wenxin — ErnieClient |
+| Zhipu AI (GLM) | ✅ | Nuvem | Serviço de IA Zhipu Qingyan — ZhipuClient |
+| Moonshot (Kimi) | ✅ | Nuvem | Serviço de IA Moonshot Kimi — MoonshotClient |
 | Volcengine Ark (Doubao) | ✅ | Nuvem | Serviço de IA Doubao da ByteDance |
 | Herdsman | ✅ | Local/Nuvem | Motor de inferência sem autenticação, compatível com o formato OpenAI API |
 | Meituan LongCat | ✅ | Nuvem | Modelo grande auto-desenvolvido da Meituan, compatível com o formato OpenAI API, autenticação por API Key |
 | Qiniu Cloud AI | ✅ | Nuvem | Serviço de inferência de modelo grande da Qiniu Cloud, compatível com o formato OpenAI API, autenticação por API Key |
-| DeepSeek (Directo) | 📋 | Nuvem | Serviço de IA DeepSeek |
+| DeepSeek (Directo) | ✅ | Nuvem | Serviço de IA DeepSeek — DeepSeekClient, suporta modo thinking |
 | 01.AI (Yi) | ⚠️ | Nuvem | Serviço de IA 01.AI (Obsoleto: registo de novos utilizadores interrompido) |
-| Tencent Hunyuan | 📋 | Nuvem | Serviço de IA Tencent Hunyuan |
-| SiliconFlow | 📋 | Nuvem | Serviço de IA SiliconFlow |
-| MiniMax | 📋 | Nuvem | Serviço de IA MiniMax |
+| Tencent Hunyuan | ✅ | Nuvem | Serviço de IA Tencent Hunyuan — HunyuanClient, duplo endpoint TokenHub/Legacy |
+| SiliconFlow | ✅ | Nuvem | Serviço de IA SiliconFlow — SiliconFlowClient, suporta lista dinâmica de modelos |
+| MiniMax | ✅ | Nuvem | Serviço de IA MiniMax — MiniMaxClient |
 | OpenAI | 💡 | Nuvem | Serviço OpenAI API (série GPT) |
 | Anthropic | 💡 | Nuvem | Serviço de IA Anthropic Claude |
 | Google DeepMind | 💡 | Nuvem | Serviço de IA Google Gemini |

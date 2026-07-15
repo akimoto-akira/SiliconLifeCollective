@@ -38,6 +38,13 @@
   - **Herdsman** — inferenční engine bez autentizace, kompatibilní s OpenAI API formátem
   - **Meituan LongCat** — vlastní velký model Meituan, kompatibilní s OpenAI API formátem, autentizace API klíčem
   - **Qiniu Cloud AI** — cloudová AI služba Qiniu, autentizace API klíčem
+  - **DeepSeek** — thinking mode, reasoning effort, až 1M kontextové okno
+  - **Zhipu AI (GLM)** — thinking mode, vision podle modelu, bezplatné modely, až 1M kontext
+  - **Baidu Qianfan (Ernie)** — bezplatné modely, až 131K kontext
+  - **Tencent Hunyuan** — duální endpoint (TokenHub + Legacy), thinking mode, až 262K kontext
+  - **MiniMax** — domácí/mezinárodní endpoint, adaptivní thinking, multimodální, až 1M kontext
+  - **Moonshot (Kimi)** — thinking mode, multimodální, až 262K kontext
+  - **SiliconFlow** — agregátor 100+ open-source modelů, dynamické objevení modelů, až 1M kontext
 - **32 kalendářních systémů** — úplné pokrytí hlavních světových kalendářů, včetně gregoriánského, čínského lunárního, islámského, hebrejského, japonského, perského, mayského, čínských historických kalendářů atd.
 - **Znalostní síť** — znalostní graf založený na trojicích (subjekt-relace-objekt), podporuje ukládání, dotazování a objevování cest
 - **Projektový pracovní prostor** — správa projektového prostoru, podpora vytváření/archivace/ničení projektů, přiřazování rolí, pracovní poznámky, sledování úkolů a izolace oprávnění nástrojů
@@ -122,7 +129,7 @@ Tento projekt nabízí dvě implementační verze pro různé scénáře:
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programovací jazyk | C# | C# |
 | Typ aplikace | Konzolová aplikace | Desktopová aplikace (systémová lišta Windows/macOS / stavové okno Linux) |
-| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
+| AI integrace | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI (GLM), Baidu Qianfan (Ernie), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow | Ollama (lokální), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI (GLM), Baidu Qianfan (Ernie), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow |
 | Datové úložiště | Souborový systém (JSON + časově indexované adresáře) | SpeedyPack (formát .spk, mapování v paměti + asynchronní perzistence) |
 | Webový server | HttpListener (vestavěný v .NET) | HttpListener (vestavěný v .NET) |
 | Dynamická kompilace | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -160,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Globální lokátor služeb
 │   │
 │   ├── SiliconLife.Common/                # Sdílená implementace (společná pro obě verze)
-│   │   ├── AI/                            # AI klienti a továrny (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
+│   │   ├── AI/                            # AI klienti a továrny (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow)
 │   │   ├── Calendar/                      # 32 implementací kalendáře
 │   │   ├── Localization/                  # Základ lokalizace a 34 jazykových/regionálních variant
 │   │   ├── Resources/                     # Sdílené zdrojové soubory
@@ -266,6 +273,13 @@ Volání nástroje → Exekutor → Správce Oprávnění → [Frekvenční mezi
   - **Herdsman**: Není vyžadována autentizace, kompatibilní s OpenAI API formátem
   - **Meituan LongCat**: Získejte API klíč z platformy Meituan
   - **Qiniu Cloud AI**: Získejte API klíč z [konzole Qiniu](https://portal.qiniu.com/)
+  - **DeepSeek**: Získejte API klíč z [platformy DeepSeek](https://platform.deepseek.com/)
+  - **Zhipu AI**: Získejte API klíč z [platformy Zhipu](https://open.bigmodel.cn/)
+  - **Baidu Qianfan**: Získejte API klíč z [konzole Qianfan](https://qianfan.baidubce.com/)
+  - **Tencent Hunyuan**: Získejte API klíč z [platformy Hunyuan](https://hunyuan.tencent.com/)
+  - **MiniMax**: Získejte API klíč z [platformy MiniMax](https://platform.minimaxi.com/)
+  - **Moonshot (Kimi)**: Získejte API klíč z [platformy Moonshot](https://platform.moonshot.cn/)
+  - **SiliconFlow**: Získejte API klíč z [platformy SiliconFlow](https://cloud.siliconflow.cn/)
 
 ### Sestavení projektu
 

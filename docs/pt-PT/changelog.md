@@ -61,6 +61,24 @@ Ambas as versões partilham as mesmas interfaces e funcionalidades, diferindo ap
 
 ## [Não Publicado]
 
+### 2026-07-15
+
+#### Novas Funcionalidades
+- `4634e33` - Implementação de 7 clientes de IA na nuvem nacionais
+  - DeepSeek (deepseek.com) — Suporta modo thinking (reasoning_content), 1.048.576 de contexto
+  - Zhipu GLM (bigmodel.cn) — Suporta thinking, visão por modelo, 1.048.576 de contexto
+  - Baidu Qianfan/Wenxin (qianfan.baidubce.com) — 131.072 de contexto
+  - Tencent Hunyuan (hunyuan.cloud.tencent.com) — Duplo endpoint TokenHub/Legacy, 262.144 de contexto
+  - MiniMax (minimaxi.com) — 1.048.576 de contexto
+  - Moonshot/Kimi (moonshot.cn) — 262.144 de contexto
+  - SiliconFlow (siliconflow.cn) — Plataforma de agregação, suporta lista dinâmica de modelos, 1.048.576 de contexto
+
+#### Obsolescências
+- 01.AI (零一万物) marcado como obsoleto (registo de novos utilizadores interrompido)
+
+#### Alterações
+- DefaultSiliconBeing / DefaultSiliconBeingFactory registam todas as 7 novas fábricas de clientes
+
 ### 2026-05-26
 
 #### Novas Funcionalidades

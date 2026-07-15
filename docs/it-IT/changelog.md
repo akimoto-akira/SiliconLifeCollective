@@ -61,6 +61,21 @@ Le due versioni condividono le stesse interfacce e funzionalità, differendo sol
 
 ## [Non Pubblicato]
 
+### 2026-07-15
+
+#### Nuove Funzionalità
+- Implementazione di 7 nuovi client AI cloud:
+  - **DeepSeekClient** — Servizio AI DeepSeek, supporto modalità thinking (reasoning_content), parametro reasoning_effort, finestra di contesto da 1.048.576 token
+  - **ZhipuClient (GLM)** — Servizio AI Zhipu Qingyan, supporto thinking e visione per modello, finestra di contesto da 1.048.576 token
+  - **ErnieClient (Baidu Qianfan)** — Servizio AI Baidu Wenxin Yiyan, finestra di contesto da 131.072 token
+  - **HunyuanClient (Tencent Hunyuan)** — Servizio AI Tencent Hunyuan, endpoint doppio TokenHub/Legacy, finestra di contesto da 262.144 token
+  - **MiniMaxClient** — Servizio AI MiniMax, finestra di contesto da 1.048.576 token
+  - **MoonshotClient (Kimi)** — Servizio AI Moonshot Kimi, finestra di contesto da 262.144 token
+  - **SiliconFlowClient** — Piattaforma di aggregazione SiliconFlow, lista dinamica modelli, finestra di contesto da 1.048.576 token
+
+#### Deprecato
+- **01.AI (Yi)** — Servizio AI 01.AI deprecato (registrazione nuovi utenti interrotta)
+
 ### 2026-05-26
 
 #### Nuove Funzionalità

@@ -316,6 +316,79 @@ Das System unterstützt mehrere KI-Backends über die `IAIClient`-Schnittstelle:
 - **Funktionen**: Streaming, Werkzeugaufrufe
 - **Konfiguration**: `apiKey`, `endpoint`, `model`
 
+### DeepSeekClient
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Endpoint**: `https://api.deepseek.com`
+- **Funktionen**: Streaming, Werkzeugaufrufe, Thinking-Modus (reasoning_content), konfigurierbare Schlussfolgerungsstärke (reasoning_effort)
+- **Kontextfenster**: Bis zu 1M Tokens (deepseek-v4-Serie); 131K Tokens (andere DeepSeek-Modelle)
+- **Konfiguration**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`, `reasoningEffort`
+
+### ZhipuClient (GLM)
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Endpoint**: `https://open.bigmodel.cn/api/paas/v4`
+- **Funktionen**: Streaming, Werkzeugaufrufe, Thinking-Modus (nur GLM-5-Serie), Vision (modellabhängig: glm-4v/glm-5v-Serien)
+- **Kontextfenster**: Bis zu 1M Tokens (GLM-5.2, GLM-4-long); 200K Tokens (GLM-4.7/4.6); 131K Tokens (GLM-4/5 Standard)
+- **Kostenloses Modell**: `glm-4-flash` verfügbar
+- **Konfiguration**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`
+
+### ErnieClient (Baidu/Qianfan)
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API (Qianfan v2)
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Endpoint**: `https://qianfan.baidubce.com/v2`
+- **Funktionen**: Streaming, Werkzeugaufrufe, Vision (nur ERNIE-5-Serie)
+- **Kontextfenster**: Bis zu 131K Tokens (ERNIE-5, ERNIE-3.5-128k, ERNIE-speed-128k); 8K Tokens (ERNIE-4/3.5/speed/tiny Standard)
+- **Kostenlose Modelle**: `ernie-speed`, `ernie-tiny` verfügbar
+- **Konfiguration**: `apiKey`, `endpoint`, `model`
+
+### HunyuanClient (Tencent)
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Dual-Endpunkte**: TokenHub (empfohlen: `https://tokenhub.tencentmaas.com/v1`) + Legacy (`https://api.hunyuan.cloud.tencent.com/v1`)
+- **Funktionen**: Streaming, Werkzeugaufrufe (modellabhängig: hy3, hunyuan-turbos/t1/turbo), Thinking-Modus (hy3, hy-2.0)
+- **Kontextfenster**: Bis zu 262K Tokens (hy3, hunyuan-lite, hunyuan-t1); 131K Tokens (hunyuan-turbos, hunyuan-a13b, hy-2.0); 32K Tokens (hunyuan-pro/standard)
+- **Konfiguration**: `apiKey`, `endpoint`, `model`, `thinkingEnabled`
+
+### MiniMaxClient
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Endpoint**: `https://api.minimaxi.com/v1`
+- **Funktionen**: Streaming, Werkzeugaufrufe, Thinking-Modus mit reasoning_split (adaptiv bei M3), Vision (M3: Bild + Video)
+- **Kontextfenster**: Bis zu 1M Tokens (M3, M1/text-01); 200K Tokens (M2.5/M2.1); 196K Tokens (M2/M2.7)
+- **Konfiguration**: `apiKey`, `endpoint`, `model`
+
+### MoonshotClient (Kimi)
+
+- **Typ**: Cloud-KI-Service
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Endpoint**: `https://api.moonshot.cn/v1`
+- **Funktionen**: Streaming, Werkzeugaufrufe, Thinking-Modus (kimi-k2.7: enabled+keep=all; kimi-k2.5/k2.6: standardmäßig deaktiviert), Vision (kimi-k2.5/k2.6/k2.7)
+- **Kontextfenster**: Bis zu 262K Tokens (kimi-k2-Serie); 131K Tokens (v1-128k); 32K Tokens (v1-32k); 8K Tokens (v1-8k)
+- **Konfiguration**: `apiKey`, `endpoint`, `model`
+
+### SiliconFlowClient
+
+- **Typ**: Cloud-KI-Service (Modell-Aggregator)
+- **Protokoll**: OpenAI-kompatible API
+- **Authentifizierung**: Bearer-Token (API-Schlüssel)
+- **Endpoint**: `https://api.siliconflow.cn/v1`
+- **Funktionen**: Streaming, Werkzeugaufrufe, Reasoning-Inhalte (enable_thinking); aggregiert 100+ Open-Source-Modelle von mehreren Anbietern; dynamische Modellliste
+- **Kontextfenster**: Modellabhängig — bis zu 1M Tokens (DeepSeek-V4, GLM-5.2, MiniMax-M3); 268K Tokens (Qwen3.6/3.5, Kimi-K2, Gemma-4); 168K Tokens (DeepSeek-V3)
+- **Vision**: Modellabhängig (Qwen3.5-9B/Qwen3.6-VL, GLM-4.6v/5v, Kimi-K2.5/K2.6/K2.7)
+- **Konfiguration**: `apiKey`, `endpoint`, `model`
+
 ### IAIClient-Fähigkeitsschnittstelle
 
 Die `IAIClient`-Schnittstelle definiert die Fähigkeiten jedes KI-Clients und ermöglicht es dem `ContextManager`, sein Verhalten anzupassen:
@@ -338,6 +411,13 @@ Jeder KI-Client-Typ hat eine entsprechende Fabrikimplementierung von `IAIClientF
 - `HerdsmanClientFactory` — Erstellt HerdsmanClient-Instanzen
 - `LongCatClientFactory` — Erstellt LongCatClient-Instanzen
 - `QiniuAIClientFactory` — Erstellt QiniuAIClient-Instanzen
+- `DeepSeekClientFactory` — Erstellt DeepSeekClient-Instanzen
+- `ZhipuClientFactory` — Erstellt ZhipuClient-Instanzen
+- `ErnieClientFactory` — Erstellt ErnieClient-Instanzen
+- `HunyuanClientFactory` — Erstellt HunyuanClient-Instanzen
+- `MiniMaxClientFactory` — Erstellt MiniMaxClient-Instanzen
+- `MoonshotClientFactory` — Erstellt MoonshotClient-Instanzen
+- `SiliconFlowClientFactory` — Erstellt SiliconFlowClient-Instanzen
 
 Die Fabriken bieten:
 - `CreateClient(Dictionary<string, object> config)` — Instanziiert einen Client aus der Konfiguration
@@ -361,18 +441,18 @@ Die Fabriken bieten:
 |------|------|------|------|
 | Ollama | ✅ | Lokal | Lokaler KI-Dienst, unterstützt lokale Modellbereitstellung |
 | DashScope (Alibaba Cloud Bailian) | ✅ | Cloud | Alibaba Cloud Bailian KI-Dienst, unterstützt Multi-Region-Bereitstellung |
-| Baidu Qianfan (Wenxin Yiyan) | 📋 | Cloud | Baidu Wenxin Yiyan KI-Dienst |
-| Zhipu AI (GLM) | 📋 | Cloud | Zhipu Qingyan KI-Dienst |
-| Moonshot (Kimi) | 📋 | Cloud | Moonshot Kimi KI-Dienst |
+| Baidu Qianfan (Wenxin Yiyan) | ✅ | Cloud | Baidu Wenxin Yiyan KI-Dienst, Qianfan v2 OpenAI-kompatible API, 131K Kontext |
+| Zhipu AI (GLM) | ✅ | Cloud | Zhipu Qingyan KI-Dienst, Thinking-Modus (GLM-5), Vision (modellabhängig), 1M Kontext |
+| Moonshot (Kimi) | ✅ | Cloud | Moonshot Kimi KI-Dienst, Thinking-Modus, Vision (K2.5+), 262K Kontext |
 | Volcengine Ark Doubao | ✅ | Cloud | ByteDance Doubao KI-Dienst |
 | Herdsman | ✅ | Lokal/Cloud | Authentifizierungsfreie Inferenz-Engine, kompatibel mit OpenAI-API-Format |
 | Meituan LongCat | ✅ | Cloud | Meituans eigenes Großmodell, kompatibel mit OpenAI-API-Format, API-Schlüssel-Authentifizierung |
 | Qiniu Cloud AI | ✅ | Cloud | Qiniu Cloud-KI-Service, API-Schlüssel-Authentifizierung |
-| DeepSeek (Direktverbindung) | 📋 | Cloud | DeepSeek KI-Dienst |
-| 01.AI (Yi) | ⚠️ | Cloud | 01.AI KI-Dienst (Veraltet: Registrierung neuer Nutzer eingestellt) |
-| Tencent Hunyuan | 📋 | Cloud | Tencent Hunyuan KI-Dienst |
-| SiliconFlow | 📋 | Cloud | SiliconFlow KI-Dienst |
-| MiniMax | 📋 | Cloud | MiniMax KI-Dienst |
+| DeepSeek (Direktverbindung) | ✅ | Cloud | DeepSeek KI-Dienst, Thinking-Modus, 1M Kontext |
+| 01.AI (Yi) | ⚠️ | Cloud | 01.AI KI-Dienst (Veraltet: Neuregistrierung eingestellt) |
+| Tencent Hunyuan | ✅ | Cloud | Tencent Hunyuan KI-Dienst, Dual-Endpunkte (TokenHub + Legacy), 262K Kontext |
+| SiliconFlow | ✅ | Cloud | SiliconFlow KI-Dienst, aggregiert 100+ Open-Source-Modelle, dynamische Modellliste, 1M Kontext |
+| MiniMax | ✅ | Cloud | MiniMax KI-Dienst, Thinking mit reasoning_split, Vision (M3), 1M Kontext |
 | OpenAI | 💡 | Cloud | OpenAI API-Dienst (GPT-Serie) |
 | Anthropic | 💡 | Cloud | Anthropic Claude KI-Dienst |
 | Google DeepMind | 💡 | Cloud | Google Gemini KI-Dienst |

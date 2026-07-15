@@ -127,6 +127,13 @@ Konfiguracja backendów AI:
 - Herdsman (lokalna/chmurowa, bez autoryzacji)
 - Meituan LongCat (chmurowa)
 - Qiniu Cloud AI (chmurowa)
+- DeepSeek (chmurowa, tryb thinking)
+- Zhipu AI GLM (chmurowa, tryb thinking, wizja wg modelu)
+- Ernie Baidu Qianfan (chmurowa)
+- Tencent Hunyuan (chmurowa, podwójny endpoint)
+- MiniMax (chmurowa)
+- Moonshot Kimi (chmurowa, tryb thinking)
+- SiliconFlow (chmurowa, agregator modeli)
 - Niestandardowi klienci
 
 ### Ustawienia przechowywania

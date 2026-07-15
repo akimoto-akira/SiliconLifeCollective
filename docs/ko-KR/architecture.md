@@ -286,6 +286,77 @@
 - **설정**: `apiKey`, `endpoint`, `model`
 - **특징**: 바이트댄스 AI 서비스, 다양한 더우바오 모델 지원
 
+### DeepSeekClient(DeepSeek)
+
+- **타입**: 클라우드 AI 서비스
+- **프로토콜**: OpenAI 호환 API
+- **엔드포인트**: `https://api.deepseek.com`
+- **인증**: Bearer 토큰(API 키)
+- **기능**: 스트리밍, 툴 콜, 사고망(thinking) 모드, 추론 콘텐츠
+- **컨텍스트 윈도우**: 최대 1M 토큰(DeepSeek-V4 시리즈), 기본 131K 토큰
+- **설정**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
+### ZhipuClient(즈푸 GLM)
+
+- **타입**: 클라우드 AI 서비스
+- **프로토콜**: OpenAI 호환 API
+- **엔드포인트**: `https://open.bigmodel.cn/api/paas/v4`
+- **인증**: Bearer 토큰(API 키)
+- **기능**: 스트리밍, 툴 콜, 사고망(thinking) 모드, 비전(모델별 지원), 무료 모델(glm-4-flash) 지원
+- **컨텍스트 윈도우**: 최대 1M 토큰(GLM-4-Long, GLM-5.2), 기본 131K 토큰
+- **설정**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
+### ErnieClient(바이두 천판/원이이옌)
+
+- **타입**: 클라우드 AI 서비스
+- **프로토콜**: OpenAI 호환 API(천판 v2)
+- **엔드포인트**: `https://qianfan.baidubce.com/v2`
+- **인증**: Bearer 토큰(API 키)
+- **기능**: 스트리밍, 툴 콜, 무료 모델(ernie-speed, ernie-tiny) 지원
+- **컨텍스트 윈도우**: 최대 131K 토큰
+- **설정**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
+### HunyuanClient(텐센트 혼위안)
+
+- **타입**: 클라우드 AI 서비스
+- **프로토콜**: OpenAI 호환 API
+- **엔드포인트**: TokenHub(권장) `https://tokenhub.tencentmaas.com/v1`, 레거시 `https://api.hunyuan.cloud.tencent.com/v1`
+- **인증**: Bearer 토큰(API 키)
+- **기능**: 스트리밍, 툴 콜, 사고망(thinking) 모드, 추론 콘텐츠
+- **컨텍스트 윈도우**: 최대 262K 토큰
+- **특징**: 모델명에 따라 TokenHub/레거시 엔드포인트 자동 선택(hy3 시리즈 → TokenHub)
+- **설정**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
+### MiniMaxClient
+
+- **타입**: 클라우드 AI 서비스
+- **프로토콜**: OpenAI 호환 API
+- **엔드포인트**: 국내 `https://api.minimaxi.com/v1`, 국제 `https://api.minimax.io/v1`
+- **인증**: Bearer 토큰(API 키)
+- **기능**: 스트리밍, 툴 콜, 사고망(thinking) 모드, 적응형 추론(reasoning_split), 멀티모달
+- **컨텍스트 윈도우**: 최대 1M 토큰
+- **설정**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
+### MoonshotClient(위즈덤 문/Kimi)
+
+- **타입**: 클라우드 AI 서비스
+- **프로토콜**: OpenAI 호환 API
+- **엔드포인트**: `https://api.moonshot.cn/v1`
+- **인증**: Bearer 토큰(API 키)
+- **기능**: 스트리밍, 툴 콜, 사고망(thinking) 모드, 추론 콘텐츠
+- **컨텍스트 윈도우**: 최대 262K 토큰
+- **설정**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
+### SiliconFlowClient(실리콘 플로우)
+
+- **타입**: 클라우드 AI 서비스
+- **프로토콜**: OpenAI 호환 API
+- **엔드포인트**: `https://api.siliconflow.cn/v1`
+- **인증**: Bearer 토큰(API 키)
+- **기능**: 스트리밍, 툴 콜, 사고망(thinking) 모드, 동적 모델 목록, 100개 이상 오픈소스 모델 집합
+- **컨텍스트 윈도우**: 최대 1M 토큰
+- **설정**: `apiKey`, `endpoint`, `model`, `contextWindowTokens`
+
 ### 클라이언트 팩토리 패턴
 
 각 AI 클라이언트 타입에는 `IAIClientFactory`를 구현하는 해당 팩토리가 있습니다:
@@ -296,6 +367,13 @@
 - `HerdsmanClientFactory` —— HerdsmanClient 인스턴스 생성
 - `LongCatClientFactory` —— LongCatClient 인스턴스 생성
 - `QiniuAIClientFactory` —— QiniuAIClient 인스턴스 생성
+- `DeepSeekClientFactory` —— DeepSeekClient 인스턴스 생성
+- `ZhipuClientFactory` —— ZhipuClient 인스턴스 생성
+- `ErnieClientFactory` —— ErnieClient 인스턴스 생성
+- `HunyuanClientFactory` —— HunyuanClient 인스턴스 생성
+- `MiniMaxClientFactory` —— MiniMaxClient 인스턴스 생성
+- `MoonshotClientFactory` —— MoonshotClient 인스턴스 생성
+- `SiliconFlowClientFactory` —— SiliconFlowClient 인스턴스 생성
 
 팩토리가 제공하는 기능:
 - `CreateClient(Dictionary<string, object> config)` —— 설정에서 클라이언트 인스턴스화
@@ -331,18 +409,18 @@
 |------|------|------|------|
 | Ollama | ✅ | 로컬 | 로컬 AI 서비스, 로컬 모델 배포 지원 |
 | DashScope(알리윈 바이리안) | ✅ | 클라우드 | 알리윈 바이리안 AI 서비스, 다중 리전 배포 지원 |
-| 바이두 첸판(원이이옌) | 📋 | 클라우드 | 바이두 원이이옌 AI 서비스 |
-| 즈푸 AI(GLM) | 📋 | 클라우드 | 즈푸칭옌 AI 서비스 |
-| 위즈덤 문(Dark Side)(Kimi) | 📋 | 클라우드 | 위즈덤 문(Dark Side) Kimi AI 서비스 |
+| DeepSeek | ✅ | 클라우드 | DeepSeek AI 서비스, 사고망 모드, 1M 컨텍스트 |
+| 즈푸 AI(GLM) | ✅ | 클라우드 | 즈푸칭옌 AI 서비스, 사고망 모드, 비전, 1M 컨텍스트 |
+| 바이두 천판(원이이옌) | ✅ | 클라우드 | 바이두 원이이옌 AI 서비스, 131K 컨텍스트, 무료 모델 지원 |
+| 텐센트 혼위안 | ✅ | 클라우드 | 텐센트 혼위안 AI 서비스, 듀얼 엔드포인트, 262K 컨텍스트 |
+| MiniMax | ✅ | 클라우드 | MiniMax AI 서비스, 1M 컨텍스트, 멀티모달 |
+| 위즈덤 문(Kimi) | ✅ | 클라우드 | 위즈덤 문 Kimi AI 서비스, 262K 컨텍스트 |
+| 실리콘 플로우 | ✅ | 클라우드 | 실리콘 플로우 AI 서비스, 100+ 모델 집합, 1M 컨텍스트 |
 | 바이트댄스 Ark.더우바오 | ✅ | 클라우드 | 바이트댄스 더우바오 AI 서비스 |
 | Herdsman | ✅ | 로컬/클라우드 | 인증 없는 추론 엔진, OpenAI API 형식 호환 |
 | Meituan LongCat | ✅ | 클라우드 | 메이퇀 자체 개발 대형 모델, OpenAI API 형식 호환, API 키 인증 |
 | Qiniu Cloud AI | ✅ | 클라우드 | 치니우 클라우드 대형 모델 추론 서비스, OpenAI API 형식 호환, API 키 인증 |
-| DeepSeek(직접 연결) | 📋 | 클라우드 | DeepSeek AI 서비스 |
-| 링이완우 | ⚠️ | 클라우드 | 링이완우 AI 서비스 (폐기됨: 신규 사용자 등록 중단) |
-| 텐센트 혼위안 | 📋 | 클라우드 | 텐센트 혼위안 AI 서비스 |
-| 실리콘 플로우 | 📋 | 클라우드 | 실리콘 플로우 AI 서비스 |
-| MiniMax | 📋 | 클라우드 | MiniMax AI 서비스 |
+| 링이완우(零一万物) | ⚠️ | 클라우드 | 폐기됨: 신규 사용자 등록 중단 |
 | OpenAI | 💡 | 클라우드 | OpenAI API 서비스(GPT 시리즈) |
 | Anthropic | 💡 | 클라우드 | Anthropic Claude AI 서비스 |
 | Google DeepMind | 💡 | 클라우드 | Google Gemini AI 서비스 |

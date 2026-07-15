@@ -34,6 +34,13 @@
 - **Support multi-backends IA**
   - **Ollama** — Déploiement de modèles locaux, utilisation de l'API HTTP native
   - **Alibaba Cloud Bailian (DashScope)** — Service IA cloud, compatible API OpenAI, prenant en charge plus de 13 modèles, déploiement multi-régions
+  - **DeepSeek** — Service IA cloud, mode thinking, 1M contexte, contrôle de l'effort de raisonnement
+  - **Zhipu AI (GLM)** — Service IA cloud, mode thinking (GLM-5), vision par modèle, 1M contexte, modèle gratuit `glm-4-flash`
+  - **Baidu Qianfan (ERNIE)** — Service IA cloud, 131K contexte, modèles gratuits disponibles
+  - **Tencent Hunyuan** — Service IA cloud, double endpoint (TokenHub + Legacy), mode thinking, 262K contexte
+  - **MiniMax** — Service IA cloud, multimodal natif M3 (image + vidéo), 1M contexte
+  - **Moonshot (Kimi)** — Service IA cloud, mode thinking, vision, 262K contexte
+  - **SiliconFlow** — Service IA cloud agrégateur, 100+ modèles open source, liste de modèles dynamique, 1M contexte
   - **Volcengine Ark** — Service IA cloud de ByteDance, prenant en charge les modes flux et non-flux, avec contrôle de débit intégré
   - **Herdsman** — Moteur d'inférence sans authentification, compatible avec le format API OpenAI
   - **Meituan LongCat** — Grand modèle développé en interne par Meituan, compatible avec le format API OpenAI, authentification par clé API
@@ -122,7 +129,7 @@ Ce projet propose deux versions d'implémentation, répondant à différents sc�
 | Runtime | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Langage de programmation | C# | C# |
 | Type d'application | Application console | Application de bureau (barre d'état système Windows/macOS / fenêtre d'état Linux) |
-| Intégration IA | Ollama (local), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (local), Alibaba Cloud Bailian (cloud), Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
+| Intégration IA | Ollama (local), Alibaba Cloud Bailian (cloud), DeepSeek, Zhipu AI (GLM), Baidu Qianfan (ERNIE), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow, Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (local), Alibaba Cloud Bailian (cloud), DeepSeek, Zhipu AI (GLM), Baidu Qianfan (ERNIE), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow, Volcengine Ark (cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
 | Stockage de données | Système de fichiers (JSON + répertoires d'index temporel) | SpeedyPack (format .spk, cartographie en mémoire + persistance asynchrone) |
 | Serveur Web | HttpListener (intégré .NET) | HttpListener (intégré .NET) |
 | Compilation dynamique | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -160,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Localisateur de services global
 │   │
 │   ├── SiliconLife.Common/                # Implémentations partagées (communes aux deux versions)
-│   │   ├── AI/                            # Clients IA et fabriques (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
+│   │   ├── AI/                            # Clients IA et fabriques (Ollama, DashScope, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow, VolcengineArk, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32 implémentations de calendriers
 │   │   ├── Localization/                  # Classe de base de localisation et 34 variantes linguistiques/régionales
 │   │   ├── Resources/                     # Fichiers de ressources partagées
@@ -259,9 +266,16 @@ Appel d'outil → Exécuteur → Gestionnaire d'Autorisations → [Cache de fré
 ### Prérequis
 
 - **.NET 9 SDK** — [Lien de téléchargement](https://dotnet.microsoft.com/download/dotnet/9.0)
-- **Backend IA** (choisir l'un des trois) :
+- **Backend IA** (choisir parmi les options disponibles) :
   - **Ollama** : [Installer Ollama](https://ollama.com) et tirer un modèle (par exemple `ollama pull llama3`)
   - **Alibaba Cloud Bailian** : Obtenir une clé API depuis la [console Bailian](https://bailian.console.aliyun.com/)
+  - **DeepSeek** : Obtenir une clé API depuis la [plateforme DeepSeek](https://platform.deepseek.com/)
+  - **Zhipu AI** : Obtenir une clé API depuis [open.bigmodel.cn](https://open.bigmodel.cn/)
+  - **Baidu Qianfan** : Obtenir une clé API depuis [qianfan.baidubce.com](https://qianfan.baidubce.com/)
+  - **Tencent Hunyuan** : Obtenir une clé API depuis [hunyuan.tencent.com](https://hunyuan.tencent.com/)
+  - **MiniMax** : Obtenir une clé API depuis [platform.minimaxi.com](https://platform.minimaxi.com/)
+  - **Moonshot** : Obtenir une clé API depuis [platform.moonshot.cn](https://platform.moonshot.cn/)
+  - **SiliconFlow** : Obtenir une clé API depuis [cloud.siliconflow.cn](https://cloud.siliconflow.cn/)
   - **Volcengine Ark** : Obtenir une clé API depuis la [console Volcengine](https://console.volcengine.com/ark)
   - **Herdsman** : Sans authentification, compatible avec le format API OpenAI
   - **Meituan LongCat** : Obtenir une clé API depuis la plateforme Meituan

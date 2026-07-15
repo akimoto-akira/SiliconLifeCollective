@@ -284,7 +284,7 @@ public class MyCustomSkin : ISkin
 
 ```
 SiliconLife.Common/
-├── AI/                    # AI clients and factory implementations
+├── AI/                    # AI clients and factory implementations (Ollama, DashScope, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow, VolcengineArk, Herdsman, LongCat, QiniuAI)
 ├── Calendar/              # 32 calendar implementations
 ├── Localization/          # Localization base classes and 34 language variant implementations
 ├── Security/              # Permission Manager

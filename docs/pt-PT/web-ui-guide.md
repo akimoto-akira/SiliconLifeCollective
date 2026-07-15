@@ -127,6 +127,13 @@ Configurar o backend de IA:
 - Herdsman (local/nuvem, sem autenticação)
 - Meituan LongCat (nuvem)
 - Qiniu Cloud AI (nuvem)
+- DeepSeek (nuvem)
+- Zhipu GLM (nuvem)
+- Baidu Qianfan/Wenxin (nuvem)
+- Tencent Hunyuan (nuvem)
+- MiniMax (nuvem)
+- Moonshot/Kimi (nuvem)
+- SiliconFlow (nuvem)
 - Clientes personalizados
 
 ### Definições de Armazenamento

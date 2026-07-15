@@ -593,6 +593,34 @@ data: {"type": "complete", "sessionId": "uuid"}
       "apiKey": "...",
       "endpoint": "...",
       "model": "..."
+    },
+    "DeepSeek": {
+      "apiKey": "...",
+      "model": "..."
+    },
+    "Zhipu": {
+      "apiKey": "...",
+      "model": "..."
+    },
+    "Ernie": {
+      "apiKey": "...",
+      "model": "..."
+    },
+    "Hunyuan": {
+      "apiKey": "...",
+      "model": "..."
+    },
+    "MiniMax": {
+      "apiKey": "...",
+      "model": "..."
+    },
+    "Moonshot": {
+      "apiKey": "...",
+      "model": "..."
+    },
+    "SiliconFlow": {
+      "apiKey": "...",
+      "model": "..."
     }
   }
 }

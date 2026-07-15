@@ -33,6 +33,13 @@
 - **Ollama** (선택, 로컬 AI용) - [다운로드](https://ollama.com/)
 - **바이리안 API 키** (선택, 클라우드 AI용) - [신청](https://bailian.console.aliyun.com/)
 - **Volcano Engine Ark API 키** (선택, 클라우드 AI용) - [신청](https://console.volcengine.com/ark)
+- **DeepSeek API 키** (선택, 클라우드 AI용) - [신청](https://platform.deepseek.com/)
+- **즈푸 AI API 키** (선택, 클라우드 AI용) - [신청](https://open.bigmodel.cn/)
+- **바이두 천판 API 키** (선택, 클라우드 AI용) - [신청](https://console.bce.baidu.com/qianfan/)
+- **텐센트 혼위안 API 키** (선택, 클라우드 AI용) - [신청](https://console.cloud.tencent.com/hunyuan/)
+- **MiniMax API 키** (선택, 클라우드 AI용) - [신청](https://platform.minimaxi.com/)
+- **위즈덤 문(Kimi) API 키** (선택, 클라우드 AI용) - [신청](https://platform.moonshot.cn/)
+- **실리콘 플로우 API 키** (선택, 클라우드 AI용) - [신청](https://cloud.siliconflow.cn/)
 - **Herdsman** (선택, 로컬/클라우드 추론 엔진) - 인증 없음, OpenAI API 형식 호환
 - **Meituan LongCat API 키** (선택, 클라우드 AI용) - API 키 인증
 - **Qiniu Cloud AI API 키** (선택, 클라우드 AI용) - API 키 인증
@@ -143,6 +150,111 @@ dotnet build
   }
 }
 ```
+
+#### 옵션 G: DeepSeek (클라우드)
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "API-키",
+      "Model": "deepseek-chat"
+    }
+  }
+}
+```
+
+> **특징**: 사고망(thinking) 모드 지원, DeepSeek-V4 시리즈는 1M 컨텍스트 윈도우 제공.
+
+#### 옵션 H: 즈푸 AI/GLM (클라우드)
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "API-키",
+      "Model": "glm-4-flash"
+    }
+  }
+}
+```
+
+> **특징**: 사고망 모드, 비전(모델별), 무료 모델(glm-4-flash) 지원. GLM-4-Long/GLM-5.2는 1M 컨텍스트 제공.
+
+#### 옵션 I: 바이두 천판/원이이옌 (클라우드)
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "API-키",
+      "Model": "ernie-4.0-8k"
+    }
+  }
+}
+```
+
+> **특징**: 천판 v2 OpenAI 호환 API, 무료 모델(ernie-speed, ernie-tiny) 지원, 최대 131K 컨텍스트.
+
+#### 옵션 J: 텐센트 혼위안 (클라우드)
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "API-키",
+      "Model": "hunyuan-t1"
+    }
+  }
+}
+```
+
+> **특징**: TokenHub/레거시 엔드포인트 자동 선택, 사고망 모드, 최대 262K 컨텍스트.
+
+#### 옵션 K: MiniMax (클라우드)
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "API-키",
+      "Model": "MiniMax-M3"
+    }
+  }
+}
+```
+
+> **특징**: 1M 컨텍스트, 멀티모달, 적응형 추론 지원. 국제 엔드포인트 사용 시 `endpoint`를 `international`로 설정.
+
+#### 옵션 L: 위즈덤 문/Kimi (클라우드)
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "API-키",
+      "Model": "kimi-k2"
+    }
+  }
+}
+```
+
+> **특징**: 사고망 모드, 최대 262K 컨텍스트.
+
+#### 옵션 M: 실리콘 플로우 (클라우드)
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "API-키",
+      "Model": "Qwen/Qwen3-235B-A22B"
+    }
+  }
+}
+```
+
+> **특징**: 100개 이상 오픈소스 모델 집합, 동적 모델 목록, 사고망 모드, 1M 컨텍스트.
 
 ### 4. 애플리케이션 실행
 

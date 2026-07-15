@@ -34,9 +34,17 @@
   - **Ollama** — 로컬 모델 배포, 네이티브 HTTP API 사용
   - **알리바바 클라우드 DashScope(百炼)** — 클라우드 AI 서비스, OpenAI API 호환, 13개 이상 모델 지원, 다중 지역 배포
   - **Volcengine Ark(火山引擎)** — ByteDance 클라우드 AI 서비스, 스트리밍 및 비스트리밍 모드 지원, 내장 속도 제어
+  - **DeepSeek** — DeepSeek AI 서비스, 사고망 모드, 1M 컨텍스트 윈도우
+  - **즈푸 AI(GLM)** — 즈푸칭옌 AI 서비스, 사고망 모드, 비전, 1M 컨텍스트 윈도우
+  - **바이두 천판(원이이옌)** — 바이두 AI 서비스, 131K 컨텍스트, 무료 모델 지원
+  - **텐센트 혼위안** — 텐센트 AI 서비스, 듀얼 엔드포인트(TokenHub + 레거시), 262K 컨텍스트
+  - **MiniMax** — MiniMax AI 서비스, 1M 컨텍스트, 멀티모달
+  - **위즈덤 문(Kimi)** — Kimi AI 서비스, 262K 컨텍스트
+  - **실리콘 플로우** — 100개 이상 오픈소스 모델 집합, 동적 모델 목록, 1M 컨텍스트
   - **Herdsman** — 인증 없는 추론 엔진, OpenAI API 형식 호환
   - **Meituan LongCat** — 메이퇀 자체 개발 대형 모델, OpenAI API 형식 호환, API 키 인증
   - **Qiniu Cloud AI** — 치니우 클라우드 대형 모델 추론 서비스, OpenAI API 형식 호환, API 키 인증
+  - **零一万物(링이완우)** — ⚠️ 폐기됨(신규 사용자 등록 중지)
 - **32가지 캘린더 시스템** — 전 세계 주요 달력 완전 커버, 양력, 음력, 이슬람력, 히브리력, 일본력, 페르시아력, 마야력, 중국 역사력 등 포함
 - **노리지 네트워크 시스템** — 트리플(주어-관계-목적어) 기반 지식 그래프, 저장, 쿼리 및 경로 발견 지원
 - **프로젝트 워크스페이스** — 프로젝트 공간 관리, 프로젝트 생성/아카이빙/삭제, 역할 할당, 워크 노트, 태스크 추적 및 툴 퍼미션 격리 지원
@@ -121,7 +129,7 @@
 | 런타임 | .NET 9 | .NET 9(Windows/macOS/Linux) |
 | 프로그래밍 언어 | C# | C# |
 | 애플리케이션 유형 | 콘솔 애플리케이션 | 데스크톱 애플리케이션(Windows/macOS 시스템 트레이 / Linux 상태 창) |
-| AI 통합 | Ollama(로컬), 알리바바 클라우드 DashScope(클라우드), Volcengine Ark(클라우드), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama(로컬), 알리바바 클라우드 DashScope(클라우드), Volcengine Ark(클라우드), Herdsman, Meituan LongCat, Qiniu Cloud AI |
+| AI 통합 | Ollama(로컬), DashScope(클라우드), Volcengine Ark(클라우드), DeepSeek, 즈푸 GLM, 바이두 천판, 텐센트 혼위안, MiniMax, 위즈덤 문(Kimi), 실리콘 플로우, Herdsman, LongCat, Qiniu Cloud AI | Ollama(로컬), DashScope(클라우드), Volcengine Ark(클라우드), DeepSeek, 즈푸 GLM, 바이두 천판, 텐센트 혼위안, MiniMax, 위즈덤 문(Kimi), 실리콘 플로우, Herdsman, LongCat, Qiniu Cloud AI |
 | 데이터 스토리지 | 파일 시스템(JSON + 시간 인덱스 디렉토리) | SpeedyPack(.spk 형식, 메모리 매핑 + 비동기 영속화) |
 | 웹 서버 | HttpListener(.NET 내장) | HttpListener(.NET 내장) |
 | 동적 컴파일 | Roslyn(Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn(Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -159,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # 글로벌 서비스 로케이터
 │   │
 │   ├── SiliconLife.Common/                # 공유 구현(두 버전 공용)
-│   │   ├── AI/                            # AI 클라이언트 및 팩토리(Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
+│   │   ├── AI/                            # AI 클라이언트 및 팩토리(Ollama, DashScope, VolcengineArk, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow, Herdsman, LongCat, QiniuAI)
 │   │   ├── Calendar/                      # 32가지 캘린더 구현
 │   │   ├── Localization/                  # 로컬라이제이션 베이스 클래스 및 34개 언어/지역 변형 구현
 │   │   ├── Resources/                     # 공유 리소스 파일
@@ -262,6 +270,13 @@ SiliconLifeCollective.sln
   - **Ollama**: [Ollama 설치](https://ollama.com) 및 모델 풀(예: `ollama pull llama3`)
   - **알리바바 클라우드 DashScope**: [DashScope 콘솔](https://bailian.console.aliyun.com/)에서 API 키 획득
   - **Volcengine Ark**: [Volcengine 콘솔](https://console.volcengine.com/ark)에서 API 키 획득
+  - **DeepSeek**: [DeepSeek 플랫폼](https://platform.deepseek.com/)에서 API 키 획득
+  - **즈푸 AI**: [즈푸 개방 플랫폼](https://open.bigmodel.cn/)에서 API 키 획득
+  - **바이두 천판**: [천판 콘솔](https://console.bce.baidu.com/qianfan/)에서 API 키 획득
+  - **텐센트 혼위안**: [혼위안 콘솔](https://console.cloud.tencent.com/hunyuan/)에서 API 키 획득
+  - **MiniMax**: [MiniMax 개방 플랫폼](https://platform.minimaxi.com/)에서 API 키 획득
+  - **위즈덤 문(Kimi)**: [Moonshot 개방 플랫폼](https://platform.moonshot.cn/)에서 API 키 획득
+  - **실리콘 플로우**: [SiliconFlow 플랫폼](https://cloud.siliconflow.cn/)에서 API 키 획득
 
 ### 프로젝트 빌드
 

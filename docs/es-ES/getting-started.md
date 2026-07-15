@@ -36,6 +36,13 @@ Este proyecto proporciona dos versiones de implementación:
 - **Herdsman** (opcional, motor de inferencia local/nube) - Sin autenticación, compatible con el formato API OpenAI
 - **Clave API de Meituan LongCat** (opcional, para IA en la nube) - Autenticación por clave API
 - **Clave API de Qiniu Cloud AI** (opcional, para IA en la nube) - Autenticación por clave API
+- **Clave API de DeepSeek** (opcional, para IA en la nube) - [Solicitar](https://platform.deepseek.com/)
+- **Clave API de Zhipu AI (GLM)** (opcional, para IA en la nube) - [Solicitar](https://open.bigmodel.cn/), modelo gratuito disponible
+- **Clave API de Baidu Qianfan (Wenxin)** (opcional, para IA en la nube) - [Solicitar](https://console.bce.baidu.com/qianfan/), modelos gratuitos disponibles
+- **Clave API de Tencent Hunyuan** (opcional, para IA en la nube) - [Solicitar](https://console.cloud.tencent.com/hunyuan/)
+- **Clave API de MiniMax** (opcional, para IA en la nube) - [Solicitar](https://platform.minimaxi.com/)
+- **Clave API de Moonshot (Kimi)** (opcional, para IA en la nube) - [Solicitar](https://platform.moonshot.cn/)
+- **Clave API de SiliconFlow** (opcional, para IA en la nube) - [Solicitar](https://cloud.siliconflow.cn/), agrega 100+ modelos de código abierto
 
 ## Inicio Rápido
 
@@ -143,6 +150,122 @@ Edite `src/SiliconLife.Default/Config/DefaultConfigData.cs` o modifique la confi
   }
 }
 ```
+
+#### Opción G: DeepSeek (Nube)
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "clave-api",
+      "Endpoint": "https://api.deepseek.com",
+      "Model": "deepseek-v4-flash",
+      "ThinkingEnabled": true,
+      "ReasoningEffort": "high"
+    }
+  }
+}
+```
+
+> **Características**: Modo thinking con `reasoning_content`, control de esfuerzo de razonamiento (`high`/`medium`/`low`), ventana de contexto 1M. Modelos: `deepseek-v4-flash` (alta velocidad), `deepseek-v4-pro` (razonamiento insignia).
+
+#### Opción H: Zhipu AI / GLM (Nube)
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "clave-api",
+      "Endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "Model": "glm-4-flash",
+      "ThinkingEnabled": false
+    }
+  }
+}
+```
+
+> **Características**: Modelo gratuito `glm-4-flash` recomendado para depuración; `glm-4-long` soporta 1M de contexto; serie GLM-5 soporta modo thinking; visión disponible en modelos `glm-4v*`/`glm-5v*`.
+
+#### Opción I: Baidu Qianfan / Wenxin (Nube)
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "clave-api",
+      "Endpoint": "https://qianfan.baidubce.com/v2",
+      "Model": "ernie-5.1"
+    }
+  }
+}
+```
+
+> **Características**: Modelos gratuitos disponibles (`ernie-speed-128k`, `ernie-tiny-8k`); `ernie-5.1` soporta multimodal; ventana de contexto máxima 131K.
+
+#### Opción J: Tencent Hunyuan (Nube)
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "clave-api",
+      "Endpoint": "https://tokenhub.tencentmaas.com/v1",
+      "Model": "hy3",
+      "ThinkingEnabled": false
+    }
+  }
+}
+```
+
+> **Características**: Doble endpoint — TokenHub (`https://tokenhub.tencentmaas.com/v1`, recomendado para hy3) y Legacy (`https://api.hunyuan.cloud.tencent.com/v1`); `hunyuan-lite` es gratuito pero sin llamadas a herramientas; modo thinking para serie hy3; ventana de contexto máxima 262K.
+
+#### Opción K: MiniMax (Nube)
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "clave-api",
+      "Endpoint": "domestic",
+      "Model": "MiniMax-M3"
+    }
+  }
+}
+```
+
+> **Características**: Endpoint `domestic` (`https://api.minimaxi.com/v1`) o `international` (`https://api.minimax.io/v1`); M3 soporta multimodal nativo (imagen + vídeo); ventana de contexto máxima 1M.
+
+#### Opción L: Moonshot / Kimi (Nube)
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "clave-api",
+      "Endpoint": "https://api.moonshot.cn/v1",
+      "Model": "kimi-k2.6"
+    }
+  }
+}
+```
+
+> **Características**: `kimi-k2.6` insignia multimodal; `kimi-k2.7-code` fuerza modo thinking para código; visión soportada en modelos con sufijo `vision`; ventana de contexto máxima 262K.
+
+#### Opción M: SiliconFlow (Nube)
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "clave-api",
+      "Endpoint": "https://api.siliconflow.cn/v1",
+      "Model": "deepseek-ai/DeepSeek-V3.2"
+    }
+  }
+}
+```
+
+> **Características**: Agrega 100+ modelos de código abierto de múltiples proveedores; lista de modelos obtenida dinámicamente vía API `/models` con fallback a lista curada; visión soportada en modelos con sufijo `vision`; ventana de contexto máxima 1M.
 
 ### 4. Ejecutar la aplicación
 

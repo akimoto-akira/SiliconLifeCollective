@@ -280,7 +280,7 @@ public class MyCustomSkin : ISkin
 
 ```
 SiliconLife.Common/
-├── AI/                    # AI 用戶端與工廠實作
+├── AI/                    # AI 用戶端與工廠實作（Ollama、DashScope、VolcengineArk、Herdsman、LongCat、QiniuAI、DeepSeek、Zhipu、Ernie、Hunyuan、MiniMax、Moonshot、SiliconFlow）
 ├── Calendar/              # 32 種日曆實作
 ├── Localization/          # 在地化基底類別與 34 種語言變體實作
 ├── Security/              # 權限管理器

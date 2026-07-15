@@ -61,6 +61,24 @@
 
 ## [未發佈]
 
+### 2026-07-15
+
+#### 新功能
+- `4634e33` - 7個國產AI雲端用戶端實作
+  - DeepSeek（deepseek.com）— 支援 thinking 模式（reasoning_content），1,048,576 上下文
+  - 智譜GLM（bigmodel.cn）— 支援 thinking，按模型判斷視覺，1,048,576 上下文
+  - 百度千帆/文心一言（qianfan.baidubce.com）— 131,072 上下文
+  - 騰訊混元（hunyuan.cloud.tencent.com）— 雙端點 TokenHub/Legacy，262,144 上下文
+  - MiniMax（minimaxi.com）— 1,048,576 上下文
+  - 月之暗面Kimi（moonshot.cn）— 262,144 上下文
+  - 矽基流動（siliconflow.cn）— 聚合平臺，支援動態模型清單，1,048,576 上下文
+
+#### 廢棄
+- 零一萬物標記為已廢棄（停止新使用者註冊）
+
+#### 變更
+- DefaultSiliconBeing / DefaultSiliconBeingFactory 註冊全部7個新用戶端工廠
+
 ### 2026-05-26
 
 #### 新功能

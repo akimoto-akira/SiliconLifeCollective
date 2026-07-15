@@ -127,6 +127,13 @@ Configurar el backend de IA:
 - Herdsman (local/nube, sin autenticación)
 - Meituan LongCat (nube)
 - Qiniu Cloud AI (nube)
+- DeepSeek (nube, modo thinking, 1M contexto)
+- Zhipu AI / GLM (nube, thinking + visión, modelo gratuito)
+- Baidu Qianfan / Wenxin (nube, modelos gratuitos)
+- Tencent Hunyuan (nube, doble endpoint, 262K contexto)
+- MiniMax (nube, thinking, multimodal)
+- Moonshot / Kimi (nube, thinking, multimodal)
+- SiliconFlow (nube, 100+ modelos agregados)
 - Cliente personalizado
 
 ### Ajustes de Almacenamiento

@@ -284,7 +284,7 @@ public class MyCustomSkin : ISkin
 
 ```
 SiliconLife.Common/
-├── AI/                    # AI 클라이언트 및 팩토리 구현
+├── AI/                    # AI 클라이언트 및 팩토리 구현 (Ollama, DashScope, VolcengineArk, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow, Herdsman, LongCat, QiniuAI)
 ├── Calendar/              # 32가지 캘린더 구현
 ├── Localization/          # 로컬라이제이션 베이스 클래스 및 34개 언어 변형 구현
 ├── Security/              # 퍼미션 매니저

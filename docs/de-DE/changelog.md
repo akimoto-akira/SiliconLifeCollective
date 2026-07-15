@@ -61,6 +61,23 @@ Beide Versionen teilen sich dieselben Schnittstellen und Funktionen und untersch
 
 ## [Unveröffentlicht]
 
+### 2026-07-09
+
+#### Neue Funktionen
+- 7 neue KI-Client-Implementierungen hinzugefügt:
+  - **DeepSeekClient** — DeepSeek KI-Service, Thinking-Modus, 1M Kontext (deepseek-v4)
+  - **ZhipuClient (GLM)** — Zhipu AI, Thinking (GLM-5), Vision (modellabhängig), kostenloses Modell `glm-4-flash`, 1M Kontext
+  - **ErnieClient (Baidu/Qianfan)** — Baidu Wenxin Yiyan, Qianfan v2 API, 131K Kontext, kostenlose Modelle verfügbar
+  - **HunyuanClient (Tencent)** — Tencent Hunyuan, Dual-Endpunkte (TokenHub + Legacy), Thinking, 262K Kontext
+  - **MiniMaxClient** — MiniMax KI-Service, Thinking mit reasoning_split, Vision (M3: Bild + Video), 1M Kontext
+  - **MoonshotClient (Kimi)** — Moonshot Kimi, Thinking, Vision (K2.5+), 262K Kontext
+  - **SiliconFlowClient** — SiliconFlow Modell-Aggregator, 100+ Open-Source-Modelle, dynamische Modellliste, 1M Kontext
+- Alle 7 Clients unterstützen: Streaming, Werkzeugaufrufe, OpenAI-kompatible API, Bearer-Token-Authentifizierung
+- 01.AI (Yi) als veraltet markiert (⚠️ Neuregistrierung eingestellt)
+
+#### Dokumentation
+- Deutsche Dokumentation (de-DE) aktualisiert: Architektur, Schnellstart, API-Referenz, Entwicklungshandbuch, README, Änderungsprotokoll
+
 ### 2026-05-26
 
 #### Neue Funktionen

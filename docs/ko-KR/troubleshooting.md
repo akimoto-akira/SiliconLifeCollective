@@ -102,6 +102,23 @@ HTTP 404: Endpoint not found
 3. Model 매개변수가 모델 이름이 아닌 추론 엔드포인트 ID(예: `ep-20241212123456-abcde`)를 사용하는지 확인
 4. 계정에 해당 엔드포인트 접근 권한이 있는지 확인
 
+#### 문제: DeepSeek/Zhipu/Ernie/Hunyuan/MiniMax/Moonshot/SiliconFlow 연결 실패
+
+**증상**:
+```
+HTTP 401: Unauthorized
+또는
+HTTP 403: Forbidden
+```
+
+**해결책**:
+1. API 키가 올바른지 확인
+2. API 키에 해당 모델 접근 권한이 있는지 확인
+3. 엔드포인트가 올바른지 확인 (기본 엔드포인트는 자동 설정됨)
+4. 계정 잔액이 충분한지 확인
+5. **텐센트 혼위안**: hy3 시리즈 모델은 TokenHub 엔드포인트(`https://tokenhub.tencentmaas.com/v1`)를 자동 사용
+6. **MiniMax**: 국제 서비스 사용 시 `endpoint`를 `international`로 설정
+
 ---
 
 ### 런타임 문제

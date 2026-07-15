@@ -36,6 +36,13 @@
 - **牧马人推理引擎**（可选，本地/云端推理） - 无需认证，兼容 OpenAI API 格式
 - **美团 LongCat API 密钥**（可选，用于云端 AI） - API Key 认证
 - **七牛云 AI API 密钥**（可选，用于云端 AI） - API Key 认证
+- **DeepSeek API 密钥**（可选，用于云端 AI） - [申请](https://platform.deepseek.com/)
+- **智谱 AI API 密钥**（可选，用于云端 AI） - [申请](https://open.bigmodel.cn/)
+- **百度千帆 API 密钥**（可选，用于云端 AI） - [申请](https://qianfan.baidubce.com/)
+- **腾讯混元 API 密钥**（可选，用于云端 AI） - [申请](https://cloud.tencent.com/product/hunyuan)
+- **MiniMax API 密钥**（可选，用于云端 AI） - [申请](https://api.minimaxi.com/)
+- **月之暗面 API 密钥**（可选，用于云端 AI） - [申请](https://platform.moonshot.cn/)
+- **硅基流动 API 密钥**（可选，用于云端 AI） - [申请](https://siliconflow.cn/)
 
 ## 快速开始
 
@@ -143,6 +150,111 @@ dotnet build
   }
 }
 ```
+
+#### 选项 G：DeepSeek（云端）
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "your-api-key-here",
+      "Model": "deepseek-chat"
+    }
+  }
+}
+```
+
+> **特点**：支持 thinking 模式（reasoning_content），1,048,576 上下文窗口。
+
+#### 选项 H：智谱 GLM（云端）
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "your-api-key-here",
+      "Model": "glm-4-plus"
+    }
+  }
+}
+```
+
+> **特点**：支持 thinking 模式，按模型判断视觉支持，1,048,576 上下文窗口。
+
+#### 选项 I：百度千帆/文心一言（云端）
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "your-api-key-here",
+      "Model": "ernie-4.0-8k"
+    }
+  }
+}
+```
+
+> **特点**：百度千帆平台，131,072 上下文窗口。
+
+#### 选项 J：腾讯混元（云端）
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "your-api-key-here",
+      "Model": "hy3"
+    }
+  }
+}
+```
+
+> **特点**：双端点（TokenHub 推荐 / Legacy），推荐 hy3 模型，262,144 上下文窗口。
+
+#### 选项 K：MiniMax（云端）
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "your-api-key-here",
+      "Model": "MiniMax-Text-01"
+    }
+  }
+}
+```
+
+> **特点**：1,048,576 上下文窗口。
+
+#### 选项 L：月之暗面 Kimi（云端）
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "your-api-key-here",
+      "Model": "moonshot-v1-auto"
+    }
+  }
+}
+```
+
+> **特点**：262,144 上下文窗口。
+
+#### 选项 M：硅基流动（云端）
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "your-api-key-here",
+      "Model": "Qwen/Qwen2.5-7B-Instruct"
+    }
+  }
+}
+```
+
+> **特点**：聚合平台，支持动态获取可用模型列表，1,048,576 上下文窗口。
 
 ### 4. 运行应用程序
 

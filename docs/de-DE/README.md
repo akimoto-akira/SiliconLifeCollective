@@ -38,6 +38,13 @@
   - **Herdsman** — Authentifizierungsfreie Inferenz-Engine, kompatibel mit OpenAI-API-Format
   - **Meituan LongCat** — Meituans eigenes Großmodell, kompatibel mit OpenAI-API-Format, API-Schlüssel-Authentifizierung
   - **Qiniu Cloud AI** — Qiniu Cloud-KI-Service, API-Schlüssel-Authentifizierung
+  - **DeepSeek** — DeepSeek KI-Service direkt, Thinking-Modus, 1M Kontext, API-Schlüssel-Authentifizierung
+  - **Zhipu AI (GLM)** — Zhipu Qingyan KI-Service, Thinking (GLM-5), Vision (modellabhängig), kostenloses Modell `glm-4-flash`, 1M Kontext
+  - **Baidu Qianfan (ERNIE)** — Baidu Wenxin Yiyan KI-Service, Qianfan v2 API, kostenlose Modelle verfügbar, 131K Kontext
+  - **Tencent Hunyuan** — Tencent Hunyuan KI-Service, Dual-Endpunkte (TokenHub + Legacy), Thinking, 262K Kontext
+  - **MiniMax** — MiniMax KI-Service, Thinking mit reasoning_split, Vision (M3: Bild + Video), 1M Kontext
+  - **Moonshot (Kimi)** — Moonshot Kimi KI-Service, Thinking, Vision (K2.5+), 262K Kontext
+  - **SiliconFlow** — Modell-Aggregator, 100+ Open-Source-Modelle, dynamische Modellliste, 1M Kontext
 - **32 Kalendersysteme** — Vollständige Abdeckung der wichtigsten weltweiten Kalendersysteme, einschließlich Gregorianisch, Chinesisch, Islamisch, Hebräisch, Japanisch, Persisch, Maya, historische chinesische Kalender usw.
 - **Wissensnetzwerk-System** — Auf Tripeln (Subjekt-Relation-Objekt) basierendes Wissensnetzwerk mit Speicherung, Abfrage und Pfadfindung
 - **Projektarbeitsbereich** — Projektraumverwaltung mit Projekterstellung/-archivierung/-zerstörung, Rollenzuweisung, Arbeitsnotizen, Aufgabenverfolgung und Werkzeugberechtigungsisolierung
@@ -122,7 +129,7 @@ Dieses Projekt bietet zwei Implementierungsversionen für unterschiedliche Anwen
 | Laufzeit | .NET 9 | .NET 9 (Windows/macOS/Linux) |
 | Programmiersprache | C# | C# |
 | Anwendungstyp | Konsolenanwendung | Desktop-Anwendung (Windows/macOS-System-Tray / Linux-Statusfenster) |
-| KI-Integration | Ollama (lokal), Alibaba Cloud Bailian (Cloud), Volcengine Ark (Cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI | Ollama (lokal), Alibaba Cloud Bailian (Cloud), Volcengine Ark (Cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI |
+| KI-Integration | Ollama (lokal), Alibaba Cloud Bailian (Cloud), Volcengine Ark (Cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI (GLM), Baidu Qianfan (ERNIE), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow | Ollama (lokal), Alibaba Cloud Bailian (Cloud), Volcengine Ark (Cloud), Herdsman, Meituan LongCat, Qiniu Cloud AI, DeepSeek, Zhipu AI (GLM), Baidu Qianfan (ERNIE), Tencent Hunyuan, MiniMax, Moonshot (Kimi), SiliconFlow |
 | Datenspeicher | Dateisystem (JSON + Zeitindex-Verzeichnisse) | SpeedyPack (.spk-Format, Speicherabbildung + asynchrone Persistierung) |
 | Web-Server | HttpListener (.NET-integriert) | HttpListener (.NET-integriert) |
 | Dynamische Kompilierung | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) | Roslyn (Microsoft.CodeAnalysis.CSharp 4.13.0) |
@@ -160,7 +167,7 @@ SiliconLifeCollective.sln
 │   │   └── ServiceLocator.cs              # Globaler Service-Locator
 │   │
 │   ├── SiliconLife.Common/                # Gemeinsame Implementierung (von beiden Versionen genutzt)
-│   │   ├── AI/                            # KI-Clients und Fabriken (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI)
+│   │   ├── AI/                            # KI-Clients und Fabriken (Ollama, DashScope, VolcengineArk, Herdsman, LongCat, QiniuAI, DeepSeek, Zhipu, Ernie, Hunyuan, MiniMax, Moonshot, SiliconFlow)
 │   │   ├── Calendar/                      # 32 Kalenderimplementierungen
 │   │   ├── Localization/                  # Lokalisierungsbasis und 34 Sprach-/Regionalvarianten
 │   │   ├── Resources/                     # Gemeinsame Ressourcendateien
@@ -266,6 +273,13 @@ Werkzeugaufruf → Executor → Berechtigungsmanager → [Benutzerfrequenz-Cache
   - **Herdsman**: Keine Authentifizierung erforderlich, kompatibel mit OpenAI-API-Format
   - **Meituan LongCat**: API-Schlüssel von der Meituan-Plattform abrufen
   - **Qiniu Cloud AI**: API-Schlüssel von der [Qiniu-Konsole](https://portal.qiniu.com/) abrufen
+  - **DeepSeek**: API-Schlüssel von [DeepSeek Platform](https://platform.deepseek.com/) abrufen
+  - **Zhipu AI (GLM)**: API-Schlüssel von [BigModel](https://open.bigmodel.cn/) abrufen
+  - **Baidu Qianfan (ERNIE)**: API-Schlüssel von [Qianfan](https://qianfan.baidubce.com/) abrufen
+  - **Tencent Hunyuan**: API-Schlüssel von [Tencent Cloud](https://console.cloud.tencent.com/hunyuan) abrufen
+  - **MiniMax**: API-Schlüssel von [MiniMax Platform](https://platform.minimaxi.com/) abrufen
+  - **Moonshot (Kimi)**: API-Schlüssel von [Moonshot](https://platform.moonshot.cn/) abrufen
+  - **SiliconFlow**: API-Schlüssel von [SiliconFlow Cloud](https://cloud.siliconflow.cn/) abrufen
 
 ### Projekt erstellen
 

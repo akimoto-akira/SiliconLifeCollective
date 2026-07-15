@@ -123,6 +123,13 @@ Lorsque l'IA appelle un outil :
 Configurer le backend IA :
 - Ollama (local)
 - Bailian (cloud)
+- DeepSeek (cloud, mode thinking)
+- Zhipu AI / GLM (cloud, mode thinking, vision)
+- Baidu Qianfan / ERNIE (cloud)
+- Tencent Hunyuan (cloud, TokenHub + Legacy)
+- MiniMax (cloud, multimodal M3)
+- Moonshot / Kimi (cloud, mode thinking, vision)
+- SiliconFlow (cloud, agrégateur 100+ modèles)
 - Volcengine Ark (cloud)
 - Herdsman (local/cloud, sans authentification)
 - Meituan LongCat (cloud)

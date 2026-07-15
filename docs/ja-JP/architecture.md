@@ -287,6 +287,79 @@
 - **設定**：`apiKey`、`endpoint`、`model`
 - **特徴**：ByteDance の AI サービス、複数の豆包モデルをサポート
 
+### DeepSeekClient（DeepSeek）
+
+- **タイプ**：クラウド AI サービス
+- **プロトコル**：OpenAI 互換 API
+- **エンドポイント**：`https://api.deepseek.com`
+- **認証**：Bearer トークン（API キー）
+- **機能**：ストリーミング、ツールコール、思考モード（thinking）、推論コンテンツ（reasoning_content）
+- **コンテキストウィンドウ**：最大 1M（1,048,576）トークン
+- **設定**：`apiKey`、`endpoint`、`model`、`contextWindowTokens`
+
+### ZhipuClient（智谱AI GLM）
+
+- **タイプ**：クラウド AI サービス
+- **プロトコル**：OpenAI 互換 API
+- **エンドポイント**：`https://open.bigmodel.cn/api/paas/v4`
+- **認証**：Bearer トークン（API キー）
+- **機能**：ストリーミング、ツールコール、思考モード（thinking）、推論コンテンツ（reasoning_content）、モデル別ビジョン対応
+- **コンテキストウィンドウ**：最大 1M（1,048,576）トークン
+- **設定**：`apiKey`、`endpoint`、`model`、`contextWindowTokens`
+
+### ErnieClient（百度千帆）
+
+- **タイプ**：クラウド AI サービス
+- **プロトコル**：OpenAI 互換 API
+- **エンドポイント**：`https://qianfan.baidubce.com/v2`
+- **認証**：Bearer トークン（API キー）
+- **機能**：ストリーミング、ツールコール、推論コンテンツ（reasoning_content）、モデル別ビジョン対応
+- **コンテキストウィンドウ**：最大 131K（131,072）トークン
+- **設定**：`apiKey`、`endpoint`、`model`、`contextWindowTokens`
+
+### HunyuanClient（騰訊混元）
+
+- **タイプ**：クラウド AI サービス
+- **プロトコル**：OpenAI 互換 API
+- **エンドポイント**：TokenHub（推奨）`https://tokenhub.tencentmaas.com/v1` または レガシー `https://api.hunyuan.cloud.tencent.com/v1`
+- **認証**：Bearer トークン（API キー）
+- **機能**：ストリーミング、ツールコール、思考モード（thinking）、推論コンテンツ（reasoning_content）、モデル別ツールコール対応
+- **対応モデル**：hy3（TokenHub、256K、推奨）、hy3-preview（TokenHub、256K、Agent）
+- **コンテキストウィンドウ**：最大 262K（262,144）トークン
+- **特徴**：モデル名に基づいて TokenHub とレガシーエンドポイントを自動選択
+- **設定**：`apiKey`、`endpoint`、`model`、`contextWindowTokens`
+
+### MiniMaxClient（MiniMax）
+
+- **タイプ**：クラウド AI サービス
+- **プロトコル**：OpenAI 互換 API
+- **エンドポイント**：国内 `https://api.minimaxi.com/v1` / 国際 `https://api.minimax.io/v1`
+- **認証**：Bearer トークン（API キー）
+- **機能**：ストリーミング、ツールコール、思考モード（adaptive thinking）、推論コンテンツ（reasoning_content）、モデル別ビジョン対応
+- **コンテキストウィンドウ**：最大 1M（1,048,576）トークン
+- **設定**：`apiKey`、`endpoint`（国内/国際）、`model`、`contextWindowTokens`
+
+### MoonshotClient（月之暗面 Kimi）
+
+- **タイプ**：クラウド AI サービス
+- **プロトコル**：OpenAI 互換 API
+- **エンドポイント**：`https://api.moonshot.cn/v1`
+- **認証**：Bearer トークン（API キー）
+- **機能**：ストリーミング、ツールコール、思考モード（thinking）、推論コンテンツ（reasoning_content）、モデル別ビジョン対応
+- **コンテキストウィンドウ**：最大 262K（262,144）トークン
+- **設定**：`apiKey`、`endpoint`、`model`、`contextWindowTokens`
+
+### SiliconFlowClient（硅基流動）
+
+- **タイプ**：クラウド AI サービス
+- **プロトコル**：OpenAI 互換 API
+- **エンドポイント**：`https://api.siliconflow.cn/v1`
+- **認証**：Bearer トークン（API キー）
+- **機能**：ストリーミング、ツールコール、思考モード（enable_thinking）、推論コンテンツ（reasoning_content）、モデル別ビジョン対応、動的モデルリスト取得
+- **コンテキストウィンドウ**：最大 1M（1,048,576）トークン
+- **特徴**：API 経由で利用可能なモデルリストを動的取得
+- **設定**：`apiKey`、`endpoint`、`model`、`contextWindowTokens`
+
 ### クライアントファクトリーパターン
 
 各 AI クライアントタイプには、対応する `IAIClientFactory` 実装があります：
@@ -297,6 +370,13 @@
 - `HerdsmanClientFactory` —— HerdsmanClient インスタンスを作成
 - `LongCatClientFactory` —— LongCatClient インスタンスを作成
 - `QiniuAIClientFactory` —— QiniuAIClient インスタンスを作成
+- `DeepSeekClientFactory` —— DeepSeekClient インスタンスを作成
+- `ZhipuClientFactory` —— ZhipuClient インスタンスを作成
+- `ErnieClientFactory` —— ErnieClient インスタンスを作成
+- `HunyuanClientFactory` —— HunyuanClient インスタンスを作成
+- `MiniMaxClientFactory` —— MiniMaxClient インスタンスを作成
+- `MoonshotClientFactory` —— MoonshotClient インスタンスを作成
+- `SiliconFlowClientFactory` —— SiliconFlowClient インスタンスを作成
 
 ファクトリーが提供する機能：
 - `CreateClient(Dictionary<string, object> config)` —— 設定からクライアントをインスタンス化
@@ -332,18 +412,18 @@
 |------|------|------|------|
 | Ollama | ✅ | ローカル | ローカル AI サービス、ローカルモデルデプロイをサポート |
 | DashScope（Alibaba Cloud Bailian） | ✅ | クラウド | Alibaba Cloud Bailian AI サービス、マルチリージョンデプロイをサポート |
-| 百度千帆（文心一言） | 📋 | クラウド | 百度文心一言 AI サービス |
-| 智谱AI（GLM） | 📋 | クラウド | 智谱清言 AI サービス |
-| 月之暗面（Kimi） | 📋 | クラウド | 月之暗面 Kimi AI サービス |
+| 百度千帆（文心一言） | ✅ | クラウド | 百度文心一言 AI サービス、131K コンテキスト、モデル別ビジョン対応 |
+| 智谱AI（GLM） | ✅ | クラウド | 智谱清言 AI サービス、思考モード対応、モデル別ビジョン、1M コンテキスト |
+| 月之暗面（Kimi） | ✅ | クラウド | 月之暗面 Kimi AI サービス、思考モード対応、262K コンテキスト |
 | 火山方舟引擎.豆包 | ✅ | クラウド | ByteDance 豆包 AI サービス |
 | Herdsman | ✅ | ローカル/クラウド | 認証不要の推論エンジン、OpenAI API 形式互換 |
 | Meituan LongCat | ✅ | クラウド | 美団独自開発大規模モデル、OpenAI API 形式互換、API キー認証 |
 | Qiniu Cloud AI | ✅ | クラウド | 七牛クラウド大規模モデル推論サービス、OpenAI API 形式互換、API キー認証 |
-| DeepSeek（直結） | 📋 | クラウド | DeepSeek AI サービス |
-| 零一万物 | ⚠️ | クラウド | 零一万物 AI サービス（廃止予定：新規ユーザー登録停止） |
-| 腾讯混元 | 📋 | クラウド | Tencent 混元 AI サービス |
-| 硅基流动 | 📋 | クラウド | SiliconFlow AI サービス |
-| MiniMax | 📋 | クラウド | MiniMax AI サービス |
+| DeepSeek（直結） | ✅ | クラウド | DeepSeek AI サービス、思考モード対応、1M コンテキスト |
+| 零一万物 | ⚠️ | クラウド | 零一万物 AI サービス（⚠️非推奨：新規ユーザー登録停止） |
+| 腾讯混元 | ✅ | クラウド | Tencent 混元 AI サービス、TokenHub + レガシーのデュアルエンドポイント、262K コンテキスト |
+| 硅基流动 | ✅ | クラウド | SiliconFlow AI サービス、動的モデルリスト、1M コンテキスト |
+| MiniMax | ✅ | クラウド | MiniMax AI サービス、国内/国際エンドポイント、1M コンテキスト |
 | OpenAI | 💡 | クラウド | OpenAI API サービス（GPT シリーズ） |
 | Anthropic | 💡 | クラウド | Anthropic Claude AI サービス |
 | Google DeepMind | 💡 | クラウド | Google Gemini AI サービス |

@@ -36,6 +36,13 @@ Ce projet propose deux versions d'implémentation :
 - **Herdsman** (facultatif, moteur d'inférence local/cloud) - Sans authentification, compatible avec le format API OpenAI
 - **Clé API Meituan LongCat** (facultatif, pour l'IA cloud) - Authentification par clé API
 - **Clé API Qiniu Cloud AI** (facultatif, pour l'IA cloud) - Authentification par clé API
+- **Clé API DeepSeek** (facultatif, pour l'IA cloud) - [Demander](https://platform.deepseek.com/)
+- **Clé API Zhipu AI** (facultatif, pour l'IA cloud) - [Demander](https://open.bigmodel.cn/)
+- **Clé API Baidu Qianfan** (facultatif, pour l'IA cloud) - [Demander](https://qianfan.baidubce.com/)
+- **Clé API Tencent Hunyuan** (facultatif, pour l'IA cloud) - [Demander](https://hunyuan.tencent.com/)
+- **Clé API MiniMax** (facultatif, pour l'IA cloud) - [Demander](https://platform.minimaxi.com/)
+- **Clé API Moonshot** (facultatif, pour l'IA cloud) - [Demander](https://platform.moonshot.cn/)
+- **Clé API SiliconFlow** (facultatif, pour l'IA cloud) - [Demander](https://cloud.siliconflow.cn/)
 
 ## Démarrage rapide
 
@@ -143,6 +150,118 @@ dotnet build
   }
 }
 ```
+
+#### Option G : DeepSeek (Cloud)
+
+```json
+{
+  "AIClients": {
+    "DeepSeek": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://api.deepseek.com",
+      "Model": "deepseek-v4-flash"
+    }
+  }
+}
+```
+
+> **Caractéristiques** : Mode thinking activé par défaut, 1M contexte, contrôle de l'effort de raisonnement (`reasoningEffort`).
+
+#### Option H : Zhipu AI / GLM (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Zhipu": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://open.bigmodel.cn/api/paas/v4",
+      "Model": "glm-4-flash"
+    }
+  }
+}
+```
+
+> **Caractéristiques** : Mode thinking pour GLM-5, vision selon le modèle (glm-4v/glm-5v), modèle gratuit `glm-4-flash`, 1M contexte.
+
+#### Option I : Baidu Qianfan / ERNIE (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Ernie": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://qianfan.baidubce.com/v2",
+      "Model": "ernie-5.1"
+    }
+  }
+}
+```
+
+> **Caractéristiques** : Modèles gratuits disponibles (`ernie-speed`, `ernie-tiny`), 131K contexte.
+
+#### Option J : Tencent Hunyuan (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Hunyuan": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://tokenhub.tencentmaas.com/v1",
+      "Model": "hy3"
+    }
+  }
+}
+```
+
+> **Endpoints disponibles** : TokenHub (recommandé) : `https://tokenhub.tencentmaas.com/v1` ; Legacy : `https://api.hunyuan.cloud.tencent.com/v1`. Mode thinking pour hy3/hy-2.0, 262K contexte.
+
+#### Option K : MiniMax (Cloud)
+
+```json
+{
+  "AIClients": {
+    "MiniMax": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://api.minimaxi.com/v1",
+      "Model": "MiniMax-M3"
+    }
+  }
+}
+```
+
+> **Caractéristiques** : Multimodal natif (image + vidéo pour M3), mode thinking adaptatif, 1M contexte.
+
+#### Option L : Moonshot / Kimi (Cloud)
+
+```json
+{
+  "AIClients": {
+    "Moonshot": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://api.moonshot.cn/v1",
+      "Model": "kimi-k2.6"
+    }
+  }
+}
+```
+
+> **Caractéristiques** : Mode thinking (k2.5/k2.6/k2.7), multimodal, 262K contexte.
+
+#### Option M : SiliconFlow (Cloud — Agrégateur)
+
+```json
+{
+  "AIClients": {
+    "SiliconFlow": {
+      "ApiKey": "clé-api",
+      "Endpoint": "https://api.siliconflow.cn/v1",
+      "Model": "deepseek-ai/DeepSeek-V3.2"
+    }
+  }
+}
+```
+
+> **Caractéristiques** : Agrège 100+ modèles open source de multiples fournisseurs, liste de modèles dynamique, 1M contexte.
 
 ### 4. Exécuter l'application
 

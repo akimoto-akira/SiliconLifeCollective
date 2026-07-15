@@ -61,6 +61,22 @@
 
 ## [未リリース]
 
+### 2026-07-15
+
+#### 新機能
+- 7つの新しい AI クライアントを実装、国内主要 AI プラットフォームへの直接接続を完了
+  - **DeepSeekClient** — `https://api.deepseek.com` エンドポイント、思考モード（thinking）対応、1M コンテキストウィンドウ
+  - **ZhipuClient（GLM）** — `https://open.bigmodel.cn/api/paas/v4` エンドポイント、思考モード対応、モデル別ビジョン対応、1M コンテキストウィンドウ
+  - **ErnieClient（百度千帆）** — `https://qianfan.baidubce.com/v2` エンドポイント、131K コンテキストウィンドウ、モデル別ビジョン対応
+  - **HunyuanClient（騰訊混元）** — TokenHub + レガシーのデュアルエンドポイント自動選択、262K コンテキストウィンドウ、hy3/hy3-preview モデル対応
+  - **MiniMaxClient** — 国内 `https://api.minimaxi.com/v1` / 国際 `https://api.minimax.io/v1` エンドポイント、1M コンテキストウィンドウ
+  - **MoonshotClient（Kimi）** — `https://api.moonshot.cn/v1` エンドポイント、262K コンテキストウィンドウ
+  - **SiliconFlowClient（硅基流動）** — `https://api.siliconflow.cn/v1` エンドポイント、動的モデルリスト取得、1M コンテキストウィンドウ
+
+#### 変更
+- 零一万物（Yi/Lingyiwanwu）を⚠️非推奨に変更（新規ユーザー登録停止のため）
+- AI プラットフォーム対応一覧の7プラットフォームステータスを 📋→✅ に更新（百度千帆、智谱AI、月之暗面、DeepSeek、騰訊混元、硅基流動、MiniMax）
+
 ### 2026-05-26
 
 #### 新機能

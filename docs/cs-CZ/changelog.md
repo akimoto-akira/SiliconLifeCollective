@@ -61,6 +61,17 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze v implementaci 
 
 ## [Nezveřejněno]
 
+### Nové AI klienty
+
+- **DeepSeekClient** — přímé připojení k DeepSeek API, thinking mode, reasoning effort, až 1M kontextové okno, endpoint `https://api.deepseek.com`
+- **ZhipuClient (GLM)** — přímé připojení k Zhipu AI API, thinking mode, vision podle modelu, bezplatné modely, až 1M kontext, endpoint `https://open.bigmodel.cn/api/paas/v4`
+- **ErnieClient (Baidu/Qianfan)** — přímé připojení k Baidu Qianfan v2 API, bezplatné modely (ernie-speed, ernie-tiny), až 131K kontext, endpoint `https://qianfan.baidubce.com/v2`
+- **HunyuanClient (Tencent)** — přímé připojení k Tencent Hunyuan API, duální endpoint (TokenHub + Legacy), thinking mode, až 262K kontext
+- **MiniMaxClient** — přímé připojení k MiniMax API, domácí/mezinárodní endpoint, adaptivní thinking, multimodální, až 1M kontext, endpoint `https://api.minimaxi.com/v1`
+- **MoonshotClient (Kimi)** — přímé připojení k Moonshot/Kimi API, thinking mode, multimodální, až 262K kontext, endpoint `https://api.moonshot.cn/v1`
+- **SiliconFlowClient** — přímé připojení k SiliconFlow API, agregátor 100+ open-source modelů, dynamické objevení modelů přes API, reasoning obsah, až 1M kontext, endpoint `https://api.siliconflow.cn/v1`
+- **01.AI (Yi)** — označeno jako zastaralé (⚠️), nové registrace ukončeny
+
 ### 2026-05-26
 
 #### Nové funkce
