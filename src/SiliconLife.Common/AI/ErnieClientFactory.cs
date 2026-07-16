@@ -24,17 +24,11 @@ public class ErnieClientFactory : IAIClientFactory, IAIClientFactoryHelp
 {
     private const string DefaultEndpoint = "https://qianfan.baidubce.com/v2";
 
-    private static readonly Dictionary<string, string> Models = new()
-    {
-        ["ernie-5.1"] = "ERNIE 5.1 (Flagship, 128K, Multimodal)",
-        ["ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, Cost-effective)",
-        ["ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ernie-3.5-8k"] = "ERNIE 3.5 (8K, Economy)",
-        ["ernie-3.5-128k"] = "ERNIE 3.5 (128K, Long context)",
-        ["ernie-speed-128k"] = "ERNIE Speed (128K, Free)",
-        ["ernie-speed-8k"] = "ERNIE Speed (8K, Free) - Recommended for debugging",
-        ["ernie-tiny-8k"] = "ERNIE Tiny (8K, Free)",
-    };
+    private static readonly string[] ModelIds =
+    [
+        "ernie-5.1", "ernie-4.0-turbo-8k", "ernie-4.0-8k", "ernie-3.5-8k",
+        "ernie-3.5-128k", "ernie-speed-128k", "ernie-speed-8k", "ernie-tiny-8k",
+    ];
 
     public IAIClient CreateClient(Dictionary<string, object> config)
     {
@@ -87,7 +81,16 @@ public class ErnieClientFactory : IAIClientFactory, IAIClientFactoryHelp
         string configKey, Dictionary<string, object> currentConfig, Language language)
     {
         if (configKey == "model")
-            return Models;
+        {
+            var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
+            var models = new Dictionary<string, string>();
+            foreach (var modelId in ModelIds)
+            {
+                string displayName = localization?.GetConfigDisplayName($"ErnieModel_{modelId}", out _) ?? modelId;
+                models[modelId] = displayName;
+            }
+            return models;
+        }
         return null;
     }
 

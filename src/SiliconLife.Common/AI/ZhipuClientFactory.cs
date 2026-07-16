@@ -24,19 +24,11 @@ public class ZhipuClientFactory : IAIClientFactory, IAIClientFactoryHelp
 {
     private const string DefaultEndpoint = "https://open.bigmodel.cn/api/paas/v4";
 
-    private static readonly Dictionary<string, string> Models = new()
-    {
-        ["glm-4-flash"] = "GLM-4-Flash (Free, 128K) - Recommended for debugging",
-        ["glm-4.7-flash"] = "GLM-4.7-Flash (Free, 200K)",
-        ["glm-4-air"] = "GLM-4-Air (0.5 CNY/M, 128K)",
-        ["glm-4-flashx"] = "GLM-4-FlashX (0.1 CNY/M, 128K)",
-        ["glm-4-plus"] = "GLM-4-Plus (5 CNY/M, 128K)",
-        ["glm-4-long"] = "GLM-4-Long (1 CNY/M, 1M context)",
-        ["glm-4.6"] = "GLM-4.6 (Flagship, 200K)",
-        ["glm-4.7"] = "GLM-4.7 (Flagship, 200K)",
-        ["glm-5"] = "GLM-5 (Coding Agent, 128K)",
-        ["glm-5.1"] = "GLM-5.1 (Long-range Agent, 128K)",
-    };
+    private static readonly string[] ModelIds =
+    [
+        "glm-4-flash", "glm-4.7-flash", "glm-4-air", "glm-4-flashx", "glm-4-plus",
+        "glm-4-long", "glm-4.6", "glm-4.7", "glm-5", "glm-5.1",
+    ];
 
     public IAIClient CreateClient(Dictionary<string, object> config)
     {
@@ -96,7 +88,16 @@ public class ZhipuClientFactory : IAIClientFactory, IAIClientFactoryHelp
         string configKey, Dictionary<string, object> currentConfig, Language language)
     {
         if (configKey == "model")
-            return Models;
+        {
+            var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
+            var models = new Dictionary<string, string>();
+            foreach (var modelId in ModelIds)
+            {
+                string displayName = localization?.GetConfigDisplayName($"ZhipuModel_{modelId}", out _) ?? modelId;
+                models[modelId] = displayName;
+            }
+            return models;
+        }
         return null;
     }
 

@@ -22,16 +22,11 @@ namespace SiliconLife.Common.AI;
 /// </summary>
 public class HunyuanClientFactory : IAIClientFactory, IAIClientFactoryHelp
 {
-    private static readonly Dictionary<string, string> Models = new()
-    {
-        ["hy3"] = "Hy3 (TokenHub, 256K, 1 CNY/M input) - Recommended",
-        ["hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
-        ["hunyuan-lite"] = "Hunyuan-Lite (Free, 256K, No Tool Calling)",
-        ["hunyuan-turbos-latest"] = "Hunyuan-TurboS (0.8 CNY/M, 128K)",
-        ["hunyuan-t1-latest"] = "Hunyuan-T1 (1 CNY/M, 256K)",
-        ["hunyuan-a13b"] = "Hunyuan-A13B (0.5 CNY/M, Lightweight)",
-        ["hunyuan-functioncall"] = "Hunyuan-FunctionCall (Tool Calling)",
-    };
+    private static readonly string[] ModelIds =
+    [
+        "hy3", "hy3-preview", "hunyuan-lite", "hunyuan-turbos-latest",
+        "hunyuan-t1-latest", "hunyuan-a13b", "hunyuan-functioncall",
+    ];
 
     public IAIClient CreateClient(Dictionary<string, object> config)
     {
@@ -94,7 +89,16 @@ public class HunyuanClientFactory : IAIClientFactory, IAIClientFactoryHelp
         string configKey, Dictionary<string, object> currentConfig, Language language)
     {
         if (configKey == "model")
-            return Models;
+        {
+            var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
+            var models = new Dictionary<string, string>();
+            foreach (var modelId in ModelIds)
+            {
+                string displayName = localization?.GetConfigDisplayName($"HunyuanModel_{modelId}", out _) ?? modelId;
+                models[modelId] = displayName;
+            }
+            return models;
+        }
         return null;
     }
 

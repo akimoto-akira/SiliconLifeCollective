@@ -23,15 +23,11 @@ public class MoonshotClientFactory : IAIClientFactory, IAIClientFactoryHelp
 {
     private const string DefaultEndpoint = "https://api.moonshot.cn/v1";
 
-    private static readonly Dictionary<string, string> Models = new()
-    {
-        ["kimi-k2.6"] = "Kimi K2.6 (Flagship, 256K, Multimodal) - Recommended",
-        ["kimi-k2.5"] = "Kimi K2.5 (Cost-effective Flagship, 256K)",
-        ["kimi-k2.7-code"] = "Kimi K2.7 Code (Coding, 256K, Forced Thinking)",
-        ["moonshot-v1-8k"] = "Moonshot V1 8K",
-        ["moonshot-v1-32k"] = "Moonshot V1 32K",
-        ["moonshot-v1-128k"] = "Moonshot V1 128K",
-    };
+    private static readonly string[] ModelIds =
+    [
+        "kimi-k2.6", "kimi-k2.5", "kimi-k2.7-code",
+        "moonshot-v1-8k", "moonshot-v1-32k", "moonshot-v1-128k",
+    ];
 
     public IAIClient CreateClient(Dictionary<string, object> config)
     {
@@ -84,7 +80,16 @@ public class MoonshotClientFactory : IAIClientFactory, IAIClientFactoryHelp
         string configKey, Dictionary<string, object> currentConfig, Language language)
     {
         if (configKey == "model")
-            return Models;
+        {
+            var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
+            var models = new Dictionary<string, string>();
+            foreach (var modelId in ModelIds)
+            {
+                string displayName = localization?.GetConfigDisplayName($"MoonshotModel_{modelId}", out _) ?? modelId;
+                models[modelId] = displayName;
+            }
+            return models;
+        }
         return null;
     }
 

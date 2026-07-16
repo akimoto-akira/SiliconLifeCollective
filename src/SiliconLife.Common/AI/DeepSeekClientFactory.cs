@@ -24,11 +24,7 @@ public class DeepSeekClientFactory : IAIClientFactory, IAIClientFactoryHelp
 {
     private const string DefaultEndpoint = "https://api.deepseek.com";
 
-    private static readonly Dictionary<string, string> Models = new()
-    {
-        ["deepseek-v4-flash"] = "DeepSeek-V4-Flash (1M context, high speed)",
-        ["deepseek-v4-pro"] = "DeepSeek-V4-Pro (1M context, flagship reasoning)",
-    };
+    private static readonly string[] ModelIds = ["deepseek-v4-flash", "deepseek-v4-pro"];
 
     public IAIClient CreateClient(Dictionary<string, object> config)
     {
@@ -92,7 +88,16 @@ public class DeepSeekClientFactory : IAIClientFactory, IAIClientFactoryHelp
         string configKey, Dictionary<string, object> currentConfig, Language language)
     {
         if (configKey == "model")
-            return Models;
+        {
+            var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
+            var models = new Dictionary<string, string>();
+            foreach (var modelId in ModelIds)
+            {
+                string displayName = localization?.GetConfigDisplayName($"DeepSeekModel_{modelId}", out _) ?? modelId;
+                models[modelId] = displayName;
+            }
+            return models;
+        }
         return null;
     }
 

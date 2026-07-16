@@ -602,7 +602,7 @@ public class DefaultSiliconBeing : SiliconBeingBase
             "VolcengineArkClient" => new VolcengineArkClientFactory(),
             "HerdsmanClient" => new HerdsmanClientFactory(),
             "LongCatClient" => new LongCatClientFactory(),
-            "QiniuAI" => new QiniuAIClientFactory(),
+            "QiniuAIClient" => new QiniuAIClientFactory(),
             "DeepSeekClient" => new DeepSeekClientFactory(),
             "ZhipuClient" => new ZhipuClientFactory(),
             "MoonshotClient" => new MoonshotClientFactory(),

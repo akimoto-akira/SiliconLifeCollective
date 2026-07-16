@@ -24,14 +24,10 @@ public class MiniMaxClientFactory : IAIClientFactory, IAIClientFactoryHelp
     private const string DomesticEndpoint = "https://api.minimaxi.com/v1";
     private const string InternationalEndpoint = "https://api.minimax.io/v1";
 
-    private static readonly Dictionary<string, string> Models = new()
-    {
-        ["MiniMax-M3"] = "MiniMax-M3 (Flagship, 1M context, Multimodal) - Recommended",
-        ["MiniMax-M2.7"] = "MiniMax-M2.7 (192K, Coding/Agent)",
-        ["MiniMax-M2.7-highspeed"] = "MiniMax-M2.7 Highspeed (Low latency)",
-        ["MiniMax-M2.5"] = "MiniMax-M2.5 (Agent SOTA, 200K)",
-        ["MiniMax-M2"] = "MiniMax-M2 (Open-source Agent, 192K)",
-    };
+    private static readonly string[] ModelIds =
+    [
+        "MiniMax-M3", "MiniMax-M2.7", "MiniMax-M2.7-highspeed", "MiniMax-M2.5", "MiniMax-M2",
+    ];
 
     public IAIClient CreateClient(Dictionary<string, object> config)
     {
@@ -86,7 +82,16 @@ public class MiniMaxClientFactory : IAIClientFactory, IAIClientFactoryHelp
         string configKey, Dictionary<string, object> currentConfig, Language language)
     {
         if (configKey == "model")
-            return Models;
+        {
+            var localization = LocalizationManager.Instance.GetLocalization(language) as DefaultLocalizationBase;
+            var models = new Dictionary<string, string>();
+            foreach (var modelId in ModelIds)
+            {
+                string displayName = localization?.GetConfigDisplayName($"MiniMaxModel_{modelId}", out _) ?? modelId;
+                models[modelId] = displayName;
+            }
+            return models;
+        }
         if (configKey == "endpoint")
             return new Dictionary<string, string>
             {
