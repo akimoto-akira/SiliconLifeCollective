@@ -1,4 +1,4 @@
-# 変更ログ
+﻿# 変更ログ
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | **日本語** | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -66,416 +66,238 @@
 
 ## [未リリース]
 
+### 2026-07-16
+
+#### 新機能
+- `7431312` - 13言語ファイルのAIクライアント設定翻訳を補完 - CsCZ/PlPLをstubから完全な辞書実装に変更、残り10ファイルに7つの新クライアント（DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan）のConfigDisplayNames/ConfigDescriptions/ConfigGroupNamesエントリを追加、6つのClientFactoryの設定キーメタデータを同期更新
+  - 20 ファイル変更
+
+#### ドキュメント
+- `d6608ea` - 全13言語版のchangelogにDuMate（Baidu Qianfan）のAI IDEツール紹介を追加
+  - 13 ファイル変更
+
+#### 協力フレームワーク
+- `c607c97` - DuMate（Baidu Qianfan）を常駐 AI アクターとして .ai-collab レジストリに登録
+  - 1 ファイル変更
+
+
 ### 2026-07-15
 
 #### 新機能
-- 7つの新しい AI クライアントを実装、国内主要 AI プラットフォームへの直接接続を完了
-  - **DeepSeekClient** — `https://api.deepseek.com` エンドポイント、思考モード（thinking）対応、1M コンテキストウィンドウ
-  - **ZhipuClient（GLM）** — `https://open.bigmodel.cn/api/paas/v4` エンドポイント、思考モード対応、モデル別ビジョン対応、1M コンテキストウィンドウ
-  - **ErnieClient（百度千帆）** — `https://qianfan.baidubce.com/v2` エンドポイント、131K コンテキストウィンドウ、モデル別ビジョン対応
-  - **HunyuanClient（騰訊混元）** — TokenHub + レガシーのデュアルエンドポイント自動選択、262K コンテキストウィンドウ、hy3/hy3-preview モデル対応
-  - **MiniMaxClient** — 国内 `https://api.minimaxi.com/v1` / 国際 `https://api.minimax.io/v1` エンドポイント、1M コンテキストウィンドウ
-  - **MoonshotClient（Kimi）** — `https://api.moonshot.cn/v1` エンドポイント、262K コンテキストウィンドウ
-  - **SiliconFlowClient（硅基流動）** — `https://api.siliconflow.cn/v1` エンドポイント、動的モデルリスト取得、1M コンテキストウィンドウ
-
-#### 変更
-- 零一万物（Yi/Lingyiwanwu）を⚠️非推奨に変更（新規ユーザー登録停止のため）
-- AI プラットフォーム対応一覧の7プラットフォームステータスを 📋→✅ に更新（百度千帆、智谱AI、月之暗面、DeepSeek、騰訊混元、硅基流動、MiniMax）
-
-### 2026-05-26
-
-#### 新機能
-- `a49041b` - ロシア語(ru-RU)ローカリゼーションサポートを追加 (ref task-364)
-  - 216 ファイル変更
-
-#### 修正
-- `79096f2` - glossary テーブル形式を標準 Markdown に変更、余分なスペース整列を削除
-  - 1 ファイル変更
+- `c007263` - 10個のAIクライアントのヘルプドキュメントを補完 - HelpTopicsに10個のトピックを登録、HelpLocalizationBaseに30個の抽象プロパティを追加、12言語ファイルで完全なMarkdownヘルプ内容（プラットフォーム紹介/登録手順/設定方法/利用可能モデル/課金/FAQ）を実装、Herdsman/LongCat/QiniuAI/DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuanをカバー
+  - 12 ファイル変更
+- `4634e33` - 国内7つのAIプラットフォームクライアントを実装（DeepSeek/智譜GLM/月之暗面Kimi/硅基流動/MiniMax/百度文心/騰訊混元）- 14個の独立クラスファイル、LongCatClientスタイルに準拠、継承なし、全てOpenAI互換 + Bearer Token、Tool Calling/ストリーミング/思考モード対応、DefaultSiliconBeingとDefaultSiliconBeingFactoryに登録
+  - 16 ファイル変更
 
 #### ドキュメント
-- `174a954` - glossary に欠落していた Deutsch/Polski/Português 3列の用語翻訳を補完
-  - 1 ファイル変更
+- `108c4ea` - 全13言語ドキュメントを更新して7つの新AIクライアントを反映 - ステータス 📋→✅、01.AIを非推奨に変更
+  - 94 ファイル変更
 
-#### 協力フレームワーク
-- `5b03d53` - .ai-collab タスク記録を更新 - task-364 ロシア語ローカリゼーション (ref task-364)
-  - 5 ファイル変更
 
-- `018947d` - 2026-05-25 の sessions と changes をアーカイブ
-  - 2 ファイル変更
+### 2026-07-14
 
-### 2026-05-25
+#### ドキュメント
+- `344b429` - 全言語のarchitecture.md AIプラットフォームステータスに「非推奨」ステータスを追加、01.AIを非推奨に変更（新規ユーザー登録停止）
+  - 13 ファイル変更
 
-#### 新機能
-- `14721a9` - ThinkOnProject 人員配置プロンプトを詳細な実行可能アクションプランに細分化 (ref task-363)
-  - 20 ファイル変更
 
-#### 修正
-- `abb4285` - beingsHtml の .join() 呼び出し位置エラーを修正 (ref task-361)
-  - 1 ファイル変更
-
-- `1c0b9ed` - WorkflowDetailView の states-overview レンダリングによる state-initial 重複文字列バグを削除 (ref task-362)
-  - 6 ファイル変更
-
-#### 協力フレームワーク
-- `ecc48a1` - .ai-collab メタデータを更新（relatedCommit および activity log） (ref task-361)
-  - 4 ファイル変更
-
-- `64529a7` - 2026-05-24 の sessions と changes をアーカイブ（手動補完実行）
-  - 28 ファイル変更
-
-- `4150e52` - 完了タスク task-341~361 をアーカイブ (ref archive)
-  - 2 ファイル変更
-
-### 2026-05-24
-
-#### 新機能
-- `db60fd9` - ツール権限リストに ToolAction 宣言のないツールを表示し、設定不可と注記 (ref task-331, task-332, task-333)
-  - 21 ファイル変更
-
-- `6004a7f` - WorkflowTemplate にロール定義サポートを追加 + 12言語ローカリゼーション + DiskTool 修正 (ref task-346)
-  - 24 ファイル変更
-
-- `75ce452` - ProjectSpace ロールプールと ProjectTool ロール管理アクション (ref task-347)
-  - 12 ファイル変更
-
-- `edfb600` - BuildProjectScenarioContext にロール情報を追加 (ref task-348)
-  - 21 ファイル変更
-
-- `6a2d713` - HasProjectsWithoutTemplate を HasProjectsNeedingAttention に拡張 (ref task-349)
-  - 21 ファイル変更
-
-- `a773224` - ワークフロータスク作成時にロールプールから実行者を割り当てるよう変更 (ref task-350)
-  - 6 ファイル変更
-
-- `77a27f9` - TravelCodeWikiTool を地理エンティティエントリとして拡張 (ref task-353)
-  - 8 ファイル変更
-
-- `873ef23` - GeoDataTool 実装完了、.ai-collab ステータス更新 (ref task-352)
-  - 7 ファイル変更
-
-- `feaccab` - GeoContentTool 実装完了、.ai-collab ステータス更新 (ref task-351)
-  - 6 ファイル変更
-
-- `6e60ad1` - GeoLanguageTool を拡張（ObjectPath サポート + set_word）、メタデータをバックフィル (ref task-356, task-355)
-  - 7 ファイル変更
-
-- `4eff807` - 各 GeoLocation サブクラスで GetWikiDocuments() を実装 (ref task-357)
-  - 5 ファイル変更
-
-- `baad5df` - MediaWiki API パブリッシュサービスを実装 (ref task-358)
-  - 6 ファイル変更
-
-- `b846a21` - ワークフロー詳細ページを実装 (ref task-361)
-  - 24 ファイル変更
-
-#### 修正
-- `a290088` - CuratorTool で新規作成したシリコンビーイングが再起動後に消失する問題 (ref task-334)
-  - 11 ファイル変更
-
-- `69a8cba` - タスクページが beingId でフィルタリングされないバグを修正 (ref task-360)
-  - 8 ファイル変更
-
-- `7dd1a65` - Router.cs にワークフロー詳細ページルートを登録 (ref task-361)
-  - 1 ファイル変更
-
-#### リファクタリング
-- `5e02711` - 共通層ストレージパス抽象化をリファクタリング、ファイルシステムハードコードを排除 (ref task-335)
-  - 12 ファイル変更
-
-- `0ec0929` - DynamicBeingLoader.SaveBeingCode が直接ファイルシステム操作の代わりに IStorage を使用 (ref task-336)
-  - 7 ファイル変更
-
-- `9a44b48` - PlaywrightWebView IStorage ブリッジ + WebViewBrowserTool 基底クラス分離 (ref task-337, task-340)
-  - 11 ファイル変更
-
-- `8fea742` - WebViewBrowserTool スクリーンショット保存が直接ファイルシステム操作の代わりに IStorage を使用 (ref task-338)
-  - 6 ファイル変更
-
-- `4c24e6d` - DefaultPermissionCallback がハードコードパスの代わりに BeingPathResolver を使用 (ref task-339)
-  - 6 ファイル変更
-
-- `ab428cd` - DefaultSiliconBeing のダウンキャストを削除、基底クラスの SaveState() を直接呼び出し (ref task-344)
-  - 7 ファイル変更
-
-- `1e6eb80` - PlaywrightWebView ブラウザ状態一時ファイルブリッジを IStorage 直接読み書きに変更 (ref task-341)
-  - 7 ファイル変更
-
-- `17f00e9` - DiskTool 検索操作を DiskExecutor 経由に変更 (ref task-342)
-  - 8 ファイル変更
-
-- `8158703` - ChatController 添付チェックを DiskExecutor 経由に変更 (ref task-343)
-  - 7 ファイル変更
-
-- `3243ae6` - TravelCodeWikiPublishWorkflow を7ステートマシンに書き直し、強制追跡の TravelCodeWikiWithAI ファイルを削除 (ref task-355)
-  - 6 ファイル変更
+### 2026-07-07
 
 #### クリーンアップ
-- `d685288` - HotReloadTool.cs と tools/HotReload ディレクトリを削除 (ref task-345)
-  - 8 ファイル変更
+- `e06e6f2` - OsmStoreツールチェーンとTravelCodeWikiWithAIプラグインを削除 - tools/OsmStore.*の3プロジェクトを削除、src/TravelCodeWikiWithAI/プラグインプロジェクトを削除、sln参照をクリーンアップ、プロジェクトを独立版TCW開発ルートに回帰
+  - 45 ファイル変更
 
-#### ドキュメント
-- `f1789d1` - README.md の説明行を最適化 (ref task-359)
-  - 9 ファイル変更
 
-#### 協力フレームワーク
-- `982c6bb` - .ai-collab に欠落していた relatedCommit と commitHash フィールドを補完
-  - 6 ファイル変更
-
-- `d91e9f8` - task-331~340 をアーカイブ、タスクボードをクリア
-  - 2 ファイル変更
-
-- `9135e30` - task-341~344 共通層 IStorage リファクタリング + 抽象修正をリリース
-  - 1 ファイル変更
-
-- `f70b350` - TravelCodeWikiWithAI アーキテクチャ改造 13項目タスクを追加 (ref task-346~358)
-  - 2 ファイル変更
-
-- `f81d38b` - ai-collab session と task tracking ファイルを更新
-  - 3 ファイル変更
-
-### 2026-05-23
+### 2026-07-06
 
 #### 修正
-- `9c3c64e` - ExecuteTool 実行時権限検証がプロジェクトレベル制限をバイパスする問題を修正 (ref task-324)
+- `1b15886` - OSMデータモデルの標準化と要素タイプセーフティ修正
   - 7 ファイル変更
 
-- `94a9e35` - 権限テンプレート定義と ToolActionAttribute 宣言の不一致を修正 (ref task-325)
-  - 6 ファイル変更
 
-- `e8d8371` - すべての Action が無効なツールを AI リクエストから全体除去 (ref task-326)
-  - 6 ファイル変更
-
-- `32c7d8a` - ツール権限 API に Action 名検証を追加 + チャット履歴 Markdown レンダリング修正 (ref task-327, task-328, task-329)
-  - 9 ファイル変更
-
-- `797db8c` - Markdown レンダリング fallback が誤って mdRendered を設定し、marked ロード後に再レンダリングされない問題 (ref task-330)
-  - 9 ファイル変更
-
-#### 協力フレームワーク
-- `1496094` - task-324~327 ツール認可フレームワーク修正タスクをリリース
-  - 776 ファイル変更
-
-- `0d16e63` - 協力タスクステータスを更新、task-330 をコミット 797db8c に関連付け、アーカイブの準備
-  - 2 ファイル変更
-
-- `e602e1c` - task-316~330 をアーカイブ、タスクボードをクリア (ref task-316~330)
-  - 2 ファイル変更
-
-- `20291ce` - 日単位で sessions と changes をアーカイブ（5月13-22日）
-  - 106 ファイル変更
-
-### 2026-05-22
-
-#### ドキュメント整合性修正
-- `9e07b27` - フランス語ドキュメント(fr-FR)とソースコードの整合性差異を修正 (ref task-307)
-  - 10 ファイル変更
-
-- `9e3be72` - ドイツ語ドキュメント(de-DE)とソースコードの整合性を修正 (ref task-308)
-  - 5 ファイル変更
-
-- `2bc7151` - スペイン語(es-ES)ドキュメントとソースコードの整合性差異を修正 (ref task-309)
-  - 13 ファイル変更
-
-- `f95088e` - イタリア語ドキュメント(it-IT)とソースコードの整合性を修正 (ref task-310)
-  - 11 ファイル変更
-
-- `6ea9f4a` - ポーランド語ドキュメント(pl-PL)とソースコードの整合性を修正 (ref task-311)
-  - 16 ファイル変更
-
-- `7646923` - ポルトガル語ドキュメント(pt-PT)とソースコードの整合性を修正 (ref task-312)
-  - 12 ファイル変更
-
-- `7eaf9db` - チェコ語ドキュメント(cs-CZ)とソースコードの整合性を修正 (ref task-313)
-  - 12 ファイル変更
-
-#### 協力フレームワーク
-- `3cb7347` - task-313 の relatedCommit=7eaf9db を更新
-  - 1 ファイル変更
-
-### 2026-05-21
+### 2026-07-05
 
 #### 新機能
-- `99eca78` - 右クリックメニューに「ストレージを表示（読み取り専用）」機能を追加、プロセス内で Speedy.Manager を呼び出し (ref task-301)
-  - 26 ファイル変更
-
-#### ドキュメント整合性修正
-- `7f65cf1` - zh-CN ドキュメントとソースコードの整合性差異を修正 (ref task-303)
-  - 15 ファイル変更
-
-- `a9e2a2c` - 英語(en)ドキュメントとソースコードの整合性差異を修正 (ref task-302)
-  - 9 ファイル変更
-
-- `2549105` - 繁體中文(zh-HK)ドキュメントとソースコードの整合性差異を修正 (ref task-304)
-  - 12 ファイル変更
-
-- `277eb50` - 日本語ドキュメントとソースコードの整合性差異を修正 (ref task-305)
-  - 10 ファイル変更
-
-- `edce413` - 韓国語(ko-KR)ドキュメントとソースコードの整合性差異を修正 (ref task-306)
-  - 18 ファイル変更
-
-- `f2adcae` - ポルトガル語ドキュメントとソースコードの不一致問題を修正 (ref task-220)
-  - 15 ファイル変更
-
-- `3332987` - 繁体字中国語（香港）ドキュメントとソースコードの不一致問題を修正 (ref task-218)
-  - 14 ファイル変更
-
-- `af9f715` - ポーランド語ドキュメントとソースコードの不一致問題を修正 (ref task-217)
-  - 15 ファイル変更
-
-- `2e2b18b` - 韓国語ドキュメントとソースコードの不一致問題を修正 (ref task-216)
-  - 16 ファイル変更
-
-- `626ebc9` - 日本語ドキュメントとソースコードの不一致問題を修正 (ref task-215)
-  - 19 ファイル変更
-
-- `48d061b` - イタリア語ドキュメントとソースコードの不一致問題を修正 (ref task-214)
-  - 14 ファイル変更
-
-#### 協力フレームワーク
-- `6683bee` - Marvis AI チームを登録、タスクステータスを更新
-  - 3 ファイル変更
-
-- `03fc905` - task-210~220 をアーカイブ
-  - 5 ファイル変更
-
-### 2026-05-20
-
-#### 新機能
-- `65176d4` - ポルトガル語（pt-PT + pt-BR）完全ローカリゼーションサポートを追加 (ref task-208)
-  - 41 ファイル変更
-
-#### ドキュメント整合性修正
-- `af4dffd` - zh-CN ドキュメントとソースコードのすべての不一致問題を修正 (ref task-209)
-  - 11 ファイル変更
-
-- `144b945` - 英語(en)とチェコ語(cs-CZ)ドキュメントとソースコードの不一致問題を修正 (ref task-219, task-210)
-  - 22 ファイル変更
-
-- `08bec55` - ドイツ語ドキュメント(de-DE)とソースコードの不一致問題を修正 (ref task-211)
-  - 14 ファイル変更
-
-- `7ff28de` - スペイン語(es-ES)ドキュメントとソースコードの不一致問題を修正 (ref task-212)
-  - 14 ファイル変更
-
-- `15e2133` - フランス語ドキュメント(fr-FR)とソースコードの不一致問題を修正 (ref task-213)
-  - 13 ファイル変更
-
-#### 修正
-- `7dac388` - プロジェクトタスクリストが表示できない問題を修正 (ref task-207)
-  - 6 ファイル変更
-
-#### 協力フレームワーク
-- `7890223` - task-201~209 をアーカイブ、task-210~220 ドキュメント整合性修正タスクをリリース
-  - 5 ファイル変更
-
-### 2026-05-19
-
-#### 新機能
-- `cd72846` - PluginLoader セキュリティスキャンバイパスの安全な代替案を実装 (ref task-203)
-  - 13 ファイル変更
-
-- `fc0c00c` - Speedy.Manager 機能強化 - 新規作成/インポート/エクスポート/TreeView 階層/プログレスウィンドウ (ref task-206)
-  - 9 ファイル変更
-
-#### 修正
-- `ec07118` - ITypeRegistry/IObjectFactory がプラグインロード前に登録されていない問題を修正 (ref task-205)
-  - 8 ファイル変更
-
-- `9e749db` - プロジェクト作成時の Creator ID is required エラーを修正 (ref task-204)
+- `be4320b` - TravelCodeWikiWithAIにCLDRデータプロバイダモジュールを追加
   - 4 ファイル変更
 
-#### インフラストラクチャ
-- `43dc092` - CLDR マイグレーション - CldrDataProvider を追加、.github を削除
-  - 1 ファイル変更
 
-- `c09ec1f` - cldr/ を .gitignore に追加
-  - 1 ファイル変更
+### 2026-07-04
 
-- `221f818` - GitHub 同期を Gitee プッシュミラー方式に変更、workflow は手動予備のみ保持
-  - 1 ファイル変更
-
-- `08cdf1a` - GitHub 同期 workflow を修正 - リトライロジックと変更なしスキップを追加
-  - 1 ファイル変更
-
-- `fb4e77d` - SiliconLife.Speedy.Manager.csproj を更新
-  - 1 ファイル変更
-
-#### 協力フレームワーク
-- `df90af0` - task-203 の relatedCommit=cd72846 を更新
-  - 1 ファイル変更
-
-### 2026-05-18
+#### 新機能
+- `dbcabf3` - プラグイン権限システム強化 - ネットワーク/ファイルIOをExecutorモードにリファクタリング + GeneratedCodeAttributeホワイトリスト免除
+  - 34 ファイル変更
+- `e84bb63` - コンパイルエラーを修正しTravelCodeWikiWithAIプロジェクトを追加
+  - 53 ファイル変更
 
 #### リファクタリング
-- `e720d06` - Speedy.Manager を WinForms から完全に Avalonia に改造 (ref task-202)
-  - 17 ファイル変更
+- `9e5a345` - TravelCodeWikiWithAIのPBFを同期オンラインOSM APIに完全移行
+  - 4 ファイル変更
 
-#### 修正
-- `08894a9` - メモリタイムラインサマリーエントリの階層表示エラーを修正 (ref task-201)
-  - 3 ファイル変更
 
-#### 協力フレームワーク
-- `2871afb` - 全タスクをアーカイブ、tasks.json をクリア
-  - 2 ファイル変更
-
-### 2026-05-17
+### 2026-05-31
 
 #### 新機能
-- `d6eb994` - プロジェクトリストページにプロジェクト作成エントリとワークフローテンプレート選択を追加 (ref task-203)
-  - 14 ファイル変更
+- `a5f37bd` - プロジェクト思考、会話システムおよびストレージ関連機能を更新
+  - 13 ファイル変更
 
-- `0872134` - ThinkOnProject テンプレートなしプロジェクトキュレーター駆動オーケストレーション (ref task-202)
-  - 6 ファイル変更
 
-- `cb3188e` - グループチャット @メンション可視化 (ref task-208)
-  - 4 ファイル変更
+### 2026-05-30
 
-- `f9968e5` - AI クライアント ToolCall 能力宣言とグレースフルデグラデーション (ref task-205)
-  - 4 ファイル変更
+#### 新機能
+- `c3cf429` - QiniuAIClient AIクライアントを追加（七牛雲AI大モデル推論サービス） (ref task-409)
+  - 20 ファイル変更
+- `d04131f` - LongCatClient AIクライアントを追加（美団LongCat大モデル） (ref task-408)
+  - 19 ファイル変更
 
-- `0d2b843` - グループチャット決定ロジック ShouldReplyInGroupChat (ref task-201)
-  - 6 ファイル変更
+#### 協力フレームワーク
+- `e9564f5` - 変更された全ファイルを更新
+  - 140 ファイル変更
+- `9c8b42f` - 2026-05-29のsessionsとchangesをアーカイブ
+  - 20 ファイル変更
 
-- `277a2b1` - ナレッジネットワーク補完 - 高度なクエリとグラフトラバーサル (ref task-207)
-  - 9 ファイル変更
+
+### 2026-05-29
+
+#### 新機能
+- `d548e48` - プロジェクト思考詳細ページでメッセージをサイクル(Cycle)別にグループ化して折りたたみ表示 (ref task-407)
+  - 23 ファイル変更
+- `28d893d` - IAIClientにマルチモーダル能力宣言インターフェースを追加 + ChatMessageにマルチモーダルフィールドを追加 (ref task-402)
+  - 13 ファイル変更
+- `ebe6a49` - プロジェクト思考詳細ページにセッションステータス、作成時間、完了時間の表示を追加 (ref task-406)
+  - 22 ファイル変更
+- `9a53d55` - IAIClientにContextWindowTokens + Token予算制 + ファクトリ設定化を追加 (ref task-401, task-403)
+  - 26 ファイル変更
+- `202b99c` - HerdsmanClient AIクライアントを追加 + 初期化画面ドロップダウンが更新されない問題を修正 (ref task-399, task-400)
+  - 20 ファイル変更
+- `285ab2f` - プロジェクト処理記録のフロントエンド表示 (ref task-397)
+  - 25 ファイル変更
+- `b4b633f` - ThinkOnProject疑似Session複数ラウンド対話メカニズム (ref task-395)
+  - 13 ファイル変更
+- `d3e543f` - ThinkOnProjectシナリオコンテキストに利用可能なシリコンビーイング情報を追加 (ref task-394)
+  - 21 ファイル変更
+- `07eb628` - BuildRequestにシリコンビーイングプロジェクト帰属情報を動的注入 (ref task-396)
+  - 21 ファイル変更
+- `2089696` - ToolにProjectシナリオサポートを追加 + PluginLoaderの複数ディレクトリ統一リファクタリング
+  - 12 ファイル変更
 
 #### 修正
-- `6d0b66e` - グループチャットメッセージ送信時の appendMessage TypeError を修正 (ref task-209)
-  - 5 ファイル変更
-
-- `b15167c` - task-203 で漏れていた list-workflow-templates ルート登録を補完 (ref task-203)
-  - 1 ファイル変更
-
-- `dc549a2` - Gitee 同期 workflow を修正 - トークン URL にユーザー名を追加
-  - 1 ファイル変更
-
-#### インフラストラクチャ
-- `e5fa3ad` - GitHub 自動同期 schedule を無効化、Gitee 公式同期方案を待機
+- `b80a33b` - プロジェクト思考詳細ページの読み込みヒントテキストが英語ハードコードおよびローカリゼーション欠落を修正 (ref task-405)
+  - 6 ファイル変更
+- `90b60c5` - ツール呼び出しラウンドでAI本文ContentとThinkingが非表示になる問題を修正 (ref task-404)
+  - 8 ファイル変更
+- `a7d9a97` - ThinkOnProjectの複数ラウンドループ継続およびプロジェクトリマインダーメッセージ消失を修正
+  - 6 ファイル変更
+- `c0838dd` - ProjectThinkSessionメッセージがCycleに書き込まれないおよび完了後に履歴が削除される問題を修正 (ref task-398)
+  - 7 ファイル変更
+- `f3d1794` - シリコンビーイングProject/Broadcast/Stoppedステータスのローカリゼーション欠落および表示異常を修正 (ref task-393)
+  - 20 ファイル変更
+- `3eaa90d` - 削除済みプロジェクトTravelCodeWikiWithAIのソリューション参照を削除
   - 1 ファイル変更
 
 #### 協力フレームワーク
-- `4a58c82` - システム能力分析レポート + ThinkOnProject 設計案を追加
-  - 5 ファイル変更
-
-- `8ab29e6` - システム能力完全性分析レポートを .ai-collab/docs にアーカイブ
+- `f3cbed7` - task-394~396を登録（ThinkOnProject強化）
+  - 3 ファイル変更
+- `e1971f5` - task-393を登録（BeingActivityローカリゼーションと表示修正）
+  - 1 ファイル変更
+- `e710fa4` - changes commitHashとstateセッション終了を更新
   - 2 ファイル変更
-
-- `b412d9c` - 旧タスクをアーカイブ、総合分析に基づき task-201~208 を再リリース
-  - 2 ファイル変更
-
-- `437884a` - 協力メタデータを更新 - task-202/203/204 完了 (ref task-202, task-203, task-204)
-  - 2 ファイル変更
-
-- `bf78d79` - 協力メタデータを更新 - task-201/205/208 完了
-  - 2 ファイル変更
-
-- `de6ee0e` - セッション終了記録 catpaw-20260517-2215
-  - 5 ファイル変更
-
-- `7223b6f` - セッション終了記録 catpaw-20260517-2200
+- `4cacc4a` - 2026-05-28のsessionsとchangesをアーカイブ
   - 4 ファイル変更
 
+
+### 2026-05-28
+
+#### 新機能
+- `ae8b673` - プラグインディレクトリ設定を単一パスから複数ディレクトリリストにアップグレード (ref task-391)
+  - 29 ファイル変更
+- `aac46c1` - PluginLoaderにCSソースモードを追加、DLLなし時にプラグインをコンパイルロード (ref task-389)
+  - 6 ファイル変更
+
+#### 修正
+- `63047b0` - 全PluginLoaderをServiceLocatorに登録、複数ディレクトリプラグインの不完全なリフレクションを修正 (ref task-391)
+  - 3 ファイル変更
+- `fcad655` - directoryListブラウズボタンのインタラクション問題を修正 (ref task-392)
+  - 9 ファイル変更
+
+#### ドキュメント
+- `e6d3037` - PluginDemo-22 CSソースコンパイルロードモードの例 (ref task-390)
+  - 21 ファイル変更
+
+#### 協力フレームワーク
+- `09d9e9c` - 30個の完了タスクをアーカイブ（task-362~task-391）
+  - 2 ファイル変更
+- `66204a1` - 2026-05-28のsessions（8）とchanges（8）をアーカイブ
+  - 18 ファイル変更
+- `308a8d0` - task-391のrelatedCommitを更新
+  - 1 ファイル変更
+- `6fc4e05` - task-389（CSソースモード）とtask-390（PluginDemo-22）を登録
+  - 1 ファイル変更
+
+
+### 2026-05-27
+
+#### 新機能
+- `e154a18` - PluginDemo-21 WorkflowTemplateの完全なビジネスワークフロー例を完成 (ref task-388)
+  - 19 ファイル変更
+- `aa771b3` - PluginCapability宣言型権限システムを実装 (ref task-379)
+  - 9 ファイル変更
+- `5e5e9d1` - 04-SafeSystemIO System.IOホワイトリストセーフタイプ例を追加 (ref task-370)
+  - 20 ファイル変更
+
+#### ドキュメント
+- `48f6702` - 19-TickObjectと20-SpeedyPackの全言語README翻訳をベースラインに揃える (ref task-386, task-387)
+  - 119 ファイル変更
+- `5d570e5` - task-378 禁止の文字列リフレクションバイパス反例を完成 (ref task-378)
+  - 19 ファイル変更
+- `348c410` - PluginDemo-11 禁止のP/Invokeおよびunsafeコード反例 (ref task-377)
+  - 19 ファイル変更
+- `fc92a49` - PluginDemo-10 禁止のリフレクション操作反例 (ref task-376)
+  - 19 ファイル変更
+- `826ad2a` - PluginDemo-09 禁止プロセス操作反例プラグインを作成 (ref task-375)
+  - 19 ファイル変更
+- `7870b05` - PluginDemo-08 禁止ネットワーク操作反例を追加 (ref task-374)
+  - 15 ファイル変更
+- `8636e31` - PluginDemo-07 禁止ファイルI/O操作反例 (ref task-373)
+  - 19 ファイル変更
+- `322312e` - PluginDemo-06 TrustedAssemblies信頼済み依存例を追加 (ref task-372)
+  - 19 ファイル変更
+- `6df98a0` - IWorkflowPluginワークフロープラグイン例を追加 (ref task-371)
+  - 20 ファイル変更
+- `f3787ba` - PluginDemo-03 IObjectFactory登録と作成例 (ref task-369)
+  - 20 ファイル変更
+- `bb4324d` - PluginDemo-02 ITypeRegistry登録とクエリ例 (ref task-368)
+  - 20 ファイル変更
+- `bbdfa3c` - PluginDemo-01 最小IPlugin実装例 (ref task-367)
+  - 19 ファイル変更
+
+#### 協力フレームワーク
+- `de44057` - 5月25日と27日のsessionsとchangesをアーカイブ
+  - 58 ファイル変更
+- `9e4a84c` - tasks.jsonのlastCommitHashを48f6702に更新
+  - 1 ファイル変更
+- `beb58b2` - taskIndexインデックスを補充（8 pending, 19 completed）
+  - 1 ファイル変更
+- `63f7bfc` - task-388のrelatedCommitを更新 (ref task-388)
+  - 1 ファイル変更
+- `e61be6f` - task-378のrelatedCommitを更新 (ref task-378)
+  - 1 ファイル変更
+- `dde579b` - WorkflowTemplate完全使用例タスクを公開（task-388）
+  - 1 ファイル変更
+- `2294fa7` - TickObjectおよびSpeedyPack例タスクを公開（task-386~387）
+  - 1 ファイル変更
+- `82b9f63` - 6個のPluginCapability例タスクを公開（task-380~385）
+  - 1 ファイル変更
+- `588539b` - PluginCapability宣言型権限システムタスクを公開（task-379）
+  - 1 ファイル変更
+- `37f9c23` - ソリューションとプロジェクトファイル参照を更新
+  - 8 ファイル変更
+- `e1f7892` - 12個のPluginDemo待受タスクを公開（task-367~378）
+  - 3 ファイル変更
+- `87ae858` - PluginDemoプラグイン正反例タスク登録を作成（task-367）
+  - 2 ファイル変更
+- `f77a102` - 2026-05-26のsessionsとchangesをアーカイブ
+  - 7 ファイル変更
 
 ## [Alpha-0.2] - 2026-05-16
 

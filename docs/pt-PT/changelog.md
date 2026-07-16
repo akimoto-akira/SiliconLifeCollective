@@ -1,4 +1,4 @@
-# Registo de Alterações
+﻿# Registo de Alterações
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -66,418 +66,238 @@ Ambas as versões partilham as mesmas interfaces e funcionalidades, diferindo ap
 
 ## [Não Publicado]
 
+### 2026-07-16
+
+#### Novas Funcionalidades
+- `7431312` - Completar traduções de configuração de clientes IA para 13 ficheiros de idioma - CsCZ/PlPL actualizados de stub para implementação completa de dicionário, os 10 ficheiros restantes adicionam entradas ConfigDisplayNames/ConfigDescriptions/ConfigGroupNames para 7 novos clientes (DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan), actualização sincronizada de metadados de chave de configuração de 6 ClientFactory
+  - 20 ficheiro(s) modificado(s)
+
+#### Documentação
+- `d6608ea` - Adicionar introdução da ferramenta AI IDE DuMate (Baidu Qianfan) a todas as 13 versões de idioma do changelog
+  - 13 ficheiro(s) modificado(s)
+
+#### Framework de Colaboração
+- `c607c97` - Registar DuMate (Baidu Qianfan) como actor IA residente no registo .ai-collab
+  - 1 ficheiro(s) modificado(s)
+
+
 ### 2026-07-15
 
 #### Novas Funcionalidades
-- `4634e33` - Implementação de 7 clientes de IA na nuvem nacionais
-  - DeepSeek (deepseek.com) — Suporta modo thinking (reasoning_content), 1.048.576 de contexto
-  - Zhipu GLM (bigmodel.cn) — Suporta thinking, visão por modelo, 1.048.576 de contexto
-  - Baidu Qianfan/Wenxin (qianfan.baidubce.com) — 131.072 de contexto
-  - Tencent Hunyuan (hunyuan.cloud.tencent.com) — Duplo endpoint TokenHub/Legacy, 262.144 de contexto
-  - MiniMax (minimaxi.com) — 1.048.576 de contexto
-  - Moonshot/Kimi (moonshot.cn) — 262.144 de contexto
-  - SiliconFlow (siliconflow.cn) — Plataforma de agregação, suporta lista dinâmica de modelos, 1.048.576 de contexto
-
-#### Obsolescências
-- 01.AI (零一万物) marcado como obsoleto (registo de novos utilizadores interrompido)
-
-#### Alterações
-- DefaultSiliconBeing / DefaultSiliconBeingFactory registam todas as 7 novas fábricas de clientes
-
-### 2026-05-26
-
-#### Novas Funcionalidades
-- `a49041b` - Adicionar suporte de localização em russo (ru-RU) (ref task-364)
-  - 216 ficheiros alterados
-
-#### Correcções
-- `79096f2` - Formato da tabela glossary alterado para Markdown padrão, removido alinhamento com espaços desnecessários
-  - 1 ficheiro alterado
+- `c007263` - Completar documentação de ajuda para 10 clientes IA - HelpTopics regista 10 tópicos, HelpLocalizationBase adiciona 30 propriedades abstractas, 12 ficheiros de idioma implementam conteúdo de ajuda Markdown completo (introdução da plataforma/passos de registo/métodos de configuração/modelos disponíveis/faturação/FAQ), cobrindo Herdsman/LongCat/QiniuAI/DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan
+  - 12 ficheiro(s) modificado(s)
+- `4634e33` - Implementação de 7 clientes de plataformas IA nacionais (DeepSeek/Zhipu GLM/Moonshot Kimi/SiliconFlow/MiniMax/Baidu Ernie/Tencent Hunyuan) - 14 ficheiros de classe independentes, seguindo o estilo LongCatClient, sem herança, todos compatíveis com OpenAI + Bearer Token, suportando Tool Calling/streaming/modo thinking, registados em DefaultSiliconBeing e DefaultSiliconBeingFactory
+  - 16 ficheiro(s) modificado(s)
 
 #### Documentação
-- `174a954` - Preenchidas as colunas em falta Deutsch/Polski/Português na tradução de terminologia do glossary
-  - 1 ficheiro alterado
+- `108c4ea` - Actualizar toda a documentação em 13 idiomas para reflectir 7 novos clientes IA - estado 📋→✅, 01.AI marcado como obsoleto
+  - 94 ficheiro(s) modificado(s)
 
-#### Framework de Colaboração
-- `5b03d53` - Actualização dos registos de tarefas .ai-collab - task-364 localização russa (ref task-364)
-  - 5 ficheiros alterados
 
-- `018947d` - Arquivadas as sessions e changes de 2026-05-25
-  - 2 ficheiros alterados
+### 2026-07-14
 
-### 2026-05-25
+#### Documentação
+- `344b429` - Adicionar estado "Obsoleto" ao estado da plataforma IA em architecture.md para todos os idiomas, marcar 01.AI como obsoleto (registo de novos utilizadores interrompido)
+  - 13 ficheiro(s) modificado(s)
 
-#### Novas Funcionalidades
-- `14721a9` - Refinamento do prompt de pessoal ThinkOnProject para plano de acção detalhado e executável (ref task-363)
-  - 20 ficheiros alterados
 
-#### Correcções
-- `abb4285` - Corrigida posição incorrecta da chamada .join() em beingsHtml (ref task-361)
-  - 1 ficheiro alterado
-
-- `1c0b9ed` - Eliminado bug de string duplicada state-initial causado pela renderização states-overview em WorkflowDetailView (ref task-362)
-  - 6 ficheiros alterados
-
-#### Framework de Colaboração
-- `ecc48a1` - Actualização dos metadados .ai-collab (relatedCommit e activity log) (ref task-361)
-  - 4 ficheiros alterados
-
-- `64529a7` - Arquivadas as sessions e changes de 2026-05-24 (execução manual complementar)
-  - 28 ficheiros alterados
-
-- `4150e52` - Arquivadas tarefas concluídas task-341~361 (ref archive)
-  - 2 ficheiros alterados
-
-### 2026-05-24
-
-#### Novas Funcionalidades
-- `db60fd9` - Lista de permissões de ferramentas mostra ferramentas sem declaração ToolAction e marca como não configuráveis (ref task-331, task-332, task-333)
-  - 21 ficheiros alterados
-
-- `6004a7f` - WorkflowTemplate adiciona suporte a definição de funções + localização em 12 idiomas + correcção do DiskTool (ref task-346)
-  - 24 ficheiros alterados
-
-- `75ce452` - Pool de funções do ProjectSpace e acções de gestão de funções do ProjectTool (ref task-347)
-  - 12 ficheiros alterados
-
-- `edfb600` - BuildProjectScenarioContext adiciona informações de funções (ref task-348)
-  - 21 ficheiros alterados
-
-- `6a2d713` - HasProjectsWithoutTemplate expandido para HasProjectsNeedingAttention (ref task-349)
-  - 21 ficheiros alterados
-
-- `a773224` - Criação de tarefas de fluxo de trabalho passa a usar pool de funções para atribuir executores (ref task-350)
-  - 6 ficheiros alterados
-
-- `77a27f9` - Expansão do TravelCodeWikiTool como entrada de entidades geográficas (ref task-353)
-  - 8 ficheiros alterados
-
-- `873ef23` - Implementação do GeoDataTool concluída, actualização do estado .ai-collab (ref task-352)
-  - 7 ficheiros alterados
-
-- `feaccab` - Implementação do GeoContentTool concluída, actualização do estado .ai-collab (ref task-351)
-  - 6 ficheiros alterados
-
-- `6e60ad1` - Expansão do GeoLanguageTool (suporte ObjectPath + set_word), retro-preenchimento de metadados (ref task-356, task-355)
-  - 7 ficheiros alterados
-
-- `4eff807` - Implementação de GetWikiDocuments() nas subclasses GeoLocation (ref task-357)
-  - 5 ficheiros alterados
-
-- `baad5df` - Implementação do serviço de publicação MediaWiki API (ref task-358)
-  - 6 ficheiros alterados
-
-- `b846a21` - Implementação da página de detalhes do fluxo de trabalho (ref task-361)
-  - 24 ficheiros alterados
-
-#### Correcções
-- `a290088` - Silicon Beings criados via CuratorTool perdidos após reinício (ref task-334)
-  - 11 ficheiros alterados
-
-- `69a8cba` - Corrigido bug da página de tarefas não filtrar por beingId (ref task-360)
-  - 8 ficheiros alterados
-
-- `7dd1a65` - Registo da rota da página de detalhes do fluxo de trabalho no Router.cs (ref task-361)
-  - 1 ficheiro alterado
-
-#### Refactorização
-- `5e02711` - Refactorização da abstracção de caminhos de armazenamento na camada comum, eliminando hardcoded do sistema de ficheiros (ref task-335)
-  - 12 ficheiros alterados
-
-- `0ec0929` - DynamicBeingLoader.SaveBeingCode usa IStorage em vez de operações directas no sistema de ficheiros (ref task-336)
-  - 7 ficheiros alterados
-
-- `9a44b48` - Ponte IStorage do PlaywrightWebView + desacoplamento da classe base WebViewBrowserTool (ref task-337, task-340)
-  - 11 ficheiros alterados
-
-- `8fea742` - WebViewBrowserTool gravação de capturas de ecrã usa IStorage em vez de operações directas no sistema de ficheiros (ref task-338)
-  - 6 ficheiros alterados
-
-- `4c24e6d` - DefaultPermissionCallback usa BeingPathResolver em vez de caminhos hardcoded (ref task-339)
-  - 6 ficheiros alterados
-
-- `ab428cd` - Removido downcast do DefaultSiliconBeing, chamada directa ao SaveState() da classe base (ref task-344)
-  - 7 ficheiros alterados
-
-- `1e6eb80` - Ficheiros temporários do estado do navegador PlaywrightWebView passam a usar leitura/escrita directa via IStorage (ref task-341)
-  - 7 ficheiros alterados
-
-- `17f00e9` - Operações de pesquisa do DiskTool passam pelo DiskExecutor (ref task-342)
-  - 8 ficheiros alterados
-
-- `8158703` - Verificação de anexos do ChatController passa pelo DiskExecutor (ref task-343)
-  - 7 ficheiros alterados
-
-- `3243ae6` - Reescrita do TravelCodeWikiPublishWorkflow como máquina de estados de 7 passos, remoção do ficheiro TravelCodeWikiWithAI de rastreamento forçado (ref task-355)
-  - 6 ficheiros alterados
+### 2026-07-07
 
 #### Limpeza
-- `d685288` - Eliminação do HotReloadTool.cs e do directório tools/HotReload (ref task-345)
-  - 8 ficheiros alterados
+- `e06e6f2` - Remover cadeia de ferramentas OsmStore e plugin TravelCodeWikiWithAI - eliminar tools/OsmStore.* três projectos, eliminar src/TravelCodeWikiWithAI/ projecto de plugin, limpar referências sln, o projecto regressa à rota de desenvolvimento TCW autónoma
+  - 45 ficheiro(s) modificado(s)
 
-#### Documentação
-- `f1789d1` - Optimização da linha de descrição do README.md (ref task-359)
-  - 9 ficheiros alterados
 
-#### Framework de Colaboração
-- `982c6bb` - Preenchimento dos campos relatedCommit e commitHash em falta no .ai-collab
-  - 6 ficheiros alterados
-
-- `d91e9f8` - Arquivadas task-331~340, quadro de tarefas limpo
-  - 2 ficheiros alterados
-
-- `9135e30` - Publicadas task-341~344 refactorização IStorage da camada comum + correcção de abstracção
-  - 1 ficheiro alterado
-
-- `f70b350` - Adicionadas 13 tarefas de reestruturação arquitectónica do TravelCodeWikiWithAI (ref task-346~358)
-  - 2 ficheiros alterados
-
-- `f81d38b` - Actualização dos ficheiros de session e task tracking do ai-collab
-  - 3 ficheiros alterados
-
-### 2026-05-23
+### 2026-07-06
 
 #### Correcções
-- `9c3c64e` - Corrigida verificação de permissões em tempo de execução do ExecuteTool que contornava restrições ao nível do projecto (ref task-324)
-  - 7 ficheiros alterados
+- `1b15886` - Padronização do modelo de dados OSM e correcção de segurança do tipo de elemento
+  - 7 ficheiro(s) modificado(s)
 
-- `94a9e35` - Corrigida inconsistência entre definição de modelos de permissões e declaração ToolActionAttribute (ref task-325)
-  - 6 ficheiros alterados
 
-- `e8d8371` - Ferramentas com todas as Actions desactivadas removidas integralmente dos pedidos à IA (ref task-326)
-  - 6 ficheiros alterados
-
-- `32c7d8a` - API de permissões de ferramentas adiciona validação de nome de Action + correcção de renderização Markdown do histórico de chat (ref task-327, task-328, task-329)
-  - 9 ficheiros alterados
-
-- `797db8c` - Renderização Markdown fallback define erroneamente mdRendered impedindo que marked recarregue e re-renderize (ref task-330)
-  - 9 ficheiros alterados
-
-#### Framework de Colaboração
-- `1496094` - Publicadas tarefas de reparação do framework de autorização de ferramentas task-324~327
-  - 776 ficheiros alterados
-
-- `0d16e63` - Actualização do estado das tarefas de colaboração, associação do task-330 ao commit 797db8c, preparação para arquivo
-  - 2 ficheiros alterados
-
-- `e602e1c` - Arquivadas task-316~330, quadro de tarefas limpo (ref task-316~330)
-  - 2 ficheiros alterados
-
-- `20291ce` - Arquivamento diário de sessions e changes (13-22 de Maio)
-  - 106 ficheiros alterados
-
-### 2026-05-22
-
-#### Correcções de Consistência da Documentação
-- `9e07b27` - Corrigidas diferenças de consistência entre documentação francesa (fr-FR) e código fonte (ref task-307)
-  - 10 ficheiros alterados
-
-- `9e3be72` - Corrigida consistência entre documentação alemã (de-DE) e código fonte (ref task-308)
-  - 5 ficheiros alterados
-
-- `2bc7151` - Corrigidas diferenças de consistência entre documentação espanhola (es-ES) e código fonte (ref task-309)
-  - 13 ficheiros alterados
-
-- `f95088e` - Corrigida consistência entre documentação italiana (it-IT) e código fonte (ref task-310)
-  - 11 ficheiros alterados
-
-- `6ea9f4a` - Corrigida consistência entre documentação polaca (pl-PL) e código fonte (ref task-311)
-  - 16 ficheiros alterados
-
-- `7646923` - Corrigida consistência entre documentação portuguesa (pt-PT) e código fonte (ref task-312)
-  - 12 ficheiros alterados
-
-- `7eaf9db` - Corrigida consistência entre documentação checa (cs-CZ) e código fonte (ref task-313)
-  - 12 ficheiros alterados
-
-#### Framework de Colaboração
-- `3cb7347` - Actualização task-313 relatedCommit=7eaf9db
-  - 1 ficheiro alterado
-
-### 2026-05-21
+### 2026-07-05
 
 #### Novas Funcionalidades
-- `99eca78` - Menu de contexto adiciona funcionalidade "Ver Armazenamento (só de leitura)", chamada intra-processo ao Speedy.Manager (ref task-301)
-  - 26 ficheiros alterados
+- `be4320b` - TravelCodeWikiWithAI adiciona módulo de fornecedor de dados CLDR
+  - 4 ficheiro(s) modificado(s)
 
-#### Correcções de Consistência da Documentação
-- `7f65cf1` - Corrigidas diferenças de consistência entre documentação zh-CN e código fonte (ref task-303)
-  - 15 ficheiros alterados
 
-- `a9e2a2c` - Corrigidas diferenças de consistência entre documentação inglesa (en) e código fonte (ref task-302)
-  - 9 ficheiros alterados
-
-- `2549105` - Corrigidas diferenças de consistência entre documentação em chinês tradicional (zh-HK) e código fonte (ref task-304)
-  - 12 ficheiros alterados
-
-- `277eb50` - Corrigidas diferenças de consistência entre documentação japonesa e código fonte (ref task-305)
-  - 10 ficheiros alterados
-
-- `edce413` - Corrigidas diferenças de consistência entre documentação coreana (ko-KR) e código fonte (ref task-306)
-  - 18 ficheiros alterados
-
-- `f2adcae` - Corrigido problema de inconsistência entre documentação portuguesa e código fonte (ref task-220)
-  - 15 ficheiros alterados
-
-- `3332987` - Corrigido problema de inconsistência entre documentação em chinês tradicional (Hong Kong) e código fonte (ref task-218)
-  - 14 ficheiros alterados
-
-- `af9f715` - Corrigido problema de inconsistência entre documentação polaca e código fonte (ref task-217)
-  - 15 ficheiros alterados
-
-- `2e2b18b` - Corrigido problema de inconsistência entre documentação coreana e código fonte (ref task-216)
-  - 16 ficheiros alterados
-
-- `626ebc9` - Corrigido problema de inconsistência entre documentação japonesa e código fonte (ref task-215)
-  - 19 ficheiros alterados
-
-- `48d061b` - Corrigido problema de inconsistência entre documentação italiana e código fonte (ref task-214)
-  - 14 ficheiros alterados
-
-#### Framework de Colaboração
-- `6683bee` - Registo da equipa Marvis AI, actualização do estado das tarefas
-  - 3 ficheiros alterados
-
-- `03fc905` - Arquivadas task-210~220
-  - 5 ficheiros alterados
-
-### 2026-05-20
+### 2026-07-04
 
 #### Novas Funcionalidades
-- `65176d4` - Adicionar suporte completo de localização em português (pt-PT + pt-BR) (ref task-208)
-  - 41 ficheiros alterados
-
-#### Correcções de Consistência da Documentação
-- `af4dffd` - Corrigidos todos os problemas de inconsistência entre documentação zh-CN e código fonte (ref task-209)
-  - 11 ficheiros alterados
-
-- `144b945` - Corrigidos problemas de inconsistência entre documentação inglesa (en) e checa (cs-CZ) e código fonte (ref task-219, task-210)
-  - 22 ficheiros alterados
-
-- `08bec55` - Corrigido problema de inconsistência entre documentação alemã (de-DE) e código fonte (ref task-211)
-  - 14 ficheiros alterados
-
-- `7ff28de` - Corrigido problema de inconsistência entre documentação espanhola (es-ES) e código fonte (ref task-212)
-  - 14 ficheiros alterados
-
-- `15e2133` - Corrigido problema de inconsistência entre documentação francesa (fr-FR) e código fonte (ref task-213)
-  - 13 ficheiros alterados
-
-#### Correcções
-- `7dac388` - Corrigida impossibilidade de exibir lista de tarefas do projecto (ref task-207)
-  - 6 ficheiros alterados
-
-#### Framework de Colaboração
-- `7890223` - Arquivadas task-201~209, publicadas task-210~220 tarefas de correcção de consistência da documentação
-  - 5 ficheiros alterados
-
-### 2026-05-19
-
-#### Novas Funcionalidades
-- `cd72846` - Implementada solução de segurança alternativa para bypass da verificação de segurança do PluginLoader (ref task-203)
-  - 13 ficheiros alterados
-
-- `fc0c00c` - Melhorias no Speedy.Manager - Criar/Importar/Exportar/TreeView hierárquica/Janela de progresso (ref task-206)
-  - 9 ficheiros alterados
-
-#### Correcções
-- `ec07118` - Corrigido problema de ITypeRegistry/IObjectFactory não registados antes do carregamento de plugins (ref task-205)
-  - 8 ficheiros alterados
-
-- `9e749db` - Corrigido erro "Creator ID is required" ao criar projecto (ref task-204)
-  - 4 ficheiros alterados
-
-#### Infraestrutura
-- `43dc092` - Migração CLDR - Adicionar CldrDataProvider, remover .github
-  - 1 ficheiro alterado
-
-- `c09ec1f` - Adicionar cldr/ ao .gitignore
-  - 1 ficheiro alterado
-
-- `221f818` - Sincronização GitHub alterada para esquema de espelhamento push via Gitee, workflow mantido apenas como backup manual
-  - 1 ficheiro alterado
-
-- `08cdf1a` - Corrigido workflow de sincronização GitHub - Adicionar lógica de retry e skip sem alterações
-  - 1 ficheiro alterado
-
-- `fb4e77d` - Actualização do SiliconLife.Speedy.Manager.csproj
-  - 1 ficheiro alterado
-
-#### Framework de Colaboração
-- `df90af0` - Actualização task-203 relatedCommit=cd72846
-  - 1 ficheiro alterado
-
-### 2026-05-18
+- `dbcabf3` - Melhoria do sistema de permissões de plugins - refactorizar IO de rede/ficheiro para modo Executor + isenção de lista branca GeneratedCodeAttribute
+  - 34 ficheiro(s) modificado(s)
+- `e84bb63` - Corrigir erros de compilação e adicionar o projecto TravelCodeWikiWithAI
+  - 53 ficheiro(s) modificado(s)
 
 #### Refactorização
-- `e720d06` - Reconversão completa do Speedy.Manager de WinForms para Avalonia (ref task-202)
-  - 17 ficheiros alterados
+- `9e5a345` - TravelCodeWikiWithAI migra completamente PBF para a API OSM online síncrona
+  - 4 ficheiro(s) modificado(s)
 
-#### Correcções
-- `08894a9` - Corrigido erro de exibição do nível de entradas de resumo na linha temporal de memória (ref task-201)
-  - 3 ficheiros alterados
 
-#### Framework de Colaboração
-- `2871afb` - Arquivadas todas as tarefas, tasks.json limpo
-  - 2 ficheiros alterados
-
-### 2026-05-17
+### 2026-05-31
 
 #### Novas Funcionalidades
-- `d6eb994` - Página de lista de projectos adiciona entrada para criar projecto e selecção de modelo de fluxo de trabalho (ref task-203)
-  - 14 ficheiros alterados
+- `a5f37bd` - Actualizar o pensamento do projecto, o sistema de conversação e as funcionalidades de armazenamento
+  - 13 ficheiro(s) modificado(s)
 
-- `0872134` - Orquestração orientada pelo Curator para projectos sem modelo no ThinkOnProject (ref task-202)
-  - 6 ficheiros alterados
 
-- `cb3188e` - Visualização de menções @ em chat de grupo (ref task-208)
-  - 4 ficheiros alterados
+### 2026-05-30
 
-- `f9968e5` - Declaração de capacidade ToolCall do cliente de IA e degradação elegante (ref task-205)
-  - 4 ficheiros alterados
-
-- `0d2b843` - Lógica de decisão em chat de grupo ShouldReplyInGroupChat (ref task-201)
-  - 6 ficheiros alterados
-
-- `277a2b1` - Complemento da rede de conhecimento - Consultas avançadas e travessia do grafo (ref task-207)
-  - 9 ficheiros alterados
-
-#### Correcções
-- `6d0b66e` - Corrigido TypeError appendMessage ao enviar mensagens em chat de grupo (ref task-209)
-  - 5 ficheiros alterados
-
-- `b15167c` - Commit complementar do registo de rota list-workflow-templates omitido no task-203 (ref task-203)
-  - 1 ficheiro alterado
-
-- `dc549a2` - Corrigido workflow de sincronização Gitee - Adicionar username ao token URL
-  - 1 ficheiro alterado
-
-#### Infraestrutura
-- `e5fa3ad` - Desactivada sincronização automática GitHub schedule, aguardando solução oficial de sincronização Gitee
-  - 1 ficheiro alterado
+#### Novas Funcionalidades
+- `c3cf429` - Adicionar cliente IA QiniuAIClient (serviço de inferência de grande modelo IA Qiniu Cloud) (ref task-409)
+  - 20 ficheiro(s) modificado(s)
+- `d04131f` - Adicionar cliente IA LongCatClient (grande modelo LongCat Meituan) (ref task-408)
+  - 19 ficheiro(s) modificado(s)
 
 #### Framework de Colaboração
-- `4a58c82` - Adicionado relatório de análise de capacidades do sistema + plano de design ThinkOnProject
-  - 5 ficheiros alterados
+- `e9564f5` - Actualizar todos os ficheiros modificados
+  - 140 ficheiro(s) modificado(s)
+- `9c8b42f` - Arquivar sessions e changes de 2026-05-29
+  - 20 ficheiro(s) modificado(s)
 
-- `8ab29e6` - Relatório de análise de integridade de capacidades do sistema arquivado em .ai-collab/docs
-  - 2 ficheiros alterados
 
-- `b412d9c` - Arquivadas tarefas antigas, republicadas task-201~208 com base na análise abrangente
-  - 2 ficheiros alterados
+### 2026-05-29
 
-- `437884a` - Actualização dos metadados de colaboração - task-202/203/204 concluídas (ref task-202, task-203, task-204)
-  - 2 ficheiros alterados
+#### Novas Funcionalidades
+- `d548e48` - Página de detalhe do pensamento do projecto agrupa mensagens por Cycle com secções colapsáveis (ref task-407)
+  - 23 ficheiro(s) modificado(s)
+- `28d893d` - IAIClient adiciona interface de declaração de capacidade multimodal + ChatMessage adiciona campos multimodais (ref task-402)
+  - 13 ficheiro(s) modificado(s)
+- `ebe6a49` - Página de detalhe do pensamento do projecto adiciona exibição do estado da sessão, hora de criação e hora de conclusão (ref task-406)
+  - 22 ficheiro(s) modificado(s)
+- `9a53d55` - IAIClient adiciona ContextWindowTokens + sistema de orçamento Token + configuração de fábrica (ref task-401, task-403)
+  - 26 ficheiro(s) modificado(s)
+- `202b99c` - Adicionar cliente IA HerdsmanClient + corrigir o menu pendente da interface de inicialização que não actualiza (ref task-399, task-400)
+  - 20 ficheiro(s) modificado(s)
+- `285ab2f` - Exibição frontal do registo de processamento do projecto (ref task-397)
+  - 25 ficheiro(s) modificado(s)
+- `b4b633f` - Mecanismo de diálogo multi-ronda pseudo-Session do ThinkOnProject (ref task-395)
+  - 13 ficheiro(s) modificado(s)
+- `d3e543f` - O contexto de cenário do ThinkOnProject adiciona informações de seres de silício disponíveis (ref task-394)
+  - 21 ficheiro(s) modificado(s)
+- `07eb628` - BuildRequest injeta dinamicamente informações de pertença de projecto de seres de silício (ref task-396)
+  - 21 ficheiro(s) modificado(s)
+- `2089696` - Tool adiciona suporte de cenário Project + refactorização unificada multi-diretório PluginLoader
+  - 12 ficheiro(s) modificado(s)
 
-- `bf78d79` - Actualização dos metadados de colaboração - task-201/205/208 concluídas
-  - 2 ficheiros alterados
+#### Correcções
+- `b80a33b` - Corrigir texto de dica de carregamento da página de detalhe do pensamento do projecto codificado em inglês e com falta de localização (ref task-405)
+  - 6 ficheiro(s) modificado(s)
+- `90b60c5` - Corrigir a ocultação de Content e Thinking do corpo IA nas rondas de chamada de ferramentas (ref task-404)
+  - 8 ficheiro(s) modificado(s)
+- `a7d9a97` - Corrigir a continuação do ciclo multi-ronda do ThinkOnProject e a perda de mensagens de lembrete do projecto
+  - 6 ficheiro(s) modificado(s)
+- `c0838dd` - Corrigir que as mensagens ProjectThinkSession não são escritas no Cycle e o histórico é eliminado após conclusão (ref task-398)
+  - 7 ficheiro(s) modificado(s)
+- `f3d1794` - Corrigir a falta de localização do estado Project/Broadcast/Stopped dos seres de silício e a anomalia de exibição (ref task-393)
+  - 20 ficheiro(s) modificado(s)
+- `3eaa90d` - Remover referências de solução ao projecto eliminado TravelCodeWikiWithAI
+  - 1 ficheiro(s) modificado(s)
 
-- `de6ee0e` - Registo de fim de sessão catpaw-20260517-2215
-  - 5 ficheiros alterados
+#### Framework de Colaboração
+- `f3cbed7` - Registar task-394~396 (melhorias do ThinkOnProject)
+  - 3 ficheiro(s) modificado(s)
+- `e1971f5` - Registar task-393 (localização de BeingActivity e correcção de exibição)
+  - 1 ficheiro(s) modificado(s)
+- `e710fa4` - Actualizar changes commitHash e fim de sessão de state
+  - 2 ficheiro(s) modificado(s)
+- `4cacc4a` - Arquivar sessions e changes de 2026-05-28
+  - 4 ficheiro(s) modificado(s)
 
-- `7223b6f` - Registo de fim de sessão catpaw-20260517-2200
-  - 4 ficheiros alterados
 
+### 2026-05-28
+
+#### Novas Funcionalidades
+- `ae8b673` - Configuração do directório de plugins actualizada de caminho único para lista multi-diretório (ref task-391)
+  - 29 ficheiro(s) modificado(s)
+- `aac46c1` - PluginLoader adiciona modo de fonte CS, compilar-carregar plugins quando não existe DLL (ref task-389)
+  - 6 ficheiro(s) modificado(s)
+
+#### Correcções
+- `63047b0` - Registar todos os PluginLoaders no ServiceLocator, corrigir reflexão incompleta de plugins multi-diretório (ref task-391)
+  - 3 ficheiro(s) modificado(s)
+- `fcad655` - Corrigir problema de interacção do botão de navegação directoryList (ref task-392)
+  - 9 ficheiro(s) modificado(s)
+
+#### Documentação
+- `e6d3037` - PluginDemo-22 exemplo de modo de compilação-carregamento de código-fonte CS (ref task-390)
+  - 21 ficheiro(s) modificado(s)
+
+#### Framework de Colaboração
+- `09d9e9c` - Arquivar 30 tarefas concluídas (task-362~task-391)
+  - 2 ficheiro(s) modificado(s)
+- `66204a1` - Arquivar sessions (8) e changes (8) de 2026-05-28
+  - 18 ficheiro(s) modificado(s)
+- `308a8d0` - Actualizar relatedCommit de task-391
+  - 1 ficheiro(s) modificado(s)
+- `6fc4e05` - Registar task-389 (modo de fonte CS) e task-390 (PluginDemo-22)
+  - 1 ficheiro(s) modificado(s)
+
+
+### 2026-05-27
+
+#### Novas Funcionalidades
+- `e154a18` - Completar exemplo de fluxo de trabalho de negócio completo PluginDemo-21 WorkflowTemplate (ref task-388)
+  - 19 ficheiro(s) modificado(s)
+- `aa771b3` - Implementar sistema de permissões declarativo PluginCapability (ref task-379)
+  - 9 ficheiro(s) modificado(s)
+- `5e5e9d1` - Adicionar exemplo de tipo seguro de lista branca 04-SafeSystemIO System.IO (ref task-370)
+  - 20 ficheiro(s) modificado(s)
+
+#### Documentação
+- `48f6702` - Alinhar traduções README de 19-TickObject e 20-SpeedyPack em todos os idiomas à linha base (ref task-386, task-387)
+  - 119 ficheiro(s) modificado(s)
+- `5d570e5` - Completar task-378 contra-exemplo de bypass de reflexão de string proibida (ref task-378)
+  - 19 ficheiro(s) modificado(s)
+- `348c410` - PluginDemo-11 contra-exemplo de código P/Invoke e unsafe proibido (ref task-377)
+  - 19 ficheiro(s) modificado(s)
+- `fc92a49` - PluginDemo-10 contra-exemplo de operação de reflexão proibida (ref task-376)
+  - 19 ficheiro(s) modificado(s)
+- `826ad2a` - Criar plugin contra-exemplo de operação de processo proibida PluginDemo-09 (ref task-375)
+  - 19 ficheiro(s) modificado(s)
+- `7870b05` - Adicionar contra-exemplo de operação de rede proibida PluginDemo-08 (ref task-374)
+  - 15 ficheiro(s) modificado(s)
+- `8636e31` - PluginDemo-07 contra-exemplo de operação de I/O de ficheiro proibida (ref task-373)
+  - 19 ficheiro(s) modificado(s)
+- `322312e` - Adicionar exemplo de dependência confiável PluginDemo-06 TrustedAssemblies (ref task-372)
+  - 19 ficheiro(s) modificado(s)
+- `6df98a0` - Adicionar exemplo de plugin de fluxo de trabalho IWorkflowPlugin (ref task-371)
+  - 20 ficheiro(s) modificado(s)
+- `f3787ba` - PluginDemo-03 exemplo de registo e criação de IObjectFactory (ref task-369)
+  - 20 ficheiro(s) modificado(s)
+- `bb4324d` - PluginDemo-02 exemplo de registo e consulta de ITypeRegistry (ref task-368)
+  - 20 ficheiro(s) modificado(s)
+- `bbdfa3c` - PluginDemo-01 exemplo de implementação mínima de IPlugin (ref task-367)
+  - 19 ficheiro(s) modificado(s)
+
+#### Framework de Colaboração
+- `de44057` - Arquivar sessions e changes de 25 e 27 de maio
+  - 58 ficheiro(s) modificado(s)
+- `9e4a84c` - Actualizar lastCommitHash de tasks.json para 48f6702
+  - 1 ficheiro(s) modificado(s)
+- `beb58b2` - Completar índice taskIndex (8 pending, 19 completed)
+  - 1 ficheiro(s) modificado(s)
+- `63f7bfc` - Actualizar relatedCommit de task-388 (ref task-388)
+  - 1 ficheiro(s) modificado(s)
+- `e61be6f` - Actualizar relatedCommit de task-378 (ref task-378)
+  - 1 ficheiro(s) modificado(s)
+- `dde579b` - Publicar tarefa de exemplo de uso completo de WorkflowTemplate (task-388)
+  - 1 ficheiro(s) modificado(s)
+- `2294fa7` - Publicar tarefas de exemplo TickObject e SpeedyPack (task-386~387)
+  - 1 ficheiro(s) modificado(s)
+- `82b9f63` - Publicar 6 tarefas de exemplo PluginCapability (task-380~385)
+  - 1 ficheiro(s) modificado(s)
+- `588539b` - Publicar tarefa de sistema de permissões declarativo PluginCapability (task-379)
+  - 1 ficheiro(s) modificado(s)
+- `37f9c23` - Actualizar referências de solução e ficheiro de projecto
+  - 8 ficheiro(s) modificado(s)
+- `e1f7892` - Publicar 12 tarefas pendentes PluginDemo (task-367~378)
+  - 3 ficheiro(s) modificado(s)
+- `87ae858` - Criar registo de tarefa de exemplo positivo/negativo de plugin PluginDemo (task-367)
+  - 2 ficheiro(s) modificado(s)
+- `f77a102` - Arquivar sessions e changes de 2026-05-26
+  - 7 ficheiro(s) modificado(s)
 
 ## [Alpha-0.2] - 2026-05-16
 

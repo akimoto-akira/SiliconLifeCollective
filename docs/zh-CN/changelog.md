@@ -66,418 +66,238 @@
 
 ## [未发布]
 
+### 2026-07-16
+
+#### 新功能
+- `7431312` - 补全 13 个语言文件的 AI 客户端配置翻译 - CsCZ/PlPL 从 stub 改为完整字典实现，其余 10 个文件补充 7 个新客户端（DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan）的 ConfigDisplayNames/ConfigDescriptions/ConfigGroupNames 条目，同步更新 6 个 ClientFactory 的配置键元数据
+  - 20 个文件变更
+
+#### 文档
+- `d6608ea` - 在所有 13 个语言版本的 changelog 中添加 DuMate（百度千帆）的 AI IDE 工具介绍
+  - 13 个文件变更
+
+#### 协作框架
+- `c607c97` - 注册 DuMate（百度千帆）为常驻 AI 协作者到 .ai-collab 注册表
+  - 1 个文件变更
+
+
 ### 2026-07-15
 
 #### 新功能
-- `4634e33` - 7个国产AI云端客户端实现
-  - DeepSeek（deepseek.com）— 支持 thinking 模式（reasoning_content），1,048,576 上下文
-  - 智谱GLM（bigmodel.cn）— 支持 thinking，按模型判断视觉，1,048,576 上下文
-  - 百度千帆/文心一言（qianfan.baidubce.com）— 131,072 上下文
-  - 腾讯混元（hunyuan.cloud.tencent.com）— 双端点 TokenHub/Legacy，262,144 上下文
-  - MiniMax（minimaxi.com）— 1,048,576 上下文
-  - 月之暗面Kimi（moonshot.cn）— 262,144 上下文
-  - 硅基流动（siliconflow.cn）— 聚合平台，支持动态模型列表，1,048,576 上下文
-
-#### 废弃
-- 零一万物标记为已废弃（停止新用户注册）
-
-#### 变更
-- DefaultSiliconBeing / DefaultSiliconBeingFactory 注册全部7个新客户端工厂
-
-### 2026-05-26
-
-#### 新功能
-- `a49041b` - 添加俄语(ru-RU)本地化支持 (ref task-364)
-  - 216 个文件变更
-
-#### 修复
-- `79096f2` - glossary 表格格式改为标准 Markdown，移除多余空格对齐
-  - 1 个文件变更
+- `c007263` - 补全 10 个 AI 客户端的帮助文档 - HelpTopics 注册 10 个主题，HelpLocalizationBase 添加 30 个抽象属性，12 个语言文件实现完整 Markdown 帮助内容（平台简介/注册步骤/配置方法/可用模型/计费/常见问题），覆盖 Herdsman/LongCat/QiniuAI/DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan
+  - 12 个文件变更
+- `4634e33` - 实现 7 个国内 AI 平台客户端（DeepSeek/智谱GLM/月之暗面Kimi/硅基流动/MiniMax/百度文心/腾讯混元）- 14 个独立类文件，遵循 LongCatClient 风格，不使用继承，全部 OpenAI 兼容 + Bearer Token，支持 Tool Calling/流式/思考模式，在 DefaultSiliconBeing 和 DefaultSiliconBeingFactory 注册
+  - 16 个文件变更
 
 #### 文档
-- `174a954` - 补充 glossary 缺失的 Deutsch/Polski/Português 三列术语翻译
-  - 1 个文件变更
+- `108c4ea` - 更新全部 13 语言文档以反映 7 个新 AI 客户端 - 状态 📋→✅，01.AI 标记为已废弃
+  - 94 个文件变更
 
-#### 协作框架
-- `5b03d53` - 更新 .ai-collab 任务记录 - task-364 俄语本地化 (ref task-364)
-  - 5 个文件变更
 
-- `018947d` - 归档 2026-05-25 的 sessions 和 changes
-  - 2 个文件变更
+### 2026-07-14
 
-### 2026-05-25
+#### 文档
+- `344b429` - 全语种 architecture.md AI 平台状态新增「已废弃」状态，标记零一万物为已废弃（停止新用户注册）
+  - 13 个文件变更
 
-#### 新功能
-- `14721a9` - 细化 ThinkOnProject 人员配备提示词为详细可执行行动计划 (ref task-363)
-  - 20 个文件变更
 
-#### 修复
-- `abb4285` - 修复 beingsHtml 的 .join() 调用位置错误 (ref task-361)
-  - 1 个文件变更
-
-- `1c0b9ed` - 删除 WorkflowDetailView 中 states-overview 渲染导致 state-initial 重复字符串 bug (ref task-362)
-  - 6 个文件变更
-
-#### 协作框架
-- `ecc48a1` - 更新 .ai-collab 元数据（relatedCommit 及 activity log） (ref task-361)
-  - 4 个文件变更
-
-- `64529a7` - 归档 2026-05-24 的 sessions 和 changes（手动补执行）
-  - 28 个文件变更
-
-- `4150e52` - 归档已完成任务 task-341~361 (ref archive)
-  - 2 个文件变更
-
-### 2026-05-24
-
-#### 新功能
-- `db60fd9` - 工具权限列表显示无 ToolAction 声明的工具并标注无法设置 (ref task-331, task-332, task-333)
-  - 21 个文件变更
-
-- `6004a7f` - WorkflowTemplate 增加角色定义支持 + 12 语言本地化 + DiskTool 修复 (ref task-346)
-  - 24 个文件变更
-
-- `75ce452` - ProjectSpace 角色池与 ProjectTool 角色管理动作 (ref task-347)
-  - 12 个文件变更
-
-- `edfb600` - BuildProjectScenarioContext 增加角色信息 (ref task-348)
-  - 21 个文件变更
-
-- `6a2d713` - HasProjectsWithoutTemplate 扩展为 HasProjectsNeedingAttention (ref task-349)
-  - 21 个文件变更
-
-- `a773224` - 工作流任务创建改用角色池分配执行者 (ref task-350)
-  - 6 个文件变更
-
-- `77a27f9` - 扩展 TravelCodeWikiTool 作为地理实体入口 (ref task-353)
-  - 8 个文件变更
-
-- `873ef23` - GeoDataTool 实现完成，.ai-collab 状态更新 (ref task-352)
-  - 7 个文件变更
-
-- `feaccab` - GeoContentTool 实现完成，.ai-collab 状态更新 (ref task-351)
-  - 6 个文件变更
-
-- `6e60ad1` - 扩展 GeoLanguageTool（ObjectPath 支持 + set_word），回填元数据 (ref task-356, task-355)
-  - 7 个文件变更
-
-- `4eff807` - 各 GeoLocation 子类实现 GetWikiDocuments() (ref task-357)
-  - 5 个文件变更
-
-- `baad5df` - 实现 MediaWiki API 发布服务 (ref task-358)
-  - 6 个文件变更
-
-- `b846a21` - 实现工作流详情页面 (ref task-361)
-  - 24 个文件变更
-
-#### 修复
-- `a290088` - 通过 CuratorTool 新建的硅基人重启后丢失 (ref task-334)
-  - 11 个文件变更
-
-- `69a8cba` - 修复任务页面不按 beingId 过滤的 Bug (ref task-360)
-  - 8 个文件变更
-
-- `7dd1a65` - 在 Router.cs 中注册工作流详情页路由 (ref task-361)
-  - 1 个文件变更
-
-#### 重构
-- `5e02711` - 重构公共层存储路径抽象，消除文件系统硬编码 (ref task-335)
-  - 12 个文件变更
-
-- `0ec0929` - DynamicBeingLoader.SaveBeingCode 使用 IStorage 替代直接文件系统操作 (ref task-336)
-  - 7 个文件变更
-
-- `9a44b48` - PlaywrightWebView IStorage 桥接 + WebViewBrowserTool 基类解耦 (ref task-337, task-340)
-  - 11 个文件变更
-
-- `8fea742` - WebViewBrowserTool 截图保存使用 IStorage 替代直接文件系统操作 (ref task-338)
-  - 6 个文件变更
-
-- `4c24e6d` - DefaultPermissionCallback 使用 BeingPathResolver 替代硬编码路径 (ref task-339)
-  - 6 个文件变更
-
-- `ab428cd` - 去除 DefaultSiliconBeing 向下转型，直接调用基类 SaveState() (ref task-344)
-  - 7 个文件变更
-
-- `1e6eb80` - PlaywrightWebView 浏览器状态临时文件桥接改用 IStorage 直接读写 (ref task-341)
-  - 7 个文件变更
-
-- `17f00e9` - DiskTool 搜索操作改走 DiskExecutor (ref task-342)
-  - 8 个文件变更
-
-- `8158703` - ChatController 附件检查改走 DiskExecutor (ref task-343)
-  - 7 个文件变更
-
-- `3243ae6` - 重写 TravelCodeWikiPublishWorkflow 为 7 步状态机，移除强制追踪的 TravelCodeWikiWithAI 文件 (ref task-355)
-  - 6 个文件变更
+### 2026-07-07
 
 #### 清理
-- `d685288` - 删除 HotReloadTool.cs 和 tools/HotReload 目录 (ref task-345)
-  - 8 个文件变更
+- `e06e6f2` - 移除 OsmStore 工具链和 TravelCodeWikiWithAI 插件 - 删除 tools/OsmStore.* 三个项目，删除 src/TravelCodeWikiWithAI/ 插件项目，清理 sln 引用，项目回归独立版 TCW 开发路线
+  - 45 个文件变更
 
-#### 文档
-- `f1789d1` - 优化 README.md 描述行 (ref task-359)
-  - 9 个文件变更
 
-#### 协作框架
-- `982c6bb` - 补充 .ai-collab 缺失的 relatedCommit 和 commitHash 字段
-  - 6 个文件变更
-
-- `d91e9f8` - 归档 task-331~340，任务板清空
-  - 2 个文件变更
-
-- `9135e30` - 发布 task-341~344 公共层 IStorage 重构 + 抽象修正
-  - 1 个文件变更
-
-- `f70b350` - 新增 TravelCodeWikiWithAI 架构改造 13 项任务 (ref task-346~358)
-  - 2 个文件变更
-
-- `f81d38b` - 更新 ai-collab session 和 task tracking 文件
-  - 3 个文件变更
-
-### 2026-05-23
+### 2026-07-06
 
 #### 修复
-- `9c3c64e` - 修复 ExecuteTool 运行时权限校验绕过项目级限制 (ref task-324)
+- `1b15886` - OSM 数据模型标准化与元素类型安全修复
   - 7 个文件变更
 
-- `94a9e35` - 修复权限模板定义与 ToolActionAttribute 声明不一致 (ref task-325)
-  - 6 个文件变更
 
-- `e8d8371` - 全部 Action 被禁的工具从 AI 请求中整体移除 (ref task-326)
-  - 6 个文件变更
-
-- `32c7d8a` - 工具权限 API 增加 Action 名校验 + 聊天历史 Markdown 渲染修复 (ref task-327, task-328, task-329)
-  - 9 个文件变更
-
-- `797db8c` - Markdown 渲染 fallback 错误设置 mdRendered 导致 marked 加载后不重新渲染 (ref task-330)
-  - 9 个文件变更
-
-#### 协作框架
-- `1496094` - 发布 task-324~327 工具授权框架修复任务
-  - 776 个文件变更
-
-- `0d16e63` - 更新协作任务状态，关联 task-330 至提交 797db8c，为归档做准备
-  - 2 个文件变更
-
-- `e602e1c` - 归档 task-316~330，任务板清空 (ref task-316~330)
-  - 2 个文件变更
-
-- `20291ce` - 按天归档 sessions 和 changes（5 月 13-22 日）
-  - 106 个文件变更
-
-### 2026-05-22
-
-#### 文档一致性修复
-- `9e07b27` - 修正法语文档(fr-FR)与源代码一致性差异 (ref task-307)
-  - 10 个文件变更
-
-- `9e3be72` - 修正德语文档(de-DE)与源代码的一致性 (ref task-308)
-  - 5 个文件变更
-
-- `2bc7151` - 修正西班牙语(es-ES)文档与源代码一致性差异 (ref task-309)
-  - 13 个文件变更
-
-- `f95088e` - 修正意大利语文档(it-IT)与源代码的一致性 (ref task-310)
-  - 11 个文件变更
-
-- `6ea9f4a` - 修正波兰语文档(pl-PL)与源代码的一致性 (ref task-311)
-  - 16 个文件变更
-
-- `7646923` - 修正葡萄牙语文档(pt-PT)与源代码的一致性 (ref task-312)
-  - 12 个文件变更
-
-- `7eaf9db` - 修正捷克语(cs-CZ)文档与源代码的一致性 (ref task-313)
-  - 12 个文件变更
-
-#### 协作框架
-- `3cb7347` - 更新 task-313 relatedCommit=7eaf9db
-  - 1 个文件变更
-
-### 2026-05-21
+### 2026-07-05
 
 #### 新功能
-- `99eca78` - 右键菜单添加「查看存储（只读）」功能，进程内调用 Speedy.Manager (ref task-301)
-  - 26 个文件变更
-
-#### 文档一致性修复
-- `7f65cf1` - 修正 zh-CN 文档与源代码的一致性差异 (ref task-303)
-  - 15 个文件变更
-
-- `a9e2a2c` - 修正英文(en)文档与源代码一致性差异 (ref task-302)
-  - 9 个文件变更
-
-- `2549105` - 修正繁體中文(zh-HK)文檔與源代碼一致性差異 (ref task-304)
-  - 12 个文件变更
-
-- `277eb50` - 修正日語文檔與源代碼的整合性差異 (ref task-305)
-  - 10 个文件变更
-
-- `edce413` - 修正韓語(ko-KR)文檔與源代碼的一致性差異 (ref task-306)
-  - 18 个文件变更
-
-- `f2adcae` - 修复葡萄牙语文档与源代码不一致问题 (ref task-220)
-  - 15 个文件变更
-
-- `3332987` - 修复繁体中文（香港）文档与源代码不一致问题 (ref task-218)
-  - 14 个文件变更
-
-- `af9f715` - 修复波兰语文档与源代码不一致问题 (ref task-217)
-  - 15 个文件变更
-
-- `2e2b18b` - 修复韩语文档与源代码不一致问题 (ref task-216)
-  - 16 个文件变更
-
-- `626ebc9` - 修复日语文档与源代码不一致问题 (ref task-215)
-  - 19 个文件变更
-
-- `48d061b` - 修复意大利语文档与源代码不一致问题 (ref task-214)
-  - 14 个文件变更
-
-#### 协作框架
-- `6683bee` - 注册 Marvis AI 团队，更新任务状态
-  - 3 个文件变更
-
-- `03fc905` - 归档 task-210~220
-  - 5 个文件变更
-
-### 2026-05-20
-
-#### 新功能
-- `65176d4` - 添加葡萄牙语（pt-PT + pt-BR）完整本地化支持 (ref task-208)
-  - 41 个文件变更
-
-#### 文档一致性修复
-- `af4dffd` - 修正 zh-CN 文档与源代码的全部不一致问题 (ref task-209)
-  - 11 个文件变更
-
-- `144b945` - 修正英文(en)和捷克语(cs-CZ)文档与源代码不一致问题 (ref task-219, task-210)
-  - 22 个文件变更
-
-- `08bec55` - 修正德语文档(de-DE)与源代码不一致问题 (ref task-211)
-  - 14 个文件变更
-
-- `7ff28de` - 修复西班牙语(es-ES)文档与源代码不一致问题 (ref task-212)
-  - 14 个文件变更
-
-- `15e2133` - 修复法语文档(fr-FR)与源代码不一致问题 (ref task-213)
-  - 13 个文件变更
-
-#### 修复
-- `7dac388` - 修复项目任务列表无法显示 (ref task-207)
-  - 6 个文件变更
-
-#### 协作框架
-- `7890223` - 归档 task-201~209，发布 task-210~220 文档一致性修复任务
-  - 5 个文件变更
-
-### 2026-05-19
-
-#### 新功能
-- `cd72846` - 实现 PluginLoader 安全扫描绕过的安全替代方案 (ref task-203)
-  - 13 个文件变更
-
-- `fc0c00c` - Speedy.Manager 功能增强 - 新建/导入/导出/TreeView 层级/进度窗口 (ref task-206)
-  - 9 个文件变更
-
-#### 修复
-- `ec07118` - 修复 ITypeRegistry/IObjectFactory 未在插件加载前注册的问题 (ref task-205)
-  - 8 个文件变更
-
-- `9e749db` - 修复创建项目时 Creator ID is required 错误 (ref task-204)
+- `be4320b` - TravelCodeWikiWithAI 新增 CLDR 数据提供模块
   - 4 个文件变更
 
-#### 基础设施
-- `43dc092` - CLDR 迁移 - 添加 CldrDataProvider，移除 .github
-  - 1 个文件变更
 
-- `c09ec1f` - 添加 cldr/ 到 .gitignore
-  - 1 个文件变更
+### 2026-07-04
 
-- `221f818` - GitHub 同步改用 Gitee 推送镜像方案，workflow 仅保留手动备用
-  - 1 个文件变更
-
-- `08cdf1a` - 修复 GitHub 同步 workflow - 添加重试逻辑和无变更跳过
-  - 1 个文件变更
-
-- `fb4e77d` - 更新 SiliconLife.Speedy.Manager.csproj
-  - 1 个文件变更
-
-#### 协作框架
-- `df90af0` - 更新 task-203 relatedCommit=cd72846
-  - 1 个文件变更
-
-### 2026-05-18
+#### 新功能
+- `dbcabf3` - 插件权限系统增强 - 重构网络/文件 IO 为 Executor 模式 + GeneratedCodeAttribute 白名单豁免
+  - 34 个文件变更
+- `e84bb63` - 修复编译错误并新增 TravelCodeWikiWithAI 项目
+  - 53 个文件变更
 
 #### 重构
-- `e720d06` - 将 Speedy.Manager 从 WinForms 完全改造为 Avalonia (ref task-202)
-  - 17 个文件变更
+- `9e5a345` - TravelCodeWikiWithAI 全量迁移 PBF 至同步在线 OSM API
+  - 4 个文件变更
 
-#### 修复
-- `08894a9` - 修复记忆时间线摘要条目层级显示错误 (ref task-201)
-  - 3 个文件变更
 
-#### 协作框架
-- `2871afb` - 归档全部任务，tasks.json 清空
-  - 2 个文件变更
-
-### 2026-05-17
+### 2026-05-31
 
 #### 新功能
-- `d6eb994` - 项目列表页增加创建项目入口和工作流模板选择 (ref task-203)
-  - 14 个文件变更
+- `a5f37bd` - 更新项目思考、对话系统及存储相关功能
+  - 13 个文件变更
 
-- `0872134` - ThinkOnProject 无模板项目主理人驱动编排 (ref task-202)
-  - 6 个文件变更
 
-- `cb3188e` - 群聊 @提及可视化 (ref task-208)
-  - 4 个文件变更
+### 2026-05-30
 
-- `f9968e5` - AI 客户端 ToolCall 能力声明与优雅降级 (ref task-205)
-  - 4 个文件变更
+#### 新功能
+- `c3cf429` - 新增 QiniuAIClient AI 客户端（七牛云 AI 大模型推理服务） (ref task-409)
+  - 20 个文件变更
+- `d04131f` - 新增 LongCatClient AI 客户端（美团 LongCat 大模型） (ref task-408)
+  - 19 个文件变更
 
-- `0d2b843` - 群聊决策逻辑 ShouldReplyInGroupChat (ref task-201)
-  - 6 个文件变更
+#### 协作框架
+- `e9564f5` - 更新所有修改的文件
+  - 140 个文件变更
+- `9c8b42f` - 归档 2026-05-29 的 sessions 和 changes
+  - 20 个文件变更
 
-- `277a2b1` - 知识网络补全 - 高级查询和图谱遍历 (ref task-207)
-  - 9 个文件变更
+
+### 2026-05-29
+
+#### 新功能
+- `d548e48` - 项目思考详情页按轮次（Cycle）分组展示消息并支持折叠 (ref task-407)
+  - 23 个文件变更
+- `28d893d` - IAIClient 增加多模态能力声明接口 + ChatMessage 增加多模态字段 (ref task-402)
+  - 13 个文件变更
+- `ebe6a49` - 项目思考详情页增加会话状态、创建时间、完成时间展示 (ref task-406)
+  - 22 个文件变更
+- `9a53d55` - IAIClient 增加 ContextWindowTokens + Token 预算制 + 工厂配置化 (ref task-401, task-403)
+  - 26 个文件变更
+- `202b99c` - 新增 HerdsmanClient AI 客户端 + 修复初始化界面下拉菜单不刷新 (ref task-399, task-400)
+  - 20 个文件变更
+- `285ab2f` - 项目处理记录前端展示 (ref task-397)
+  - 25 个文件变更
+- `b4b633f` - ThinkOnProject 伪 Session 多轮对话机制 (ref task-395)
+  - 13 个文件变更
+- `d3e543f` - ThinkOnProject 场景上下文增加可用硅基人信息 (ref task-394)
+  - 21 个文件变更
+- `07eb628` - BuildRequest 动态注入硅基人项目归属信息 (ref task-396)
+  - 21 个文件变更
+- `2089696` - Tool 添加 Project 场景支持 + PluginLoader 多目录统一重构
+  - 12 个文件变更
 
 #### 修复
-- `6d0b66e` - 修复群聊发送消息时 appendMessage TypeError (ref task-209)
-  - 5 个文件变更
-
-- `b15167c` - 补充提交 task-203 遗漏的 list-workflow-templates 路由注册 (ref task-203)
-  - 1 个文件变更
-
-- `dc549a2` - 修复 Gitee 同步 workflow - 添加用户名到 token URL
-  - 1 个文件变更
-
-#### 基础设施
-- `e5fa3ad` - 禁用 GitHub 自动同步 schedule，等待 Gitee 官方同步方案
+- `b80a33b` - 修复项目思考详情页加载提示文本硬编码英文及缺少本地化 (ref task-405)
+  - 6 个文件变更
+- `90b60c5` - 修复工具调用轮次中 AI 正文 Content 和 Thinking 被隐藏的问题 (ref task-404)
+  - 8 个文件变更
+- `a7d9a97` - ThinkOnProject 多轮循环续接及项目提醒信息丢失修复
+  - 6 个文件变更
+- `c0838dd` - 修复 ProjectThinkSession 消息未写入 Cycle 及完成后历史被删除的问题 (ref task-398)
+  - 7 个文件变更
+- `f3d1794` - 修复硅基人 Project/Broadcast/Stopped 状态本地化缺失及展示异常 (ref task-393)
+  - 20 个文件变更
+- `3eaa90d` - 移除已删除项目 TravelCodeWikiWithAI 的解决方案引用
   - 1 个文件变更
 
 #### 协作框架
-- `4a58c82` - 新增系统能力分析报告 + ThinkOnProject 设计方案
-  - 5 个文件变更
-
-- `8ab29e6` - 系统能力完整性分析报告归档至 .ai-collab/docs
+- `f3cbed7` - 注册 task-394~396（ThinkOnProject 增强）
+  - 3 个文件变更
+- `e1971f5` - 注册 task-393（BeingActivity 本地化与展示修复）
+  - 1 个文件变更
+- `e710fa4` - 更新 changes commitHash 和 state 会话结束
   - 2 个文件变更
-
-- `b412d9c` - 归档旧任务，基于综合分析重新发布 task-201~208
-  - 2 个文件变更
-
-- `437884a` - 更新协作元数据 - task-202/203/204 完成 (ref task-202, task-203, task-204)
-  - 2 个文件变更
-
-- `bf78d79` - 更新协作元数据 - task-201/205/208 完成
-  - 2 个文件变更
-
-- `de6ee0e` - 会话结束记录 catpaw-20260517-2215
-  - 5 个文件变更
-
-- `7223b6f` - 会话结束记录 catpaw-20260517-2200
+- `4cacc4a` - 归档 2026-05-28 的 sessions 和 changes
   - 4 个文件变更
 
+
+### 2026-05-28
+
+#### 新功能
+- `ae8b673` - 插件目录配置从单一路径升级为多目录列表 (ref task-391)
+  - 29 个文件变更
+- `aac46c1` - PluginLoader 增加 CS 源码模式，无 DLL 时编译加载插件 (ref task-389)
+  - 6 个文件变更
+
+#### 修复
+- `63047b0` - 注册所有 PluginLoader 到 ServiceLocator，修复多目录插件反射不全 (ref task-391)
+  - 3 个文件变更
+- `fcad655` - 修复 directoryList 浏览按钮交互问题 (ref task-392)
+  - 9 个文件变更
+
+#### 文档
+- `e6d3037` - PluginDemo-22 CS 源码编译加载模式示例 (ref task-390)
+  - 21 个文件变更
+
+#### 协作框架
+- `09d9e9c` - 归档 30 个已完成任务（task-362~task-391）
+  - 2 个文件变更
+- `66204a1` - 归档 2026-05-28 的 sessions（8）和 changes（8）
+  - 18 个文件变更
+- `308a8d0` - 更新 task-391 relatedCommit
+  - 1 个文件变更
+- `6fc4e05` - 注册 task-389（CS 源码模式）和 task-390（PluginDemo-22）
+  - 1 个文件变更
+
+
+### 2026-05-27
+
+#### 新功能
+- `e154a18` - 完成 PluginDemo-21 WorkflowTemplate 完整业务工作流示例 (ref task-388)
+  - 19 个文件变更
+- `aa771b3` - 实现 PluginCapability 声明式权限系统 (ref task-379)
+  - 9 个文件变更
+- `5e5e9d1` - 添加 04-SafeSystemIO System.IO 白名单安全类型示例 (ref task-370)
+  - 20 个文件变更
+
+#### 文档
+- `48f6702` - 对齐 19-TickObject 和 20-SpeedyPack 所有语言 README 翻译至基准 (ref task-386, task-387)
+  - 119 个文件变更
+- `5d570e5` - 完成 task-378 禁止的字符串反射绕过反例 (ref task-378)
+  - 19 个文件变更
+- `348c410` - PluginDemo-11 禁止的 P/Invoke 和 unsafe 代码反例 (ref task-377)
+  - 19 个文件变更
+- `fc92a49` - PluginDemo-10 禁止的反射操作反例 (ref task-376)
+  - 19 个文件变更
+- `826ad2a` - 创建 PluginDemo-09 禁止进程操作反例插件 (ref task-375)
+  - 19 个文件变更
+- `7870b05` - 添加 PluginDemo-08 禁止网络操作反例 (ref task-374)
+  - 15 个文件变更
+- `8636e31` - PluginDemo-07 禁止文件 I/O 操作反例 (ref task-373)
+  - 19 个文件变更
+- `322312e` - 添加 PluginDemo-06 TrustedAssemblies 受信依赖示例 (ref task-372)
+  - 19 个文件变更
+- `6df98a0` - 添加 IWorkflowPlugin 工作流插件示例 (ref task-371)
+  - 20 个文件变更
+- `f3787ba` - PluginDemo-03 IObjectFactory 注册与创建示例 (ref task-369)
+  - 20 个文件变更
+- `bb4324d` - PluginDemo-02 ITypeRegistry 注册与查询示例 (ref task-368)
+  - 20 个文件变更
+- `bbdfa3c` - PluginDemo-01 最简 IPlugin 实现示例 (ref task-367)
+  - 19 个文件变更
+
+#### 协作框架
+- `de44057` - 归档 5 月 25 日和 27 日的 sessions 和 changes
+  - 58 个文件变更
+- `9e4a84c` - 更新 tasks.json lastCommitHash 为 48f6702
+  - 1 个文件变更
+- `beb58b2` - 补充 taskIndex 索引（8 pending, 19 completed）
+  - 1 个文件变更
+- `63f7bfc` - 更新 task-388 relatedCommit (ref task-388)
+  - 1 个文件变更
+- `e61be6f` - 更新 task-378 relatedCommit (ref task-378)
+  - 1 个文件变更
+- `dde579b` - 发布 WorkflowTemplate 完整使用示例任务（task-388）
+  - 1 个文件变更
+- `2294fa7` - 发布 TickObject 和 SpeedyPack 示例任务（task-386~387）
+  - 1 个文件变更
+- `82b9f63` - 发布 6 个 PluginCapability 示例任务（task-380~385）
+  - 1 个文件变更
+- `588539b` - 发布 PluginCapability 声明式权限系统任务（task-379）
+  - 1 个文件变更
+- `37f9c23` - 更新解决方案和项目文件引用
+  - 8 个文件变更
+- `e1f7892` - 发布 12 个 PluginDemo 待领取任务（task-367~378）
+  - 3 个文件变更
+- `87ae858` - 创建 PluginDemo 插件正反例任务注册（task-367）
+  - 2 个文件变更
+- `f77a102` - 归档 2026-05-26 的 sessions 和 changes
+  - 7 个文件变更
 
 ## [Alpha-0.2] - 2026-05-16
 

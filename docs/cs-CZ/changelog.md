@@ -1,4 +1,4 @@
-# Seznam změn
+﻿# Seznam změn
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | **Čeština** | [Русский](../ru-RU/changelog.md)
 
@@ -66,411 +66,238 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze v implementaci 
 
 ## [Nezveřejněno]
 
-### Nové AI klienty
-
-- **DeepSeekClient** — přímé připojení k DeepSeek API, thinking mode, reasoning effort, až 1M kontextové okno, endpoint `https://api.deepseek.com`
-- **ZhipuClient (GLM)** — přímé připojení k Zhipu AI API, thinking mode, vision podle modelu, bezplatné modely, až 1M kontext, endpoint `https://open.bigmodel.cn/api/paas/v4`
-- **ErnieClient (Baidu/Qianfan)** — přímé připojení k Baidu Qianfan v2 API, bezplatné modely (ernie-speed, ernie-tiny), až 131K kontext, endpoint `https://qianfan.baidubce.com/v2`
-- **HunyuanClient (Tencent)** — přímé připojení k Tencent Hunyuan API, duální endpoint (TokenHub + Legacy), thinking mode, až 262K kontext
-- **MiniMaxClient** — přímé připojení k MiniMax API, domácí/mezinárodní endpoint, adaptivní thinking, multimodální, až 1M kontext, endpoint `https://api.minimaxi.com/v1`
-- **MoonshotClient (Kimi)** — přímé připojení k Moonshot/Kimi API, thinking mode, multimodální, až 262K kontext, endpoint `https://api.moonshot.cn/v1`
-- **SiliconFlowClient** — přímé připojení k SiliconFlow API, agregátor 100+ open-source modelů, dynamické objevení modelů přes API, reasoning obsah, až 1M kontext, endpoint `https://api.siliconflow.cn/v1`
-- **01.AI (Yi)** — označeno jako zastaralé (⚠️), nové registrace ukončeny
-
-### 2026-05-26
+### 2026-07-16
 
 #### Nové funkce
-- `a49041b` - Přidána podpora ruštiny (ru-RU) lokalizace (ref task-364)
-  - 216 změněných souborů
-
-#### Opravy
-- `79096f2` - Formát tabulky glossary převeden na standardní Markdown, odstraněny nadbytečné mezery pro zarovnání
-  - 1 změněný soubor
+- `7431312` - Doplnit překlady konfigurace AI klientů pro 13 jazykových souborů - CsCZ/PlPL upgradovány ze stub na plnou implementaci slovníku, zbývajících 10 souborů doplňuje položky ConfigDisplayNames/ConfigDescriptions/ConfigGroupNames pro 7 nových klientů (DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan), synchronní aktualizace metadat konfiguračních klíčů 6 ClientFactory
+  - 20 soubor(ů) změněno
 
 #### Dokumentace
-- `174a954` - Doplněny chybějící překlady terminologie ve sloupcích Deutsch/Polski/Português v glossary
-  - 1 změněný soubor
+- `d6608ea` - Přidat představení AI IDE nástroje DuMate (Baidu Qianfan) do všech 13 jazykových verzí changelogu
+  - 13 soubor(ů) změněno
 
 #### Kolaborační rámec
-- `5b03d53` - Aktualizovány záznamy úkolů .ai-collab - task-364 ruská lokalizace (ref task-364)
-  - 5 změněných souborů
+- `c607c97` - Zaregistrovat DuMate (Baidu Qianfan) jako rezidentního AI aktéra v registru .ai-collab
+  - 1 soubor(ů) změněno
 
-- `018947d` - Archivovány sessions a changes z 2026-05-25
-  - 2 změněné soubory
 
-### 2026-05-25
+### 2026-07-15
 
 #### Nové funkce
-- `14721a9` - Zjemněny personální tipy ThinkOnProject na detailní proveditelný akční plán (ref task-363)
-  - 20 změněných souborů
+- `c007263` - Doplnit dokumentaci nápovědy pro 10 AI klientů - HelpTopics registruje 10 témat, HelpLocalizationBase přidává 30 abstraktních vlastností, 12 jazykových souborů implementuje úplný obsah nápovědy v Markdown (úvod platformy/kroky registrace/metody konfigurace/dostupné modely/fakturace/FAQ), pokrývá Herdsman/LongCat/QiniuAI/DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan
+  - 12 soubor(ů) změněno
+- `4634e33` - Implementace 7 domácích AI platformních klientů (DeepSeek/Zhipu GLM/Moonshot Kimi/SiliconFlow/MiniMax/Baidu Ernie/Tencent Hunyuan) - 14 nezávislých souborů tříd, následující styl LongCatClient, bez dědičnosti, všechny kompatibilní s OpenAI + Bearer Token, podpora Tool Calling/streaming/thinking režimu, registrováno v DefaultSiliconBeing a DefaultSiliconBeingFactory
+  - 16 soubor(ů) změněno
 
-#### Opravy
-- `abb4285` - Opravena chyba umístění volání .join() v beingsHtml (ref task-361)
-  - 1 změněný soubor
+#### Dokumentace
+- `108c4ea` - Aktualizovat veškerou dokumentaci ve 13 jazycích, aby odrážela 7 nových AI klientů - status 📋→✅, 01.AI označen jako zastaralý
+  - 94 soubor(ů) změněno
 
-- `1c0b9ed` - Odstraněn bug s duplicitním řetězcem state-initial způsobeným vykreslením states-overview v WorkflowDetailView (ref task-362)
-  - 6 změněných souborů
 
-#### Kolaborační rámec
-- `ecc48a1` - Aktualizována metadata .ai-collab (relatedCommit a activity log) (ref task-361)
-  - 4 změněné soubory
+### 2026-07-14
 
-- `64529a7` - Archivovány sessions a changes z 2026-05-24 (ruční doplnění provedení)
-  - 28 změněných souborů
+#### Dokumentace
+- `344b429` - Přidat stav "Zastaralý" do stavu AI platformy v architecture.md pro všechny jazyky, označit 01.AI jako zastaralý (registrace nových uživatelů zastavena)
+  - 13 soubor(ů) změněno
 
-- `4150e52` - Archivovány dokončené úkoly task-341~361 (ref archive)
-  - 2 změněné soubory
 
-### 2026-05-24
-
-#### Nové funkce
-- `db60fd9` - Seznam oprávnění nástrojů zobrazuje nástroje bez deklarace ToolAction a označuje je jako nenastavitelné (ref task-331, task-332, task-333)
-  - 21 změněných souborů
-
-- `6004a7f` - WorkflowTemplate přidána podpora definic rolí + 12 jazyková lokalizace + oprava DiskTool (ref task-346)
-  - 24 změněných souborů
-
-- `75ce452` - Role pool ProjectSpace a akce správy rolí ProjectTool (ref task-347)
-  - 12 změněných souborů
-
-- `edfb600` - BuildProjectScenarioContext přidány informace o rolích (ref task-348)
-  - 21 změněných souborů
-
-- `6a2d713` - HasProjectsWithoutTemplate rozšířeno na HasProjectsNeedingAttention (ref task-349)
-  - 21 změněných souborů
-
-- `a773224` - Vytváření úkolů workflow používá role pool pro přiřazení exekutorů (ref task-350)
-  - 6 změněných souborů
-
-- `77a27f9` - Rozšířen TravelCodeWikiTool jako vstupní bod pro geografické entity (ref task-353)
-  - 8 změněných souborů
-
-- `873ef23` - Implementace GeoDataTool dokončena, aktualizován stav .ai-collab (ref task-352)
-  - 7 změněných souborů
-
-- `feaccab` - Implementace GeoContentTool dokončena, aktualizován stav .ai-collab (ref task-351)
-  - 6 změněných souborů
-
-- `6e60ad1` - Rozšířen GeoLanguageTool (podpora ObjectPath + set_word), doplněny metadata (ref task-356, task-355)
-  - 7 změněných souborů
-
-- `4eff807` - Implementováno GetWikiDocuments() v podtřídách GeoLocation (ref task-357)
-  - 5 změněných souborů
-
-- `baad5df` - Implementována služba publikace MediaWiki API (ref task-358)
-  - 6 změněných souborů
-
-- `b846a21` - Implementována stránka detailu workflow (ref task-361)
-  - 24 změněných souborů
-
-#### Opravy
-- `a290088` - Křemíková bytost vytvořená přes CuratorTool se ztrácí po restartu (ref task-334)
-  - 11 změněných souborů
-
-- `69a8cba` - Opraven bug, kdy stránka úkolů nefiltrovala podle beingId (ref task-360)
-  - 8 změněných souborů
-
-- `7dd1a65` - Registrace routy stránky detailu workflow v Router.cs (ref task-361)
-  - 1 změněný soubor
-
-#### Refaktoring
-- `5e02711` - Refaktorována abstrakce cest úložiště ve veřejné vrstvě, odstraněno hardcodování souborového systému (ref task-335)
-  - 12 změněných souborů
-
-- `0ec0929` - DynamicBeingLoader.SaveBeingCode používá IStorage místo přímých operací souborového systému (ref task-336)
-  - 7 změněných souborů
-
-- `9a44b48` - PlaywrightWebView IStorage bridge + decoupling základní třídy WebViewBrowserTool (ref task-337, task-340)
-  - 11 změněných souborů
-
-- `8fea742` - Ukládání snímků obrazovky WebViewBrowserTool používá IStorage místo přímých operací souborového systému (ref task-338)
-  - 6 změněných souborů
-
-- `4c24e6d` - DefaultPermissionCallback používá BeingPathResolver místo hardcodovaných cest (ref task-339)
-  - 6 změněných souborů
-
-- `ab428cd` - Odstraněn downcasting v DefaultSiliconBeing, přímé volání SaveState() základní třídy (ref task-344)
-  - 7 změněných souborů
-
-- `1e6eb80` - Dočasné soubory stavu prohlížeče PlaywrightWebView převedeny na přímé čtení/zápis přes IStorage (ref task-341)
-  - 7 změněných souborů
-
-- `17f00e9` - Vyhledávací operace DiskTool převedeny přes DiskExecutor (ref task-342)
-  - 8 změněných souborů
-
-- `8158703` - Kontrola příloh ChatController převedena přes DiskExecutor (ref task-343)
-  - 7 změněných souborů
-
-- `3243ae6` - Přepsán TravelCodeWikiPublishWorkflow jako 7-krokový stavový automat, odstraněny vynuceně sledované soubory TravelCodeWikiWithAI (ref task-355)
-  - 6 změněných souborů
+### 2026-07-07
 
 #### Čištění
-- `d685288` - Smazány HotReloadTool.cs a adresář tools/HotReload (ref task-345)
-  - 8 změněných souborů
+- `e06e6f2` - Odstranit toolchain OsmStore a plugin TravelCodeWikiWithAI - smazat tools/OsmStore.* tři projekty, smazat src/TravelCodeWikiWithAI/ plugin projekt, vyčistit sln odkazy, projekt se vrací k samostatné vývojové trase TCW
+  - 45 soubor(ů) změněno
 
-#### Dokumentace
-- `f1789d1` - Optimalizován popisný řádek v README.md (ref task-359)
-  - 9 změněných souborů
 
-#### Kolaborační rámec
-- `982c6bb` - Doplněny chybějící pole relatedCommit a commitHash v .ai-collab
-  - 6 změněných souborů
-
-- `d91e9f8` - Archivovány task-331~340, task board vyčištěn
-  - 2 změněné soubory
-
-- `9135e30` - Zveřejněny task-341~344 refaktoring IStorage ve veřejné vrstvě + oprava abstrakce
-  - 1 změněný soubor
-
-- `f70b350` - Přidáno 13 úkolů architektonické transformace TravelCodeWikiWithAI (ref task-346~358)
-  - 2 změněné soubory
-
-- `f81d38b` - Aktualizovány soubory ai-collab session a task tracking
-  - 3 změněné soubory
-
-### 2026-05-23
+### 2026-07-06
 
 #### Opravy
-- `9c3c64e` - Opraveno obejití ověření oprávnění za běhu v ExecuteTool u projektových omezení (ref task-324)
-  - 7 změněných souborů
+- `1b15886` - Standardizace datového modelu OSM a oprava bezpečnosti typu prvku
+  - 7 soubor(ů) změněno
 
-- `94a9e35` - Opravena nekonzistence mezi definicí šablony oprávnění a deklarací ToolActionAttribute (ref task-325)
-  - 6 změněných souborů
 
-- `e8d8371` - Nástroje se všemi zakázanými akcemi jsou zcela odstraněny z AI požadavků (ref task-326)
-  - 6 změněných souborů
-
-- `32c7d8a` - API oprávnění nástrojů přidáno ověření názvu akce + oprava vykreslování Markdown v historii chatu (ref task-327, task-328, task-329)
-  - 9 změněných souborů
-
-- `797db8c` - Fallback vykreslování Markdown nesprávně nastavuje mdRendered, což způsobuje, že se po načtení marked neznovu vykresluje (ref task-330)
-  - 9 změněných souborů
-
-#### Kolaborační rámec
-- `1496094` - Zveřejněny opravné úkoly task-324~327 rámce oprávnění nástrojů
-  - 776 změněných souborů
-
-- `0d16e63` - Aktualizován stav kolaboračních úkolů, přiřazen task-330 ke commitu 797db8c, příprava na archivaci
-  - 2 změněné soubory
-
-- `e602e1c` - Archivovány task-316~330, task board vyčištěn (ref task-316~330)
-  - 2 změněné soubory
-
-- `20291ce` - Denní archivace sessions a changes (13.-22. května)
-  - 106 změněných souborů
-
-### 2026-05-22
-
-#### Opravy konzistence dokumentace
-- `9e07b27` - Opraveny rozdíly v konzistenci mezi francouzskou dokumentací (fr-FR) a zdrojovým kódem (ref task-307)
-  - 10 změněných souborů
-
-- `9e3be72` - Opravena konzistence mezi německou dokumentací (de-DE) a zdrojovým kódem (ref task-308)
-  - 5 změněných souborů
-
-- `2bc7151` - Opraveny rozdíly v konzistenci mezi španělskou dokumentací (es-ES) a zdrojovým kódem (ref task-309)
-  - 13 změněných souborů
-
-- `f95088e` - Opravena konzistence mezi italskou dokumentací (it-IT) a zdrojovým kódem (ref task-310)
-  - 11 změněných souborů
-
-- `6ea9f4a` - Opravena konzistence mezi polskou dokumentací (pl-PL) a zdrojovým kódem (ref task-311)
-  - 16 změněných souborů
-
-- `7646923` - Opravena konzistence mezi portugalskou dokumentací (pt-PT) a zdrojovým kódem (ref task-312)
-  - 12 změněných souborů
-
-- `7eaf9db` - Opravena konzistence mezi českou dokumentací (cs-CZ) a zdrojovým kódem (ref task-313)
-  - 12 změněných souborů
-
-#### Kolaborační rámec
-- `3cb7347` - Aktualizován task-313 relatedCommit=7eaf9db
-  - 1 změněný soubor
-
-### 2026-05-21
+### 2026-07-05
 
 #### Nové funkce
-- `99eca78` - Kontextové menu přidáno "Zobrazit úložiště (jen pro čtení)", volání Speedy.Manager v procesu (ref task-301)
-  - 26 změněných souborů
+- `be4320b` - TravelCodeWikiWithAI přidává modul poskytovatele CLDR dat
+  - 4 soubor(ů) změněno
 
-#### Opravy konzistence dokumentace
-- `7f65cf1` - Opraveny rozdíly v konzistenci mezi dokumentací zh-CN a zdrojovým kódem (ref task-303)
-  - 15 změněných souborů
 
-- `a9e2a2c` - Opraveny rozdíly v konzistenci mezi anglickou dokumentací (en) a zdrojovým kódem (ref task-302)
-  - 9 změněných souborů
-
-- `2549105` - Opraveny rozdíly v konzistenci mezi dokumentací v tradiční čínštině (zh-HK) a zdrojovým kódem (ref task-304)
-  - 12 změněných souborů
-
-- `277eb50` - Opraveny rozdíly v konzistenci mezi japonskou dokumentací a zdrojovým kódem (ref task-305)
-  - 10 změněných souborů
-
-- `edce413` - Opraveny rozdíly v konzistenci mezi korejskou dokumentací (ko-KR) a zdrojovým kódem (ref task-306)
-  - 18 změněných souborů
-
-- `f2adcae` - Opraven problém nekonzistence portugalské dokumentace se zdrojovým kódem (ref task-220)
-  - 15 změněných souborů
-
-- `3332987` - Opraven problém nekonzistence dokumentace v tradiční čínštině (Hongkong) se zdrojovým kódem (ref task-218)
-  - 14 změněných souborů
-
-- `af9f715` - Opraven problém nekonzistence polské dokumentace se zdrojovým kódem (ref task-217)
-  - 15 změněných souborů
-
-- `2e2b18b` - Opraven problém nekonzistence korejské dokumentace se zdrojovým kódem (ref task-216)
-  - 16 změněných souborů
-
-- `626ebc9` - Opraven problém nekonzistence japonské dokumentace se zdrojovým kódem (ref task-215)
-  - 19 změněných souborů
-
-- `48d061b` - Opraven problém nekonzistence italské dokumentace se zdrojovým kódem (ref task-214)
-  - 14 změněných souborů
-
-#### Kolaborační rámec
-- `6683bee` - Registrován tým Marvis AI, aktualizován stav úkolů
-  - 3 změněné soubory
-
-- `03fc905` - Archivovány task-210~220
-  - 5 změněných souborů
-
-### 2026-05-20
+### 2026-07-04
 
 #### Nové funkce
-- `65176d4` - Přidána kompletní podpora lokalizace portugalštiny (pt-PT + pt-BR) (ref task-208)
-  - 41 změněných souborů
-
-#### Opravy konzistence dokumentace
-- `af4dffd` - Opraveny všechny nekonzistence mezi dokumentací zh-CN a zdrojovým kódem (ref task-209)
-  - 11 změněných souborů
-
-- `144b945` - Opraveny nekonzistence mezi anglickou (en) a českou (cs-CZ) dokumentací a zdrojovým kódem (ref task-219, task-210)
-  - 22 změněných souborů
-
-- `08bec55` - Opraveny nekonzistence mezi německou dokumentací (de-DE) a zdrojovým kódem (ref task-211)
-  - 14 změněných souborů
-
-- `7ff28de` - Opraveny nekonzistence mezi španělskou dokumentací (es-ES) a zdrojovým kódem (ref task-212)
-  - 14 změněných souborů
-
-- `15e2133` - Opraveny nekonzistence mezi francouzskou dokumentací (fr-FR) a zdrojovým kódem (ref task-213)
-  - 13 změněných souborů
-
-#### Opravy
-- `7dac388` - Opraveno nezobrazování seznamu projektových úkolů (ref task-207)
-  - 6 změněných souborů
-
-#### Kolaborační rámec
-- `7890223` - Archivovány task-201~209, zveřejněny úkoly task-210~220 pro opravu konzistence dokumentace
-  - 5 změněných souborů
-
-### 2026-05-19
-
-#### Nové funkce
-- `cd72846` - Implementováno bezpečné alternativní řešení pro obejití bezpečnostního skenu PluginLoader (ref task-203)
-  - 13 změněných souborů
-
-- `fc0c00c` - Vylepšení Speedy.Manager - vytvoření/import/export/TreeView hierarchie/okno průběhu (ref task-206)
-  - 9 změněných souborů
-
-#### Opravy
-- `ec07118` - Opraven problém, kdy ITypeRegistry/IObjectFactory nebyly registrovány před načtením pluginů (ref task-205)
-  - 8 změněných souborů
-
-- `9e749db` - Opravena chyba "Creator ID is required" při vytváření projektu (ref task-204)
-  - 4 změněné soubory
-
-#### Infrastruktura
-- `43dc092` - Migrace CLDR - přidán CldrDataProvider, odstraněn .github
-  - 1 změněný soubor
-
-- `c09ec1f` - Přidáno cldr/ do .gitignore
-  - 1 změněný soubor
-
-- `221f818` - Synchronizace GitHub převedena na schéma zrcadlení Gitee push, workflow ponecháno pouze jako ruční záloha
-  - 1 změněný soubor
-
-- `08cdf1a` - Opraven synchronizační workflow GitHub - přidána logika opakování a přeskočení při žádných změnách
-  - 1 změněný soubor
-
-- `fb4e77d` - Aktualizován SiliconLife.Speedy.Manager.csproj
-  - 1 změněný soubor
-
-#### Kolaborační rámec
-- `df90af0` - Aktualizován task-203 relatedCommit=cd72846
-  - 1 změněný soubor
-
-### 2026-05-18
+- `dbcabf3` - Vylepšení systému oprávnění pluginů - refaktoring síťového/souborového IO do Executor módu + výjimka z bílé listiny GeneratedCodeAttribute
+  - 34 soubor(ů) změněno
+- `e84bb63` - Opravit chyby kompilace a přidat projekt TravelCodeWikiWithAI
+  - 53 soubor(ů) změněno
 
 #### Refaktoring
-- `e720d06` - Speedy.Manager kompletně přepracován z WinForms na Avalonia (ref task-202)
-  - 17 změněných souborů
+- `9e5a345` - TravelCodeWikiWithAI plně migruje PBF na synchronní online OSM API
+  - 4 soubor(ů) změněno
 
-#### Opravy
-- `08894a9` - Opravena chyba zobrazení úrovně položek v časové ose paměti (ref task-201)
-  - 3 změněné soubory
 
-#### Kolaborační rámec
-- `2871afb` - Archivovány všechny úkoly, tasks.json vyčištěn
-  - 2 změněné soubory
-
-### 2026-05-17
+### 2026-05-31
 
 #### Nové funkce
-- `d6eb994` - Stránka seznamu projektů přidala vstup pro vytvoření projektu a výběr šablony workflow (ref task-203)
-  - 14 změněných souborů
+- `a5f37bd` - Aktualizovat projektové myšlení, konverzační systém a funkce související s úložištěm
+  - 13 soubor(ů) změněno
 
-- `0872134` - ThinkOnProject orchestrace řízená Kurátorem pro projekty bez šablony (ref task-202)
-  - 6 změněných souborů
 
-- `cb3188e` - Vizualizace @zmínky ve skupinovém chatu (ref task-208)
-  - 4 změněné soubory
+### 2026-05-30
 
-- `f9968e5` - Deklarace schopnosti ToolCall AI klienta a elegantní degradace (ref task-205)
-  - 4 změněné soubory
-
-- `0d2b843` - Rozhodovací logika skupinového chatu ShouldReplyInGroupChat (ref task-201)
-  - 6 změněných souborů
-
-- `277a2b1` - Doplnění znalostní sítě - pokročilé dotazy a průchod grafem (ref task-207)
-  - 9 změněných souborů
-
-#### Opravy
-- `6d0b66e` - Opraven appendMessage TypeError při odesílání zpráv ve skupinovém chatu (ref task-209)
-  - 5 změněných souborů
-
-- `b15167c` - Doplněna chybějící registrace routy list-workflow-templates z commitu task-203 (ref task-203)
-  - 1 změněný soubor
-
-- `dc549a2` - Opraven synchronizační workflow Gitee - přidáno uživatelské jméno do URL tokenu
-  - 1 změněný soubor
-
-#### Infrastruktura
-- `e5fa3ad` - Zakázán automatický plán synchronizace GitHub, čeká na oficiální řešení synchronizace Gitee
-  - 1 změněný soubor
+#### Nové funkce
+- `c3cf429` - Přidat AI klienta QiniuAIClient (inferenční služba velkých modelů Qiniu Cloud AI) (ref task-409)
+  - 20 soubor(ů) změněno
+- `d04131f` - Přidat AI klienta LongCatClient (velký model LongCat Meituan) (ref task-408)
+  - 19 soubor(ů) změněno
 
 #### Kolaborační rámec
-- `4a58c82` - Přidána zpráva o analýze systémových schopností + návrh ThinkOnProject
-  - 5 změněných souborů
+- `e9564f5` - Aktualizovat všechny změněné soubory
+  - 140 soubor(ů) změněno
+- `9c8b42f` - Archivovat sessions a changes z 2026-05-29
+  - 20 soubor(ů) změněno
 
-- `8ab29e6` - Zpráva o úplnosti systémových schopností archivována do .ai-collab/docs
-  - 2 změněné soubory
 
-- `b412d9c` - Archivovány staré úkoly, na základě komplexní analýzy znovu zveřejněny task-201~208
-  - 2 změněné soubory
+### 2026-05-29
 
-- `437884a` - Aktualizována kolaborační metadata - task-202/203/204 dokončeny (ref task-202, task-203, task-204)
-  - 2 změněné soubory
+#### Nové funkce
+- `d548e48` - Stránka detailu projektového myšlení seskupuje zprávy podle cyklu (Cycle) se skládacími sekcemi (ref task-407)
+  - 23 soubor(ů) změněno
+- `28d893d` - IAIClient přidává rozhraní deklarace multimodálních schopností + ChatMessage přidává multimodální pole (ref task-402)
+  - 13 soubor(ů) změněno
+- `ebe6a49` - Stránka detailu projektového myšlení přidává zobrazení stavu relace, času vytvoření a času dokončení (ref task-406)
+  - 22 soubor(ů) změněno
+- `9a53d55` - IAIClient přidává ContextWindowTokens + systém rozpočtu Token + konfiguraci továrny (ref task-401, task-403)
+  - 26 soubor(ů) změněno
+- `202b99c` - Přidat AI klienta HerdsmanClient + opravit neaktualizování rozbalovacího menu inicializačního rozhraní (ref task-399, task-400)
+  - 20 soubor(ů) změněno
+- `285ab2f` - Frontend zobrazení záznamu o zpracování projektu (ref task-397)
+  - 25 soubor(ů) změněno
+- `b4b633f` - Mechanismus pseudo-Session vícekolového dialogu ThinkOnProject (ref task-395)
+  - 13 soubor(ů) změněno
+- `d3e543f` - Kontext scény ThinkOnProject přidává informace o dostupných křemíkových bytostech (ref task-394)
+  - 21 soubor(ů) změněno
+- `07eb628` - BuildRequest dynamicky vkládá informace o příslušnosti projektu křemíkových bytostí (ref task-396)
+  - 21 soubor(ů) změněno
+- `2089696` - Tool přidává podporu scénáře Project + sjednocený refaktoring více adresářů PluginLoader
+  - 12 soubor(ů) změněno
 
-- `bf78d79` - Aktualizována kolaborační metadata - task-201/205/208 dokončeny
-  - 2 změněné soubory
+#### Opravy
+- `b80a33b` - Opravit text nápovědy načítání stránky detailu projektového myšlení natvrdo kódovaný v angličtině a chybějící lokalizaci (ref task-405)
+  - 6 soubor(ů) změněno
+- `90b60c5` - Opravit skrývání obsahu Content a Thinking AI v kolech volání nástrojů (ref task-404)
+  - 8 soubor(ů) změněno
+- `a7d9a97` - Opravit pokračování vícekolového cyklu ThinkOnProject a ztrátu zpráv připomenutí projektu
+  - 6 soubor(ů) změněno
+- `c0838dd` - Opravit že zprávy ProjectThinkSession nejsou zapisovány do Cycle a historie je po dokončení smazána (ref task-398)
+  - 7 soubor(ů) změněno
+- `f3d1794` - Opravit chybějící lokalizaci stavu Project/Broadcast/Stopped křemíkových bytostí a anomálii zobrazení (ref task-393)
+  - 20 soubor(ů) změněno
+- `3eaa90d` - Odstranit odkazy řešení na smazaný projekt TravelCodeWikiWithAI
+  - 1 soubor(ů) změněno
 
-- `de6ee0e` - Záznam o ukončení relace catpaw-20260517-2215
-  - 5 změněných souborů
+#### Kolaborační rámec
+- `f3cbed7` - Zaregistrovat task-394~396 (vylepšení ThinkOnProject)
+  - 3 soubor(ů) změněno
+- `e1971f5` - Zaregistrovat task-393 (lokalizace BeingActivity a oprava zobrazení)
+  - 1 soubor(ů) změněno
+- `e710fa4` - Aktualizovat changes commitHash a konec relace state
+  - 2 soubor(ů) změněno
+- `4cacc4a` - Archivovat sessions a changes z 2026-05-28
+  - 4 soubor(ů) změněno
 
-- `7223b6f` - Záznam o ukončení relace catpaw-20260517-2200
-  - 4 změněné soubory
 
+### 2026-05-28
+
+#### Nové funkce
+- `ae8b673` - Konfigurace adresáře pluginů upgradována z jedné cesty na seznam více adresářů (ref task-391)
+  - 29 soubor(ů) změněno
+- `aac46c1` - PluginLoader přidává CS zdrojový mód, kompilovat-načíst pluginy při absenci DLL (ref task-389)
+  - 6 soubor(ů) změněno
+
+#### Opravy
+- `63047b0` - Zaregistrovat všechny PluginLoader do ServiceLocator, opravit neúplnou reflexi multi-adresářových pluginů (ref task-391)
+  - 3 soubor(ů) změněno
+- `fcad655` - Opravit problém interakce tlačítka prohlížení directoryList (ref task-392)
+  - 9 soubor(ů) změněno
+
+#### Dokumentace
+- `e6d3037` - PluginDemo-22 příklad módu kompilace-načtení CS zdrojového kódu (ref task-390)
+  - 21 soubor(ů) změněno
+
+#### Kolaborační rámec
+- `09d9e9c` - Archivovat 30 dokončených úkolů (task-362~task-391)
+  - 2 soubor(ů) změněno
+- `66204a1` - Archivovat sessions (8) a changes (8) z 2026-05-28
+  - 18 soubor(ů) změněno
+- `308a8d0` - Aktualizovat relatedCommit task-391
+  - 1 soubor(ů) změněno
+- `6fc4e05` - Zaregistrovat task-389 (CS zdrojový mód) a task-390 (PluginDemo-22)
+  - 1 soubor(ů) změněno
+
+
+### 2026-05-27
+
+#### Nové funkce
+- `e154a18` - Dokončit PluginDemo-21 WorkflowTemplate úplný příklad obchodního workflow (ref task-388)
+  - 19 soubor(ů) změněno
+- `aa771b3` - Implementovat PluginCapability deklarativní systém oprávnění (ref task-379)
+  - 9 soubor(ů) změněno
+- `5e5e9d1` - Přidat příklad bezpečného typu bílé listiny 04-SafeSystemIO System.IO (ref task-370)
+  - 20 soubor(ů) změněno
+
+#### Dokumentace
+- `48f6702` - Zarovnat překlady README pro 19-TickObject a 20-SpeedyPack ve všech jazycích na základní linii (ref task-386, task-387)
+  - 119 soubor(ů) změněno
+- `5d570e5` - Dokončit task-378 zakázaný protipříklad obcházení reflexe řetězce (ref task-378)
+  - 19 soubor(ů) změněno
+- `348c410` - PluginDemo-11 zakázaný protipříklad P/Invoke a unsafe kódu (ref task-377)
+  - 19 soubor(ů) změněno
+- `fc92a49` - PluginDemo-10 zakázaný protipříklad operace reflexe (ref task-376)
+  - 19 soubor(ů) změněno
+- `826ad2a` - Vytvořit PluginDemo-09 zakázaný protipříklad pluginu operace procesu (ref task-375)
+  - 19 soubor(ů) změněno
+- `7870b05` - Přidat PluginDemo-08 zakázaný protipříklad síťové operace (ref task-374)
+  - 15 soubor(ů) změněno
+- `8636e31` - PluginDemo-07 zakázaný protipříklad operace souborového I/O (ref task-373)
+  - 19 soubor(ů) změněno
+- `322312e` - Přidat PluginDemo-06 TrustedAssemblies příklad důvěryhodné závislosti (ref task-372)
+  - 19 soubor(ů) změněno
+- `6df98a0` - Přidat příklad workflow pluginu IWorkflowPlugin (ref task-371)
+  - 20 soubor(ů) změněno
+- `f3787ba` - PluginDemo-03 příklad registrace a vytvoření IObjectFactory (ref task-369)
+  - 20 soubor(ů) změněno
+- `bb4324d` - PluginDemo-02 příklad registrace a dotazu ITypeRegistry (ref task-368)
+  - 20 soubor(ů) změněno
+- `bbdfa3c` - PluginDemo-01 příklad minimální implementace IPlugin (ref task-367)
+  - 19 soubor(ů) změněno
+
+#### Kolaborační rámec
+- `de44057` - Archivovat sessions a changes z 25. a 27. května
+  - 58 soubor(ů) změněno
+- `9e4a84c` - Aktualizovat lastCommitHash tasks.json na 48f6702
+  - 1 soubor(ů) změněno
+- `beb58b2` - Doplnit index taskIndex (8 pending, 19 completed)
+  - 1 soubor(ů) změněno
+- `63f7bfc` - Aktualizovat relatedCommit task-388 (ref task-388)
+  - 1 soubor(ů) změněno
+- `e61be6f` - Aktualizovat relatedCommit task-378 (ref task-378)
+  - 1 soubor(ů) změněno
+- `dde579b` - Zveřejnit úlohu kompletního příkladu použití WorkflowTemplate (task-388)
+  - 1 soubor(ů) změněno
+- `2294fa7` - Zveřejnit úlohy příkladů TickObject a SpeedyPack (task-386~387)
+  - 1 soubor(ů) změněno
+- `82b9f63` - Zveřejnit 6 úloh příkladů PluginCapability (task-380~385)
+  - 1 soubor(ů) změněno
+- `588539b` - Zveřejnit úlohu deklarativního systému oprávnění PluginCapability (task-379)
+  - 1 soubor(ů) změněno
+- `37f9c23` - Aktualizovat odkazy řešení a souborů projektu
+  - 8 soubor(ů) změněno
+- `e1f7892` - Zveřejnit 12 čekajících úloh PluginDemo (task-367~378)
+  - 3 soubor(ů) změněno
+- `87ae858` - Vytvořit registraci úlohy pozitivního/negativního příkladu pluginu PluginDemo (task-367)
+  - 2 soubor(ů) změněno
+- `f77a102` - Archivovat sessions a changes z 2026-05-26
+  - 7 soubor(ů) změněno
 
 ## [Alpha-0.2] - 2026-05-16
 

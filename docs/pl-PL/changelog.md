@@ -1,4 +1,4 @@
-# Dziennik zmian
+﻿# Dziennik zmian
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -66,413 +66,238 @@ Obie wersje współdzielą te same interfejsy i funkcjonalności, różnią się
 
 ## [Nieopublikowane]
 
-### 2026-07-09
+### 2026-07-16
 
 #### Nowe funkcje
-- Dodanie 7 nowych klientów AI (status 📋→✅):
-  - **DeepSeekClient** — endpoint `https://api.deepseek.com`, tryb thinking, okno kontekstu 1M tokenów
-  - **ZhipuClient (GLM)** — endpoint `https://open.bigmodel.cn/api/paas/v4`, tryb thinking (seria GLM-5), wizja wg modelu, okno kontekstu 1M tokenów
-  - **ErnieClient (Baidu/Qianfan)** — endpoint `https://qianfan.baidubce.com/v2`, okno kontekstu 131K tokenów
-  - **HunyuanClient (Tencent)** — podwójny endpoint (TokenHub + Legacy), okno kontekstu 262K tokenów
-  - **MiniMaxClient** — endpoint `https://api.minimaxi.com/v1`, okno kontekstu 1M tokenów
-  - **MoonshotClient (Kimi)** — endpoint `https://api.moonshot.cn/v1`, okno kontekstu 262K tokenów
-  - **SiliconFlowClient** — endpoint `https://api.siliconflow.cn/v1`, dynamiczna lista modeli, okno kontekstu 1M tokenów
-- 01.AI (Yi) oznaczony jako przestarzały ⚠️ (rejestracja nowych użytkowników wstrzymana)
-
-### 2026-05-26
-
-#### Nowe funkcje
-- `a49041b` - Dodanie obsługi lokalizacji rosyjskiej (ru-RU) (ref task-364)
-  - 216 zmienionych plików
-
-#### Poprawki
-- `79096f2` - Zmiana formatu tabeli glossary na standardowy Markdown, usunięcie nadmiarowych spacji wyrównujących
-  - 1 zmieniony plik
+- `7431312` - Uzupełnić tłumaczenia konfiguracji klientów IA dla 13 plików językowych - CsCZ/PlPL zaktualizowane ze stub do pełnej implementacji słownika, pozostałe 10 plików dodaje wpisy ConfigDisplayNames/ConfigDescriptions/ConfigGroupNames dla 7 nowych klientów (DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan), synchroniczna aktualizacja metadanych kluczy konfiguracji 6 ClientFactory
+  - 20 plik(ów) zmienionych
 
 #### Dokumentacja
-- `174a954` - Uzupełnienie brakujących tłumaczeń terminów w kolumnach Deutsch/Polski/Português w glossary
-  - 1 zmieniony plik
+- `d6608ea` - Dodać wprowadzenie narzędzia AI IDE DuMate (Baidu Qianfan) do wszystkich 13 wersji językowych changeloga
+  - 13 plik(ów) zmienionych
 
 #### Ramy współpracy
-- `5b03d53` - Aktualizacja rekordów zadań .ai-collab — task-364 lokalizacja rosyjska (ref task-364)
-  - 5 zmienionych plików
+- `c607c97` - Zarejestrować DuMate (Baidu Qianfan) jako rezydującego aktora IA w rejestrze .ai-collab
+  - 1 plik(ów) zmienionych
 
-- `018947d` - Archiwizacja sesji i zmian z 2026-05-25
-  - 2 zmienione pliki
 
-### 2026-05-25
+### 2026-07-15
 
 #### Nowe funkcje
-- `14721a9` - Uszczegółowienie podpowiedzi personelu ThinkOnProject jako szczegółowego planu działania (ref task-363)
-  - 20 zmienionych plików
+- `c007263` - Uzupełnić dokumentację pomocy dla 10 klientów IA - HelpTopics rejestruje 10 tematów, HelpLocalizationBase dodaje 30 właściwości abstrakcyjnych, 12 plików językowych implementuje pełną zawartość pomocy Markdown (wprowadzenie platformy/kroki rejestracji/metody konfiguracji/dostępne modele/fakturowanie/FAQ), obejmując Herdsman/LongCat/QiniuAI/DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan
+  - 12 plik(ów) zmienionych
+- `4634e33` - Implementacja 7 krajowych klientów platform IA (DeepSeek/Zhipu GLM/Moonshot Kimi/SiliconFlow/MiniMax/Baidu Ernie/Tencent Hunyuan) - 14 niezależnych plików klas, zgodnych ze stylem LongCatClient, bez dziedziczenia, wszystkie kompatybilne z OpenAI + Bearer Token, obsługujące Tool Calling/streaming/tryb thinking, zarejestrowane w DefaultSiliconBeing i DefaultSiliconBeingFactory
+  - 16 plik(ów) zmienionych
 
-#### Poprawki
-- `abb4285` - Naprawa błędu pozycji wywołania .join() w beingsHtml (ref task-361)
-  - 1 zmieniony plik
+#### Dokumentacja
+- `108c4ea` - Zaktualizować całą dokumentację w 13 językach, aby odzwierciedlała 7 nowych klientów IA - status 📋→✅, 01.AI oznaczony jako przestarzały
+  - 94 plik(ów) zmienionych
 
-- `1c0b9ed` - Usunięcie błędu duplikacji ciągu state-initial w renderowaniu states-overview w WorkflowDetailView (ref task-362)
-  - 6 zmienionych plików
 
-#### Ramy współpracy
-- `ecc48a1` - Aktualizacja metadanych .ai-collab (relatedCommit i activity log) (ref task-361)
-  - 4 zmienione pliki
+### 2026-07-14
 
-- `64529a7` - Archiwizacja sesji i zmian z 2026-05-24 (ręczne uzupełnienie wykonania)
-  - 28 zmienionych plików
+#### Dokumentacja
+- `344b429` - Dodać status "Przestarzały" do statusu platformy IA w architecture.md dla wszystkich języków, oznaczyć 01.AI jako przestarzały (rejestracja nowych użytkowników wstrzymana)
+  - 13 plik(ów) zmienionych
 
-- `4150e52` - Archiwizacja ukończonych zadań task-341~361 (ref archive)
-  - 2 zmienione pliki
 
-### 2026-05-24
-
-#### Nowe funkcje
-- `db60fd9` - Lista uprawnień narzędzi wyświetla narzędzia bez deklaracji ToolAction i oznacza je jako niemożliwe do skonfigurowania (ref task-331, task-332, task-333)
-  - 21 zmienionych plików
-
-- `6004a7f` - WorkflowTemplate dodaje obsługę definicji ról + lokalizacja 12 języków + poprawka DiskTool (ref task-346)
-  - 24 zmienione pliki
-
-- `75ce452` - Pula ról ProjectSpace i akcje zarządzania rolami ProjectTool (ref task-347)
-  - 12 zmienionych plików
-
-- `edfb600` - BuildProjectScenarioContext dodaje informacje o rolach (ref task-348)
-  - 21 zmienionych plików
-
-- `6a2d713` - Rozszerzenie HasProjectsWithoutTemplate na HasProjectsNeedingAttention (ref task-349)
-  - 21 zmienionych plików
-
-- `a773224` - Tworzenie zadań przepływu pracy używa puli ról do przypisywania wykonawców (ref task-350)
-  - 6 zmienionych plików
-
-- `77a27f9` - Rozszerzenie TravelCodeWikiTool jako punktu wejścia jednostek geograficznych (ref task-353)
-  - 8 zmienionych plików
-
-- `873ef23` - Implementacja GeoDataTool ukończona, aktualizacja stanu .ai-collab (ref task-352)
-  - 7 zmienionych plików
-
-- `feaccab` - Implementacja GeoContentTool ukończona, aktualizacja stanu .ai-collab (ref task-351)
-  - 6 zmienionych plików
-
-- `6e60ad1` - Rozszerzenie GeoLanguageTool (obsługa ObjectPath + set_word), uzupełnienie metadanych (ref task-356, task-355)
-  - 7 zmienionych plików
-
-- `4eff807` - Implementacja GetWikiDocuments() w podklasach GeoLocation (ref task-357)
-  - 5 zmienionych plików
-
-- `baad5df` - Implementacja usługi publikacji MediaWiki API (ref task-358)
-  - 6 zmienionych plików
-
-- `b846a21` - Implementacja strony szczegółów przepływu pracy (ref task-361)
-  - 24 zmienione pliki
-
-#### Poprawki
-- `a290088` - Utrata istot krzemowych utworzonych przez CuratorTool po ponownym uruchomieniu (ref task-334)
-  - 11 zmienionych plików
-
-- `69a8cba` - Naprawa błędu braku filtrowania strony zadań według beingId (ref task-360)
-  - 8 zmienionych plików
-
-- `7dd1a65` - Rejestracja trasy strony szczegółów przepływu pracy w Router.cs (ref task-361)
-  - 1 zmieniony plik
-
-#### Refaktoryzacja
-- `5e02711` - Refaktoryzacja abstrakcji ścieżek przechowywania warstwy wspólnej, eliminacja hardcodowania systemu plików (ref task-335)
-  - 12 zmienionych plików
-
-- `0ec0929` - DynamicBeingLoader.SaveBeingCode używa IStorage zamiast bezpośrednich operacji systemu plików (ref task-336)
-  - 7 zmienionych plików
-
-- `9a44b48` - Most IStorage PlaywrightWebView + dekorelacja klasy bazowej WebViewBrowserTool (ref task-337, task-340)
-  - 11 zmienionych plików
-
-- `8fea742` - Zapis zrzutów ekranu WebViewBrowserTool używa IStorage zamiast bezpośrednich operacji systemu plików (ref task-338)
-  - 6 zmienionych plików
-
-- `4c24e6d` - DefaultPermissionCallback używa BeingPathResolver zamiast hardkodowanych ścieżek (ref task-339)
-  - 6 zmienionych plików
-
-- `ab428cd` - Usunięcie downcastingu DefaultSiliconBeing, bezpośrednie wywołanie SaveState() klasy bazowej (ref task-344)
-  - 7 zmienionych plików
-
-- `1e6eb80` - Most plików tymczasowych stanu przeglądarki PlaywrightWebView zmieniony na bezpośredni odczyt/zapis IStorage (ref task-341)
-  - 7 zmienionych plików
-
-- `17f00e9` - Operacja wyszukiwania DiskTool przekierowana przez DiskExecutor (ref task-342)
-  - 8 zmienionych plików
-
-- `8158703` - Sprawdzanie załączników ChatController przekierowane przez DiskExecutor (ref task-343)
-  - 7 zmienionych plików
-
-- `3243ae6` - Przepisanie TravelCodeWikiPublishWorkflow jako 7-etapowej maszyny stanów, usunięcie wymuszonego śledzenia pliku TravelCodeWikiWithAI (ref task-355)
-  - 6 zmienionych plików
+### 2026-07-07
 
 #### Czyszczenie
-- `d685288` - Usunięcie HotReloadTool.cs i katalogu tools/HotReload (ref task-345)
-  - 8 zmienionych plików
+- `e06e6f2` - Usunąć łańcuch narzędzi OsmStore i wtyczkę TravelCodeWikiWithAI - usunąć tools/OsmStore.* trzy projekty, usunąć src/TravelCodeWikiWithAI/ projekt wtyczki, wyczyścić referencje sln, projekt powraca do niezależnej ścieżki rozwoju TCW
+  - 45 plik(ów) zmienionych
 
-#### Dokumentacja
-- `f1789d1` - Optymalizacja wierszy opisowych README.md (ref task-359)
-  - 9 zmienionych plików
 
-#### Ramy współpracy
-- `982c6bb` - Uzupełnienie brakujących pól relatedCommit i commitHash w .ai-collab
-  - 6 zmienionych plików
-
-- `d91e9f8` - Archiwizacja task-331~340, wyczyszczenie tablicy zadań
-  - 2 zmienione pliki
-
-- `9135e30` - Publikacja task-341~344 refaktoryzacja IStorage warstwy wspólnej + korekta abstrakcji
-  - 1 zmieniony plik
-
-- `f70b350` - Dodanie 13 zadań przebudowy architektury TravelCodeWikiWithAI (ref task-346~358)
-  - 2 zmienione pliki
-
-- `f81d38b` - Aktualizacja sesji ai-collab i plików śledzenia zadań
-  - 3 zmienione pliki
-
-### 2026-05-23
+### 2026-07-06
 
 #### Poprawki
-- `9c3c64e` - Naprawa obejścia weryfikacji uprawnień ExecuteTool w czasie wykonywania dla ograniczeń na poziomie projektu (ref task-324)
-  - 7 zmienionych plików
+- `1b15886` - Standaryzacja modelu danych OSM i poprawka bezpieczeństwa typu elementu
+  - 7 plik(ów) zmienionych
 
-- `94a9e35` - Naprawa niespójności między definicją szablonu uprawnień a deklaracją ToolActionAttribute (ref task-325)
-  - 6 zmienionych plików
 
-- `e8d8371` - Narzędzia ze wszystkimi akcjami wyłączonymi są całkowicie usuwane z żądań AI (ref task-326)
-  - 6 zmienionych plików
-
-- `32c7d8a` - API uprawnień narzędzi dodaje weryfikację nazw akcji + naprawa renderowania Markdown historii czatu (ref task-327, task-328, task-329)
-  - 9 zmienionych plików
-
-- `797db8c` - Renderowanie Markdown fallback błędnie ustawia mdRendered, powodując brak ponownego renderowania po załadowaniu marked (ref task-330)
-  - 9 zmienionych plików
-
-#### Ramy współpracy
-- `1496094` - Publikacja zadań naprawy ramy autoryzacji narzędzi task-324~327
-  - 776 zmienionych plików
-
-- `0d16e63` - Aktualizacja stanu zadań współpracy, powiązanie task-330 z zatwierdzeniem 797db8c, przygotowanie do archiwizacji
-  - 2 zmienione pliki
-
-- `e602e1c` - Archiwizacja task-316~330, wyczyszczenie tablicy zadań (ref task-316~330)
-  - 2 zmienione pliki
-
-- `20291ce` - Codzienna archiwizacja sesji i zmian (13–22 maja)
-  - 106 zmienionych plików
-
-### 2026-05-22
-
-#### Poprawki spójności dokumentacji
-- `9e07b27` - Korekta różnic spójności dokumentacji francuskiej (fr-FR) z kodem źródłowym (ref task-307)
-  - 10 zmienionych plików
-
-- `9e3be72` - Korekta spójności dokumentacji niemieckiej (de-DE) z kodem źródłowym (ref task-308)
-  - 5 zmienionych plików
-
-- `2bc7151` - Korekta różnic spójności dokumentacji hiszpańskiej (es-ES) z kodem źródłowym (ref task-309)
-  - 13 zmienionych plików
-
-- `f95088e` - Korekta spójności dokumentacji włoskiej (it-IT) z kodem źródłowym (ref task-310)
-  - 11 zmienionych plików
-
-- `6ea9f4a` - Korekta spójności dokumentacji polskiej (pl-PL) z kodem źródłowym (ref task-311)
-  - 16 zmienionych plików
-
-- `7646923` - Korekta spójności dokumentacji portugalskiej (pt-PT) z kodem źródłowym (ref task-312)
-  - 12 zmienionych plików
-
-- `7eaf9db` - Korekta spójności dokumentacji czeskiej (cs-CZ) z kodem źródłowym (ref task-313)
-  - 12 zmienionych plików
-
-#### Ramy współpracy
-- `3cb7347` - Aktualizacja relatedCommit=7eaf9db dla task-313
-  - 1 zmieniony plik
-
-### 2026-05-21
+### 2026-07-05
 
 #### Nowe funkcje
-- `99eca78` - Dodanie funkcji „Wyświetl przechowywanie (tylko do odczytu)" w menu kontekstowym, wywołanie Speedy.Manager w procesie (ref task-301)
-  - 26 zmienionych plików
+- `be4320b` - TravelCodeWikiWithAI dodaje moduł dostawcy danych CLDR
+  - 4 plik(ów) zmienionych
 
-#### Poprawki spójności dokumentacji
-- `7f65cf1` - Korekta różnic spójności dokumentacji zh-CN z kodem źródłowym (ref task-303)
-  - 15 zmienionych plików
 
-- `a9e2a2c` - Korekta różnic spójności dokumentacji angielskiej (en) z kodem źródłowym (ref task-302)
-  - 9 zmienionych plików
-
-- `2549105` - Korekta różnic spójności dokumentacji tradycyjnego chińskiego (zh-HK) z kodem źródłowym (ref task-304)
-  - 12 zmienionych plików
-
-- `277eb50` - Korekta różnic spójności dokumentacji japońskiej z kodem źródłowym (ref task-305)
-  - 10 zmienionych plików
-
-- `edce413` - Korekta różnic spójności dokumentacji koreańskiej (ko-KR) z kodem źródłowym (ref task-306)
-  - 18 zmienionych plików
-
-- `f2adcae` - Naprawa niespójności dokumentacji portugalskiej z kodem źródłowym (ref task-220)
-  - 15 zmienionych plików
-
-- `3332987` - Naprawa niespójności dokumentacji tradycyjnego chińskiego (Hongkong) z kodem źródłowym (ref task-218)
-  - 14 zmienionych plików
-
-- `af9f715` - Naprawa niespójności dokumentacji polskiej z kodem źródłowym (ref task-217)
-  - 15 zmienionych plików
-
-- `2e2b18b` - Naprawa niespójności dokumentacji koreańskiej z kodem źródłowym (ref task-216)
-  - 16 zmienionych plików
-
-- `626ebc9` - Naprawa niespójności dokumentacji japońskiej z kodem źródłowym (ref task-215)
-  - 19 zmienionych plików
-
-- `48d061b` - Naprawa niespójności dokumentacji włoskiej z kodem źródłowym (ref task-214)
-  - 14 zmienionych plików
-
-#### Ramy współpracy
-- `6683bee` - Rejestracja zespołu Marvis AI, aktualizacja stanu zadań
-  - 3 zmienione pliki
-
-- `03fc905` - Archiwizacja task-210~220
-  - 5 zmienionych plików
-
-### 2026-05-20
+### 2026-07-04
 
 #### Nowe funkcje
-- `65176d4` - Dodanie pełnej obsługi lokalizacji portugalskiej (pt-PT + pt-BR) (ref task-208)
-  - 41 zmienionych plików
-
-#### Poprawki spójności dokumentacji
-- `af4dffd` - Korekta wszystkich niespójności dokumentacji zh-CN z kodem źródłowym (ref task-209)
-  - 11 zmienionych plików
-
-- `144b945` - Korekta niespójności dokumentacji angielskiej (en) i czeskiej (cs-CZ) z kodem źródłowym (ref task-219, task-210)
-  - 22 zmienione pliki
-
-- `08bec55` - Korekta niespójności dokumentacji niemieckiej (de-DE) z kodem źródłowym (ref task-211)
-  - 14 zmienionych plików
-
-- `7ff28de` - Naprawa niespójności dokumentacji hiszpańskiej (es-ES) z kodem źródłowym (ref task-212)
-  - 14 zmienionych plików
-
-- `15e2133` - Naprawa niespójności dokumentacji francuskiej (fr-FR) z kodem źródłowym (ref task-213)
-  - 13 zmienionych plików
-
-#### Poprawki
-- `7dac388` - Naprawa braku możliwości wyświetlania listy zadań projektu (ref task-207)
-  - 6 zmienionych plików
-
-#### Ramy współpracy
-- `7890223` - Archiwizacja task-201~209, publikacja zadań naprawy spójności dokumentacji task-210~220
-  - 5 zmienionych plików
-
-### 2026-05-19
-
-#### Nowe funkcje
-- `cd72846` - Implementacja bezpiecznej alternatywy obejścia skanowania bezpieczeństwa PluginLoader (ref task-203)
-  - 13 zmienionych plików
-
-- `fc0c00c` - Ulepszenie funkcji Speedy.Manager — tworzenie/import/eksport/TreeView hierarchii/okno postępu (ref task-206)
-  - 9 zmienionych plików
-
-#### Poprawki
-- `ec07118` - Naprawa problemu ITypeRegistry/IObjectFactory niezarejestrowanych przed ładowaniem wtyczek (ref task-205)
-  - 8 zmienionych plików
-
-- `9e749db` - Naprawa błędu „Creator ID is required" przy tworzeniu projektu (ref task-204)
-  - 4 zmienione pliki
-
-#### Infrastruktura
-- `43dc092` - Migracja CLDR — dodanie CldrDataProvider, usunięcie .github
-  - 1 zmieniony plik
-
-- `c09ec1f` - Dodanie cldr/ do .gitignore
-  - 1 zmieniony plik
-
-- `221f818` - Zmiana synchronizacji GitHub na schemat mirroringu push z Gitee, workflow zachowany tylko jako ręczny zapas
-  - 1 zmieniony plik
-
-- `08cdf1a` - Naprawa workflow synchronizacji GitHub — dodanie logiki ponownych prób i pomijania braku zmian
-  - 1 zmieniony plik
-
-- `fb4e77d` - Aktualizacja SiliconLife.Speedy.Manager.csproj
-  - 1 zmieniony plik
-
-#### Ramy współpracy
-- `df90af0` - Aktualizacja relatedCommit=cd72846 dla task-203
-  - 1 zmieniony plik
-
-### 2026-05-18
+- `dbcabf3` - Ulepszenie systemu uprawnień wtyczek - refaktoryzacja IO sieci/plików do trybu Executor + zwolnienie z białej listy GeneratedCodeAttribute
+  - 34 plik(ów) zmienionych
+- `e84bb63` - Naprawić błędy kompilacji i dodać projekt TravelCodeWikiWithAI
+  - 53 plik(ów) zmienionych
 
 #### Refaktoryzacja
-- `e720d06` - Całkowita przebudowa Speedy.Manager z WinForms na Avalonia (ref task-202)
-  - 17 zmienionych plików
+- `9e5a345` - TravelCodeWikiWithAI w pełni migruje PBF do synchronicznego online API OSM
+  - 4 plik(ów) zmienionych
 
-#### Poprawki
-- `08894a9` - Naprawa błędu wyświetlania poziomu wpisów podsumowania osi czasu pamięci (ref task-201)
-  - 3 zmienione pliki
 
-#### Ramy współpracy
-- `2871afb` - Archiwizacja wszystkich zadań, wyczyszczenie tasks.json
-  - 2 zmienione pliki
-
-### 2026-05-17
+### 2026-05-31
 
 #### Nowe funkcje
-- `d6eb994` - Dodanie punktu tworzenia projektu i wyboru szablonu przepływu pracy na stronie listy projektów (ref task-203)
-  - 14 zmienionych plików
+- `a5f37bd` - Zaktualizować myślenie projektowe, system konwersacji i funkcje związane z przechowywaniem
+  - 13 plik(ów) zmienionych
 
-- `0872134` - Napędzane przez kuratora aranżowanie projektów bez szablonu ThinkOnProject (ref task-202)
-  - 6 zmienionych plików
 
-- `cb3188e` - Wizualizacja @wspomnień w czacie grupowym (ref task-208)
-  - 4 zmienione pliki
+### 2026-05-30
 
-- `f9968e5` - Deklaracja zdolności ToolCall klienta AI i elegancka degradacja (ref task-205)
-  - 4 zmienione pliki
-
-- `0d2b843` - Logika decyzyjna czatu grupowego ShouldReplyInGroupChat (ref task-201)
-  - 6 zmienionych plików
-
-- `277a2b1` - Uzupełnienie Sieci Wiedzy — zaawansowane zapytania i przechodzenie grafu (ref task-207)
-  - 9 zmienionych plików
-
-#### Poprawki
-- `6d0b66e` - Naprawa TypeError appendMessage podczas wysyłania wiadomości w czacie grupowym (ref task-209)
-  - 5 zmienionych plików
-
-- `b15167c` - Uzupełnienie pominiętej rejestracji trasy list-workflow-templates w task-203 (ref task-203)
-  - 1 zmieniony plik
-
-- `dc549a2` - Naprawa workflow synchronizacji Gitee — dodanie nazwy użytkownika do URL tokenu
-  - 1 zmieniony plik
-
-#### Infrastruktura
-- `e5fa3ad` - Wyłączenie automatycznego harmonogramu synchronizacji GitHub, oczekiwanie na oficjalne rozwiązanie synchronizacji Gitee
-  - 1 zmieniony plik
+#### Nowe funkcje
+- `c3cf429` - Dodać klienta IA QiniuAIClient (usługa wnioskowania dużego modelu IA Qiniu Cloud) (ref task-409)
+  - 20 plik(ów) zmienionych
+- `d04131f` - Dodać klienta IA LongCatClient (duży model LongCat Meituan) (ref task-408)
+  - 19 plik(ów) zmienionych
 
 #### Ramy współpracy
-- `4a58c82` - Dodanie raportu analizy zdolności systemu + projekt ThinkOnProject
-  - 5 zmienionych plików
+- `e9564f5` - Zaktualizować wszystkie zmienione pliki
+  - 140 plik(ów) zmienionych
+- `9c8b42f` - Archiwizować sesje i zmiany z 2026-05-29
+  - 20 plik(ów) zmienionych
 
-- `8ab29e6` - Archiwizacja raportu kompletności zdolności systemu do .ai-collab/docs
-  - 2 zmienione pliki
 
-- `b412d9c` - Archiwizacja starych zadań, ponowna publikacja task-201~208 na podstawie analizy kompleksowej
-  - 2 zmienione pliki
+### 2026-05-29
 
-- `437884a` - Aktualizacja metadanych współpracy — ukończenie task-202/203/204 (ref task-202, task-203, task-204)
-  - 2 zmienione pliki
+#### Nowe funkcje
+- `d548e48` - Strona szczegółów myślenia projektu grupuje wiadomości według cyklu (Cycle) z sekcjami zwijanymi (ref task-407)
+  - 23 plik(ów) zmienionych
+- `28d893d` - IAIClient dodaje interfejs deklaracji zdolności multimodalnych + ChatMessage dodaje pola multimodalne (ref task-402)
+  - 13 plik(ów) zmienionych
+- `ebe6a49` - Strona szczegółów myślenia projektu dodaje wyświetlanie statusu sesji, czasu utworzenia i czasu zakończenia (ref task-406)
+  - 22 plik(ów) zmienionych
+- `9a53d55` - IAIClient dodaje ContextWindowTokens + system budżetu Token + konfigurację fabryki (ref task-401, task-403)
+  - 26 plik(ów) zmienionych
+- `202b99c` - Dodać klienta IA HerdsmanClient + naprawić brak odświeżania menu rozwijanego interfejsu inicjalizacji (ref task-399, task-400)
+  - 20 plik(ów) zmienionych
+- `285ab2f` - Wyświetlanie frontendowe rekordu przetwarzania projektu (ref task-397)
+  - 25 plik(ów) zmienionych
+- `b4b633f` - Mechanizm dialogu wielorundowego pseudo-Session ThinkOnProject (ref task-395)
+  - 13 plik(ów) zmienionych
+- `d3e543f` - Kontekst scenariusza ThinkOnProject dodaje informacje o dostępnych istotach krzemowych (ref task-394)
+  - 21 plik(ów) zmienionych
+- `07eb628` - BuildRequest dynamicznie wstrzykuje informacje o przynależności projektowej istot krzemowych (ref task-396)
+  - 21 plik(ów) zmienionych
+- `2089696` - Tool dodaje obsługę scenariusza Project + ujednolicony refaktoring wielokatalogowy PluginLoader
+  - 12 plik(ów) zmienionych
 
-- `bf78d79` - Aktualizacja metadanych współpracy — ukończenie task-201/205/208
-  - 2 zmienione pliki
+#### Poprawki
+- `b80a33b` - Naprawić tekst podpowiedzi ładowania strony szczegółów myślenia projektu zakodowany na sztywno w języku angielskim i brakującą lokalizację (ref task-405)
+  - 6 plik(ów) zmienionych
+- `90b60c5` - Naprawić ukrywanie treści Content i Thinking AI w rundach wywołań narzędzi (ref task-404)
+  - 8 plik(ów) zmienionych
+- `a7d9a97` - Naprawić kontynuację wielorundowej pętli ThinkOnProject i utratę wiadomości przypomnień projektu
+  - 6 plik(ów) zmienionych
+- `c0838dd` - Naprawić że wiadomości ProjectThinkSession nie są zapisywane w Cycle a historia jest usuwana po ukończeniu (ref task-398)
+  - 7 plik(ów) zmienionych
+- `f3d1794` - Naprawić brak lokalizacji statusu Project/Broadcast/Stopped istot krzemowych i anomalię wyświetlania (ref task-393)
+  - 20 plik(ów) zmienionych
+- `3eaa90d` - Usunąć referencje rozwiązania do usuniętego projektu TravelCodeWikiWithAI
+  - 1 plik(ów) zmienionych
 
-- `de6ee0e` - Rekord zakończenia sesji catpaw-20260517-2215
-  - 5 zmienionych plików
+#### Ramy współpracy
+- `f3cbed7` - Zarejestrować task-394~396 (ulepszenia ThinkOnProject)
+  - 3 plik(ów) zmienionych
+- `e1971f5` - Zarejestrować task-393 (lokalizacja BeingActivity i poprawka wyświetlania)
+  - 1 plik(ów) zmienionych
+- `e710fa4` - Zaktualizować changes commitHash i koniec sesji state
+  - 2 plik(ów) zmienionych
+- `4cacc4a` - Archiwizować sesje i zmiany z 2026-05-28
+  - 4 plik(ów) zmienionych
 
-- `7223b6f` - Rekord zakończenia sesji catpaw-20260517-2200
-  - 4 zmienione pliki
 
+### 2026-05-28
+
+#### Nowe funkcje
+- `ae8b673` - Konfiguracja katalogu wtyczek zaktualizowana z pojedynczej ścieżki do listy wielokatalogowej (ref task-391)
+  - 29 plik(ów) zmienionych
+- `aac46c1` - PluginLoader dodaje tryb źródła CS, kompiluj-ładuj wtyczki gdy brak DLL (ref task-389)
+  - 6 plik(ów) zmienionych
+
+#### Poprawki
+- `63047b0` - Zarejestrować wszystkie PluginLoader w ServiceLocator, naprawić niekompletną refleksję wtyczek wielokatalogowych (ref task-391)
+  - 3 plik(ów) zmienionych
+- `fcad655` - Naprawić problem interakcji przycisku przeglądania directoryList (ref task-392)
+  - 9 plik(ów) zmienionych
+
+#### Dokumentacja
+- `e6d3037` - PluginDemo-22 przykład trybu kompilacji-ładowania kodu źródłowego CS (ref task-390)
+  - 21 plik(ów) zmienionych
+
+#### Ramy współpracy
+- `09d9e9c` - Archiwizować 30 ukończonych zadań (task-362~task-391)
+  - 2 plik(ów) zmienionych
+- `66204a1` - Archiwizować sesje (8) i zmiany (8) z 2026-05-28
+  - 18 plik(ów) zmienionych
+- `308a8d0` - Zaktualizować relatedCommit task-391
+  - 1 plik(ów) zmienionych
+- `6fc4e05` - Zarejestrować task-389 (tryb źródła CS) i task-390 (PluginDemo-22)
+  - 1 plik(ów) zmienionych
+
+
+### 2026-05-27
+
+#### Nowe funkcje
+- `e154a18` - Ukończyć PluginDemo-21 WorkflowTemplate pełny przykład przepływu pracy biznesowej (ref task-388)
+  - 19 plik(ów) zmienionych
+- `aa771b3` - Zaimplementować PluginCapability deklaratywny system uprawnień (ref task-379)
+  - 9 plik(ów) zmienionych
+- `5e5e9d1` - Dodać przykład bezpiecznego typu białej listy 04-SafeSystemIO System.IO (ref task-370)
+  - 20 plik(ów) zmienionych
+
+#### Dokumentacja
+- `48f6702` - Wyrównać tłumaczenia README 19-TickObject i 20-SpeedyPack we wszystkich językach do linii bazowej (ref task-386, task-387)
+  - 119 plik(ów) zmienionych
+- `5d570e5` - Ukończyć task-378 zabroniony kontrprzykład obejścia refleksji ciągu znaków (ref task-378)
+  - 19 plik(ów) zmienionych
+- `348c410` - PluginDemo-11 zabroniony kontrprzykład kodu P/Invoke i unsafe (ref task-377)
+  - 19 plik(ów) zmienionych
+- `fc92a49` - PluginDemo-10 zabroniony kontrprzykład operacji refleksji (ref task-376)
+  - 19 plik(ów) zmienionych
+- `826ad2a` - Utworzyć PluginDemo-09 zabroniony kontrprzykład wtyczki operacji procesu (ref task-375)
+  - 19 plik(ów) zmienionych
+- `7870b05` - Dodać PluginDemo-08 zabroniony kontrprzykład operacji sieciowej (ref task-374)
+  - 15 plik(ów) zmienionych
+- `8636e31` - PluginDemo-07 zabroniony kontrprzykład operacji wejścia/wyjścia plików (ref task-373)
+  - 19 plik(ów) zmienionych
+- `322312e` - Dodać PluginDemo-06 TrustedAssemblies przykład zaufanej zależności (ref task-372)
+  - 19 plik(ów) zmienionych
+- `6df98a0` - Dodać przykład wtyczki przepływu pracy IWorkflowPlugin (ref task-371)
+  - 20 plik(ów) zmienionych
+- `f3787ba` - PluginDemo-03 przykład rejestracji i tworzenia IObjectFactory (ref task-369)
+  - 20 plik(ów) zmienionych
+- `bb4324d` - PluginDemo-02 przykład rejestracji i zapytania ITypeRegistry (ref task-368)
+  - 20 plik(ów) zmienionych
+- `bbdfa3c` - PluginDemo-01 przykład minimalnej implementacji IPlugin (ref task-367)
+  - 19 plik(ów) zmienionych
+
+#### Ramy współpracy
+- `de44057` - Archiwizować sesje i zmiany z 25 i 27 maja
+  - 58 plik(ów) zmienionych
+- `9e4a84c` - Zaktualizować lastCommitHash tasks.json na 48f6702
+  - 1 plik(ów) zmienionych
+- `beb58b2` - Uzupełnić indeks taskIndex (8 pending, 19 completed)
+  - 1 plik(ów) zmienionych
+- `63f7bfc` - Zaktualizować relatedCommit task-388 (ref task-388)
+  - 1 plik(ów) zmienionych
+- `e61be6f` - Zaktualizować relatedCommit task-378 (ref task-378)
+  - 1 plik(ów) zmienionych
+- `dde579b` - Opublikować zadanie pełnego przykładu użycia WorkflowTemplate (task-388)
+  - 1 plik(ów) zmienionych
+- `2294fa7` - Opublikować zadania przykładowe TickObject i SpeedyPack (task-386~387)
+  - 1 plik(ów) zmienionych
+- `82b9f63` - Opublikować 6 zadań przykładowych PluginCapability (task-380~385)
+  - 1 plik(ów) zmienionych
+- `588539b` - Opublikować zadanie deklaratywnego systemu uprawnień PluginCapability (task-379)
+  - 1 plik(ów) zmienionych
+- `37f9c23` - Zaktualizować referencje rozwiązania i plików projektu
+  - 8 plik(ów) zmienionych
+- `e1f7892` - Opublikować 12 oczekujących zadań PluginDemo (task-367~378)
+  - 3 plik(ów) zmienionych
+- `87ae858` - Utworzyć rejestrację zadania przykładu pozytywnego/negatywnego wtyczki PluginDemo (task-367)
+  - 2 plik(ów) zmienionych
+- `f77a102` - Archiwizować sesje i zmiany z 2026-05-26
+  - 7 plik(ów) zmienionych
 
 ## [Alpha-0.2] - 2026-05-16
 
