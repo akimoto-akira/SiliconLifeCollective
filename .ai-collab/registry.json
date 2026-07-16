@@ -98,6 +98,21 @@
         "timezone": "Asia/Shanghai",
         "channel": "marvis-desktop"
       }
+    },
+    {
+      "id": "qianfan-dumate",
+      "type": "resident-ai",
+      "platform": "百度千帆",
+      "model": "unknown",
+      "description": "百度千帆桌面平台通用 AI 助手，自 2026 年 7 月参与项目，负责代码开发、本地化翻译、文档编写与协作",
+      "runtimeEnv": {
+        "host": "PURELIGHT-WJX",
+        "os": "Windows 11 (x64)",
+        "shell": "cmd",
+        "workspace": "D:\\SiliconLifeCollective",
+        "timezone": "Asia/Shanghai",
+        "channel": "qianfan-desktop"
+      }
     }
   ],
   "rules": {
