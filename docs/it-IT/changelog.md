@@ -52,6 +52,11 @@ Le due versioni condividono le stesse interfacce e funzionalità, differendo sol
 - Utilizzato in combinazione con Qoder dal 6 maggio 2026.
 - Basato sulla serie di modelli LongCat sviluppati autonomamente da Meituan, con forte capacità di rifattorizzazione dell'architettura del codice completo.
 
+#### DuMate (Baidu Qianfan)
+- Utilizzato da luglio 2026 per lo sviluppo del codice, la localizzazione e la documentazione.
+- Assistente IA generalista sulla piattaforma desktop Qianfan, con capacità di orchestrazione multi-strumento, operazioni sui file, automazione del browser ed esecuzione di attività multi-fase.
+- Legge e scrive direttamente i file locali, esegue comandi shell ed effettua ricerche web sul desktop Windows dell'utente.
+
 ### Documentazione dei Requisiti
 
 - La documentazione dei requisiti di questo progetto non è pubblica.
