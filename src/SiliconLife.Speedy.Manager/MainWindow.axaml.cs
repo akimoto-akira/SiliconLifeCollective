@@ -59,6 +59,7 @@ public partial class MainWindow : Window
 
         MenuImportFolder.Click += async (_, _) => await ImportFolder_ClickAsync();
         MenuExportEntry.Click += async (_, _) => await ExportEntry_ClickAsync();
+        MenuDeleteEntry.Click += async (_, _) => await DeleteEntry_ClickAsync();
 
         KeyDown += MainWindow_KeyDown;
 
@@ -68,6 +69,7 @@ public partial class MainWindow : Window
             BtnImportFile.IsEnabled = false;
             BtnCompact.IsEnabled = false;
             MenuImportFolder.IsEnabled = false;
+            MenuDeleteEntry.IsEnabled = false;
         }
 
         if (!_ownsPack)
@@ -109,6 +111,11 @@ public partial class MainWindow : Window
         else if (e.Key == Key.F5)
         {
             RefreshView();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Delete)
+        {
+            await DeleteEntry_ClickAsync();
             e.Handled = true;
         }
     }
@@ -431,8 +438,8 @@ public partial class MainWindow : Window
     {
         if (_currentPack == null || _isImporting) return;
 
-        var selectedNode = DirectoryTree.SelectedItem as DirectoryTreeNode;
-        if (selectedNode == null)
+        var selectedNodes = GetSelectedNodes().ToList();
+        if (selectedNodes.Count == 0)
         {
             await ShowWarningAsync("Please select a directory or file in the tree first.");
             return;
@@ -441,13 +448,59 @@ public partial class MainWindow : Window
         var storageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
         if (storageProvider == null) return;
 
-        if (selectedNode.IsFile)
+        // Single selection: keep original behavior with dedicated pickers
+        if (selectedNodes.Count == 1)
         {
-            await ExportSingleFileAsync(selectedNode.Path, storageProvider);
+            var node = selectedNodes[0];
+            if (node.IsFile)
+                await ExportSingleFileAsync(node.Path, storageProvider);
+            else
+                await ExportDirectoryAsync(node.Path, node.Name, storageProvider);
+            return;
         }
-        else
+
+        // Multiple selection: choose one destination folder, export all items under it
+        var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
-            await ExportDirectoryAsync(selectedNode.Path, selectedNode.Name, storageProvider);
+            Title = "Select Export Destination Folder",
+            AllowMultiple = false
+        });
+
+        if (folders.Count == 0) return;
+
+        var destPath = folders[0].TryGetLocalPath();
+        if (destPath == null) return;
+
+        try
+        {
+            StatusLabel.Text = $"Exporting {selectedNodes.Count} items...";
+
+            var exportedCount = 0;
+            await Task.Run(() =>
+            {
+                foreach (var node in selectedNodes)
+                {
+                    if (node.IsFile)
+                    {
+                        var bytes = _currentPack!.Read(node.Path);
+                        if (bytes == null) continue;
+                        var fileName = Path.GetFileName(node.Path);
+                        File.WriteAllBytes(Path.Combine(destPath, fileName), bytes);
+                        exportedCount++;
+                    }
+                    else
+                    {
+                        exportedCount += ExportDirectoryRecursive(node.Path, Path.Combine(destPath, node.Name));
+                    }
+                }
+            });
+
+            StatusLabel.Text = $"Exported {exportedCount} file(s) from {selectedNodes.Count} items";
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync($"Export failed: {ex.Message}");
+            StatusLabel.Text = "Export failed";
         }
     }
 
@@ -540,6 +593,134 @@ public partial class MainWindow : Window
         }
 
         return count;
+    }
+
+    // ─── Delete Entry (Tree Context Menu) ───────────────────────────────────────
+
+    private async Task DeleteEntry_ClickAsync()
+    {
+        if (_currentPack == null || _isImporting || _isReadOnly) return;
+
+        var selectedNodes = GetSelectedNodes().ToList();
+        if (selectedNodes.Count == 0)
+        {
+            await ShowWarningAsync("Please select one or more items in the tree first.");
+            return;
+        }
+
+        // Collect all file paths under selected nodes (recursively for directories)
+        var pathsToDelete = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var node in selectedNodes)
+            CollectPathsForDeletion(node.Path, node.IsFile, pathsToDelete);
+
+        if (pathsToDelete.Count == 0)
+        {
+            await ShowWarningAsync("No files to delete in the current selection.");
+            return;
+        }
+
+        // Confirmation dialog
+        var summary = selectedNodes.Count == 1
+            ? $"Are you sure you want to delete '{selectedNodes[0].Name}'?\n\n{pathsToDelete.Count} file(s) will be removed."
+            : $"Are you sure you want to delete {selectedNodes.Count} selected items?\n\n{pathsToDelete.Count} file(s) will be removed in total.";
+
+        if (!await ConfirmAsync(summary, "Confirm Delete"))
+            return;
+
+        try
+        {
+            StatusLabel.Text = $"Deleting {pathsToDelete.Count} file(s)...";
+
+            using var tx = _currentPack.BeginTransaction();
+            foreach (var path in pathsToDelete)
+                tx.Delete(path);
+            tx.Commit();
+
+            await _currentPack.FlushAsync();
+
+            StatusLabel.Text = $"Deleted {pathsToDelete.Count} file(s)";
+            RefreshView();
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorAsync($"Delete failed: {ex.Message}");
+            StatusLabel.Text = "Delete failed";
+        }
+    }
+
+    private void CollectPathsForDeletion(string path, bool isFile, HashSet<string> paths)
+    {
+        if (isFile)
+        {
+            paths.Add(path);
+            return;
+        }
+
+        // Directory: collect all files in this directory and its subdirectories
+        foreach (var entry in _currentPack!.ListEntries(path))
+            paths.Add(entry);
+
+        foreach (var subDir in _currentPack.ListDirectories(path))
+            CollectPathsForDeletion(subDir, isFile: false, paths);
+    }
+
+    // ─── Tree Selection Helpers ─────────────────────────────────────────────────
+
+    private IEnumerable<DirectoryTreeNode> GetSelectedNodes()
+    {
+        // Multi-select mode: prefer SelectedItems
+        if (DirectoryTree.SelectedItems is IEnumerable<DirectoryTreeNode> multi)
+            return multi;
+
+        // Fallback to single SelectedItem (defensive)
+        if (DirectoryTree.SelectedItem is DirectoryTreeNode single)
+            return new[] { single };
+
+        return Array.Empty<DirectoryTreeNode>();
+    }
+
+    // ─── Confirmation Dialog ────────────────────────────────────────────────────
+
+    private async Task<bool> ConfirmAsync(string message, string title = "Confirm")
+    {
+        var dialog = new Window
+        {
+            Title = title,
+            Width = 420,
+            Height = 220,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false
+        };
+
+        var panel = new StackPanel { Margin = new Thickness(20) };
+        panel.Children.Add(new TextBlock
+        {
+            Text = message,
+            TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+            Margin = new Thickness(0, 0, 0, 16)
+        });
+
+        var btnPanel = new StackPanel
+        {
+            Orientation = Avalonia.Layout.Orientation.Horizontal,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+            Spacing = 8
+        };
+
+        var yesBtn = new Button { Content = "Yes", Width = 80 };
+        var noBtn = new Button { Content = "No", Width = 80 };
+        btnPanel.Children.Add(yesBtn);
+        btnPanel.Children.Add(noBtn);
+        panel.Children.Add(btnPanel);
+
+        dialog.Content = panel;
+
+        var result = false;
+        yesBtn.Click += (_, _) => { result = true; dialog.Close(); };
+        noBtn.Click += (_, _) => { result = false; dialog.Close(); };
+
+        await dialog.ShowDialog(this);
+        return result;
     }
 
     // ─── Content Type Inference ─────────────────────────────────────────────────
@@ -680,8 +861,12 @@ public partial class MainWindow : Window
     {
         if (_currentPack == null || _isImporting) return;
 
-        if (DirectoryTree.SelectedItem is DirectoryTreeNode node)
+        var selectedNodes = GetSelectedNodes().ToList();
+        if (selectedNodes.Count == 0) return;
+
+        if (selectedNodes.Count == 1)
         {
+            var node = selectedNodes[0];
             if (node.IsFile)
             {
                 PreviewContent(node.Path);
@@ -692,7 +877,19 @@ public partial class MainWindow : Window
                 UpdateBreadcrumb();
                 PreviewDirectorySummary(node.Path, node.Name);
             }
+            return;
         }
+
+        // Multi-select preview: show a brief summary instead of single-item content
+        var fileCount = selectedNodes.Count(n => n.IsFile);
+        var dirCount = selectedNodes.Count - fileCount;
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"Multiple selection ({selectedNodes.Count} items)");
+        sb.AppendLine($"  Directories: {dirCount}");
+        sb.AppendLine($"  Files:       {fileCount}");
+        sb.AppendLine();
+        sb.AppendLine("Use Export / Delete from the context menu to act on all selected items.");
+        PreviewTextBox.Text = sb.ToString();
     }
 
     private void PreviewDirectorySummary(string path, string name)

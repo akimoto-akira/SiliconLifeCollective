@@ -83,6 +83,7 @@
             <Border Grid.Column="0" Background="#F8F8F8" BorderBrush="#E0E0E0" BorderThickness="0,0,1,0">
                 <TreeView x:Name="DirectoryTree"
                           Padding="4"
+                          SelectionMode="Multiple"
                           Background="Transparent"
                           BorderThickness="0">
                     <TreeView.ItemTemplate>
@@ -99,6 +100,7 @@
                             <MenuItem x:Name="MenuImportFolder" Header="📂 Import Folder..." />
                             <Separator />
                             <MenuItem x:Name="MenuExportEntry" Header="💾 Export..." />
+                            <MenuItem x:Name="MenuDeleteEntry" Header="🗑️ Delete" />
                         </ContextMenu>
                     </TreeView.ContextMenu>
                 </TreeView>
