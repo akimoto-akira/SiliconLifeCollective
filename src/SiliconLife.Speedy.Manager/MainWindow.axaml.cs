@@ -668,9 +668,20 @@ public partial class MainWindow : Window
 
     private IEnumerable<DirectoryTreeNode> GetSelectedNodes()
     {
-        // Multi-select mode: prefer SelectedItems
-        if (DirectoryTree.SelectedItems is IEnumerable<DirectoryTreeNode> multi)
-            return multi;
+        // Multi-select mode: TreeView.SelectedItems is a non-generic IList,
+        // so we must cast each item individually rather than the whole collection.
+        var selectedItems = DirectoryTree.SelectedItems;
+        if (selectedItems != null && selectedItems.Count > 0)
+        {
+            var result = new List<DirectoryTreeNode>(selectedItems.Count);
+            foreach (var item in selectedItems)
+            {
+                if (item is DirectoryTreeNode node)
+                    result.Add(node);
+            }
+            if (result.Count > 0)
+                return result;
+        }
 
         // Fallback to single SelectedItem (defensive)
         if (DirectoryTree.SelectedItem is DirectoryTreeNode single)
