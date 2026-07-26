@@ -153,7 +153,7 @@ public class Program
 
         Router router = new Router();
         router.SetInitialized(configData.ConfigExists());
-        IIMProvider imProvider = new WebUIProvider(router);
+        IIMProvider imProvider = CreateIMProvider(configData, router);
         imProvider.ExitRequested += (s, e) => RequestExit();
 
         DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(configData.DataDirectory.FullName);
@@ -408,5 +408,69 @@ public class Program
                 _logger.Warn(null, "Failed to load custom code for curator {0}", ex, curator.Id);
             }
         }
+    }
+
+    /// <summary>
+    /// 根据 IM 平台配置创建 IM Provider 实例。
+    /// 支持单平台（直接创建）和多平台聚合模式。
+    /// </summary>
+    private static IIMProvider CreateIMProvider(DefaultConfigData configData, Router router)
+    {
+        var configs = configData.IMPlatforms;
+        var enabledConfigs = configs.Where(c => c.Enabled).ToList();
+
+        // 单平台且为 webui 的情况，直接返回 WebUIProvider（性能优化）
+        if (enabledConfigs.Count == 1 && enabledConfigs[0].Platform == "webui")
+        {
+            _logger.Info(null, "Using single WebUIProvider");
+            return new WebUIProvider(router);
+        }
+
+        // 多平台或非 webui 的情况，创建各平台 Provider 并聚合
+        var providers = new List<IIMProvider>();
+        foreach (var cfg in enabledConfigs)
+        {
+            IIMProvider? provider = CreatePlatformProvider(cfg, router);
+            if (provider != null)
+            {
+                providers.Add(provider);
+                _logger.Info(null, "Created provider for platform: {0}", cfg.Platform);
+            }
+            else
+            {
+                _logger.Warn(null, "Failed to create provider for platform: {0} (not implemented yet)", cfg.Platform);
+            }
+        }
+
+        if (providers.Count == 0)
+        {
+            _logger.Warn(null, "No valid IM providers created, falling back to WebUIProvider");
+            return new WebUIProvider(router);
+        }
+
+        if (providers.Count == 1)
+        {
+            _logger.Info(null, "Using single provider: {0}", providers[0].GetType().Name);
+            return providers[0];
+        }
+
+        _logger.Info(null, "Using AggregateIMProvider with {0} platform(s)", providers.Count);
+        return new SiliconLife.Common.IM.AggregateIMProvider(providers);
+    }
+
+    /// <summary>
+    /// 创建单个平台的 IM Provider 实例。
+    /// </summary>
+    private static IIMProvider? CreatePlatformProvider(IMPlatformConfig cfg, Router router)
+    {
+        return cfg.Platform switch
+        {
+            "webui" => new WebUIProvider(router),
+            "feishu" => new SiliconLife.Common.IM.FeishuIMProvider(cfg.Config),
+            "wecom" => new SiliconLife.Common.IM.WeComIMProvider(cfg.Config),
+            "dingtalk" => new SiliconLife.Common.IM.DingTalkIMProvider(cfg.Config),
+            // 其他平台实现后在此添加...
+            _ => null,
+        };
     }
 }

@@ -94,6 +94,7 @@ public class DefaultConfigData : AppConfigData
                     WebPort = loadedData.WebPort;
                     WebSkin = loadedData.WebSkin;
                     PluginDirectories = loadedData.PluginDirectories ?? new List<string>();
+                    IMPlatforms = loadedData.IMPlatforms ?? new List<IMPlatformConfig> { new IMPlatformConfig { Platform = "webui", Enabled = true } };
                     UserNickname = loadedData.UserNickname;
                 }
             }

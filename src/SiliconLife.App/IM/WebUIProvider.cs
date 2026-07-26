@@ -15,32 +15,9 @@ using System.Text;
 using System.Text.Json;
 using SiliconLife.Collective;
 using SiliconLife.App.Web;
+using SiliconLife.Common.IM;
 
 namespace SiliconLife.App.IM;
-
-/// <summary>
-/// Streaming buffer state for a single session.
-/// Accumulates incremental content from AI streaming responses.
-/// </summary>
-internal class StreamingBuffer
-{
-    public Guid StreamId { get; set; }
-    public StringBuilder Content { get; } = new();
-    public StringBuilder Thinking { get; } = new();
-    public string? SenderName { get; set; }
-    public Guid SenderId { get; set; }
-    public bool IsActive { get; set; }
-
-    public void Clear()
-    {
-        StreamId = Guid.Empty;
-        Content.Clear();
-        Thinking.Clear();
-        SenderName = null;
-        SenderId = Guid.Empty;
-        IsActive = false;
-    }
-}
 
 public class WebUIProvider : IIMProvider
 {

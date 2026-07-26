@@ -159,6 +159,13 @@ public class ConfigView : ViewBase
                             ).Class("dir-list-actions")
                         ).Class("form-group").Id("inputDirectoryList").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
+                            H.Label("IM 平台列表"),
+                            H.Div().Id("imPlatformListContainer").Class("im-platform-list-editor"),
+                            H.Div(
+                                H.Button("添加平台").Class("btn btn-add").Id("btnAddIMPlatformRow")
+                            ).Class("dict-actions")
+                        ).Class("form-group").Id("inputIMPlatformList").Style(new CssBuilder().InlineProperty("display", "none")),
+                        H.Div(
                             H.Button(loc.ConfigSaveButton).Class("btn btn-primary").Id("btnSave"),
                             H.Button(loc.ConfigCancelButton).Class("btn btn-secondary").Id("btnCancel")
                         ).Class("form-actions")
@@ -485,6 +492,100 @@ public class ConfigView : ViewBase
                 .Property("text-align", "center")
                 .Property("color", "var(--text-muted)")
                 .Property("font-size", "13px")
+            .EndSelector()
+            .Selector(".im-platform-list-editor")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("padding", "12px")
+                .Property("background", "var(--bg-primary)")
+                .Property("max-height", "400px")
+                .Property("overflow-y", "auto")
+            .EndSelector()
+            .Selector(".im-platform-item")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("padding", "12px")
+                .Property("margin-bottom", "10px")
+                .Property("background", "var(--bg-tertiary)")
+            .EndSelector()
+            .Selector(".im-platform-item-header")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "8px")
+                .Property("margin-bottom", "8px")
+            .EndSelector()
+            .Selector(".im-platform-item-header label")
+                .Property("font-size", "13px")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin", "0")
+            .EndSelector()
+            .Selector(".im-platform-item-content")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("gap", "8px")
+            .EndSelector()
+            .Selector(".im-platform-row")
+                .Property("display", "flex")
+                .Property("gap", "8px")
+                .Property("align-items", "center")
+            .EndSelector()
+            .Selector(".im-platform-row label")
+                .Property("font-size", "12px")
+                .Property("color", "var(--text-secondary)")
+                .Property("min-width", "80px")
+            .EndSelector()
+            .Selector(".im-platform-row select, .im-platform-row input")
+                .Property("flex", "1")
+                .Property("padding", "6px 10px")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("background", "var(--bg-primary)")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".im-platform-config-fields")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("gap", "8px")
+                .Property("margin-top", "8px")
+            .EndSelector()
+            .Selector(".im-platform-field-row")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("gap", "4px")
+            .EndSelector()
+            .Selector(".im-platform-field-row label")
+                .Property("font-size", "12px")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".im-platform-field-row input")
+                .Property("padding", "6px 10px")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("background", "var(--bg-primary)")
+                .Property("color", "var(--text-primary)")
+            .EndSelector()
+            .Selector(".im-platform-enabled")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "6px")
+            .EndSelector()
+            .Selector(".btn-im-platform-delete")
+                .Property("padding", "4px 10px")
+                .Property("background", "#dc3545")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "4px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "12px")
+            .EndSelector()
+            .Selector(".btn-im-platform-delete:hover")
+                .Property("background", "#c82333")
+            .EndSelector()
+            .Selector(".im-platform-empty")
+                .Property("text-align", "center")
+                .Property("color", "var(--text-secondary)")
+                .Property("padding", "20px")
+                .Property("font-style", "italic")
             .EndSelector();
     }
 
@@ -504,7 +605,8 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputTimespan")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputEnum")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDictionary")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDirectoryList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")));
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDirectoryList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputIMPlatformList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")));
         js.Add(() => Js.Func(() => "hideAllInputs", () => new List<string> { }, () => hideAllInputsBlock));
 
         // Dictionary editor functions
@@ -807,6 +909,218 @@ public class ConfigView : ViewBase
             .Add(() => Js.Return(() => Js.Str(() => "").Op(() => "+", () => Js.Id(() => "days")).Op(() => "+", () => Js.Str(() => ".")).Op(() => "+", () => Js.Id(() => "hours")).Op(() => "+", () => Js.Str(() => ":")).Op(() => "+", () => Js.Id(() => "minutes")).Op(() => "+", () => Js.Str(() => ":")).Op(() => "+", () => Js.Id(() => "seconds"))));
         js.Add(() => Js.Func(() => "formatTimespan", () => new List<string> { }, () => formatTimespanBlock));
 
+        var initIMPlatformListEditorBlock = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "imPlatformListContainer")).Prop(() => "innerHTML").Assign(() => Js.Str(() => "")))
+            .Add(() => Js.Let(() => "platforms", () => Js.Ternary(() => Js.Id(() => "jsonStr"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "jsonStr")), () => Js.Array())));
+
+        var forEachPlatformBlock = Js.Block()
+            .Add(() => Js.Id(() => "addIMPlatformRow").Invoke(() => Js.Id(() => "p").Prop(() => "platform"), () => Js.Id(() => "p").Prop(() => "enabled"), () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "p").Prop(() => "config"))));
+
+        var elseBlock = Js.Block()
+            .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "row").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-empty")))
+            .Add(() => Js.Id(() => "row").Prop(() => "textContent").Assign(() => Js.Str(() => "暂无已配置的 IM 平台，点击下方按钮添加")))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "imPlatformListContainer")).Call(() => "appendChild", () => Js.Id(() => "row")));
+
+        initIMPlatformListEditorBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "platforms").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
+                {
+                    Js.Id(() => "platforms").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "p" }, () => forEachPlatformBlock))
+                })
+            },
+            { (null, new List<JsSyntax>
+                {
+                    elseBlock
+                })
+            }
+        }));
+        
+        js.Add(() => Js.Func(() => "initIMPlatformListEditor", () => new List<string> { "jsonStr" }, () => initIMPlatformListEditorBlock));
+
+        // 平台配置字段 schema
+        var imSchemaData = new Dictionary<string, object[]>
+        {
+            ["webui"] = Array.Empty<object>(),
+            ["feishu"] = new object[]
+            {
+                new { key = "appId", label = "App ID", type = "text", required = true, placeholder = "" },
+                new { key = "appSecret", label = "App Secret", type = "password", required = true, placeholder = "" },
+                new { key = "verificationToken", label = "Verification Token", type = "text", required = true, placeholder = "" },
+                new { key = "encryptKey", label = "Encrypt Key", type = "text", required = false, placeholder = "" },
+                new { key = "callbackPath", label = "Callback Path", type = "text", required = false, placeholder = "/feishu/callback" },
+                new { key = "listenPort", label = "Listen Port", type = "number", required = false, placeholder = "8080" }
+            },
+            ["wecom"] = new object[]
+            {
+                new { key = "corpId", label = "Corp ID", type = "text", required = true, placeholder = "" },
+                new { key = "appSecret", label = "App Secret", type = "password", required = true, placeholder = "" },
+                new { key = "agentId", label = "Agent ID", type = "number", required = true, placeholder = "" },
+                new { key = "token", label = "Token", type = "text", required = true, placeholder = "" },
+                new { key = "encodingAESKey", label = "Encoding AES Key", type = "text", required = true, placeholder = "" },
+                new { key = "callbackPath", label = "Callback Path", type = "text", required = false, placeholder = "/wecom/callback" },
+                new { key = "listenPort", label = "Listen Port", type = "number", required = false, placeholder = "8080" }
+            },
+            ["dingtalk"] = new object[]
+            {
+                new { key = "appKey", label = "App Key", type = "text", required = true, placeholder = "" },
+                new { key = "appSecret", label = "App Secret", type = "password", required = true, placeholder = "" },
+                new { key = "robotCode", label = "Robot Code", type = "text", required = true, placeholder = "" },
+                new { key = "eventMode", label = "Event Mode", type = "text", required = false, placeholder = "stream" },
+                new { key = "callbackPath", label = "Callback Path", type = "text", required = false, placeholder = "/dingtalk/callback" },
+                new { key = "listenPort", label = "Listen Port", type = "number", required = false, placeholder = "8080" }
+            }
+        };
+        var imSchemaJson = System.Text.Json.JsonSerializer.Serialize(imSchemaData);
+        js.Add(() => Js.Const(() => "imPlatformSchemas", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => imSchemaJson))));
+
+        // renderPlatformFields(platform, container, existingConfig)
+        var renderFieldBlock = Js.Block()
+            .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "row").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-field-row")))
+            .Add(() => Js.Const(() => "labelEl", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
+            .Add(() => Js.Id(() => "labelEl").Prop(() => "textContent").Assign(() => Js.Id(() => "f").Prop(() => "label").Op(() => "+", () => Js.Ternary(() => Js.Id(() => "f").Prop(() => "required"), () => Js.Str(() => " *"), () => Js.Str(() => "")))))
+            .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "labelEl")))
+            .Add(() => Js.Const(() => "input", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
+            .Add(() => Js.Id(() => "input").Prop(() => "type").Assign(() => Js.Id(() => "f").Prop(() => "type")))
+            .Add(() => Js.Id(() => "input").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-config-field")))
+            .Add(() => Js.Id(() => "input").Prop(() => "dataset").Prop(() => "key").Assign(() => Js.Id(() => "f").Prop(() => "key")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "f").Prop(() => "placeholder"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "input").Prop(() => "placeholder").Assign(() => Js.Id(() => "f").Prop(() => "placeholder"))
+                    })
+                }
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "existingConfig").Op(() => "&&", () => Js.Id(() => "existingConfig").Index(() => Js.Id(() => "f").Prop(() => "key")).Op(() => "!==", () => Js.Id(() => "undefined"))), new List<JsSyntax>
+                    {
+                        Js.Id(() => "input").Prop(() => "value").Assign(() => Js.Id(() => "existingConfig").Index(() => Js.Id(() => "f").Prop(() => "key")))
+                    })
+                }
+            }))
+            .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "input")))
+            .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "row")));
+
+        var renderPlatformFieldsBlock = Js.Block()
+            .Add(() => Js.Id(() => "container").Prop(() => "innerHTML").Assign(() => Js.Str(() => "")))
+            .Add(() => Js.Const(() => "fields", () => Js.Id(() => "imPlatformSchemas").Index(() => Js.Id(() => "platform")).Op(() => "||", () => Js.Array())))
+            .Add(() => Js.Id(() => "fields").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "f" }, () => renderFieldBlock)));
+        js.Add(() => Js.Func(() => "renderPlatformFields", () => new List<string> { "platform", "container", "existingConfig" }, () => renderPlatformFieldsBlock));
+
+        var addIMPlatformRowBlock = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "imPlatformListContainer"))))
+            .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "row").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-item")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "header", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "header").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-item-header")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "platformLabel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
+            .Add(() => Js.Id(() => "platformLabel").Prop(() => "textContent").Assign(() => Js.Str(() => "平台类型")));
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "platformLabel")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "platformSelect", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))))
+            .Add(() => Js.Id(() => "platformSelect").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-select")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "platformSelect").Call(() => "insertAdjacentHTML", () => Js.Str(() => "beforeend"), () => Js.Str(() => "<option value=\"webui\">Web UI</option><option value=\"feishu\">飞书 (Feishu)</option><option value=\"wecom\">企业微信 (WeCom)</option><option value=\"dingtalk\">钉钉 (DingTalk)</option>")));
+        
+        addIMPlatformRowBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "platform"), new List<JsSyntax>
+                {
+                    Js.Id(() => "platformSelect").Prop(() => "value").Assign(() => Js.Id(() => "platform"))
+                })
+            }
+        }));
+        
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "platformSelect")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "enabledDiv", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "enabledDiv").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-enabled")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "enabledCheckbox", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
+            .Add(() => Js.Id(() => "enabledCheckbox").Prop(() => "type").Assign(() => Js.Str(() => "checkbox")))
+            .Add(() => Js.Id(() => "enabledCheckbox").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-enabled-check")));
+        
+        addIMPlatformRowBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "enabled").Op(() => "!==", () => Js.Bool(() => false)), new List<JsSyntax>
+                {
+                    Js.Id(() => "enabledCheckbox").Prop(() => "checked").Assign(() => Js.Bool(() => true))
+                })
+            }
+        }));
+        addIMPlatformRowBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "enabled").Op(() => "===", () => Js.Bool(() => false)), new List<JsSyntax>
+                {
+                    Js.Id(() => "enabledCheckbox").Prop(() => "checked").Assign(() => Js.Bool(() => false))
+                })
+            }
+        }));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "enabledLabel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
+            .Add(() => Js.Id(() => "enabledLabel").Prop(() => "textContent").Assign(() => Js.Str(() => "启用")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "enabledDiv").Call(() => "appendChild", () => Js.Id(() => "enabledCheckbox")))
+            .Add(() => Js.Id(() => "enabledDiv").Call(() => "appendChild", () => Js.Id(() => "enabledLabel")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "enabledDiv")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "deleteBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "textContent").Assign(() => Js.Str(() => "删除")))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "className").Assign(() => Js.Str(() => "btn-im-platform-delete")))
+            .Add(() => Js.Id(() => "deleteBtn").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "row").Prop(() => "remove").Invoke().Stmt())));
+        
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "deleteBtn")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "header")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "content", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "content").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-item-content")));
+        
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "configFields", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "configFields").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-config-fields")));
+
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "content").Call(() => "appendChild", () => Js.Id(() => "configFields")));
+
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "content")));
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "row")));
+
+        // 平台切换时重新渲染字段
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "platformSelect").Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "renderPlatformFields").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "configFields"), () => Js.Id(() => "null")).Stmt())));
+
+        // 初始渲染：解析已有配置并渲染对应字段
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "existingConfig", () => Js.Ternary(() => Js.Id(() => "configJson"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "configJson")), () => Js.Id(() => "null"))));
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "renderPlatformFields").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "configFields"), () => Js.Id(() => "existingConfig")).Stmt());
+
+        js.Add(() => Js.Func(() => "addIMPlatformRow", () => new List<string> { "platform", "enabled", "configJson" }, () => addIMPlatformRowBlock));
+
+        var getIMPlatformListJsonBlock = Js.Block()
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "imPlatformListContainer"))))
+            .Add(() => Js.Const(() => "items", () => Js.Id(() => "container").Call(() => "querySelectorAll", () => Js.Str(() => ".im-platform-item"))))
+            .Add(() => Js.Const(() => "platforms", () => Js.Array()));
+        
+        var processItemBlock = Js.Block()
+            .Add(() => Js.Const(() => "select", () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".im-platform-select"))))
+            .Add(() => Js.Const(() => "checkbox", () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".im-platform-enabled-check"))))
+            .Add(() => Js.Const(() => "fieldInputs", () => Js.Id(() => "item").Call(() => "querySelectorAll", () => Js.Str(() => ".im-platform-config-field"))))
+            .Add(() => Js.Const(() => "config", () => Js.Obj()))
+            .Add(() => Js.Id(() => "fieldInputs").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "inp" }, () => Js.Block()
+                .Add(() => Js.Id(() => "config").Index(() => Js.Id(() => "inp").Prop(() => "dataset").Prop(() => "key")).Assign(() => Js.Id(() => "inp").Prop(() => "value"))))))
+            .Add(() => Js.Id(() => "platforms").Call(() => "push", () => Js.Obj()
+                .Prop(() => "platform", () => Js.Id(() => "select").Prop(() => "value"))
+                .Prop(() => "enabled", () => Js.Id(() => "checkbox").Prop(() => "checked"))
+                .Prop(() => "config", () => Js.Id(() => "config"))));
+        
+        getIMPlatformListJsonBlock.Add(() => Js.Id(() => "items").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "item" }, () => processItemBlock)));
+        getIMPlatformListJsonBlock.Add(() => Js.Return(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "platforms"))));
+        
+        js.Add(() => Js.Func(() => "getIMPlatformListJson", () => new List<string> { }, () => getIMPlatformListJsonBlock));
+
         var openModalBlock = Js.Block()
             .Add(() => Js.Id(() => "hideAllInputs").Invoke().Stmt())
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editKey")).Prop(() => "value").Assign(() => Js.Id(() => "key")))
@@ -906,6 +1220,13 @@ public class ConfigView : ViewBase
                         Js.Break()
                     })
                 },
+                { (Js.Str(() => "imPlatformList"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputIMPlatformList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
+                        Js.Id(() => "initIMPlatformListEditor").Invoke(() => Js.Id(() => "value")),
+                        Js.Break()
+                    })
+                },
                 { (Js.Str(() => "guid"), new List<JsSyntax>
                     {
                         Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputString")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
@@ -1001,6 +1322,12 @@ public class ConfigView : ViewBase
                         Js.Break()
                     })
                 },
+                { (Js.Str(() => "imPlatformList"), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "value"), () => Js.Id(() => "getIMPlatformListJson").Invoke()),
+                        Js.Break()
+                    })
+                },
                 { (Js.Str(() => "guid"), new List<JsSyntax>
                     {
                         Js.Assign(() => Js.Id(() => "value"), () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValue")).Prop(() => "value").Call(() => "trim")),
@@ -1074,7 +1401,8 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnSave")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "saveConfig").Invoke().Stmt())))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnCancel")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "closeModal").Invoke().Stmt())))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDictRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDictRow").Invoke(() => Js.Str(() => ""), () => Js.Str(() => "")).Stmt())))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDirListRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDirListRow").Invoke(() => Js.Str(() => "")).Stmt())));
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDirListRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDirListRow").Invoke(() => Js.Str(() => "")).Stmt())))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddIMPlatformRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addIMPlatformRow").Invoke().Stmt())));
         
         var modalClickBlock = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>

@@ -13,7 +13,7 @@
 
 using SiliconLife.Collective;
 
-namespace SiliconLife.App.IM;
+namespace SiliconLife.Common.IM;
 
 /// <summary>
 /// Represents a pending permission request in the queue.
@@ -35,20 +35,20 @@ public class PendingPermissionRequest
 /// Permission request queue manager.
 /// Ensures permission requests are processed sequentially and handles timeout/cleanup.
 /// </summary>
-internal class PermissionRequestQueue
+public class PermissionRequestQueue
 {
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<PermissionRequestQueue>();
     private readonly Queue<PendingPermissionRequest> _pendingQueue = new();
     private readonly object _lock = new();
-    private readonly Func<Task> _sendAction;
+    private readonly Func<Task>? _sendAction;
     private PendingPermissionRequest? _activeRequest;
     private bool _isProcessing;
 
     /// <summary>
-    /// Creates a new permission request queue.
+    /// 创建权限请求队列。
     /// </summary>
-    /// <param name="sendAction">Action to trigger UI update for permission requests</param>
-    public PermissionRequestQueue(Func<Task> sendAction)
+    /// <param name="sendAction">触发 UI 更新的回调（可为 null，外部 IM 用文本发送）</param>
+    public PermissionRequestQueue(Func<Task>? sendAction = null)
     {
         _sendAction = sendAction;
     }
@@ -61,231 +61,6 @@ internal class PermissionRequestQueue
         lock (_lock)
         {
             return _activeRequest;
-        }
-    }
-
-    /// <summary>
-    /// Enqueues a new permission request.
-    /// </summary>
-    /// <param name="requestId">Unique request identifier</param>
-    /// <param name="userId">User ID making the request</param>
-    /// <param name="permissionType">Type of permission requested</param>
-    /// <param name="resource">Resource being accessed</param>
-    /// <param name="allowCode">6-digit allow code</param>
-    /// <param name="denyCode">6-digit deny code</param>
-    /// <returns>Task that completes when user responds</returns>
-    public Task<AskPermissionResult> EnqueueRequestAsync(
-        Guid requestId,
-        Guid userId,
-        PermissionType permissionType,
-        string resource,
-        string allowCode,
-        string denyCode)
-    {
-        var tcs = new TaskCompletionSource<AskPermissionResult>();
-        var timeoutCts = new CancellationTokenSource();
-        bool shouldProcess;
-        var request = new PendingPermissionRequest
-        {
-            RequestId = requestId,
-            UserId = userId,
-            PermissionType = permissionType,
-            Resource = resource,
-            AllowCode = allowCode,
-            DenyCode = denyCode,
-            Tcs = tcs,
-            CreatedAt = DateTime.UtcNow,
-            TimeoutCts = timeoutCts
-        };
-
-        lock (_lock)
-        {
-            _pendingQueue.Enqueue(request);
-
-            // Start timeout timer (30 minutes)
-            timeoutCts.CancelAfter(TimeSpan.FromMinutes(30));
-            timeoutCts.Token.Register(() =>
-            {
-                bool shouldProcessNext = false;
-
-                lock (_lock)
-                {
-                    if (_activeRequest?.RequestId == requestId)
-                    {
-                        _activeRequest = null;
-                        _isProcessing = false;
-                        shouldProcessNext = true;
-                    }
-                    else if (_pendingQueue.Any(r => r.RequestId == requestId))
-                    {
-                        // Remove from queue if not active
-                        var tempList = _pendingQueue.ToList();
-                        tempList.RemoveAll(r => r.RequestId == requestId);
-                        _pendingQueue.Clear();
-                        foreach (var item in tempList)
-                        {
-                            _pendingQueue.Enqueue(item);
-                        }
-                    }
-                }
-
-                if (!tcs.Task.IsCompleted)
-                {
-                    tcs.TrySetResult(new AskPermissionResult
-                    {
-                        Allowed = false
-                    });
-                }
-
-                if (shouldProcessNext)
-                {
-                    _ = ProcessNextRequestAsync();
-                }
-            });
-
-            shouldProcess = !_isProcessing;
-        }
-
-        _logger.Info(userId, "Permission request enqueued: {0} for {1}", permissionType, resource);
-
-        // Process outside the lock to avoid nested lock + async issues
-        if (shouldProcess)
-        {
-            _ = ProcessNextRequestAsync();
-        }
-
-        return tcs.Task;
-    }
-
-    /// <summary>
-    /// Processes the next request in the queue.
-    /// </summary>
-    private async Task ProcessNextRequestAsync()
-    {
-        PendingPermissionRequest? nextRequest = null;
-
-        lock (_lock)
-        {
-            if (_isProcessing || _pendingQueue.Count == 0)
-                return;
-
-            _isProcessing = true;
-            nextRequest = _pendingQueue.Dequeue();
-            _activeRequest = nextRequest;
-        }
-
-        try
-        {
-            if (nextRequest != null)
-            {
-                _logger.Info(nextRequest.UserId, "Processing permission request: {0} for {1}", 
-                    nextRequest.PermissionType, nextRequest.Resource);
-
-                // Trigger UI update
-                await _sendAction();
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(nextRequest?.UserId ?? Guid.Empty, "Error processing permission request: {0}", ex.Message);
-
-            if (nextRequest != null && !nextRequest.Tcs.Task.IsCompleted)
-            {
-                nextRequest.Tcs.TrySetResult(new AskPermissionResult
-                {
-                    Allowed = false
-                });
-            }
-
-            lock (_lock)
-            {
-                _isProcessing = false;
-                _activeRequest = null;
-            }
-
-            // Process next request
-            _ = ProcessNextRequestAsync();
-        }
-    }
-
-    /// <summary>
-    /// Completes the active request with the given result.
-    /// </summary>
-    /// <param name="result">The result to complete with</param>
-    public void CompleteActiveRequest(AskPermissionResult result)
-    {
-        PendingPermissionRequest? request = null;
-
-        lock (_lock)
-        {
-            if (_activeRequest != null)
-            {
-                request = _activeRequest;
-                _activeRequest = null;
-                _isProcessing = false;
-            }
-        }
-
-        if (request != null)
-        {
-            request.TimeoutCts.Dispose();
-
-            if (!request.Tcs.Task.IsCompleted)
-            {
-                request.Tcs.TrySetResult(result);
-            }
-
-            _logger.Info(request.UserId, "Permission request completed: {0} - {1}", 
-                request.PermissionType, result.Allowed ? "ALLOWED" : "DENIED");
-
-            // Process next request
-            _ = ProcessNextRequestAsync();
-        }
-    }
-
-    /// <summary>
-    /// Gets the current queue status.
-    /// </summary>
-    /// <returns>Tuple of (active requests, pending count)</returns>
-    public (int active, int pending) GetQueueStatus()
-    {
-        lock (_lock)
-        {
-            return (_activeRequest != null ? 1 : 0, _pendingQueue.Count);
-        }
-    }
-
-    /// <summary>
-    /// Cancels all pending requests.
-    /// </summary>
-    public void CancelAllRequests()
-    {
-        lock (_lock)
-        {
-            // Cancel active request
-            if (_activeRequest != null && !_activeRequest.Tcs.Task.IsCompleted)
-            {
-                _activeRequest.Tcs.TrySetResult(new AskPermissionResult
-                {
-                    Allowed = false
-                });
-            }
-
-            // Cancel pending requests
-            while (_pendingQueue.Count > 0)
-            {
-                var request = _pendingQueue.Dequeue();
-                if (!request.Tcs.Task.IsCompleted)
-                {
-                    request.Tcs.TrySetResult(new AskPermissionResult
-                    {
-                        Allowed = false,
-                    });
-                }
-            }
-
-            _activeRequest = null;
-            _isProcessing = false;
         }
     }
 
@@ -326,6 +101,139 @@ internal class PermissionRequestQueue
         }
 
         return await request.Tcs.Task;
+    }
+
+    /// <summary>
+    /// Processes the next request in the queue.
+    /// </summary>
+    private async Task ProcessNextRequestAsync()
+    {
+        PendingPermissionRequest? nextRequest = null;
+
+        lock (_lock)
+        {
+            if (_isProcessing || _pendingQueue.Count == 0)
+                return;
+
+            _isProcessing = true;
+            nextRequest = _pendingQueue.Dequeue();
+            _activeRequest = nextRequest;
+        }
+
+        try
+        {
+            if (nextRequest != null)
+            {
+                _logger.Info(nextRequest.UserId, "Processing permission request: {0} for {1}",
+                    nextRequest.PermissionType, nextRequest.Resource);
+
+                // Trigger UI update
+                if (_sendAction != null)
+                {
+                    await _sendAction();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(nextRequest?.UserId ?? Guid.Empty, "Error processing permission request: {0}", ex.Message);
+
+            if (nextRequest != null && !nextRequest.Tcs.Task.IsCompleted)
+            {
+                nextRequest.Tcs.TrySetResult(new AskPermissionResult
+                {
+                    Allowed = false
+                });
+            }
+
+            lock (_lock)
+            {
+                _isProcessing = false;
+                _activeRequest = null;
+            }
+
+            // Process next request
+            _ = ProcessNextRequestAsync();
+        }
+    }
+
+    /// <summary>
+    /// Completes the active request with the given result.
+    /// </summary>
+    public void CompleteActiveRequest(AskPermissionResult result)
+    {
+        PendingPermissionRequest? request = null;
+
+        lock (_lock)
+        {
+            if (_activeRequest != null)
+            {
+                request = _activeRequest;
+                _activeRequest = null;
+                _isProcessing = false;
+            }
+        }
+
+        if (request != null)
+        {
+            request.TimeoutCts.Dispose();
+
+            if (!request.Tcs.Task.IsCompleted)
+            {
+                request.Tcs.TrySetResult(result);
+            }
+
+            _logger.Info(request.UserId, "Permission request completed: {0} - {1}",
+                request.PermissionType, result.Allowed ? "ALLOWED" : "DENIED");
+
+            // Process next request
+            _ = ProcessNextRequestAsync();
+        }
+    }
+
+    /// <summary>
+    /// Gets the current queue status.
+    /// </summary>
+    public (int active, int pending) GetQueueStatus()
+    {
+        lock (_lock)
+        {
+            return (_activeRequest != null ? 1 : 0, _pendingQueue.Count);
+        }
+    }
+
+    /// <summary>
+    /// Cancels all pending requests.
+    /// </summary>
+    public void CancelAllRequests()
+    {
+        lock (_lock)
+        {
+            // Cancel active request
+            if (_activeRequest != null && !_activeRequest.Tcs.Task.IsCompleted)
+            {
+                _activeRequest.Tcs.TrySetResult(new AskPermissionResult
+                {
+                    Allowed = false
+                });
+            }
+
+            // Cancel pending requests
+            while (_pendingQueue.Count > 0)
+            {
+                var request = _pendingQueue.Dequeue();
+                if (!request.Tcs.Task.IsCompleted)
+                {
+                    request.Tcs.TrySetResult(new AskPermissionResult
+                    {
+                        Allowed = false,
+                    });
+                }
+            }
+
+            _activeRequest = null;
+            _isProcessing = false;
+        }
     }
 
     /// <summary>
@@ -410,7 +318,7 @@ internal class PermissionRequestQueue
     }
 
     /// <summary>
-    /// Called when a client connects via SSE. Triggers queue processing if there are pending requests,
+    /// Called when a client connects. Triggers queue processing if there are pending requests,
     /// or re-sends the active request so the new client can see it.
     /// </summary>
     public void OnClientConnected()
@@ -426,7 +334,7 @@ internal class PermissionRequestQueue
 
         // If there is an active request waiting for user response,
         // re-send it so the newly connected client can display it.
-        if (hasActiveRequest)
+        if (hasActiveRequest && _sendAction != null)
         {
             _ = _sendAction();
             _logger.Info(null, "Client connected, re-sending active permission request");

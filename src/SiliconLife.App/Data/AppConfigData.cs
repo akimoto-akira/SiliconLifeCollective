@@ -65,6 +65,12 @@ public abstract class AppConfigData : ConfigDataBase
     [ConfigGroup("Basic", Order = 5, DisplayNameKey = "PluginDirectories", DescriptionKey = "PluginDirectories")]
     public override List<string> PluginDirectories { get; set; } = new List<string>();
 
+    [ConfigGroup("IM", Order = 6, DisplayNameKey = "IMPlatforms", DescriptionKey = "IMPlatforms")]
+    public override List<IMPlatformConfig> IMPlatforms { get; set; } = new()
+    {
+        new IMPlatformConfig { Platform = "webui", Enabled = true }
+    };
+
     [ConfigGroup("User", Order = 2, DisplayNameKey = "UserNickname", DescriptionKey = "UserNickname")]
     public override string UserNickname { get; set; } = "User";
 

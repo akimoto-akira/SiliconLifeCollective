@@ -103,6 +103,13 @@ public abstract class ConfigDataBase
     public abstract List<string> PluginDirectories { get; set; }
 
     /// <summary>
+    /// Gets or sets the list of IM platform configurations.
+    /// Supports multiple IM platforms simultaneously, each with individual enable/disable control.
+    /// </summary>
+    [ConfigGroup("IM", Order = 6, DisplayNameKey = "IMPlatforms", DescriptionKey = "IMPlatforms")]
+    public abstract List<IMPlatformConfig> IMPlatforms { get; set; }
+
+    /// <summary>
     /// Gets the configuration file path
     /// </summary>
     /// <returns>The full path to the configuration file</returns>

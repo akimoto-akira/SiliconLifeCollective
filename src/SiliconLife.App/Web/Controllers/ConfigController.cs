@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -42,6 +42,8 @@ public class ConfigController : Controller
             HandleBrowse();
         else if (path == "/config/aioptions")
             GetAIConfigOptions();
+        else if (path == "/config/imoptions")
+            GetIMPlatformOptions();
         else
         {
             Response.StatusCode = 404;
@@ -190,6 +192,24 @@ public class ConfigController : Controller
                 try
                 {
                     var list = System.Text.Json.JsonSerializer.Deserialize<List<string>>(data.value);
+                    if (list == null)
+                    {
+                        RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });
+                        return;
+                    }
+                    value = list;
+                }
+                catch (Exception ex)
+                {
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorSaveFailed, $"JSON parse error: {ex.Message}") });
+                    return;
+                }
+            }
+            else if (propType == typeof(List<IMPlatformConfig>))
+            {
+                try
+                {
+                    var list = System.Text.Json.JsonSerializer.Deserialize<List<IMPlatformConfig>>(data.value);
                     if (list == null)
                     {
                         RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });
@@ -609,9 +629,9 @@ public class ConfigController : Controller
         if (type == typeof(DateTime)) return "datetime";
         if (type == typeof(System.IO.DirectoryInfo)) return "directory";
         if (type == typeof(List<string>)) return "directoryList";
+        if (type == typeof(List<IMPlatformConfig>)) return "imPlatformList";
         if (type.IsEnum) return "enum";
         
-        // Check for Dictionary type (any generic parameters)
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
         {
             return "dictionary";
@@ -760,6 +780,30 @@ public class ConfigController : Controller
             catch (System.UnauthorizedAccessException) { }
 
             RenderJson(new { currentPath = dir, directories = dirs });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, message = ex.Message });
+        }
+    }
+
+    private void GetIMPlatformOptions()
+    {
+        try
+        {
+            var platforms = new[]
+            {
+                new { value = "webui", display = "Web UI" },
+                new { value = "feishu", display = "飞书 (Feishu)" },
+                new { value = "wecom", display = "企业微信 (WeCom)" },
+                new { value = "dingtalk", display = "钉钉 (DingTalk)" }
+            };
+
+            RenderJson(new
+            {
+                success = true,
+                platforms = platforms
+            });
         }
         catch (Exception ex)
         {
