@@ -866,7 +866,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Runtime"] = "ランタイム設定",
         ["AI"] = "AI設定",
         ["Web"] = "Web設定",
-        ["User"] = "ユーザー設定"
+        ["User"] = "ユーザー設定",
+        ["IM"] = "IM設定"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1010,7 +1011,28 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Webポート",
         ["WebSkin"] = "Webスキン",
         ["UserNickname"] = "ユーザーニックネーム",
-        ["PluginDirectories"] = "プラグインディレクトリ"
+        ["PluginDirectories"] = "プラグインディレクトリ",
+        ["IMPlatforms"] = "IMプラットフォームリスト",
+        ["IMAddPlatform"] = "プラットフォームを追加",
+        ["IMPlatformType"] = "プラットフォームタイプ",
+        ["IMEnabledLabel"] = "有効",
+        ["IMDeleteLabel"] = "削除",
+        ["IMAuthModeLabel"] = "接続方式",
+        ["IMManualMode"] = "資格情報を手動入力",
+        ["IMScanMode"] = "QRコード認証",
+        ["IMScanAuthorizeBtn"] = "QRコードで認証",
+        ["IMWaitingAuth"] = "認証を待機中…",
+        ["IMAuthorizedStatus"] = "認証済み",
+        ["IMAuthFailedStatus"] = "認証失敗",
+        ["IMAuthTimeoutStatus"] = "認証タイムアウト",
+        ["IMRedirectBaseUrlLabel"] = "コールバックベースURL",
+        ["IMPublicCallbackHint"] = "このプラットフォームの初回認証には公開HTTPSコールバックが必要です。先にトンネルまたは公開アドレスを設定してください",
+        ["IMHelpTitle"] = "セットアップガイド",
+        ["IMHelpOfficialDoc"] = "公式ドキュメント",
+        ["IMHelp_webui"] = "このアプリケーションが直接提供するブラウザー内蔵チャットインターフェースです。外部の認証情報は不要で、有効にするだけでWebページからチャットできます。",
+        ["IMHelp_feishu"] = "Feishu Open Platform でカスタムアプリを作成し、ボット機能を有効にしてリリースを公開します。「Credentials & Basic Info」から App ID と App Secret を、「Event Subscriptions」から Verification Token / Encrypt Key をコピーします。イベントサブスクリプションのリクエストURLを本アプリのコールバックパスに向けてください。Feishu は localhost へのコールバックを許可しているため、ローカルテストに公開アドレスは不要です。",
+        ["IMHelp_wecom"] = "WeCom 管理コンソールで自社アプリを作成します（アプリ → アプリを作成）。Corp ID（マイ企業 → 企業情報）、アプリの Agent ID と App Secret、さらに「メッセージ受信サーバー」設定時に生成される Token と Encoding AES Key を入力します。コールバックURLは本アプリのコールバックパスを指す公開到達可能な HTTPS アドレスである必要があり、サーバーのIPを信頼済みIPリストに追加する必要がある場合があります。",
+        ["IMHelp_dingtalk"] = "DingTalk Open Platform でロボット付きの企業内部アプリを作成します。アプリの資格情報ページから App Key、App Secret、Robot Code を入力します。Stream モード（デフォルト）は WebSocket 接続でメッセージを受信し、公開アドレスは不要です。HTTP コールバックモードには公開到達可能な HTTPS コールバックURLが必要です。"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1072,7 +1094,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Webサーバーポート",
         ["WebSkin"] = "Webスキン名",
         ["UserNickname"] = "人間ユーザーのニックネーム",
-        ["PluginDirectories"] = "プラグインの自動検出ディレクトリリスト、相対パスまたは絶対パスに対応"
+        ["PluginDirectories"] = "プラグインの自動検出ディレクトリリスト、相対パスまたは絶対パスに対応",
+        ["IMPlatforms"] = "接続するIMプラットフォームを設定します。複数追加でき、資格情報の手動入力またはQRコード認証に対応"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

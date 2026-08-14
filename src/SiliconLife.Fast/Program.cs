@@ -183,7 +183,11 @@ public class Program
 
         Router router = new Router();
         router.SetInitialized(configData.ConfigExists());
-        IIMProvider imProvider = new WebUIProvider(router);
+        // 在深拷贝副本上解析 ${ENV_VAR} 占位符，configData.IMPlatforms 保持占位符原样，
+        // 避免后续 SaveConfig 将解析后的明文密钥写入持久化存储
+        List<IMPlatformConfig> resolvedPlatforms =
+            SiliconLife.Common.IM.ConfigSecretResolver.CreateResolvedCopy(configData.IMPlatforms);
+        IIMProvider imProvider = CreateIMProvider(resolvedPlatforms, router, out WebUIProvider webUiProvider);
         imProvider.ExitRequested += (s, e) => RequestExit();
 
         DefaultPermissionCallback permissionCallback = new DefaultPermissionCallback(string.Empty);
@@ -234,7 +238,7 @@ public class Program
         // Load all persisted non-curator beings from SiliconManager directory
         MainLoop.BeingManager.LoadPersistedBeings(beingFactory);
 
-        await StartWebServerAsync(configData, router, (WebUIProvider)imProvider, beingFactory, dynamicBeingLoader, localization);
+        await StartWebServerAsync(configData, router, webUiProvider, beingFactory, dynamicBeingLoader, localization);
 
         if (_shouldExit)
         {
@@ -596,5 +600,80 @@ public class Program
                 _logger.Warn(null, "Failed to load custom code for curator {0}", ex, curator.Id);
             }
         }
+    }
+
+    /// <summary>
+    /// 根据 IM 平台配置创建 IM Provider 实例。
+    /// 支持单平台（直接创建）和多平台聚合模式。
+    /// 入参为占位符已解析的配置副本，与持久化的原始配置对象无共享引用。
+    /// Web 前端（聊天页 SSE 等）依赖 WebUIProvider，通过 out 参数带出该实例引用；
+    /// 若配置中不含 webui 平台，会自动补充一个 WebUIProvider 纳入装配。
+    /// </summary>
+    private static IIMProvider CreateIMProvider(List<IMPlatformConfig> platformConfigs, Router router, out WebUIProvider webUiProvider)
+    {
+        var enabledConfigs = platformConfigs.Where(c => c.Enabled).ToList();
+
+        // 单平台且为 webui 的情况，直接返回 WebUIProvider（性能优化）
+        if (enabledConfigs.Count == 1 && enabledConfigs[0].Platform == "webui")
+        {
+            _logger.Info(null, "Using single WebUIProvider");
+            webUiProvider = new WebUIProvider(router);
+            return webUiProvider;
+        }
+
+        // 多平台或非 webui 的情况，创建各平台 Provider 并聚合
+        var providers = new List<IIMProvider>();
+        foreach (var cfg in enabledConfigs)
+        {
+            IIMProvider? provider = CreatePlatformProvider(cfg, router);
+            if (provider != null)
+            {
+                providers.Add(provider);
+                _logger.Info(null, "Created provider for platform: {0}", cfg.Platform);
+            }
+            else
+            {
+                _logger.Warn(null, "Failed to create provider for platform: {0} (not implemented yet)", cfg.Platform);
+            }
+        }
+
+        if (providers.Count == 0)
+        {
+            _logger.Warn(null, "No valid IM providers created, falling back to WebUIProvider");
+        }
+
+        // 配置中不含 webui 时自动补充一个 WebUIProvider，保证 Web 前端始终可用
+        WebUIProvider? existingWebUi = providers.OfType<WebUIProvider>().FirstOrDefault();
+        if (existingWebUi == null)
+        {
+            _logger.Info(null, "No webui platform configured, auto-adding WebUIProvider for web frontend");
+            existingWebUi = new WebUIProvider(router);
+            providers.Add(existingWebUi);
+        }
+        webUiProvider = existingWebUi;
+
+        if (providers.Count == 1)
+        {
+            _logger.Info(null, "Using single provider: {0}", providers[0].GetType().Name);
+            return providers[0];
+        }
+
+        _logger.Info(null, "Using AggregateIMProvider with {0} platform(s)", providers.Count);
+        return new SiliconLife.Common.IM.AggregateIMProvider(providers);
+    }
+
+    /// <summary>
+    /// 创建单个平台的 IM Provider 实例（平台工厂统一查询 IMProviderRegistry）。
+    /// </summary>
+    private static IIMProvider? CreatePlatformProvider(IMPlatformConfig cfg, Router router)
+    {
+        // webui 依赖 App 层 Router，无法在 Common 层注册工厂，保留特判
+        if (cfg.Platform == "webui")
+        {
+            return new WebUIProvider(router);
+        }
+
+        var metadata = SiliconLife.Common.IM.IMProviderRegistry.Get(cfg.Platform);
+        return metadata?.CreateProvider?.Invoke(cfg);
     }
 }

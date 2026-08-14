@@ -866,7 +866,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Runtime"] = "运行时配置",
         ["AI"] = "AI 配置",
         ["Web"] = "Web 配置",
-        ["User"] = "用户配置"
+        ["User"] = "用户配置",
+        ["IM"] = "IM 配置"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1010,7 +1011,28 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Web 端口",
         ["WebSkin"] = "Web 皮肤",
         ["UserNickname"] = "用户昵称",
-        ["PluginDirectories"] = "插件目录"
+        ["PluginDirectories"] = "插件目录",
+        ["IMPlatforms"] = "IM 平台列表",
+        ["IMAddPlatform"] = "添加平台",
+        ["IMPlatformType"] = "平台类型",
+        ["IMEnabledLabel"] = "启用",
+        ["IMDeleteLabel"] = "删除",
+        ["IMAuthModeLabel"] = "接入方式",
+        ["IMManualMode"] = "手填凭证",
+        ["IMScanMode"] = "扫码授权",
+        ["IMScanAuthorizeBtn"] = "扫码授权",
+        ["IMWaitingAuth"] = "等待授权…",
+        ["IMAuthorizedStatus"] = "已授权",
+        ["IMAuthFailedStatus"] = "授权失败",
+        ["IMAuthTimeoutStatus"] = "授权超时",
+        ["IMRedirectBaseUrlLabel"] = "回调基础地址",
+        ["IMPublicCallbackHint"] = "该平台首次授权需公网 HTTPS 回调，请先配置内网穿透或公网地址",
+        ["IMHelpTitle"] = "接入帮助",
+        ["IMHelpOfficialDoc"] = "官方文档",
+        ["IMHelp_webui"] = "内置的浏览器聊天界面，由本程序直接提供，无需任何外部凭证，启用后在网页中即可对话。",
+        ["IMHelp_feishu"] = "在飞书开放平台创建企业自建应用，开启机器人能力并发布版本。在「凭证与基础信息」获取 App ID 与 App Secret，在「事件订阅」获取 Verification Token 与 Encrypt Key。将事件订阅请求地址指向本程序的回调路径；飞书支持 localhost 回调，本地调试无需公网地址。",
+        ["IMHelp_wecom"] = "在企业微信管理后台「应用管理 → 创建应用」创建自建应用。需填写企业 ID（我的企业 → 企业信息）、应用的 Agent ID 与 Secret，以及配置「接收消息服务器」时生成的 Token 和 EncodingAESKey。回调地址必须是公网可达的 HTTPS 地址并指向本程序的回调路径，服务器 IP 还可能需加入可信 IP 列表。",
+        ["IMHelp_dingtalk"] = "在钉钉开放平台创建企业内部应用并添加机器人。在应用凭证页获取 App Key、App Secret 与 Robot Code。事件模式默认使用 Stream（WebSocket 长连接），无需公网地址；如改用 HTTP 回调模式，则需要公网可达的 HTTPS 回调地址。"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1072,7 +1094,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Web 服务器端口",
         ["WebSkin"] = "Web 皮肤名称",
         ["UserNickname"] = "人类用户的昵称",
-        ["PluginDirectories"] = "插件加载目录列表，支持相对路径（基于程序目录）或绝对路径"
+        ["PluginDirectories"] = "插件加载目录列表，支持相对路径（基于程序目录）或绝对路径",
+        ["IMPlatforms"] = "配置对接的 IM 平台，可添加多个，支持手填凭证或扫码授权"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

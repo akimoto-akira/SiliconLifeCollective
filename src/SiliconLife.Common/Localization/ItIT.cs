@@ -978,7 +978,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Runtime"] = "Configurazione runtime",
         ["AI"] = "Configurazione AI",
         ["Web"] = "Configurazione Web",
-        ["User"] = "Configurazione utente"
+        ["User"] = "Configurazione utente",
+        ["IM"] = "Configurazione IM"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1122,7 +1123,28 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Porta Web",
         ["WebSkin"] = "Tema Web",
         ["UserNickname"] = "Nome utente",
-        ["PluginDirectories"] = "Directory dei plugin"
+        ["PluginDirectories"] = "Directory dei plugin",
+        ["IMPlatforms"] = "Piattaforme IM",
+        ["IMAddPlatform"] = "Aggiungi piattaforma",
+        ["IMPlatformType"] = "Tipo di piattaforma",
+        ["IMEnabledLabel"] = "Abilitato",
+        ["IMDeleteLabel"] = "Elimina",
+        ["IMAuthModeLabel"] = "Modalità di accesso",
+        ["IMManualMode"] = "Credenziali manuali",
+        ["IMScanMode"] = "Autorizzazione con codice QR",
+        ["IMScanAuthorizeBtn"] = "Autorizza con codice QR",
+        ["IMWaitingAuth"] = "In attesa di autorizzazione…",
+        ["IMAuthorizedStatus"] = "Autorizzato",
+        ["IMAuthFailedStatus"] = "Autorizzazione non riuscita",
+        ["IMAuthTimeoutStatus"] = "Autorizzazione scaduta",
+        ["IMRedirectBaseUrlLabel"] = "URL base di callback",
+        ["IMPublicCallbackHint"] = "Questa piattaforma richiede un callback HTTPS pubblico per la prima autorizzazione; configura prima un tunnel o un indirizzo pubblico",
+        ["IMHelpTitle"] = "Guida alla configurazione",
+        ["IMHelpOfficialDoc"] = "Documentazione ufficiale",
+        ["IMHelp_webui"] = "Interfaccia di chat integrata nel browser servita direttamente da questa applicazione. Non sono richieste credenziali esterne — basta abilitarla e chattare dalla pagina web.",
+        ["IMHelp_feishu"] = "Crea un'app personalizzata sulla Feishu Open Platform, abilita la funzionalità bot e pubblica una release. Copia App ID e App Secret da 'Credentials & Basic Info' e Verification Token / Encrypt Key da 'Event Subscriptions'. Punta l'URL di richiesta della sottoscrizione eventi al percorso di callback di questa applicazione; Feishu consente callback su localhost, quindi per i test locali non serve un indirizzo pubblico.",
+        ["IMHelp_wecom"] = "Crea un'app self-built nella console di amministrazione WeCom (Apps → Create App). Inserisci il Corp ID (My Company → Company Info), l'Agent ID e l'App Secret dell'app, oltre al Token e alla Encoding AES Key generati durante la configurazione del 'server di ricezione messaggi'. L'URL di callback deve essere un indirizzo HTTPS raggiungibile pubblicamente che punti al percorso di callback di questa applicazione, e potrebbe essere necessario aggiungere l'IP del server all'elenco degli IP attendibili.",
+        ["IMHelp_dingtalk"] = "Crea un'app aziendale interna con un robot sulla DingTalk Open Platform. Inserisci App Key, App Secret e Robot Code dalla pagina delle credenziali dell'app. La modalità Stream (predefinita) riceve i messaggi tramite una connessione WebSocket e non richiede un indirizzo pubblico; la modalità callback HTTP richiede un URL di callback HTTPS raggiungibile pubblicamente."
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1184,7 +1206,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Porta del server Web",
         ["WebSkin"] = "Nome del tema Web",
         ["UserNickname"] = "Nome utente umano",
-        ["PluginDirectories"] = "Elenco delle directory dei plugin per il rilevamento automatico, supporta percorsi relativi o assoluti"
+        ["PluginDirectories"] = "Elenco delle directory dei plugin per il rilevamento automatico, supporta percorsi relativi o assoluti",
+        ["IMPlatforms"] = "Configura le piattaforme IM collegate; è possibile aggiungerne più di una, tramite credenziali manuali o autorizzazione con codice QR"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

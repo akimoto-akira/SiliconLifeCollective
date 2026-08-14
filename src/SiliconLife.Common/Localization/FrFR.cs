@@ -982,7 +982,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Runtime"] = "Configuration d'exécution",
         ["AI"] = "Configuration IA",
         ["Web"] = "Configuration Web",
-        ["User"] = "Configuration utilisateur"
+        ["User"] = "Configuration utilisateur",
+        ["IM"] = "Configuration IM"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1126,7 +1127,28 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Port Web",
         ["WebSkin"] = "Thème Web",
         ["UserNickname"] = "Nom d'utilisateur",
-        ["PluginDirectories"] = "Répertoires de plugins"
+        ["PluginDirectories"] = "Répertoires de plugins",
+        ["IMPlatforms"] = "Plateformes IM",
+        ["IMAddPlatform"] = "Ajouter une plateforme",
+        ["IMPlatformType"] = "Type de plateforme",
+        ["IMEnabledLabel"] = "Activé",
+        ["IMDeleteLabel"] = "Supprimer",
+        ["IMAuthModeLabel"] = "Mode d'accès",
+        ["IMManualMode"] = "Identifiants manuels",
+        ["IMScanMode"] = "Autorisation par QR code",
+        ["IMScanAuthorizeBtn"] = "Autoriser par QR code",
+        ["IMWaitingAuth"] = "En attente d'autorisation…",
+        ["IMAuthorizedStatus"] = "Autorisé",
+        ["IMAuthFailedStatus"] = "Échec de l'autorisation",
+        ["IMAuthTimeoutStatus"] = "Autorisation expirée",
+        ["IMRedirectBaseUrlLabel"] = "URL de base de rappel",
+        ["IMPublicCallbackHint"] = "Cette plateforme nécessite un rappel HTTPS public pour la première autorisation ; configurez d'abord un tunnel ou une adresse publique",
+        ["IMHelpTitle"] = "Guide de configuration",
+        ["IMHelpOfficialDoc"] = "Documentation officielle",
+        ["IMHelp_webui"] = "Interface de chat intégrée au navigateur, servie directement par cette application. Aucun identifiant externe n'est requis — il suffit de l'activer et de discuter depuis la page web.",
+        ["IMHelp_feishu"] = "Créez une application personnalisée sur la Feishu Open Platform, activez la fonctionnalité de bot et publiez une version. Copiez l'App ID et l'App Secret depuis 'Credentials & Basic Info', ainsi que le Verification Token / Encrypt Key depuis 'Event Subscriptions'. Faites pointer l'URL de requête d'abonnement aux événements vers le chemin de rappel de cette application ; Feishu autorise les rappels vers localhost, aucune adresse publique n'est donc nécessaire pour les tests locaux.",
+        ["IMHelp_wecom"] = "Créez une application auto-construite dans la console d'administration WeCom (Apps → Create App). Renseignez le Corp ID (My Company → Company Info), l'Agent ID et l'App Secret de l'application, ainsi que le Token et l'Encoding AES Key générés lors de la configuration du 'serveur de réception des messages'. L'URL de rappel doit être une adresse HTTPS accessible publiquement pointant vers le chemin de rappel de cette application, et l'IP du serveur peut devoir être ajoutée à la liste des IP de confiance.",
+        ["IMHelp_dingtalk"] = "Créez une application d'entreprise interne avec un robot sur la DingTalk Open Platform. Renseignez l'App Key, l'App Secret et le Robot Code depuis la page des identifiants de l'application. Le mode Stream (par défaut) reçoit les messages via une connexion WebSocket et ne nécessite aucune adresse publique ; le mode de rappel HTTP nécessite une URL de rappel HTTPS accessible publiquement."
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1188,7 +1210,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Port du serveur Web",
         ["WebSkin"] = "Nom du thème Web",
         ["UserNickname"] = "Pseudonyme de l'utilisateur humain",
-        ["PluginDirectories"] = "Liste des répertoires de plugins pour la découverte automatique, prend en charge les chemins relatifs ou absolus"
+        ["PluginDirectories"] = "Liste des répertoires de plugins pour la découverte automatique, prend en charge les chemins relatifs ou absolus",
+        ["IMPlatforms"] = "Configurer les plateformes IM connectées ; plusieurs ajouts possibles, via identifiants manuels ou autorisation par QR code"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

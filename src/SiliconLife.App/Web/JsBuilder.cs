@@ -397,7 +397,9 @@ public class JsArrowFunc : JsSyntax
             return $"({string.Join(", ", Params())}) => {{\n{stmts}\n}}";
         }
         var bodyStr = body.Build();
-        if (bodyStr.EndsWith(";"))
+        // Strip all trailing semicolons: statement wrappers (e.g. Assign().Stmt()) may stack
+        // multiple ';' and any one left over breaks the expression-bodied arrow syntax
+        while (bodyStr.EndsWith(";"))
             bodyStr = bodyStr.Substring(0, bodyStr.Length - 1);
         // Wrap object literals in parentheses to avoid being parsed as block statements
         if (body is JsObj)

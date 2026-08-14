@@ -820,7 +820,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Runtime"] = "Configuração de runtime",
         ["AI"] = "Configuração de IA",
         ["Web"] = "Configuração Web",
-        ["User"] = "Configuração do utilizador"
+        ["User"] = "Configuração do utilizador",
+        ["IM"] = "Configuração de IM"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -964,7 +965,28 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Porta Web",
         ["WebSkin"] = "Tema Web",
         ["UserNickname"] = "Nome de utilizador",
-        ["PluginDirectories"] = "Diretórios de plugins"
+        ["PluginDirectories"] = "Diretórios de plugins",
+        ["IMPlatforms"] = "Plataformas de IM",
+        ["IMAddPlatform"] = "Adicionar plataforma",
+        ["IMPlatformType"] = "Tipo de plataforma",
+        ["IMEnabledLabel"] = "Ativado",
+        ["IMDeleteLabel"] = "Eliminar",
+        ["IMAuthModeLabel"] = "Modo de acesso",
+        ["IMManualMode"] = "Credenciais manuais",
+        ["IMScanMode"] = "Autorização por código QR",
+        ["IMScanAuthorizeBtn"] = "Autorizar por código QR",
+        ["IMWaitingAuth"] = "A aguardar autorização…",
+        ["IMAuthorizedStatus"] = "Autorizado",
+        ["IMAuthFailedStatus"] = "Falha na autorização",
+        ["IMAuthTimeoutStatus"] = "Autorização expirada",
+        ["IMRedirectBaseUrlLabel"] = "URL base de callback",
+        ["IMPublicCallbackHint"] = "Esta plataforma requer um callback HTTPS público para a primeira autorização; configure primeiro um túnel ou um endereço público",
+        ["IMHelpTitle"] = "Guia de configuração",
+        ["IMHelpOfficialDoc"] = "Documentação oficial",
+        ["IMHelp_webui"] = "Interface de chat integrada no navegador, servida diretamente por esta aplicação. Não são necessárias credenciais externas — basta ativá-la e conversar a partir da página web.",
+        ["IMHelp_feishu"] = "Crie uma aplicação personalizada na Feishu Open Platform, ative a capacidade de bot e publique uma versão. Copie o App ID e o App Secret em 'Credentials & Basic Info' e o Verification Token / Encrypt Key em 'Event Subscriptions'. Aponte o URL de pedido da subscrição de eventos para o caminho de callback desta aplicação; a Feishu permite callbacks para localhost, pelo que não é necessário um endereço público para testes locais.",
+        ["IMHelp_wecom"] = "Crie uma aplicação própria na consola de administração do WeCom (Apps → Create App). Preencha o Corp ID (My Company → Company Info), o Agent ID e o App Secret da aplicação, além do Token e da Encoding AES Key gerados ao configurar o 'servidor de receção de mensagens'. O URL de callback deve ser um endereço HTTPS acessível publicamente que aponte para o caminho de callback desta aplicação, e o IP do servidor pode ter de ser adicionado à lista de IPs confiáveis.",
+        ["IMHelp_dingtalk"] = "Crie uma aplicação empresarial interna com um robô na DingTalk Open Platform. Preencha o App Key, o App Secret e o Robot Code na página de credenciais da aplicação. O modo Stream (predefinição) recebe mensagens através de uma ligação WebSocket e não precisa de endereço público; o modo de callback HTTP requer um URL de callback HTTPS acessível publicamente."
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1026,7 +1048,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Porta do servidor Web",
         ["WebSkin"] = "Nome do tema Web",
         ["UserNickname"] = "Nome do utilizador humano",
-        ["PluginDirectories"] = "Lista de diretórios de plugins para descoberta automática, suporta caminhos relativos ou absolutos"
+        ["PluginDirectories"] = "Lista de diretórios de plugins para descoberta automática, suporta caminhos relativos ou absolutos",
+        ["IMPlatforms"] = "Configurar as plataformas de IM ligadas; adicione várias, através de credenciais manuais ou autorização por código QR"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

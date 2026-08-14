@@ -834,7 +834,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Runtime"] = "Laufzeitkonfiguration",
         ["AI"] = "KI-Konfiguration",
         ["Web"] = "Web-Konfiguration",
-        ["User"] = "Benutzerkonfiguration"
+        ["User"] = "Benutzerkonfiguration",
+        ["IM"] = "IM-Konfiguration"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -978,7 +979,28 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Web-Port",
         ["WebSkin"] = "Web-Skin",
         ["UserNickname"] = "Benutzername",
-        ["PluginDirectories"] = "Plugin-Verzeichnisse"
+        ["PluginDirectories"] = "Plugin-Verzeichnisse",
+        ["IMPlatforms"] = "IM-Plattformen",
+        ["IMAddPlatform"] = "Plattform hinzufügen",
+        ["IMPlatformType"] = "Plattformtyp",
+        ["IMEnabledLabel"] = "Aktiviert",
+        ["IMDeleteLabel"] = "Löschen",
+        ["IMAuthModeLabel"] = "Zugangsart",
+        ["IMManualMode"] = "Manuelle Zugangsdaten",
+        ["IMScanMode"] = "QR-Code-Autorisierung",
+        ["IMScanAuthorizeBtn"] = "Per QR-Code autorisieren",
+        ["IMWaitingAuth"] = "Warten auf Autorisierung…",
+        ["IMAuthorizedStatus"] = "Autorisiert",
+        ["IMAuthFailedStatus"] = "Autorisierung fehlgeschlagen",
+        ["IMAuthTimeoutStatus"] = "Autorisierung abgelaufen",
+        ["IMRedirectBaseUrlLabel"] = "Callback-Basis-URL",
+        ["IMPublicCallbackHint"] = "Diese Plattform benötigt für die Erstautorisierung einen öffentlichen HTTPS-Callback; bitte zuerst einen Tunnel oder eine öffentliche Adresse konfigurieren",
+        ["IMHelpTitle"] = "Einrichtungsanleitung",
+        ["IMHelpOfficialDoc"] = "Offizielle Dokumentation",
+        ["IMHelp_webui"] = "Integrierte Browser-Chat-Oberfläche, die direkt von dieser Anwendung bereitgestellt wird. Es sind keine externen Zugangsdaten erforderlich — einfach aktivieren und über die Webseite chatten.",
+        ["IMHelp_feishu"] = "Erstellen Sie eine eigene App auf der Feishu Open Platform, aktivieren Sie die Bot-Funktion und veröffentlichen Sie ein Release. Kopieren Sie App ID und App Secret aus 'Credentials & Basic Info' sowie Verification Token / Encrypt Key aus 'Event Subscriptions'. Richten Sie die Anfrage-URL des Ereignisabonnements auf den Callback-Pfad dieser App; Feishu erlaubt localhost-Callbacks, daher ist für lokale Tests keine öffentliche Adresse nötig.",
+        ["IMHelp_wecom"] = "Erstellen Sie eine selbst entwickelte App in der WeCom-Verwaltungskonsole (Apps → Create App). Tragen Sie die Corp ID (My Company → Company Info), die Agent ID und das App Secret der App sowie den Token und den Encoding AES Key ein, die bei der Konfiguration des 'Nachrichtenempfangsservers' erzeugt wurden. Die Callback-URL muss eine öffentlich erreichbare HTTPS-Adresse sein, die auf den Callback-Pfad dieser App zeigt; die Server-IP muss ggf. zur Liste vertrauenswürdiger IPs hinzugefügt werden.",
+        ["IMHelp_dingtalk"] = "Erstellen Sie eine interne Unternehmens-App mit einem Roboter auf der DingTalk Open Platform. Tragen Sie App Key, App Secret und Robot Code von der Zugangsdaten-Seite der App ein. Der Stream-Modus (Standard) empfängt Nachrichten über eine WebSocket-Verbindung und benötigt keine öffentliche Adresse; der HTTP-Callback-Modus erfordert eine öffentlich erreichbare HTTPS-Callback-URL."
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1040,7 +1062,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Web-Server-Port",
         ["WebSkin"] = "Web-Skin-Name",
         ["UserNickname"] = "Spitzname des menschlichen Benutzers",
-        ["PluginDirectories"] = "Liste der Plugin-Verzeichnisse für automatische Erkennung, unterstützt relative oder absolute Pfade"
+        ["PluginDirectories"] = "Liste der Plugin-Verzeichnisse für automatische Erkennung, unterstützt relative oder absolute Pfade",
+        ["IMPlatforms"] = "Verbundene IM-Plattformen konfigurieren; mehrere hinzufügbar, per manueller Zugangsdaten oder QR-Code-Autorisierung"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

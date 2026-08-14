@@ -1,4 +1,4 @@
-﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -791,13 +791,28 @@ public class ConfigController : Controller
     {
         try
         {
-            var platforms = new[]
-            {
-                new { value = "webui", display = "Web UI" },
-                new { value = "feishu", display = "飞书 (Feishu)" },
-                new { value = "wecom", display = "企业微信 (WeCom)" },
-                new { value = "dingtalk", display = "钉钉 (DingTalk)" }
-            };
+            // 平台选项、字段 schema、授权模式统一来自 IMProviderRegistry（替代前端硬编码 schema）
+            var platforms = SiliconLife.Common.IM.IMProviderRegistry.GetAll()
+                .Select(m => new
+                {
+                    value = m.PlatformId,
+                    display = m.DisplayName,
+                    authModes = m.AuthModes,
+                    needsPublicCallback = m.NeedsPublicCallback,
+                    // 接入帮助：文案经当前语言本地化解析，未注册时为空串（前端据此隐藏帮助区）
+                    help = ResolveIMHelpText(m.HelpKey),
+                    helpUrl = m.HelpUrl ?? "",
+                    fields = m.ConfigFields.Select(f => new
+                    {
+                        key = f.Key,
+                        label = f.Label,
+                        type = f.Type,
+                        required = f.Required,
+                        placeholder = f.Placeholder ?? "",
+                        isSecret = f.IsSecret
+                    }).ToArray()
+                })
+                .ToArray();
 
             RenderJson(new
             {
@@ -809,5 +824,16 @@ public class ConfigController : Controller
         {
             RenderJson(new { success = false, message = ex.Message });
         }
+    }
+
+    /// <summary>
+    /// 解析 IM 平台接入帮助文案：HelpKey 为空或当前语言未注册该键时返回空串。
+    /// </summary>
+    private string ResolveIMHelpText(string? helpKey)
+    {
+        if (string.IsNullOrEmpty(helpKey))
+            return string.Empty;
+        var text = _loc.GetConfigDisplayName(helpKey, out var found);
+        return found ? text : string.Empty;
     }
 }

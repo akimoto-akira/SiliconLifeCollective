@@ -159,10 +159,10 @@ public class ConfigView : ViewBase
                             ).Class("dir-list-actions")
                         ).Class("form-group").Id("inputDirectoryList").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
-                            H.Label("IM 平台列表"),
+                            H.Label(loc.GetConfigDisplayName("IMPlatforms", out _)),
                             H.Div().Id("imPlatformListContainer").Class("im-platform-list-editor"),
                             H.Div(
-                                H.Button("添加平台").Class("btn btn-add").Id("btnAddIMPlatformRow")
+                                H.Button(loc.GetConfigDisplayName("IMAddPlatform", out _)).Class("btn btn-add").Id("btnAddIMPlatformRow")
                             ).Class("dict-actions")
                         ).Class("form-group").Id("inputIMPlatformList").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
@@ -581,17 +581,106 @@ public class ConfigView : ViewBase
             .Selector(".btn-im-platform-delete:hover")
                 .Property("background", "#c82333")
             .EndSelector()
+            .Selector(".im-auth-section")
+                .Property("display", "flex")
+                .Property("flex-direction", "column")
+                .Property("gap", "8px")
+                .Property("margin-top", "4px")
+            .EndSelector()
+            .Selector(".im-oauth-panel")
+                .Property("display", "none")
+                .Property("flex-direction", "column")
+                .Property("gap", "8px")
+            .EndSelector()
+            .Selector(".im-oauth-hint")
+                .Property("font-size", "12px")
+                .Property("color", "var(--text-secondary)")
+                .Property("font-style", "italic")
+            .EndSelector()
+            .Selector(".im-oauth-action-row")
+                .Property("display", "flex")
+                .Property("align-items", "center")
+                .Property("gap", "8px")
+            .EndSelector()
+            .Selector(".btn-im-scan-auth")
+                .Property("padding", "6px 16px")
+                .Property("background", "var(--accent-color)")
+                .Property("color", "#fff")
+                .Property("border", "none")
+                .Property("border-radius", "4px")
+                .Property("cursor", "pointer")
+                .Property("font-size", "12px")
+            .EndSelector()
+            .Selector(".btn-im-scan-auth:hover")
+                .Property("opacity", "0.9")
+            .EndSelector()
+            .Selector(".im-auth-status")
+                .Property("font-size", "12px")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
             .Selector(".im-platform-empty")
                 .Property("text-align", "center")
                 .Property("color", "var(--text-secondary)")
                 .Property("padding", "20px")
                 .Property("font-style", "italic")
+            .EndSelector()
+            .Selector(".im-help-details")
+                .Property("border", "1px solid var(--border-color)")
+                .Property("border-radius", "4px")
+                .Property("padding", "6px 10px")
+                .Property("background", "var(--bg-primary)")
+            .EndSelector()
+            .Selector(".im-help-details summary")
+                .Property("cursor", "pointer")
+                .Property("font-size", "12px")
+                .Property("color", "var(--text-secondary)")
+            .EndSelector()
+            .Selector(".im-help-text")
+                .Property("font-size", "12px")
+                .Property("color", "var(--text-secondary)")
+                .Property("margin-top", "6px")
+                .Property("line-height", "1.6")
+                .Property("white-space", "pre-wrap")
+            .EndSelector()
+            .Selector(".im-help-link")
+                .Property("display", "inline-block")
+                .Property("font-size", "12px")
+                .Property("color", "var(--accent-color)")
+                .Property("margin-top", "6px")
             .EndSelector();
+    }
+
+    /// <summary>
+    /// 解析 IM 平台接入帮助文案：HelpKey 为空或当前语言未注册该键时返回空串（前端据此隐藏帮助区）。
+    /// </summary>
+    private static string ResolveIMHelpText(DefaultLocalizationBase loc, string? helpKey)
+    {
+        if (string.IsNullOrEmpty(helpKey))
+            return string.Empty;
+        var text = loc.GetConfigDisplayName(helpKey, out var found);
+        return found ? text : string.Empty;
     }
 
     private static JsSyntax GetScripts(DefaultLocalizationBase loc)
     {
         var js = Js.Block();
+
+        // IM 编辑器文案（经 ConfigDisplayNames 本地化契约键获取）
+        var locIMPlatformType = loc.GetConfigDisplayName("IMPlatformType", out _);
+        var locIMEnabled = loc.GetConfigDisplayName("IMEnabledLabel", out _);
+        var locIMDelete = loc.GetConfigDisplayName("IMDeleteLabel", out _);
+        var locIMAuthMode = loc.GetConfigDisplayName("IMAuthModeLabel", out _);
+        var locIMManualMode = loc.GetConfigDisplayName("IMManualMode", out _);
+        var locIMScanMode = loc.GetConfigDisplayName("IMScanMode", out _);
+        var locIMScanBtn = loc.GetConfigDisplayName("IMScanAuthorizeBtn", out _);
+        var locIMWaiting = loc.GetConfigDisplayName("IMWaitingAuth", out _);
+        var locIMAuthorized = loc.GetConfigDisplayName("IMAuthorizedStatus", out _);
+        var locIMAuthFailed = loc.GetConfigDisplayName("IMAuthFailedStatus", out _);
+        var locIMAuthTimeout = loc.GetConfigDisplayName("IMAuthTimeoutStatus", out _);
+        var locIMRedirectBase = loc.GetConfigDisplayName("IMRedirectBaseUrlLabel", out _);
+        var locIMCallbackHint = loc.GetConfigDisplayName("IMPublicCallbackHint", out _);
+        var locIMHelpTitle = loc.GetConfigDisplayName("IMHelpTitle", out _);
+        var locIMHelpOfficialDoc = loc.GetConfigDisplayName("IMHelpOfficialDoc", out _);
 
         js.Add(() => Js.Let(() => "currentType", () => Js.Str(() => "string")));
                 js.Add(() => Js.Let(() => "isAIConfigDict", () => Js.Id(() => "false")));
@@ -938,41 +1027,36 @@ public class ConfigView : ViewBase
         
         js.Add(() => Js.Func(() => "initIMPlatformListEditor", () => new List<string> { "jsonStr" }, () => initIMPlatformListEditorBlock));
 
-        // 平台配置字段 schema
-        var imSchemaData = new Dictionary<string, object[]>
-        {
-            ["webui"] = Array.Empty<object>(),
-            ["feishu"] = new object[]
-            {
-                new { key = "appId", label = "App ID", type = "text", required = true, placeholder = "" },
-                new { key = "appSecret", label = "App Secret", type = "password", required = true, placeholder = "" },
-                new { key = "verificationToken", label = "Verification Token", type = "text", required = true, placeholder = "" },
-                new { key = "encryptKey", label = "Encrypt Key", type = "text", required = false, placeholder = "" },
-                new { key = "callbackPath", label = "Callback Path", type = "text", required = false, placeholder = "/feishu/callback" },
-                new { key = "listenPort", label = "Listen Port", type = "number", required = false, placeholder = "8080" }
-            },
-            ["wecom"] = new object[]
-            {
-                new { key = "corpId", label = "Corp ID", type = "text", required = true, placeholder = "" },
-                new { key = "appSecret", label = "App Secret", type = "password", required = true, placeholder = "" },
-                new { key = "agentId", label = "Agent ID", type = "number", required = true, placeholder = "" },
-                new { key = "token", label = "Token", type = "text", required = true, placeholder = "" },
-                new { key = "encodingAESKey", label = "Encoding AES Key", type = "text", required = true, placeholder = "" },
-                new { key = "callbackPath", label = "Callback Path", type = "text", required = false, placeholder = "/wecom/callback" },
-                new { key = "listenPort", label = "Listen Port", type = "number", required = false, placeholder = "8080" }
-            },
-            ["dingtalk"] = new object[]
-            {
-                new { key = "appKey", label = "App Key", type = "text", required = true, placeholder = "" },
-                new { key = "appSecret", label = "App Secret", type = "password", required = true, placeholder = "" },
-                new { key = "robotCode", label = "Robot Code", type = "text", required = true, placeholder = "" },
-                new { key = "eventMode", label = "Event Mode", type = "text", required = false, placeholder = "stream" },
-                new { key = "callbackPath", label = "Callback Path", type = "text", required = false, placeholder = "/dingtalk/callback" },
-                new { key = "listenPort", label = "Listen Port", type = "number", required = false, placeholder = "8080" }
-            }
-        };
+        // 平台配置字段 schema（数据源：IMProviderRegistry，服务端序列化后注入前端）
+        var imSchemaData = SiliconLife.Common.IM.IMProviderRegistry.GetAll()
+            .ToDictionary(
+                m => m.PlatformId,
+                m => m.ConfigFields.Select(f => (object)new
+                {
+                    key = f.Key,
+                    label = f.Label,
+                    type = f.Type,
+                    required = f.Required,
+                    placeholder = f.Placeholder ?? ""
+                }).ToArray());
         var imSchemaJson = System.Text.Json.JsonSerializer.Serialize(imSchemaData);
         js.Add(() => Js.Const(() => "imPlatformSchemas", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => imSchemaJson))));
+
+        // 平台授权元数据（authModes / needsPublicCallback / 接入帮助，数据源：IMProviderRegistry）
+        var imMetaData = SiliconLife.Common.IM.IMProviderRegistry.GetAll()
+            .ToDictionary(
+                m => m.PlatformId,
+                m => (object)new
+                {
+                    authModes = m.AuthModes,
+                    needsPublicCallback = m.NeedsPublicCallback,
+                    // 帮助文案经本地化解析，未注册时为空串（前端据此隐藏帮助区）
+                    help = ResolveIMHelpText(loc, m.HelpKey),
+                    helpUrl = m.HelpUrl ?? ""
+                });
+        var imMetaJson = System.Text.Json.JsonSerializer.Serialize(imMetaData);
+        js.Add(() => Js.Const(() => "imPlatformMeta", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Str(() => imMetaJson))));
+        js.Add(() => Js.Let(() => "imAuthEventSource", () => Js.Null()));
 
         // renderPlatformFields(platform, container, existingConfig)
         var renderFieldBlock = Js.Block()
@@ -1010,6 +1094,219 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "fields").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "f" }, () => renderFieldBlock)));
         js.Add(() => Js.Func(() => "renderPlatformFields", () => new List<string> { "platform", "container", "existingConfig" }, () => renderPlatformFieldsBlock));
 
+        // renderHelpSection(platform, helpContainer) — 可折叠接入帮助区（帮助文案 + 官方文档链接）
+        var renderHelpSectionBlock = Js.Block()
+            .Add(() => Js.Id(() => "helpContainer").Prop(() => "innerHTML").Assign(() => Js.Str(() => "")))
+            .Add(() => Js.Const(() => "meta", () => Js.Id(() => "imPlatformMeta").Index(() => Js.Id(() => "platform"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "meta").Not().Op(() => "||", () => Js.Id(() => "meta").Prop(() => "help").Not().Op(() => "&&", () => Js.Id(() => "meta").Prop(() => "helpUrl").Not())), new List<JsSyntax>
+                    {
+                        Js.Return(() => Js.Id(() => "undefined"))
+                    })
+                }
+            }))
+            .Add(() => Js.Const(() => "details", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "details"))))
+            .Add(() => Js.Id(() => "details").Prop(() => "className").Assign(() => Js.Str(() => "im-help-details")))
+            .Add(() => Js.Const(() => "summary", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "summary"))))
+            .Add(() => Js.Id(() => "summary").Prop(() => "textContent").Assign(() => Js.Str(() => locIMHelpTitle)))
+            .Add(() => Js.Id(() => "details").Call(() => "appendChild", () => Js.Id(() => "summary")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "meta").Prop(() => "help"), new List<JsSyntax>
+                    {
+                        Js.Const(() => "helpText", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))).Stmt(),
+                        Js.Id(() => "helpText").Prop(() => "className").Assign(() => Js.Str(() => "im-help-text")).Stmt(),
+                        Js.Id(() => "helpText").Prop(() => "textContent").Assign(() => Js.Id(() => "meta").Prop(() => "help")).Stmt(),
+                        Js.Id(() => "details").Call(() => "appendChild", () => Js.Id(() => "helpText")).Stmt()
+                    })
+                }
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "meta").Prop(() => "helpUrl"), new List<JsSyntax>
+                    {
+                        Js.Const(() => "helpLink", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "a"))).Stmt(),
+                        Js.Id(() => "helpLink").Prop(() => "className").Assign(() => Js.Str(() => "im-help-link")).Stmt(),
+                        Js.Id(() => "helpLink").Prop(() => "href").Assign(() => Js.Id(() => "meta").Prop(() => "helpUrl")).Stmt(),
+                        Js.Id(() => "helpLink").Prop(() => "target").Assign(() => Js.Str(() => "_blank")).Stmt(),
+                        Js.Id(() => "helpLink").Prop(() => "rel").Assign(() => Js.Str(() => "noopener")).Stmt(),
+                        Js.Id(() => "helpLink").Prop(() => "textContent").Assign(() => Js.Str(() => locIMHelpOfficialDoc)).Stmt(),
+                        Js.Id(() => "details").Call(() => "appendChild", () => Js.Id(() => "helpLink")).Stmt()
+                    })
+                }
+            }))
+            .Add(() => Js.Id(() => "helpContainer").Call(() => "appendChild", () => Js.Id(() => "details")));
+        js.Add(() => Js.Func(() => "renderHelpSection", () => new List<string> { "platform", "helpContainer" }, () => renderHelpSectionBlock));
+
+        // imAuthStatusText(status, message) — 授权状态本地化文案
+        var imAuthStatusTextBlock = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "status").Op(() => "===", () => Js.Str(() => "success")), new List<JsSyntax>
+                    {
+                        Js.Return(() => Js.Str(() => locIMAuthorized))
+                    })
+                }
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "status").Op(() => "===", () => Js.Str(() => "timeout")), new List<JsSyntax>
+                    {
+                        Js.Return(() => Js.Str(() => locIMAuthTimeout))
+                    })
+                }
+            }))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "status").Op(() => "===", () => Js.Str(() => "pending")), new List<JsSyntax>
+                    {
+                        Js.Return(() => Js.Str(() => locIMWaiting))
+                    })
+                }
+            }))
+            .Add(() => Js.Return(() => Js.Str(() => locIMAuthFailed).Op(() => "+", () => Js.Ternary(() => Js.Id(() => "message"), () => Js.Str(() => ": ").Op(() => "+", () => Js.Id(() => "message")), () => Js.Str(() => "")))));
+        js.Add(() => Js.Func(() => "imAuthStatusText", () => new List<string> { "status", "message" }, () => imAuthStatusTextBlock));
+
+        // imAuthSSEConnect() — 懒创建共享 SSE 连接并监听 im_auth_status 事件（platform 匹配才处理）
+        var imAuthSSEHandlerBlock = Js.Block()
+            .Add(() => Js.Const(() => "d", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "e").Prop(() => "data"))))
+            .Add(() => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".im-platform-item")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "item" }, () => (JsSyntax)Js.Block()
+                .Add(() => Js.Const(() => "sel", () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".im-platform-select"))))
+                .Add(() => Js.Const(() => "statusEl", () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".im-auth-status"))))
+                .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                {
+                    { (Js.Id(() => "sel").Op(() => "&&", () => Js.Id(() => "statusEl")).Op(() => "&&", () => Js.Id(() => "sel").Prop(() => "value").Op(() => "===", () => Js.Id(() => "d").Prop(() => "platform"))), new List<JsSyntax>
+                        {
+                            Js.Id(() => "statusEl").Prop(() => "textContent").Assign(() => Js.Id(() => "imAuthStatusText").Invoke(() => Js.Id(() => "d").Prop(() => "status"), () => Js.Id(() => "d").Prop(() => "message"))).Stmt()
+                        })
+                    }
+                })))));
+        var imAuthSSEConnectBlock = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "imAuthEventSource"), new List<JsSyntax>
+                    {
+                        Js.Return(() => Js.Id(() => "undefined"))
+                    })
+                }
+            }))
+            .Add(() => Js.Assign(() => Js.Id(() => "imAuthEventSource"), () => Js.New(() => Js.Id(() => "EventSource"), () => Js.Str(() => "/api/chat/stream"))))
+            .Add(() => Js.Id(() => "imAuthEventSource").Call(() => "addEventListener", () => Js.Str(() => "im_auth_status"), () => Js.Arrow(() => new List<string> { "e" }, () => (JsSyntax)imAuthSSEHandlerBlock)));
+        js.Add(() => Js.Func(() => "imAuthSSEConnect", () => new List<string> { }, () => imAuthSSEConnectBlock));
+
+        // startImAuth(platform, statusEl) — 发起授权：连 SSE → 置等待 → fetch /im/{platform}/authorize
+        var startImAuthThenBlock = Js.Block()
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "d").Prop(() => "success").Not(), new List<JsSyntax>
+                    {
+                        Js.Id(() => "statusEl").Prop(() => "textContent").Assign(() => Js.Str(() => locIMAuthFailed).Op(() => "+", () => Js.Str(() => ": ")).Op(() => "+", () => Js.Id(() => "d").Prop(() => "message"))).Stmt()
+                    })
+                }
+            }));
+        var startImAuthBlock = Js.Block()
+            .Add(() => Js.Id(() => "imAuthSSEConnect").Invoke().Stmt())
+            .Add(() => Js.Id(() => "statusEl").Prop(() => "textContent").Assign(() => Js.Str(() => locIMWaiting)))
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/im/").Op(() => "+", () => Js.Id(() => "encodeURIComponent").Invoke(() => Js.Id(() => "platform"))).Op(() => "+", () => Js.Str(() => "/authorize")))
+                .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+                .Call(() => "then", () => Js.Arrow(() => new List<string> { "d" }, () => (JsSyntax)startImAuthThenBlock))
+                .Call(() => "catch", () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "statusEl").Prop(() => "textContent").Assign(() => Js.Str(() => locIMAuthFailed)).Stmt())).Stmt());
+        js.Add(() => Js.Func(() => "startImAuth", () => new List<string> { "platform", "statusEl" }, () => startImAuthBlock));
+
+        // 接入方式选项 HTML（服务端拼接，文案经 loc）
+        var authModeOptionsHtml = $"<option value=\"manual\">{locIMManualMode}</option><option value=\"oauth\">{locIMScanMode}</option>";
+
+        // renderAuthSection(platform, authContainer, existingConfig) — 行内授权区
+        var applyImAuthModeBlock = Js.Block()
+            .Add(() => Js.Id(() => "panel").Prop(() => "style").Prop(() => "display").Assign(() => Js.Ternary(() => Js.Id(() => "modeSelect").Prop(() => "value").Op(() => "===", () => Js.Str(() => "oauth")), () => Js.Str(() => "flex"), () => Js.Str(() => "none"))));
+        var renderAuthSectionBlock = Js.Block()
+            .Add(() => Js.Id(() => "authContainer").Prop(() => "innerHTML").Assign(() => Js.Str(() => "")))
+            .Add(() => Js.Const(() => "meta", () => Js.Id(() => "imPlatformMeta").Index(() => Js.Id(() => "platform"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "meta").Not().Op(() => "||", () => Js.Id(() => "meta").Prop(() => "authModes").Call(() => "indexOf", () => Js.Str(() => "oauth")).Op(() => "<", () => Js.Num(() => "0"))), new List<JsSyntax>
+                    {
+                        Js.Return(() => Js.Id(() => "undefined"))
+                    })
+                }
+            }))
+            .Add(() => Js.Const(() => "modeRow", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "modeRow").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-row")))
+            .Add(() => Js.Const(() => "modeLabel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
+            .Add(() => Js.Id(() => "modeLabel").Prop(() => "textContent").Assign(() => Js.Str(() => locIMAuthMode)))
+            .Add(() => Js.Const(() => "modeSelect", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))))
+            .Add(() => Js.Id(() => "modeSelect").Prop(() => "className").Assign(() => Js.Str(() => "im-auth-mode-select")))
+            .Add(() => Js.Id(() => "modeSelect").Call(() => "insertAdjacentHTML", () => Js.Str(() => "beforeend"), () => Js.Str(() => authModeOptionsHtml)))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "existingConfig").Op(() => "&&", () => Js.Id(() => "existingConfig").Prop(() => "authMode")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "modeSelect").Prop(() => "value").Assign(() => Js.Id(() => "existingConfig").Prop(() => "authMode")).Stmt()
+                    })
+                }
+            }))
+            .Add(() => Js.Id(() => "modeRow").Call(() => "appendChild", () => Js.Id(() => "modeLabel")))
+            .Add(() => Js.Id(() => "modeRow").Call(() => "appendChild", () => Js.Id(() => "modeSelect")))
+            .Add(() => Js.Id(() => "authContainer").Call(() => "appendChild", () => Js.Id(() => "modeRow")))
+            .Add(() => Js.Const(() => "panel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "panel").Prop(() => "className").Assign(() => Js.Str(() => "im-oauth-panel")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "meta").Prop(() => "needsPublicCallback"), new List<JsSyntax>
+                    {
+                        Js.Const(() => "rbRow", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))).Stmt(),
+                        Js.Id(() => "rbRow").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-field-row")).Stmt(),
+                        Js.Const(() => "rbLabel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))).Stmt(),
+                        Js.Id(() => "rbLabel").Prop(() => "textContent").Assign(() => Js.Str(() => locIMRedirectBase)).Stmt(),
+                        Js.Const(() => "rbInput", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))).Stmt(),
+                        Js.Id(() => "rbInput").Prop(() => "type").Assign(() => Js.Str(() => "text")).Stmt(),
+                        Js.Id(() => "rbInput").Prop(() => "className").Assign(() => Js.Str(() => "im-redirect-base-url")).Stmt(),
+                        Js.Id(() => "rbInput").Prop(() => "placeholder").Assign(() => Js.Str(() => "https://example.com")).Stmt(),
+                        Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                        {
+                            { (Js.Id(() => "existingConfig").Op(() => "&&", () => Js.Id(() => "existingConfig").Prop(() => "redirectBaseUrl")), new List<JsSyntax>
+                                {
+                                    Js.Id(() => "rbInput").Prop(() => "value").Assign(() => Js.Id(() => "existingConfig").Prop(() => "redirectBaseUrl")).Stmt()
+                                })
+                            }
+                        }),
+                        Js.Id(() => "rbRow").Call(() => "appendChild", () => Js.Id(() => "rbLabel")).Stmt(),
+                        Js.Id(() => "rbRow").Call(() => "appendChild", () => Js.Id(() => "rbInput")).Stmt(),
+                        Js.Id(() => "panel").Call(() => "appendChild", () => Js.Id(() => "rbRow")).Stmt(),
+                        Js.Const(() => "hint", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))).Stmt(),
+                        Js.Id(() => "hint").Prop(() => "className").Assign(() => Js.Str(() => "im-oauth-hint")).Stmt(),
+                        Js.Id(() => "hint").Prop(() => "textContent").Assign(() => Js.Str(() => locIMCallbackHint)).Stmt(),
+                        Js.Id(() => "panel").Call(() => "appendChild", () => Js.Id(() => "hint")).Stmt()
+                    })
+                }
+            }))
+            .Add(() => Js.Const(() => "actionRow", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "actionRow").Prop(() => "className").Assign(() => Js.Str(() => "im-oauth-action-row")))
+            .Add(() => Js.Const(() => "authBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
+            .Add(() => Js.Id(() => "authBtn").Prop(() => "type").Assign(() => Js.Str(() => "button")))
+            .Add(() => Js.Id(() => "authBtn").Prop(() => "textContent").Assign(() => Js.Str(() => locIMScanBtn)))
+            .Add(() => Js.Id(() => "authBtn").Prop(() => "className").Assign(() => Js.Str(() => "btn-im-scan-auth")))
+            .Add(() => Js.Const(() => "authStatus", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "span"))))
+            .Add(() => Js.Id(() => "authStatus").Prop(() => "className").Assign(() => Js.Str(() => "im-auth-status")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "existingConfig").Op(() => "&&", () => Js.Id(() => "existingConfig").Prop(() => "accessToken")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "authStatus").Prop(() => "textContent").Assign(() => Js.Str(() => locIMAuthorized)).Stmt()
+                    })
+                }
+            }))
+            .Add(() => Js.Id(() => "authBtn").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "startImAuth").Invoke(() => Js.Id(() => "platform"), () => Js.Id(() => "authStatus")).Stmt())))
+            .Add(() => Js.Id(() => "actionRow").Call(() => "appendChild", () => Js.Id(() => "authBtn")))
+            .Add(() => Js.Id(() => "actionRow").Call(() => "appendChild", () => Js.Id(() => "authStatus")))
+            .Add(() => Js.Id(() => "panel").Call(() => "appendChild", () => Js.Id(() => "actionRow")))
+            .Add(() => Js.Const(() => "applyAuthMode", () => Js.Arrow(() => new List<string> { }, () => (JsSyntax)applyImAuthModeBlock)))
+            .Add(() => Js.Id(() => "modeSelect").Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Id(() => "applyAuthMode")))
+            .Add(() => Js.Id(() => "applyAuthMode").Invoke().Stmt())
+            .Add(() => Js.Id(() => "authContainer").Call(() => "appendChild", () => Js.Id(() => "panel")));
+        js.Add(() => Js.Func(() => "renderAuthSection", () => new List<string> { "platform", "authContainer", "existingConfig" }, () => renderAuthSectionBlock));
+
         var addIMPlatformRowBlock = Js.Block()
             .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "imPlatformListContainer"))))
             .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
@@ -1019,13 +1316,16 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "header").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-item-header")));
         
         addIMPlatformRowBlock.Add(() => Js.Const(() => "platformLabel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
-            .Add(() => Js.Id(() => "platformLabel").Prop(() => "textContent").Assign(() => Js.Str(() => "平台类型")));
+            .Add(() => Js.Id(() => "platformLabel").Prop(() => "textContent").Assign(() => Js.Str(() => locIMPlatformType)));
         addIMPlatformRowBlock.Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "platformLabel")));
         
         addIMPlatformRowBlock.Add(() => Js.Const(() => "platformSelect", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))))
             .Add(() => Js.Id(() => "platformSelect").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-select")));
         
-        addIMPlatformRowBlock.Add(() => Js.Id(() => "platformSelect").Call(() => "insertAdjacentHTML", () => Js.Str(() => "beforeend"), () => Js.Str(() => "<option value=\"webui\">Web UI</option><option value=\"feishu\">飞书 (Feishu)</option><option value=\"wecom\">企业微信 (WeCom)</option><option value=\"dingtalk\">钉钉 (DingTalk)</option>")));
+        // 平台 select 选项（数据源：IMProviderRegistry）
+        var imPlatformOptionsHtml = string.Join("", SiliconLife.Common.IM.IMProviderRegistry.GetAll()
+            .Select(m => $"<option value=\"{m.PlatformId}\">{m.DisplayName}</option>"));
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "platformSelect").Call(() => "insertAdjacentHTML", () => Js.Str(() => "beforeend"), () => Js.Str(() => imPlatformOptionsHtml)));
         
         addIMPlatformRowBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
         {
@@ -1063,7 +1363,7 @@ public class ConfigView : ViewBase
         }));
         
         addIMPlatformRowBlock.Add(() => Js.Const(() => "enabledLabel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
-            .Add(() => Js.Id(() => "enabledLabel").Prop(() => "textContent").Assign(() => Js.Str(() => "启用")));
+            .Add(() => Js.Id(() => "enabledLabel").Prop(() => "textContent").Assign(() => Js.Str(() => locIMEnabled)));
         
         addIMPlatformRowBlock.Add(() => Js.Id(() => "enabledDiv").Call(() => "appendChild", () => Js.Id(() => "enabledCheckbox")))
             .Add(() => Js.Id(() => "enabledDiv").Call(() => "appendChild", () => Js.Id(() => "enabledLabel")));
@@ -1071,7 +1371,7 @@ public class ConfigView : ViewBase
         addIMPlatformRowBlock.Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "enabledDiv")));
         
         addIMPlatformRowBlock.Add(() => Js.Const(() => "deleteBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
-            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "textContent").Assign(() => Js.Str(() => "删除")))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "textContent").Assign(() => Js.Str(() => locIMDelete)))
             .Add(() => Js.Id(() => "deleteBtn").Prop(() => "className").Assign(() => Js.Str(() => "btn-im-platform-delete")))
             .Add(() => Js.Id(() => "deleteBtn").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "row").Prop(() => "remove").Invoke().Stmt())));
         
@@ -1082,20 +1382,63 @@ public class ConfigView : ViewBase
         addIMPlatformRowBlock.Add(() => Js.Const(() => "content", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Id(() => "content").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-item-content")));
         
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "helpSection", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "helpSection").Prop(() => "className").Assign(() => Js.Str(() => "im-help-section")));
+
         addIMPlatformRowBlock.Add(() => Js.Const(() => "configFields", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
             .Add(() => Js.Id(() => "configFields").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-config-fields")));
 
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "authSection", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "authSection").Prop(() => "className").Assign(() => Js.Str(() => "im-auth-section")));
+
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "content").Call(() => "appendChild", () => Js.Id(() => "helpSection")));
         addIMPlatformRowBlock.Add(() => Js.Id(() => "content").Call(() => "appendChild", () => Js.Id(() => "configFields")));
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "content").Call(() => "appendChild", () => Js.Id(() => "authSection")));
 
         addIMPlatformRowBlock.Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "content")));
         addIMPlatformRowBlock.Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "row")));
 
-        // 平台切换时重新渲染字段
-        addIMPlatformRowBlock.Add(() => Js.Id(() => "platformSelect").Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "renderPlatformFields").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "configFields"), () => Js.Id(() => "null")).Stmt())));
+        // 平台切换时重新渲染帮助区、字段与授权区，并清空暂存 token
+        var platformChangeBlock = Js.Block()
+            .Add(() => Js.Id(() => "renderHelpSection").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "helpSection")).Stmt())
+            .Add(() => Js.Id(() => "renderPlatformFields").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "configFields"), () => Js.Id(() => "null")).Stmt())
+            .Add(() => Js.Id(() => "renderAuthSection").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "authSection"), () => Js.Id(() => "null")).Stmt())
+            .Add(() => Js.Id(() => "row").Prop(() => "dataset").Prop(() => "imTokens").Assign(() => Js.Str(() => "{}")));
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "platformSelect").Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string> { }, () => (JsSyntax)platformChangeBlock)));
 
-        // 初始渲染：解析已有配置并渲染对应字段
+        // 初始渲染：解析已有配置并渲染帮助区、对应字段与授权区
         addIMPlatformRowBlock.Add(() => Js.Const(() => "existingConfig", () => Js.Ternary(() => Js.Id(() => "configJson"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "configJson")), () => Js.Id(() => "null"))));
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "renderHelpSection").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "helpSection")).Stmt());
         addIMPlatformRowBlock.Add(() => Js.Id(() => "renderPlatformFields").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "configFields"), () => Js.Id(() => "existingConfig")).Stmt());
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "renderAuthSection").Invoke(() => Js.Id(() => "platformSelect").Prop(() => "value"), () => Js.Id(() => "authSection"), () => Js.Id(() => "existingConfig")).Stmt());
+
+        // 暂存已有 token 键（重新编辑保存时不丢失）
+        addIMPlatformRowBlock.Add(() => Js.Const(() => "savedTokens", () => Js.Obj()));
+        addIMPlatformRowBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "existingConfig").Op(() => "&&", () => Js.Id(() => "existingConfig").Prop(() => "accessToken")), new List<JsSyntax>
+                {
+                    Js.Id(() => "savedTokens").Prop(() => "accessToken").Assign(() => Js.Id(() => "existingConfig").Prop(() => "accessToken")).Stmt()
+                })
+            }
+        }));
+        addIMPlatformRowBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "existingConfig").Op(() => "&&", () => Js.Id(() => "existingConfig").Prop(() => "refreshToken")), new List<JsSyntax>
+                {
+                    Js.Id(() => "savedTokens").Prop(() => "refreshToken").Assign(() => Js.Id(() => "existingConfig").Prop(() => "refreshToken")).Stmt()
+                })
+            }
+        }));
+        addIMPlatformRowBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "existingConfig").Op(() => "&&", () => Js.Id(() => "existingConfig").Prop(() => "tokenExpiresAt")), new List<JsSyntax>
+                {
+                    Js.Id(() => "savedTokens").Prop(() => "tokenExpiresAt").Assign(() => Js.Id(() => "existingConfig").Prop(() => "tokenExpiresAt")).Stmt()
+                })
+            }
+        }));
+        addIMPlatformRowBlock.Add(() => Js.Id(() => "row").Prop(() => "dataset").Prop(() => "imTokens").Assign(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "savedTokens"))));
 
         js.Add(() => Js.Func(() => "addIMPlatformRow", () => new List<string> { "platform", "enabled", "configJson" }, () => addIMPlatformRowBlock));
 
@@ -1111,6 +1454,28 @@ public class ConfigView : ViewBase
             .Add(() => Js.Const(() => "config", () => Js.Obj()))
             .Add(() => Js.Id(() => "fieldInputs").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "inp" }, () => Js.Block()
                 .Add(() => Js.Id(() => "config").Index(() => Js.Id(() => "inp").Prop(() => "dataset").Prop(() => "key")).Assign(() => Js.Id(() => "inp").Prop(() => "value"))))))
+            // 合并暂存 token 键（accessToken/refreshToken/tokenExpiresAt）
+            .Add(() => Js.Const(() => "savedTokens", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "item").Prop(() => "dataset").Prop(() => "imTokens").Op(() => "||", () => Js.Str(() => "{}")))))
+            .Add(() => Js.Id(() => "Object").Prop(() => "keys").Invoke(() => Js.Id(() => "savedTokens")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "k" }, () => Js.Id(() => "config").Index(() => Js.Id(() => "k")).Assign(() => Js.Id(() => "savedTokens").Index(() => Js.Id(() => "k"))).Stmt())))
+            // 收集接入方式与回调基础地址（仅含 oauth 的平台才有这些控件）
+            .Add(() => Js.Const(() => "authSel", () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".im-auth-mode-select"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "authSel"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "config").Index(() => Js.Str(() => "authMode")).Assign(() => Js.Id(() => "authSel").Prop(() => "value")).Stmt()
+                    })
+                }
+            }))
+            .Add(() => Js.Const(() => "rbInput", () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".im-redirect-base-url"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "rbInput").Op(() => "&&", () => Js.Id(() => "rbInput").Prop(() => "value")), new List<JsSyntax>
+                    {
+                        Js.Id(() => "config").Index(() => Js.Str(() => "redirectBaseUrl")).Assign(() => Js.Id(() => "rbInput").Prop(() => "value")).Stmt()
+                    })
+                }
+            }))
             .Add(() => Js.Id(() => "platforms").Call(() => "push", () => Js.Obj()
                 .Prop(() => "platform", () => Js.Id(() => "select").Prop(() => "value"))
                 .Prop(() => "enabled", () => Js.Id(() => "checkbox").Prop(() => "checked"))

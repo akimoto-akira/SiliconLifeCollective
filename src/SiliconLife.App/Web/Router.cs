@@ -172,6 +172,10 @@ public class Router
         RegisterController(() => new ToolPermissionController(), "/api/beings/tool-permissions/apply-template", "POST");
         RegisterController(() => new ToolPermissionController(), "/api/projects/{id}/tool-permissions");
         RegisterController(() => new ToolPermissionController(), "/api/projects/{id}/tool-permissions", "PUT");
+        // IM OAuth 授权向导（本地优先扫码/OAuth 授权）
+        RegisterController(() => new ImOAuthController(), "/im/{platform}/authorize");
+        RegisterController(() => new ImOAuthController(), "/im/{platform}/callback");
+        RegisterController(() => new ImOAuthController(), "/im/{platform}/status");
     }
 
     /// <summary>Sets the callback invoked when first-run initialization completes.</summary>

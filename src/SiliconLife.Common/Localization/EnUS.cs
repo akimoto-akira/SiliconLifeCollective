@@ -866,7 +866,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Runtime"] = "Runtime Settings",
         ["AI"] = "AI Settings",
         ["Web"] = "Web Settings",
-        ["User"] = "User Settings"
+        ["User"] = "User Settings",
+        ["IM"] = "IM Configuration"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1010,7 +1011,28 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Web Port",
         ["WebSkin"] = "Web Skin",
         ["UserNickname"] = "User Nickname",
-        ["PluginDirectories"] = "Plugin Directories"
+        ["PluginDirectories"] = "Plugin Directories",
+        ["IMPlatforms"] = "IM Platforms",
+        ["IMAddPlatform"] = "Add Platform",
+        ["IMPlatformType"] = "Platform Type",
+        ["IMEnabledLabel"] = "Enabled",
+        ["IMDeleteLabel"] = "Delete",
+        ["IMAuthModeLabel"] = "Auth Mode",
+        ["IMManualMode"] = "Manual Credentials",
+        ["IMScanMode"] = "Scan Authorization",
+        ["IMScanAuthorizeBtn"] = "Authorize by Scan",
+        ["IMWaitingAuth"] = "Waiting for authorization…",
+        ["IMAuthorizedStatus"] = "Authorized",
+        ["IMAuthFailedStatus"] = "Authorization Failed",
+        ["IMAuthTimeoutStatus"] = "Authorization Timed Out",
+        ["IMRedirectBaseUrlLabel"] = "Callback Base URL",
+        ["IMPublicCallbackHint"] = "This platform requires a public HTTPS callback for first-time authorization; configure a tunnel or public address first",
+        ["IMHelpTitle"] = "Setup Guide",
+        ["IMHelpOfficialDoc"] = "Official Docs",
+        ["IMHelp_webui"] = "Built-in browser chat interface served directly by this application. No external credentials are required — just enable it and chat from the web page.",
+        ["IMHelp_feishu"] = "Create a custom app on the Feishu Open Platform, enable the bot capability and publish a release. Copy App ID and App Secret from 'Credentials & Basic Info', and Verification Token / Encrypt Key from 'Event Subscriptions'. Point the event subscription request URL to this app's callback path; Feishu allows localhost callbacks, so no public address is needed for local testing.",
+        ["IMHelp_wecom"] = "Create a self-built app in the WeCom admin console (Apps → Create App). Fill in the Corp ID (My Company → Company Info), the app's Agent ID and App Secret, plus the Token and Encoding AES Key generated when configuring the 'message receiving server'. The callback URL must be a publicly reachable HTTPS address pointing to this app's callback path, and the server IP may need to be added to the trusted IP list.",
+        ["IMHelp_dingtalk"] = "Create an internal enterprise app with a robot on the DingTalk Open Platform. Fill in the App Key, App Secret and Robot Code from the app's credentials page. Stream mode (default) receives messages over a WebSocket connection and needs no public address; HTTP callback mode requires a publicly reachable HTTPS callback URL."
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1072,7 +1094,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Web server port",
         ["WebSkin"] = "Web skin name",
         ["UserNickname"] = "Nickname of the human user",
-        ["PluginDirectories"] = "List of plugin directories for auto-discovery, supports relative or absolute paths"
+        ["PluginDirectories"] = "List of plugin directories for auto-discovery, supports relative or absolute paths",
+        ["IMPlatforms"] = "Configure connected IM platforms; add multiple, via manual credentials or scan authorization"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

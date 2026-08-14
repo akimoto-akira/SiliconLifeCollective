@@ -866,7 +866,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Runtime"] = "런타임 설정",
         ["AI"] = "AI 설정",
         ["Web"] = "Web 설정",
-        ["User"] = "사용자 설정"
+        ["User"] = "사용자 설정",
+        ["IM"] = "IM 설정"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1010,7 +1011,28 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Web 포트",
         ["WebSkin"] = "Web 스킨",
         ["UserNickname"] = "사용자 닉네임",
-        ["PluginDirectories"] = "플러그인 디렉터리"
+        ["PluginDirectories"] = "플러그인 디렉터리",
+        ["IMPlatforms"] = "IM 플랫폼 목록",
+        ["IMAddPlatform"] = "플랫폼 추가",
+        ["IMPlatformType"] = "플랫폼 유형",
+        ["IMEnabledLabel"] = "사용",
+        ["IMDeleteLabel"] = "삭제",
+        ["IMAuthModeLabel"] = "연결 방식",
+        ["IMManualMode"] = "자격 증명 직접 입력",
+        ["IMScanMode"] = "QR 코드 인증",
+        ["IMScanAuthorizeBtn"] = "QR 코드로 인증",
+        ["IMWaitingAuth"] = "인증 대기 중…",
+        ["IMAuthorizedStatus"] = "인증됨",
+        ["IMAuthFailedStatus"] = "인증 실패",
+        ["IMAuthTimeoutStatus"] = "인증 시간 초과",
+        ["IMRedirectBaseUrlLabel"] = "콜백 기본 URL",
+        ["IMPublicCallbackHint"] = "이 플랫폼의 최초 인증에는 공용 HTTPS 콜백이 필요합니다. 먼저 터널 또는 공용 주소를 설정하세요",
+        ["IMHelpTitle"] = "설정 가이드",
+        ["IMHelpOfficialDoc"] = "공식 문서",
+        ["IMHelp_webui"] = "이 애플리케이션이 직접 제공하는 브라우저 내장 채팅 인터페이스입니다. 외부 자격 증명이 필요 없으며, 활성화만 하면 웹 페이지에서 바로 채팅할 수 있습니다.",
+        ["IMHelp_feishu"] = "Feishu Open Platform에서 커스텀 앱을 만들고 봇 기능을 활성화한 뒤 릴리스를 게시하세요. 'Credentials & Basic Info'에서 App ID와 App Secret을, 'Event Subscriptions'에서 Verification Token / Encrypt Key를 복사하세요. 이벤트 구독 요청 URL을 이 앱의 콜백 경로로 지정하세요. Feishu는 localhost 콜백을 허용하므로 로컬 테스트에는 공용 주소가 필요하지 않습니다.",
+        ["IMHelp_wecom"] = "WeCom 관리 콘솔에서 자체 개발 앱을 만드세요(앱 → 앱 만들기). Corp ID(내 회사 → 회사 정보), 앱의 Agent ID와 App Secret, 그리고 '메시지 수신 서버' 구성 시 생성된 Token과 Encoding AES Key를 입력하세요. 콜백 URL은 이 앱의 콜백 경로를 가리키는 공개적으로 접근 가능한 HTTPS 주소여야 하며, 서버 IP를 신뢰할 수 있는 IP 목록에 추가해야 할 수 있습니다.",
+        ["IMHelp_dingtalk"] = "DingTalk Open Platform에서 로봇이 포함된 기업 내부 앱을 만드세요. 앱 자격 증명 페이지의 App Key, App Secret, Robot Code를 입력하세요. Stream 모드(기본값)는 WebSocket 연결로 메시지를 수신하며 공용 주소가 필요 없습니다. HTTP 콜백 모드는 공개적으로 접근 가능한 HTTPS 콜백 URL이 필요합니다."
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1072,7 +1094,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebPort"] = "Web 서버 포트",
         ["WebSkin"] = "Web 스킨 이름",
         ["UserNickname"] = "사용자 닉네임",
-        ["PluginDirectories"] = "플러그인 자동 감지 디렉터리 목록, 상대 경로 또는 절대 경로 지원"
+        ["PluginDirectories"] = "플러그인 자동 감지 디렉터리 목록, 상대 경로 또는 절대 경로 지원",
+        ["IMPlatforms"] = "연동할 IM 플랫폼을 설정합니다. 여러 개 추가 가능하며, 자격 증명 직접 입력 또는 QR 코드 인증을 지원합니다"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
