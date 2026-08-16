@@ -26,8 +26,8 @@ public class ErnieClientFactory : IAIClientFactory, IAIClientFactoryHelp
 
     private static readonly string[] ModelIds =
     [
-        "ernie-5.1", "ernie-4.0-turbo-8k", "ernie-4.0-8k", "ernie-3.5-8k",
-        "ernie-3.5-128k", "ernie-speed-128k", "ernie-speed-8k", "ernie-tiny-8k",
+        "glm-5.2", "glm-5.1", "deepseek-v4-pro", "deepseek-v4-flash",
+        "kimi-k2.6", "ernie-5.1", "qianfan-code-latest",
     ];
 
     public IAIClient CreateClient(Dictionary<string, object> config)

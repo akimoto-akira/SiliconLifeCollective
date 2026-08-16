@@ -79,7 +79,7 @@ public class ErnieClient : IAIClient
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly string _apiKey;
 
-    public const int MaxContextWindowTokens = 131072;
+    public const int MaxContextWindowTokens = 1048576;
 
     public string Endpoint { get; }
     public string DefaultModel { get; }
@@ -125,7 +125,12 @@ public class ErnieClient : IAIClient
     {
         if (string.IsNullOrEmpty(modelName)) return null;
         string lower = modelName.ToLowerInvariant();
+        if (lower.Contains("glm-5.2")) return 1048576;
+        if (lower.Contains("deepseek-v4")) return 1048576;
+        if (lower.Contains("glm-5.1")) return 131072;
+        if (lower.Contains("kimi-k2.6")) return 131072;
         if (lower.Contains("ernie-5")) return 131072;
+        if (lower.Contains("qianfan-code-latest")) return null;
         if (lower.Contains("ernie-3.5-128k") || lower.Contains("ernie-speed-128k")) return 131072;
         if (lower.Contains("ernie-4") || lower.Contains("ernie-3.5") || lower.Contains("ernie-speed") || lower.Contains("ernie-tiny")) return 8192;
         return null;
@@ -135,6 +140,10 @@ public class ErnieClient : IAIClient
     {
         if (string.IsNullOrEmpty(modelName)) return null;
         string lower = modelName.ToLowerInvariant();
+        if (lower.Contains("kimi-k2.6")) return true;
+        if (lower.Contains("deepseek-v4-pro")) return true;
+        if (lower.Contains("glm-5")) return true;
+        if (lower.Contains("deepseek-v4-flash")) return false;
         if (lower.Contains("ernie-5")) return true;
         if (lower.StartsWith("ernie-4") || lower.StartsWith("ernie-3") || lower.StartsWith("ernie-speed") || lower.StartsWith("ernie-tiny")) return false;
         return null;
