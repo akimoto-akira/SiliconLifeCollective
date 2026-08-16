@@ -357,6 +357,30 @@ public override string MemoryPageHeader => "Просмотр памяти";
     public override string ProjectWorkNotesPageHeader => "Рабочие заметки проекта";
     public override string ProjectWorkNotesEmptyState => "В этом проекте нет рабочих заметок";
     public override string ProjectWorkNotesTotalPages => "Всего {0} страниц";
+    public override string PageTitleSkills => "Управление навыками";
+    public override string SkillsPageHeader => "Навыки";
+    public override string SkillsPageSubtitle => "Навыки = переиспользуемая оркестрация инструментов + шаблоны промптов (Markdown; метаданные в YAML front matter)";
+    public override string SkillsStatFormat => "{0} навык(ов) · пользовательских {1}/{2}";
+    public override string SkillsEmptyState => "Пока нет навыков";
+    public override string SkillsBackToBeings => "← Вернуться к существам";
+    public override string SkillBtnNew => "Новый навык";
+    public override string SkillBtnImportMd => "Импорт Markdown";
+    public override string SkillBtnImportJson => "Импорт JSON";
+    public override string SkillBtnRefresh => "Обновить";
+    public override string SkillBtnEdit => "Изменить";
+    public override string SkillBtnTest => "Тест";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "Удалить";
+    public override string SkillCurrentEditingFormat => "Редактирование: {0}";
+    public override string SkillNewSkillLabel => "Новый навык (не сохранён)";
+    public override string SkillConfirmDeleteFormat => "Удалить навык {0}?";
+    public override string SkillPromptImportMd => "Вставьте Markdown навыка (YAML front matter + тело; недостающие метаданные будут дополнены автоматически)";
+    public override string SkillPromptImportJson => "Вставьте JSON SkillDefinition";
+    public override string SkillPromptTestParams => "Введите JSON тестовых параметров (например {\"source\": \"...\"}) или оставьте пустым";
+    public override string SkillTestResultPrefix => "Результат: ";
+    public override string SkillLoadFailedFormat => "Не удалось загрузить: {0}";
+    public override string SkillRequestFailed => "Ошибка запроса";
 
     public override string TasksPageHeader => "Управление задачами";
     public override string TasksEmptyState => "Нет задач";
@@ -540,7 +564,8 @@ public override string MemoryPageHeader => "Просмотр памяти";
         ["AI"] = "Настройки ИИ",
         ["Web"] = "Веб-настройки",
         ["User"] = "Пользовательские настройки",
-        ["IM"] = "Настройки IM"
+        ["IM"] = "Настройки IM",
+        ["Skill"] = "Настройки навыков"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -655,14 +680,13 @@ public override string MemoryPageHeader => "Просмотр памяти";
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (низкая задержка)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (агент SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (открытый агент, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (флагман, 128K, мультимодальная)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, экономичная)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, эконом)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, длинный контекст)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, бесплатно)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, бесплатно) — рекомендуется для отладки",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, бесплатно)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M контекста, лидер в длинных задачах)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (улучшенное кодирование, инженерные результаты)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (миллион контекста, лидер в Agent/рассуждениях)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (эффективный лёгкий, миллион контекста)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (длинный код, ввод текста/изображений)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (последний Wenxin, агент/рассуждения обновлены)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (управляется консолью)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) — рекомендуется",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, агент)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (бесплатно, 256K)",
@@ -705,7 +729,11 @@ public override string MemoryPageHeader => "Просмотр памяти";
         ["IMHelp_webui"] = "Встроенный браузерный чат-интерфейс, предоставляемый непосредственно этим приложением. Внешние учётные данные не требуются — просто включите его и общайтесь с веб-страницы.",
         ["IMHelp_feishu"] = "Создайте собственное приложение на Feishu Open Platform, включите функцию бота и опубликуйте релиз. Скопируйте App ID и App Secret из раздела 'Credentials & Basic Info', а Verification Token / Encrypt Key — из раздела 'Event Subscriptions'. Направьте URL запросов подписки на события на путь обратного вызова этого приложения; Feishu разрешает колбэки на localhost, поэтому для локального тестирования публичный адрес не нужен.",
         ["IMHelp_wecom"] = "Создайте самостоятельно разработанное приложение в консоли администратора WeCom (Apps → Create App). Укажите Corp ID (My Company → Company Info), Agent ID и App Secret приложения, а также Token и Encoding AES Key, сгенерированные при настройке 'сервера приёма сообщений'. URL обратного вызова должен быть публично доступным HTTPS-адресом, указывающим на путь обратного вызова этого приложения; возможно, потребуется добавить IP сервера в список доверенных IP.",
-        ["IMHelp_dingtalk"] = "Создайте внутреннее корпоративное приложение с роботом на DingTalk Open Platform. Укажите App Key, App Secret и Robot Code со страницы учётных данных приложения. Режим Stream (по умолчанию) получает сообщения через WebSocket-соединение и не требует публичного адреса; режим HTTP-колбэка требует публично доступного HTTPS URL обратного вызова."
+        ["IMHelp_dingtalk"] = "Создайте внутреннее корпоративное приложение с роботом на DingTalk Open Platform. Укажите App Key, App Secret и Robot Code со страницы учётных данных приложения. Режим Stream (по умолчанию) получает сообщения через WebSocket-соединение и не требует публичного адреса; режим HTTP-колбэка требует публично доступного HTTPS URL обратного вызова.",
+        ["SkillEnabled"] = "Включить навыки",
+        ["GlobalMaxToolRound"] = "Макс. число раундов вызова инструментов (глобально)",
+        ["GlobalSkillTimeoutSeconds"] = "Глобальный тайм-аут навыков (с)",
+        ["MaxCustomSkillsPerBeing"] = "Макс. число пользовательских навыков на Silicon Being"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -768,7 +796,11 @@ public override string MemoryPageHeader => "Просмотр памяти";
         ["WebSkin"] = "Имя темы веб-интерфейса",
         ["UserNickname"] = "Никнейм пользователя-человека",
         ["PluginDirectories"] = "Список каталогов плагинов для автообнаружения; поддерживаются относительные и абсолютные пути",
-        ["IMPlatforms"] = "Настройка подключённых IM-платформ; можно добавить несколько, через ручной ввод учётных данных или авторизацию по QR-коду"
+        ["IMPlatforms"] = "Настройка подключённых IM-платформ; можно добавить несколько, через ручной ввод учётных данных или авторизацию по QR-коду",
+        ["SkillEnabled"] = "Включить систему навыков (регистрация навыков, диспетчеризация ИИ и автоматические триггеры)",
+        ["GlobalMaxToolRound"] = "Верхний предел раундов вызова инструментов на одно выполнение навыка",
+        ["GlobalSkillTimeoutSeconds"] = "Верхний предел длительности выполнения навыка в секундах",
+        ["MaxCustomSkillsPerBeing"] = "Максимальное число пользовательских (невстроенных) навыков, которые может иметь каждый Silicon Being"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -796,7 +828,15 @@ public override string MemoryPageHeader => "Просмотр памяти";
         _ => logLevel.ToString()
     };
 
-    public override string GetToolDisplayName(string toolName) => toolName;
+    // ===== Tool Display Name Localization =====
+
+    private static readonly Dictionary<string, string> ToolDisplayNames = new()
+    {
+        ["skill"] = "Навык"
+    };
+
+    public override string GetToolDisplayName(string toolName) =>
+        ToolDisplayNames.GetValueOrDefault(toolName, toolName);
 
     public override string DefaultCuratorSoul => @"Ты — Куратор Silicon Life Collective.
 Ты являешься первым Silicon Being в этом коллективе.

@@ -108,6 +108,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
     /// <param name="deltaTime">Time elapsed since the last tick</param>
     public override void Tick(TimeSpan deltaTime)
     {
+        // 0. Hot-reload skills from storage (rate-limited internally)
+        if (SkillManager != null && Storage != null && SkillManager.SkillEnabled)
+        {
+            SkillManager.RefreshFromStorage(Storage);
+            SkillManager.SyncAutoSkillTickObjects(this);
+        }
+
         // 1. Check if AI config has changed (external disturbance - resets error count)
         if (CheckAndRebuildAIClient())
         {

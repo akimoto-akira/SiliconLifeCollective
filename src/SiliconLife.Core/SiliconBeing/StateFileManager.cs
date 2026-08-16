@@ -36,6 +36,13 @@ public static class StateFileManager
         /// null or empty means all actions are allowed (backward compatible).
         /// </summary>
         public ToolActionPermissionConfig? ToolActionPermissions { get; set; }
+
+        /// <summary>
+        /// Custom (being/user-created) skills persisted in the being state.
+        /// The skills/ directory is the primary storage; this field provides a
+        /// migration path from states written before the skill system existed.
+        /// </summary>
+        public List<SkillDefinition>? CustomSkills { get; set; }
     }
 
     /// <summary>

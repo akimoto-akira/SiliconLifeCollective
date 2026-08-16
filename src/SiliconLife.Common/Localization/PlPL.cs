@@ -496,6 +496,33 @@ public override string AboutFailedPluginListLabel => "Wtyczki z błędem ładowa
     public override string ProjectWorkNotesEmptyState => "Brak notatek roboczych dla tego projektu";
     public override string ProjectWorkNotesTotalPages => "Łącznie stron: {0}";
 
+    // ===== Skills Page Localization =====
+
+    public override string PageTitleSkills => "Zarządzanie umiejętnościami";
+    public override string SkillsPageHeader => "Umiejętności";
+    public override string SkillsPageSubtitle => "Umiejętności = orkiestracja narzędzi wielokrotnego użytku + szablony promptów (Markdown; metadane w front matter YAML)";
+    public override string SkillsStatFormat => "{0} umiejętności · własne {1}/{2}";
+    public override string SkillsEmptyState => "Brak umiejętności";
+    public override string SkillsBackToBeings => "← Wróć do beings";
+    public override string SkillBtnNew => "Nowa umiejętność";
+    public override string SkillBtnImportMd => "Importuj Markdown";
+    public override string SkillBtnImportJson => "Importuj JSON";
+    public override string SkillBtnRefresh => "Odśwież";
+    public override string SkillBtnEdit => "Edytuj";
+    public override string SkillBtnTest => "Testuj";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "Usuń";
+    public override string SkillCurrentEditingFormat => "Edytowanie: {0}";
+    public override string SkillNewSkillLabel => "Nowa umiejętność (niezapisana)";
+    public override string SkillConfirmDeleteFormat => "Usunąć umiejętność {0}?";
+    public override string SkillPromptImportMd => "Wklej Markdown umiejętności (front matter YAML + treść; brakujące metadane zostaną uzupełnione automatycznie)";
+    public override string SkillPromptImportJson => "Wklej JSON SkillDefinition";
+    public override string SkillPromptTestParams => "Wprowadź JSON parametrów testu (np. {\"source\": \"...\"}), pozostaw puste, aby pominąć";
+    public override string SkillTestResultPrefix => "Wynik: ";
+    public override string SkillLoadFailedFormat => "Nie udało się załadować: {0}";
+    public override string SkillRequestFailed => "Nie udało się wykonać żądania";
+
     // ===== Executor =====
     public override string ExecutorPageHeader => "Wykonawca";
 
@@ -625,7 +652,8 @@ public override string AboutFailedPluginListLabel => "Wtyczki z błędem ładowa
         ["AI"] = "Ustawienia AI",
         ["Web"] = "Ustawienia webowe",
         ["User"] = "Ustawienia użytkownika",
-        ["IM"] = "Konfiguracja IM"
+        ["IM"] = "Konfiguracja IM",
+        ["Skill"] = "Konfiguracja umiejętności"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -740,14 +768,13 @@ public override string AboutFailedPluginListLabel => "Wtyczki z błędem ładowa
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (niskie opóźnienie)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (agent open-source, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (flagowy, 128K, multimodalny)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, ekonomiczny)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, oszczędny)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, długi kontekst)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, darmowy)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, darmowy) — zalecany do debugowania",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, darmowy)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M kontekstu, lider w długich zadaniach)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (ulepszony kod, wyniki inżynierskie)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (milion kontekstu, lider w Agent/wnioskowaniu)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (efektywny lekki, milion kontekstu)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (długi kod, wejście tekst/obraz)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (najnowszy Wenxin, agent/wnioskowanie ulepszone)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (kontrolowany przez konsolę)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) — zalecany",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (darmowy, 256K)",
@@ -790,7 +817,11 @@ public override string AboutFailedPluginListLabel => "Wtyczki z błędem ładowa
         ["IMHelp_webui"] = "Wbudowany interfejs czatu w przeglądarce udostępniany bezpośrednio przez tę aplikację. Nie są wymagane żadne zewnętrzne dane uwierzytelniające — wystarczy go włączyć i rozmawiać ze strony internetowej.",
         ["IMHelp_feishu"] = "Utwórz własną aplikację na Feishu Open Platform, włącz funkcję bota i opublikuj wydanie. Skopiuj App ID i App Secret z sekcji 'Credentials & Basic Info' oraz Verification Token / Encrypt Key z sekcji 'Event Subscriptions'. Skieruj URL żądań subskrypcji zdarzeń na ścieżkę wywołania zwrotnego tej aplikacji; Feishu dopuszcza wywołania zwrotne na localhost, więc do testów lokalnych nie jest potrzebny adres publiczny.",
         ["IMHelp_wecom"] = "Utwórz samodzielnie zbudowaną aplikację w konsoli administracyjnej WeCom (Apps → Create App). Wprowadź Corp ID (My Company → Company Info), Agent ID i App Secret aplikacji, a także Token i Encoding AES Key wygenerowane podczas konfiguracji 'serwera odbierania wiadomości'. URL wywołania zwrotnego musi być publicznie dostępnym adresem HTTPS wskazującym na ścieżkę wywołania zwrotnego tej aplikacji, a IP serwera może wymagać dodania do listy zaufanych adresów IP.",
-        ["IMHelp_dingtalk"] = "Utwórz wewnętrzną aplikację firmową z robotem na DingTalk Open Platform. Wprowadź App Key, App Secret i Robot Code ze strony danych uwierzytelniających aplikacji. Tryb Stream (domyślny) odbiera wiadomości przez połączenie WebSocket i nie wymaga adresu publicznego; tryb wywołania zwrotnego HTTP wymaga publicznie dostępnego adresu URL wywołania zwrotnego HTTPS."
+        ["IMHelp_dingtalk"] = "Utwórz wewnętrzną aplikację firmową z robotem na DingTalk Open Platform. Wprowadź App Key, App Secret i Robot Code ze strony danych uwierzytelniających aplikacji. Tryb Stream (domyślny) odbiera wiadomości przez połączenie WebSocket i nie wymaga adresu publicznego; tryb wywołania zwrotnego HTTP wymaga publicznie dostępnego adresu URL wywołania zwrotnego HTTPS.",
+        ["SkillEnabled"] = "Włącz umiejętności",
+        ["GlobalMaxToolRound"] = "Globalny limit rund narzędzi",
+        ["GlobalSkillTimeoutSeconds"] = "Globalny limit czasu umiejętności (s)",
+        ["MaxCustomSkillsPerBeing"] = "Maks. umiejętności niestandardowych na byt"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -853,7 +884,11 @@ public override string AboutFailedPluginListLabel => "Wtyczki z błędem ładowa
         ["WebSkin"] = "Nazwa skórki webowej",
         ["UserNickname"] = "Pseudonim użytkownika (człowieka)",
         ["PluginDirectories"] = "Lista katalogów wtyczek do automatycznego wykrywania; obsługuje ścieżki względne i bezwzględne",
-        ["IMPlatforms"] = "Konfiguracja podłączonych platform IM; można dodać wiele, przez ręczne dane uwierzytelniające lub autoryzację przez skanowanie"
+        ["IMPlatforms"] = "Konfiguracja podłączonych platform IM; można dodać wiele, przez ręczne dane uwierzytelniające lub autoryzację przez skanowanie",
+        ["SkillEnabled"] = "Włącza system umiejętności (rejestracja umiejętności, przydzielanie przez AI i wyzwalacze automatyczne)",
+        ["GlobalMaxToolRound"] = "Górny limit rund wywołań narzędzi na każde wykonanie umiejętności",
+        ["GlobalSkillTimeoutSeconds"] = "Górny limit czasu trwania wykonania umiejętności w sekundach",
+        ["MaxCustomSkillsPerBeing"] = "Maksymalna liczba niestandardowych (niewbudowanych) umiejętności, które może posiadać każdy byt krzemowy"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -894,7 +929,8 @@ public override string AboutFailedPluginListLabel => "Wtyczki z błędem ładowa
         ["project"] = "Projekt",
         ["project_task"] = "Zadanie projektu",
         ["project_work_note"] = "Notatka robocza projektu",
-        ["webview_browser"] = "Przeglądarka WebView"
+        ["webview_browser"] = "Przeglądarka WebView",
+        ["skill"] = "Umiejętność"
     };
 
     public override string GetToolDisplayName(string toolName) =>

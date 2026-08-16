@@ -52,6 +52,7 @@ public class HelpLocalizationPlPL : HelpLocalizationBase
   public override string WorkNotes_Title => "Notatki Pracy";
   public override string Projects_Title => "Zarządzanie Projektami";
   public override string Logging_Title => "System Logowania";
+  public override string Skills_Title => "Umiejętności";
 
   public override string[] GettingStarted_Tags => new[]
   {
@@ -158,7 +159,7 @@ public class HelpLocalizationPlPL : HelpLocalizationBase
     "system logowania", "log", "zapisy", "debug", "błąd", "ostrzeżenie", "monitor", "śledzenie", "konsola",
     "plik"
   };
-
+  public override string[] Skills_Tags => new[] { "umiejętności", "skill", "orkiestracja", "prompt", "automatyzacja", "plugin", "niestandardowe" };
   public override string GettingStarted => @"
 # Szybki start
 
@@ -3371,7 +3372,7 @@ Baidu ERNIE to seria dużych modeli językowych firmy Baidu, dostępna przez pla
 
 ### Krok 1: Rejestracja w Baidu Cloud
 
-1. Odwiedź `https://qianfan.cloud.baidu.com`
+1. Odwiedź `https://cloud.baidu.com/product-s/qianfan_home`
 2. Zaloguj się kontem Baidu
 3. Przejdź weryfikację tożsamości
 
@@ -3389,28 +3390,19 @@ Na platformie Qianfan przejdź do **Zarządzanie modelami** i aktywuj modele, kt
 
 ## Dostępne modele
 
-- **ernie-4.5-turbo-128k**: model flagowy (kontekst 128K)
-- **ernie-4.0-turbo-8k**: model Turbo (kontekst 8K)
-- **ernie-4.0-turbo-8k-latest**: najnowszy Turbo (kontekst 8K)
-- **ernie-speed-pro-128k**: model Speed Pro (kontekst 128K)
-- **ernie-speed-128k**: model Speed (kontekst 128K)
-- **ernie-speed-8k**: model Speed (kontekst 8K)
-- **ernie-lite-pro-128k**: model Lite Pro (kontekst 128K)
-- **ernie-lite-8k**: model Lite (kontekst 8K)
+- **GLM-5.2**: Obsługuje naprawdę użyteczny kontekst 1M, nadal prowadzi w długoterminowych zadaniach
+- **GLM-5.1**: Znacznie wzmocnione możliwości kodowania, znacząca poprawa w długoterminowych zadaniach, dostarcza wyników na poziomie inżynieryjnym
+- **DeepSeek-V4-Pro**: Obsługuje kontekst ultra-długi na poziomie milionów, prowadzi w możliwościach agenta, wiedzy o świecie i wydajności rozumowania, zarówno krajowo, jak i w dziedzinie open source
+- **DeepSeek-V4-Flash**: Efektywny lekki model obsługujący kontekst ultra-długi na poziomie milionów
+- **Kimi-K2.6**: Silniejsza i bardziej stabilna zdolność pisania kodu długoterminowego, obsługuje zarówno wprowadzanie tekstu, jak i obrazu
+- **ERNIE-5.1**: Najnowszy model serii Wenxin, kompleksowo ulepszone podstawowe możliwości, znaczące poprawy w agentach, wiedzy, rozumowaniu i głębokim wyszukiwaniu
+- **qianfan-code-latest**: Wybór modelu jest określany przez konsolę Qianfan
 
-## Konfiguracja w Silicon Life
-
-1. Wybierz **Baidu ERNIE** jako typ klienta AI
+1. Wybierz **Baidu Qianfan** jako typ klienta AI
 2. Ustaw **Klucz API** na swój klucz API Qianfan
-3. Ustaw **Model** na nazwę aktywowanego modelu ERNIE
+3. Ustaw **Model** na nazwę aktywowanego modelu Qianfan
 4. Ustaw **Punkt końcowy** na adres API Qianfan (pozostaw puste dla wartości domyślnej)
 5. Pozostaw **Okno kontekstu Tokens** puste dla automatycznego wykrywania
-
-## Model rozliczeń
-
-- Serie ERNIE Speed i Lite posiadają darmowe limity
-- Modele płatne rozliczane według zużycia
-- Szczegóły na `https://qianfan.cloud.baidu.com/pricing`
 
 ## Częste pytania
 
@@ -4639,5 +4631,143 @@ System nie rejestruje w logach następujących informacji wrażliwych:
 - Przy dużej ilości zapisywanych logów zaleca się odpowiednie podniesienie poziomu logowania
 ";
 
-    #endregion
+    
+  public override string Skills => @"
+# Umiejetnosci
+
+## Czym jest umiejetnosc?
+
+Umiejetnosc (Skill) to wielokrotnie uzyteczna jednostka zdolnosci, ktora hermetyzuje orkiestracje narzedzi i szablony promptow. Reprezentuje konkretna ""zdolnosc"" bytu krzemowego i moze byc wywolywana automatycznie przez AI (function calling) lub aktywowana jawnie przez uzytkownika/kuratora.
+
+**Umiejetnosc vs Narzedzie:**
+- **Narzedzie (Tool)**: pojedyncza operacja atomowa (np. odczyt pliku, wyszukiwanie web) — jedno wywolanie wykonuje jedno zadanie
+- **Umiejetnosc (Skill)**: orkiestracja wieloetapowa + szablon promptu systemowego. Koordynuje wiele narzedzi do wykonywania zlozonych zadan
+
+## Zrodla umiejetnosci
+
+System obsluguje 4 zrodla umiejetnosci:
+
+| Zrodlo | Opis | Przyklad |
+|--------|------|----------|
+| Wbudowana (Builtin) | Zintegrowana w frameworku, niemodyfikowalna | Funkcje systemowe |
+| Plugin | Zarejestrowana przez interfejs `ISkillProvider` | Rozszerzenia stron trzecich |
+| Utworzona przez byt (Being) | Utworzona przez byt krzemowy w czasie wykonywania | Samoewolucja AI |
+| Utworzona przez uzytkownika (User) | Utworzona przez UI Web lub narzedzie `skill` | Niestandardowe przeplywy pracy |
+
+## Glowna konfiguracja
+
+Podczas tworzenia umiejetnosci mozna skonfigurowac:
+
+- **id**: Unikalny identyfikator (np. `summarize_document`)
+- **description**: Opis jednozdaniowy uzywany podczas function calling
+- **system_prompt**: Szablon promptu systemowego. Obsluguje symbole zastepcze `{param}`, wypelniane automatycznie w czasie wykonywania
+- **parameter_schema**: JSON Schema deklarujacy akceptowane parametry
+- **tool_whitelist**: Biala lista narzedzi dozwolonych w wykonywaniu (pusta lista = dziedziczy wszystkie narzedzia)
+- **max_tool_round**: Maksymalna liczba rund wywolan narzedzi (domyslnie 5)
+- **timeout**: Limit czasu wykonywania (domyslnie 60 sekund)
+- **on_complete**: Akcja po zakonczeniu: `write_memory` (zapis do pamieci), `notify_curator` (powiadom kuratora), `broadcast` (rozgloszenie), `none`
+- **trigger_mode**: Tryb aktywacji: `manual` (reczny/auto AI) lub `auto` (automatyczne planowanie)
+- **auto_trigger_condition**: Warunek automatycznej aktywacji (np. `daily 09:00`, `interval 6h`, wyrazenie cron)
+
+## Korzystanie z umiejetnosci
+
+### 1. Aktywacja z czatu
+
+Popros bezposrednio byt krzemowy o wykonanie umiejetnosci w czacie. Przyklad:
+
+> ""Podsumuj ten dokument""
+
+Jesli umiejetnosc `summarize_document` jest zarejestrowana, zostanie automatycznie rozpoznana i wywolana.
+
+### 2. Zarzadzanie narzedziem `skill`
+
+Byt krzemowy moze uzywac narzedzia `skill` do:
+
+- **create**: Utworz nowa umiejetnosc (`id` i `system_prompt` wymagane)
+- **list**: Wypisz wszystkie zarejestrowane umiejetnosci
+- **update**: Zaktualizuj istniejaca umiejetnosc
+- **update_from_md**: Zaktualizuj z Markdown
+- **delete**: Usun umiejetnosc
+- **export / export_md**: Eksportuj jako JSON lub Markdown
+- **import / import_md**: Importuj z JSON lub Markdown
+
+### 3. Zarzadzanie przez UI Web
+
+Strona ""Umiejetnosci"" w UI Web umozliwia:
+- Przeglad wszystkich umiejetnosci
+- Tworzenie/edytowanie/usuwanie umiejetnosci niestandardowych
+- Import/eksport definicji umiejetnosci
+- Przeglad historii wykonywania
+
+## Format pliku umiejetnosci
+
+Umiejetnosci sa domyslnie zapisywane w formacie Markdown, w katalogu `skills/` bytu.
+
+**Przyklad formatu Markdown:**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**Wyjasnienia:**
+- Czesc miedzy `---` to YAML front matter (metadane)
+- Reszta to szablon promptu systemowego (`system_prompt`)
+- Brakujace metadane sa automatycznie uzupelniane przez AI
+- Plik `.md` ma pierwszenstwo przed plikiem `.json` z tym samym ID
+
+## Umiejetnosci automatycznie aktywowane
+
+Ustaw `trigger_mode` na `auto` i zdefiniuj `auto_trigger_condition`, aby umiejetnosc wykonywala sie automatycznie o zaplanowanym czasie.
+
+**Obslugiwane formaty planowania:**
+- `daily 09:00` — codziennie o 9:00
+- `interval 6h` — co 6 godzin
+- Standardowe wyrazenie cron — np. `0 9 * * 1-5` (9:00 w dni robocze)
+
+Wyniki automatycznego wykonywania sa domyslnie zapisywane do pamieci bytu, z opcja powiadomienia kuratora lub rozgloszenia na kanal.
+
+## Uprawnienia i bezpieczenstwo
+
+- Kurator moze modyfikowac wszystkie umiejetnosci
+- Zwykly byt moze modyfikowac tylko umiejetnosci, ktore sam utworzyl (source = being) lub zaimportowane przez uzytkownika
+- Umiejetnosci podlegaja uprawnieniom akcji narzedzi (ToolActionPermissions)
+- Pusta biala lista dziedziczy wszystkie uprawnienia narzedzi bytu
+
+## Limit ilosci
+
+Kazdy byt krzemowy moze utworzyc do 50 umiejetnosci niestandardowych (regulowane przez konfiguracje).
+
+## Cesto zadawane pytania
+
+**P: Co zrobic, gdy wykonanie umiejetnosci przekracza limit czasu?**
+O: Zwieksz wartosc `timeout` w definicji umiejetnosci lub dostosuj `GlobalSkillTimeoutSeconds` w konfiguracji globalnej.
+
+**P: Co zrobic, gdy umiejetnosc nie moze wywolac narzedzia?**
+O: Sprawdz, czy `tool_whitelist` zawiera wymagane narzedzie i czy byt ma uprawnienie do tego narzedzia.
+
+**P: Jak zrobic kopie zapasowa umiejetnosci?**
+O: Uzyj `export` lub `export_md`, aby wyeksportowac jako JSON/Markdown, zapisz w bezpiecznym miejscu, a nastepnie przywroc za pomoca `import`.
+
+**P: Czy umiejetnosc moze wywolywac sama siebie rekurencyjnie?**
+O: Nie. Dzialajace umiejetnosci sa blokowane przed wywolaniami rekurencyjnymi, aby zapobiec nieskonczonym petlom.
+";
+
+#endregion
 }

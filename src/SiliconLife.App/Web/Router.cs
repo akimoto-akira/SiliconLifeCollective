@@ -108,6 +108,16 @@ public class Router
         RegisterController(() => new WorkNoteController(), "/api/work-notes/create", "POST");
         RegisterController(() => new WorkNoteController(), "/api/work-notes/update", "POST");
         RegisterController(() => new WorkNoteController(), "/api/work-notes/delete", "POST");
+        RegisterController(() => new SkillController(), "/skill");
+        RegisterController(() => new SkillController(), "/api/skills/list");
+        RegisterController(() => new SkillController(), "/api/skills/get-md");
+        RegisterController(() => new SkillController(), "/api/skills/export");
+        RegisterController(() => new SkillController(), "/api/skills/export-md");
+        RegisterController(() => new SkillController(), "/api/skills/update-md", "POST");
+        RegisterController(() => new SkillController(), "/api/skills/import", "POST");
+        RegisterController(() => new SkillController(), "/api/skills/import-md", "POST");
+        RegisterController(() => new SkillController(), "/api/skills/delete", "POST");
+        RegisterController(() => new SkillController(), "/api/skills/test", "POST");
         RegisterController(() => new KnowledgeController(), "/knowledge");
         RegisterController(() => new KnowledgeController(), "/api/knowledge/graph");
         RegisterController(() => new ProjectController(), "/project");

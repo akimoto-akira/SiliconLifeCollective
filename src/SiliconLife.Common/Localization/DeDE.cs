@@ -409,6 +409,30 @@ _ => permissionType.ToString()
     public override string ProjectWorkNotesPageHeader => "Projektarbeitsnotizen";
     public override string ProjectWorkNotesEmptyState => "Dieses Projekt hat noch keine Arbeitsnotizen";
     public override string ProjectWorkNotesTotalPages => "Gesamtseiten: {0}";
+    public override string PageTitleSkills => "Skill-Verwaltung";
+    public override string SkillsPageHeader => "Skills";
+    public override string SkillsPageSubtitle => "Skills = wiederverwendbare Tool-Orchestrierung + Prompt-Vorlagen (Markdown; Metadaten im YAML-Front-Matter)";
+    public override string SkillsStatFormat => "{0} Skill(s) · eigene {1}/{2}";
+    public override string SkillsEmptyState => "Noch keine Skills";
+    public override string SkillsBackToBeings => "← Zurück zu den Wesen";
+    public override string SkillBtnNew => "Neuer Skill";
+    public override string SkillBtnImportMd => "Markdown importieren";
+    public override string SkillBtnImportJson => "JSON importieren";
+    public override string SkillBtnRefresh => "Aktualisieren";
+    public override string SkillBtnEdit => "Bearbeiten";
+    public override string SkillBtnTest => "Testen";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "Löschen";
+    public override string SkillCurrentEditingFormat => "Bearbeiten: {0}";
+    public override string SkillNewSkillLabel => "Neuer Skill (ungespeichert)";
+    public override string SkillConfirmDeleteFormat => "Skill {0} löschen?";
+    public override string SkillPromptImportMd => "Skill-Markdown einfügen (YAML-Front-Matter + Inhalt; fehlende Metadaten werden automatisch ergänzt)";
+    public override string SkillPromptImportJson => "SkillDefinition-JSON einfügen";
+    public override string SkillPromptTestParams => "Testparameter-JSON eingeben (z. B. {\"source\": \"...\"}), leer lassen für keine";
+    public override string SkillTestResultPrefix => "Ergebnis: ";
+    public override string SkillLoadFailedFormat => "Laden fehlgeschlagen: {0}";
+    public override string SkillRequestFailed => "Anforderung fehlgeschlagen";
 
     // ===== Tasks Page Localization =====
 
@@ -835,7 +859,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["AI"] = "KI-Konfiguration",
         ["Web"] = "Web-Konfiguration",
         ["User"] = "Benutzerkonfiguration",
-        ["IM"] = "IM-Konfiguration"
+        ["IM"] = "IM-Konfiguration",
+        ["Skill"] = "Skill-Konfiguration"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -950,14 +975,13 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (Low latency)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (Agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (Open-source Agent, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (Flagship, 128K, Multimodal)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, Cost-effective)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, Economy)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, Long context)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, Free)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, Free) - Recommended for debugging",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, Free)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M Kontext, führt bei Langzeitaufgaben)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (erweiterte Codierung, ingenieurtechnische Ergebnisse)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (Millionen-Kontext, führt bei Agent/Reasoning)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (effizient leichtgewichtig, Millionen-Kontext)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (Langzeit-Code, Text/Bild-Eingabe)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (neuestes Wenxin, Agent/Reasoning-Upgrade)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (von Konsole gesteuert)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) - Recommended",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (Free, 256K)",
@@ -1000,7 +1024,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["IMHelp_webui"] = "Integrierte Browser-Chat-Oberfläche, die direkt von dieser Anwendung bereitgestellt wird. Es sind keine externen Zugangsdaten erforderlich — einfach aktivieren und über die Webseite chatten.",
         ["IMHelp_feishu"] = "Erstellen Sie eine eigene App auf der Feishu Open Platform, aktivieren Sie die Bot-Funktion und veröffentlichen Sie ein Release. Kopieren Sie App ID und App Secret aus 'Credentials & Basic Info' sowie Verification Token / Encrypt Key aus 'Event Subscriptions'. Richten Sie die Anfrage-URL des Ereignisabonnements auf den Callback-Pfad dieser App; Feishu erlaubt localhost-Callbacks, daher ist für lokale Tests keine öffentliche Adresse nötig.",
         ["IMHelp_wecom"] = "Erstellen Sie eine selbst entwickelte App in der WeCom-Verwaltungskonsole (Apps → Create App). Tragen Sie die Corp ID (My Company → Company Info), die Agent ID und das App Secret der App sowie den Token und den Encoding AES Key ein, die bei der Konfiguration des 'Nachrichtenempfangsservers' erzeugt wurden. Die Callback-URL muss eine öffentlich erreichbare HTTPS-Adresse sein, die auf den Callback-Pfad dieser App zeigt; die Server-IP muss ggf. zur Liste vertrauenswürdiger IPs hinzugefügt werden.",
-        ["IMHelp_dingtalk"] = "Erstellen Sie eine interne Unternehmens-App mit einem Roboter auf der DingTalk Open Platform. Tragen Sie App Key, App Secret und Robot Code von der Zugangsdaten-Seite der App ein. Der Stream-Modus (Standard) empfängt Nachrichten über eine WebSocket-Verbindung und benötigt keine öffentliche Adresse; der HTTP-Callback-Modus erfordert eine öffentlich erreichbare HTTPS-Callback-URL."
+        ["IMHelp_dingtalk"] = "Erstellen Sie eine interne Unternehmens-App mit einem Roboter auf der DingTalk Open Platform. Tragen Sie App Key, App Secret und Robot Code von der Zugangsdaten-Seite der App ein. Der Stream-Modus (Standard) empfängt Nachrichten über eine WebSocket-Verbindung und benötigt keine öffentliche Adresse; der HTTP-Callback-Modus erfordert eine öffentlich erreichbare HTTPS-Callback-URL.",
+        ["SkillEnabled"] = "Skills aktivieren",
+        ["GlobalMaxToolRound"] = "Globale maximale Tool-Runden",
+        ["GlobalSkillTimeoutSeconds"] = "Globales Skill-Timeout (s)",
+        ["MaxCustomSkillsPerBeing"] = "Max. benutzerdefinierte Skills pro Wesen"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1063,7 +1091,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebSkin"] = "Web-Skin-Name",
         ["UserNickname"] = "Spitzname des menschlichen Benutzers",
         ["PluginDirectories"] = "Liste der Plugin-Verzeichnisse für automatische Erkennung, unterstützt relative oder absolute Pfade",
-        ["IMPlatforms"] = "Verbundene IM-Plattformen konfigurieren; mehrere hinzufügbar, per manueller Zugangsdaten oder QR-Code-Autorisierung"
+        ["IMPlatforms"] = "Verbundene IM-Plattformen konfigurieren; mehrere hinzufügbar, per manueller Zugangsdaten oder QR-Code-Autorisierung",
+        ["SkillEnabled"] = "Skill-System aktivieren (Skill-Registrierung, KI-Dispatch und automatische Trigger)",
+        ["GlobalMaxToolRound"] = "Obergrenze der Tool-Aufruf-Runden pro Skill-Ausführung",
+        ["GlobalSkillTimeoutSeconds"] = "Obergrenze der Skill-Ausführungsdauer in Sekunden",
+        ["MaxCustomSkillsPerBeing"] = "Maximale Anzahl benutzerdefinierter (nicht integrierter) Skills pro Silicon Being"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -1137,7 +1169,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["project"] = "Projekt",
         ["project_task"] = "Projektaufgabe",
         ["project_work_note"] = "Projektarbeitsnotiz",
-        ["webview_browser"] = "WebView-Browser"
+        ["webview_browser"] = "WebView-Browser",
+        ["skill"] = "Skill"
     };
 
     public override string GetToolDisplayName(string toolName) =>

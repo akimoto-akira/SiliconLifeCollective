@@ -53,6 +53,7 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
   public override string WorkNotes_Title => "Arbeitsnotizen";
   public override string Projects_Title => "Projektmanagement";
   public override string Logging_Title => "Protokollierungssystem";
+  public override string Skills_Title => "Fähigkeiten";
 
   public override string[] GettingStarted_Tags => new[]
   {
@@ -165,7 +166,7 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
     "Protokollierungssystem", "Protokoll", "Aufzeichnungen", "Debug", "Fehler", "Warnung", "Monitor", "Verfolgung",
     "Konsole", "Datei"
   };
-
+  public override string[] Skills_Tags => new[] { "Fähigkeiten", "Skill", "Orchestrierung", "Prompt", "Automatisierung", "Plugin", "anpassbar" };
   public override string GettingStarted => @"
 # Schnellstart
 
@@ -3032,7 +3033,7 @@ Baidu ERNIE ist die große Sprachmodellreihe von Baidu, die über die Qianfan-Pl
 
 ### Schritt 1: Baidu Cloud-Konto registrieren
 
-1. Besuchen Sie `https://qianfan.cloud.baidu.com`
+1. Besuchen Sie `https://cloud.baidu.com/product-s/qianfan_home`
 2. Melden Sie sich mit Ihrem Baidu-Konto an
 3. Führen Sie die Echtzeit-Authentifizierung durch
 
@@ -3050,28 +3051,19 @@ Gehen Sie auf der Qianfan-Plattform zu **Modellverwaltung** und aktivieren Sie d
 
 ## Verfügbare Modelle
 
-- **ernie-4.5-turbo-128k**: Flaggschiff-Modell (128K-Kontext)
-- **ernie-4.0-turbo-8k**: Turbo-Modell (8K-Kontext)
-- **ernie-4.0-turbo-8k-latest**: neuestes Turbo (8K-Kontext)
-- **ernie-speed-pro-128k**: Speed Pro-Modell (128K-Kontext)
-- **ernie-speed-128k**: Speed-Modell (128K-Kontext)
-- **ernie-speed-8k**: Speed-Modell (8K-Kontext)
-- **ernie-lite-pro-128k**: Lite Pro-Modell (128K-Kontext)
-- **ernie-lite-8k**: Lite-Modell (8K-Kontext)
+- **GLM-5.2**: Unterstützt wirklich nutzbaren 1M-Kontext, bleibt bei Langzeitaufgaben führend
+- **GLM-5.1**: Deutlich verbesserte Code-Fähigkeiten, erhebliche Steigerung bei Langzeitaufgaben, liefert engineering-grade Ergebnisse
+- **DeepSeek-V4-Pro**: Unterstützt millionenfach ultra-langen Kontext, führend bei Agentenfähigkeiten, Weltwissen und Reasoning-Leistung, sowohl national als auch im Open-Source-Bereich
+- **DeepSeek-V4-Flash**: Effizientes leichtgewichtiges Modell, unterstützt millionenfach ultra-langen Kontext
+- **Kimi-K2.6**: Stärkere und stabilere Langzeit-Code-Schreibfähigkeit, unterstützt sowohl Text- als auch Bild-Eingaben
+- **ERNIE-5.1**: Neuestes Modell der Wenxin-Serie, grundlegende Fähigkeiten umfassend verbessert, deutliche Fortschritte bei Agenten, Wissen, Reasoning und Deep Search
+- **qianfan-code-latest**: Die Modellauswahl wird durch die Qianfan-Konsole bestimmt
 
-## Konfiguration in Silicon Life
-
-1. Wählen Sie **Baidu ERNIE** als KI-Client-Typ
+1. Wählen Sie **Baidu Qianfan** als KI-Client-Typ
 2. Setzen Sie den **API-Schlüssel** auf Ihren Qianfan API Key
-3. Setzen Sie das **Modell** auf den Namen des aktivierten ERNIE-Modells
+3. Setzen Sie das **Modell** auf den Namen des aktivierten Qianfan-Modells
 4. Setzen Sie den **Endpunkt** auf die Qianfan-API-Adresse (leer lassen für Standardwert)
 5. Lassen Sie das **Kontextfenster Tokens** leer für automatische Erkennung
-
-## Abrechnungsmodell
-
-- ERNIE Speed- und Lite-Serien haben kostenlose Kontingente
-- Kostenpflichtige Modelle werden nutzungsabhängig abgerechnet
-- Details unter `https://qianfan.cloud.baidu.com/pricing`
 
 ## Häufige Fragen
 
@@ -4958,5 +4950,143 @@ Das System zeichnet NICHT folgende sensitive Informationen in Logs auf:
 - Bei großen Log-Schreibmengen wird empfohlen, das Log-Level angemessen zu erhöhen
 ";
 
-  #endregion
+  
+  public override string Skills => @"
+# Faehigkeiten
+
+## Was ist eine Faehigkeit?
+
+Eine Faehigkeit (Skill) ist eine wiederverwendbare Funktionseinheit, die Tool-Orchestrierung und Prompt-Templates kapselt. Sie repraesentiert eine konkrete ""Faehigkeit"" eines Silizium-Wesens und kann entweder automatisch durch die AI (Function Calling) oder explizit durch den Benutzer/Kurator ausgeloest werden.
+
+**Faehigkeit vs. Tool:**
+- **Tool**: Ein einzelner atomarer Vorgang (z.B. Datei lesen, Web-Suche) — ein Aufruf erledigt eine Aufgabe
+- **Faehigkeit**: Multi-Schritt-Orchestrierung + System-Prompt-Template. Koordiniert mehrere Tools, um komplexe Aufgaben zu erledigen
+
+## Quellen von Faehigkeiten
+
+Das System unterstuetzt 4 Faehigkeitsquellen:
+
+| Quelle | Beschreibung | Beispiel |
+|--------|-------------|----------|
+| Eingebaut (Builtin) | Im Framework integriert, nicht aenderbar | Systemebene Funktionen |
+| Plugin | Ueber `ISkillProvider`-Schnittstelle registriert | Drittanbieter-Erweiterungen |
+| Wesen-erstellt (Being) | Vom Silizium-Wesen zur Laufzeit selbst erstellt | AI-Selbstevolution |
+| Benutzer-erstellt (User) | Ueber Web-UI oder `skill`-Tool erstellt | Benutzerdefinierte Workflows |
+
+## Kernkonfiguration
+
+Beim Erstellen einer Faehigkeit koennen folgende Parameter konfiguriert werden:
+
+- **id**: Eindeutiger Bezeichner (z.B. `summarize_document`)
+- **description**: Ein-Satz-Beschreibung, die beim Function Calling verwendet wird
+- **system_prompt**: System-Prompt-Template. Unterstuetzt `{param}`-Platzhalter, die zur Laufzeit automatisch gefuellt werden
+- **parameter_schema**: JSON Schema, das die akzeptierten Parameter deklariert
+- **tool_whitelist**: Whitelist der zur Ausfuehrung erlaubten Tools (leere Liste = alle Tools erben)
+- **max_tool_round**: Maximale Anzahl von Tool-Aufruf-Runden (Standard 5)
+- **timeout**: Ausfuehrungs-Timeout (Standard 60 Sekunden)
+- **on_complete**: Aktion nach Abschluss: `write_memory` (in Gedaechtnis schreiben), `notify_curator` (Kurator benachrichtigen), `broadcast` (Rundruf), `none`
+- **trigger_mode**: Ausloesemodus: `manual` (manuell/AI-Automatik) oder `auto` (automatische Planung)
+- **auto_trigger_condition**: Automatische Ausloesebedingung (z.B. `daily 09:00`, `interval 6h`, Cron-Ausdruck)
+
+## Verwendung von Faehigkeiten
+
+### 1. Ausloesung aus dem Chat
+
+Bitten Sie das Silizium-Wesen direkt im Chat, eine Faehigkeit auszufuehren. Beispiel:
+
+> ""Fasse dieses Dokument zusammen""
+
+Wenn die Faehigkeit `summarize_document` registriert ist, wird sie automatisch erkannt und aufgerufen.
+
+### 2. Verwaltung mit dem `skill`-Tool
+
+Das Silizium-Wesen kann das `skill`-Tool verwenden fuer:
+
+- **create**: Neue Faehigkeit erstellen (`id` und `system_prompt` erforderlich)
+- **list**: Alle registrierten Faehigkeiten auflisten
+- **update**: Vorhandene Faehigkeit aktualisieren
+- **update_from_md**: Aus Markdown aktualisieren
+- **delete**: Faehigkeit loeschen
+- **export / export_md**: Als JSON oder Markdown exportieren
+- **import / import_md**: Aus JSON oder Markdown importieren
+
+### 3. Verwaltung ueber die Web-UI
+
+Auf der Seite ""Faehigkeiten"" der Web-UI koennen Sie:
+- Alle Faehigkeiten einsehen
+- Benutzerdefinierte Faehigkeiten erstellen/bearbeiten/loeschen
+- Faehigkeitsdefinitionen importieren/exportieren
+- Ausfuehrungshistorie anzeigen
+
+## Faehigkeitsdateiformat
+
+Faehigkeiten werden standardmaessig im Markdown-Format gespeichert, im Verzeichnis `skills/` des Wesens.
+
+**Beispiel fuer Markdown-Format:**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**Erlaeuterungen:**
+- Der Bereich zwischen `---` ist YAML Front Matter (Metadaten)
+- Der Rest ist das System-Prompt-Template (`system_prompt`)
+- Fehlende Metadaten werden automatisch durch die AI ergaenzt
+- Eine `.md`-Datei hat Vorrang vor einer `.json`-Datei mit derselben ID
+
+## Automatisch ausgeloeste Faehigkeiten
+
+Setzen Sie `trigger_mode` auf `auto` und konfigurieren Sie `auto_trigger_condition`, um die Faehigkeit automatisch zur geplanten Zeit auszufuehren.
+
+**Unterstuetzte Planungsformate:**
+- `daily 09:00` — taeglich um 9 Uhr
+- `interval 6h` — alle 6 Stunden
+- Standard Cron-Ausdruck — z.B. `0 9 * * 1-5` (werktags 9 Uhr)
+
+Ergebnisse der automatischen Ausfuehrung werden standardmaessig in das Gedaechtnis des Wesens geschrieben, mit Option zur Benachrichtigung des Kurators oder Rundruf auf einen Kanal.
+
+## Berechtigungen und Sicherheit
+
+- Der Kurator kann alle Faehigkeiten aendern
+- Ein gewoehnliches Wesen kann nur selbst erstellte Faehigkeiten (source = being) oder vom Benutzer importierte Faehigkeiten aendern
+- Faehigkeiten unterliegen den Tool-Aktionsberechtigungen (ToolActionPermissions)
+- Eine leere Whitelist erbt alle Tool-Berechtigungen des Wesens
+
+## Mengenbeschraenkung
+
+Jedes Silizium-Wesen kann bis zu 50 benutzerdefinierte Faehigkeiten erstellen (ueber Konfiguration anpassbar).
+
+## Haeufig gestellte Fragen
+
+**F: Was tun, wenn die Ausfuehrung einer Faehigkeit abbricht?**
+A: Erhoehen Sie den `timeout`-Wert in der Faehigkeitsdefinition oder passen Sie `GlobalSkillTimeoutSeconds` in der globalen Konfiguration an.
+
+**F: Was tun, wenn eine Faehigkeit ein Tool nicht aufrufen kann?**
+A: Ueberpruefen Sie, ob `tool_whitelist` das benoetigte Tool enthaelt und ob das Wesen die Berechtigung fuer dieses Tool hat.
+
+**F: Wie kann ich eine Faehigkeit sichern?**
+A: Verwenden Sie `export` oder `export_md`, um sie als JSON/Markdown zu exportieren, speichern Sie sie an einem sicheren Ort und stellen Sie sie mit `import` wieder her.
+
+**F: Kann eine Faehigkeit sich selbst rekursiv aufrufen?**
+A: Nein. Laufende Faehigkeiten werden gegen rekursive Aufrufe blockiert, um Endlosschleifen zu verhindern.
+";
+
+#endregion
 }

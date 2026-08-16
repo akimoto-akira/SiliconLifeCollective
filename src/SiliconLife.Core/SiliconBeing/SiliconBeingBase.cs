@@ -126,6 +126,13 @@ public abstract class SiliconBeingBase
     public ToolManager? ToolManager { get; set; }
 
     /// <summary>
+    /// Gets or sets the skill manager for this silicon being.
+    /// Each being holds its own SkillManager instance.
+    /// Null for beings that don't use skills (backward compatible).
+    /// </summary>
+    public SkillManager? SkillManager { get; set; }
+
+    /// <summary>
     /// Gets or sets the per-being tool action permission configuration.
     /// When null or empty, all declared actions are allowed (backward compatible).
     /// Persisted to being state storage and loaded on startup.

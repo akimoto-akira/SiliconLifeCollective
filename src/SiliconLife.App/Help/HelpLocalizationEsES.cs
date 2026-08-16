@@ -54,6 +54,7 @@ public class HelpLocalizationEsES : HelpLocalizationBase
   public override string WorkNotes_Title => "Notas de Trabajo";
   public override string Projects_Title => "Gestión de Proyectos";
   public override string Logging_Title => "Sistema de Registro de Eventos";
+  public override string Skills_Title => "Habilidades";
 
   public override string[] GettingStarted_Tags => new[]
   {
@@ -181,7 +182,7 @@ public class HelpLocalizationEsES : HelpLocalizationBase
     "sistema de registro", "registro", "eventos", "debug", "error", "advertencia", "monitor", "rastreo", "consola",
     "archivo"
   };
-
+  public override string[] Skills_Tags => new[] { "habilidades", "skill", "orquestación", "prompt", "automatización", "plugin", "personalizado" };
   public override string GettingStarted => @"
 # Inicio Rápido
 
@@ -3048,7 +3049,7 @@ Baidu ERNIE es la serie de grandes modelos de lenguaje de Baidu, accesible a tra
 
 ### Paso 1: Registro en Baidu Cloud
 
-1. Visite `https://qianfan.cloud.baidu.com`
+1. Visite `https://cloud.baidu.com/product-s/qianfan_home`
 2. Inicie sesión con su cuenta de Baidu
 3. Complete la autenticación de identidad
 
@@ -3066,28 +3067,19 @@ En la plataforma Qianfan, vaya a **Gestión de modelos** y active los modelos qu
 
 ## Modelos disponibles
 
-- **ernie-4.5-turbo-128k**: modelo insignia (contexto 128K)
-- **ernie-4.0-turbo-8k**: modelo Turbo (contexto 8K)
-- **ernie-4.0-turbo-8k-latest**: Turbo más reciente (contexto 8K)
-- **ernie-speed-pro-128k**: modelo Speed Pro (contexto 128K)
-- **ernie-speed-128k**: modelo Speed (contexto 128K)
-- **ernie-speed-8k**: modelo Speed (contexto 8K)
-- **ernie-lite-pro-128k**: modelo Lite Pro (contexto 128K)
-- **ernie-lite-8k**: modelo Lite (contexto 8K)
+- **GLM-5.2**: Admite contexto 1M realmente utilizable, sigue liderando en tareas de largo alcance
+- **GLM-5.1**: Capacidades de codificación considerablemente mejoradas, mejora notable en tareas de largo alcance, entrega resultados de nivel de ingeniería
+- **DeepSeek-V4-Pro**: Admite contexto ultra largo de nivel millón, líder en capacidades de agente, conocimiento del mundo y rendimiento de razonamiento, tanto a nivel nacional como en el dominio de código abierto
+- **DeepSeek-V4-Flash**: Modelo ligero eficiente que admite contexto ultra largo de nivel millón
+- **Kimi-K2.6**: Capacidad de escritura de código de largo alcance más fuerte y estable, admite entrada de texto e imagen
+- **ERNIE-5.1**: Último modelo de la serie Wenxin, capacidades fundamentales completamente mejoradas, mejoras significativas en agentes, conocimiento, razonamiento y búsqueda profunda
+- **qianfan-code-latest**: La selección del modelo está determinada por la consola Qianfan
 
-## Configuración en Silicon Life
-
-1. Seleccione **Baidu ERNIE** como tipo de cliente IA
+1. Seleccione **Baidu Qianfan** como tipo de cliente IA
 2. Establezca la **Clave API** en su clave API de Qianfan
-3. Establezca el **Modelo** en el nombre del modelo ERNIE activado
+3. Establezca el **Modelo** en el nombre del modelo Qianfan activado
 4. Establezca el **Punto de conexión** en la dirección API de Qianfan (dejar vacío para el valor predeterminado)
 5. Deje la **Ventana de contexto Tokens** vacía para detección automática
-
-## Modo de facturación
-
-- Las series ERNIE Speed y Lite tienen cuotas gratuitas
-- Los modelos de pago se facturan por uso
-- Consulte `https://qianfan.cloud.baidu.com/pricing` para más detalles
 
 ## Preguntas frecuentes
 
@@ -5102,5 +5094,143 @@ El sistema NO registra la siguiente información sensible en los registros:
 - Al escribir grandes cantidades de registros, se recomienda aumentar apropiadamente el nivel de registro
 ";
 
-  #endregion
+  
+  public override string Skills => @"
+# Habilidades
+
+## ¿Qué es una habilidad?
+
+Una habilidad (Skill) es una unidad de capacidad reutilizable que encapsula la orquestación de herramientas y plantillas de prompts. Representa una ""capacidad"" concreta de un ser de silicio, y puede ser invocada automáticamente por la IA (function calling) o activada explícitamente por el usuario o curador.
+
+**Habilidad vs Herramienta:**
+- **Herramienta (Tool)**: Una operación atómica única (ej. lectura de archivos, búsqueda web) — una llamada completa una tarea
+- **Habilidad (Skill)**: Orquestación de múltiples pasos + plantilla de prompt del sistema. Coordina varias herramientas para completar tareas complejas
+
+## Fuentes de habilidades
+
+El sistema soporta 4 fuentes de habilidades:
+
+| Fuente | Descripción | Ejemplo |
+|--------|-------------|---------|
+| Integrada (Builtin) | Integrada en el framework, no modificable | Funciones a nivel de sistema |
+| Plugin | Registrada vía interfaz `ISkillProvider` | Extensiones de terceros |
+| Creada por el ser (Being) | Creada por el ser de silicio en tiempo de ejecución | Auto-evolución de la IA |
+| Creada por el usuario (User) | Creada vía UI Web o herramienta `skill` | Flujos de trabajo personalizados |
+
+## Configuración principal
+
+Al crear una habilidad, puede configurar:
+
+- **id**: Identificador único (ej. `summarize_document`)
+- **description**: Descripción de una frase usada en el function calling
+- **system_prompt**: Plantilla de prompt del sistema. Soporta placeholders `{param}`, rellenados automáticamente en tiempo de ejecución
+- **parameter_schema**: JSON Schema que declara los parámetros aceptados
+- **tool_whitelist**: Lista blanca de herramientas permitidas en ejecución (lista vacía = hereda todas las herramientas)
+- **max_tool_round**: Número máximo de rondas de llamadas a herramientas (5 por defecto)
+- **timeout**: Tiempo de espera de ejecución (60 segundos por defecto)
+- **on_complete**: Acción al completar: `write_memory` (escribir en memoria), `notify_curator` (notificar al curador), `broadcast` (difundir), `none`
+- **trigger_mode**: Modo de activación: `manual` (manual/llamada automática IA) o `auto` (activación programada)
+- **auto_trigger_condition**: Condición de activación automática (ej. `daily 09:00`, `interval 6h`, expresión cron)
+
+## Uso de habilidades
+
+### 1. Activación desde el chat
+
+Pida directamente al ser de silicio que ejecute una habilidad en el chat. Ej:
+
+> ""Resume este documento""
+
+Si la habilidad `summarize_document` está registrada, será reconocida e invocada automáticamente.
+
+### 2. Gestión con la herramienta `skill`
+
+El ser de silicio puede usar la herramienta `skill` para:
+
+- **create**: Crear una nueva habilidad (`id` y `system_prompt` requeridos)
+- **list**: Listar todas las habilidades registradas
+- **update**: Actualizar una habilidad existente
+- **update_from_md**: Actualizar desde Markdown
+- **delete**: Eliminar una habilidad
+- **export / export_md**: Exportar como JSON o Markdown
+- **import / import_md**: Importar desde JSON o Markdown
+
+### 3. Gestión vía UI Web
+
+La página ""Habilidades"" de la UI Web permite:
+- Ver todas las habilidades
+- Crear/editar/eliminar habilidades personalizadas
+- Importar/exportar definiciones de habilidades
+- Consultar el historial de ejecución
+
+## Formato de archivo de habilidad
+
+Las habilidades se persisten por defecto en formato Markdown, en el directorio `skills/` del ser.
+
+**Ejemplo de formato Markdown:**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**Explicaciones:**
+- La parte entre `---` es YAML front matter (metadatos)
+- El resto es la plantilla de prompt del sistema (`system_prompt`)
+- Los metadatos faltantes son completados automáticamente por la IA
+- Un archivo `.md` tiene prioridad sobre un archivo `.json` con el mismo ID
+
+## Habilidades de activación automática
+
+Configure `trigger_mode` en `auto` y defina `auto_trigger_condition` para ejecutar la habilidad automáticamente a la hora programada.
+
+**Formatos de programación soportados:**
+- `daily 09:00` — todos los días a las 9:00
+- `interval 6h` — cada 6 horas
+- Expresión cron estándar — ej. `0 9 * * 1-5` (9:00 en días laborables)
+
+Los resultados de ejecución automática se escriben por defecto en la memoria del ser, con opción de notificar al curador o difundir en un canal.
+
+## Permisos y seguridad
+
+- El curador puede modificar todas las habilidades
+- Un ser ordinario solo puede modificar las habilidades que él mismo creó (source = being) o las importadas por el usuario
+- Las habilidades están sujetas a los permisos de acciones de herramientas (ToolActionPermissions)
+- Una lista blanca vacía hereda todos los permisos de herramientas del ser
+
+## Límite de cantidad
+
+Cada ser de silicio puede crear hasta 50 habilidades personalizadas (ajustable mediante configuración).
+
+## Preguntas frecuentes
+
+**P: ¿Qué hacer si la ejecución de una habilidad expira?**
+R: Aumente el valor `timeout` en la definición de la habilidad, o ajuste `GlobalSkillTimeoutSeconds` en la configuración global.
+
+**P: ¿Qué hacer si una habilidad falla al llamar a una herramienta?**
+R: Verifique que `tool_whitelist` contenga la herramienta necesaria y que el ser tenga permiso para esa herramienta.
+
+**P: ¿Cómo hacer una copia de seguridad de una habilidad?**
+R: Use `export` o `export_md` para exportarla como JSON/Markdown, guárdela en un lugar seguro y luego restaure con `import`.
+
+**P: ¿Puede una habilidad llamarse a sí misma recursivamente?**
+R: No. Las habilidades en ejecución están bloqueadas contra llamadas recursivas para evitar bucles infinitos.
+";
+
+#endregion
 }

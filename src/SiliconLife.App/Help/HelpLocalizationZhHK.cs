@@ -54,6 +54,7 @@ public class HelpLocalizationZhHK : HelpLocalizationBase
     public override string WorkNotes_Title => "工作筆記";
     public override string Projects_Title => "項目管理";
     public override string Logging_Title => "日誌系統";
+    public override string Skills_Title => "技能系統";
 
     public override string[] GettingStarted_Tags => new[] { "安裝", "啟動", "入門", "快速入門", "開始使用", "初始化", "運行", "配置環境" };
     public override string[] BeingManagement_Tags => new[] { "硅基人", "創建", "配置", "硅基人管理", "生命體", "檔案", "設定", "管理" };
@@ -113,6 +114,7 @@ public class HelpLocalizationZhHK : HelpLocalizationBase
     public override string[] WorkNotes_Tags => new[] { "工作筆記", "筆記", "記錄", "日記", "日誌", "Markdown", "關鍵詞", "版本", "搜尋" };
     public override string[] Projects_Tags => new[] { "項目管理", "項目", "協作", "任務", "成員", "歸檔", "團隊", "工作空間", "進度" };
     public override string[] Logging_Tags => new[] { "日誌系統", "日誌", "記錄", "調試", "錯誤", "警告", "監控", "追蹤", "控制台", "文件" };
+    public override string[] Skills_Tags => new[] { "技能", "Skill", "工具編排", "提示詞模板", "自動化", "自定義技能", "插件" };
 
     public override string GettingStarted => @"
 # 快速入門
@@ -2901,7 +2903,7 @@ MiniMax 按量付費，不同模型費率不同。查看平台了解目前定價
 
 ### 第一步：註冊百度雲帳號
 
-1. 訪問 `https://qianfan.cloud.baidu.com`
+1. 訪問 `https://cloud.baidu.com/product-s/qianfan_home`
 2. 使用百度帳號登入
 3. 完成實名認證
 
@@ -2919,28 +2921,21 @@ MiniMax 按量付費，不同模型費率不同。查看平台了解目前定價
 
 ## 可用模型
 
-- **ernie-4.5-turbo-128k**：旗艦模型（128K 上下文）
-- **ernie-4.0-turbo-8k**：Turbo 模型（8K 上下文）
-- **ernie-4.0-turbo-8k-latest**：最新 Turbo（8K 上下文）
-- **ernie-speed-pro-128k**：Speed Pro 模型（128K 上下文）
-- **ernie-speed-128k**：Speed 模型（128K 上下文）
-- **ernie-speed-8k**：Speed 模型（8K 上下文）
-- **ernie-lite-pro-128k**：Lite Pro 模型（128K 上下文）
-- **ernie-lite-8k**：Lite 模型（8K 上下文）
+- **GLM-5.2**：支持真正可用的 1M 上下文，在长程任务中继续保持领先
+- **GLM-5.1**：代码能力大大增强，长程任务显著提升，交付工程级成果
+- **DeepSeek-V4-Pro**：支持百万级超长上下文，在 Agent 能力、世界知识和推理性能上均实现国内与开源领域的领先
+- **DeepSeek-V4-Flash**：高效轻量化模型，支持百万超长上下文能力
+- **Kimi-K2.6**：具备更强更稳的长程代码编写能力，同时支持文本、图片输入
+- **ERNIE-5.1**：文心系列最新模型，基础能力全面升级，在智能体、知识、推理、深度搜索等方面均有显著提升
+- **qianfan-code-latest**：模型选择由千帆控制台决定
 
 ## 在硅基生命中配置
 
-1. 選擇 **百度 ERNIE** 作為 AI 客戶端類型
+1. 選擇 **百度千帆** 作為 AI 客戶端類型
 2. 設定 **API 密鑰** 為你的千帆 API Key
-3. 設定 **模型** 為已開通的 ERNIE 模型名稱
+3. 設定 **模型** 為已開通的千帆模型名稱
 4. 設定 **端點** 為千帆 API 地址（留空使用預設值）
 5. **上下文視窗 Tokens** 留空可自動偵測
-
-## 計費方式
-
-- ERNIE Speed 和 Lite 系列有免費額度
-- 付費模型按量計費
-- 查看 `https://qianfan.cloud.baidu.com/pricing` 了解詳情
 
 ## 常見問題
 
@@ -4503,6 +4498,143 @@ Q8: 項目有截止日期嗎？**A**: 當前版本不強制設置截止日期，
 - 日誌系統保證穩定運行,單個輸出目標故障不會影響其他目標
 - 如果日誌文件過大,可提高日誌詳細程度設置（如改為 ""Warning"" 或 ""Error""）以減少記錄量
 - 大量日誌寫入時建議適當提高日誌級別
+";
+
+    public override string Skills => @"
+# 技能系統
+
+## 什麼是技能？
+
+技能（Skill）是一種可復用的能力單元，它將工具編排和提示詞模板封裝在一起，代表硅基人的一項具體「能力」。技能可以由 AI 自主調用（通過函數調用），也可以由用戶或管理者顯式觸發。
+
+**技能 vs 工具：**
+- **工具（Tool）**：單個原子操作（如讀取文件、搜索網頁），一次調用完成一件事
+- **技能（Skill）**：多步驟編排 + 系統提示詞模板，可調用多個工具協作完成複雜任務
+
+## 技能來源
+
+系統支持四類技能來源：
+
+| 來源 | 說明 | 示例 |
+|------|------|------|
+| 內置（Builtin） | 框架自帶，不可修改 | 系統級能力 |
+| 插件（Plugin） | 插件通過 ISkillProvider 接口註冊 | 第三方擴展 |
+| 硅基人創建（Being） | 硅基人在運行中自行創建 | AI 自我進化 |
+| 用戶創建（User） | 通過 Web 界面或 skill 工具創建 | 自定義工作流 |
+
+## 技能的核心配置
+
+創建技能時可配置以下參數：
+
+- **id**：唯一標識符（如 summarize_document）
+- **description**：一句話描述，用於 AI 函數調用時判斷何時使用
+- **system_prompt**：系統提示詞模板，支持 {param} 佔位符，執行時自動填充
+- **parameter_schema**：JSON Schema，聲明技能接受的參數
+- **tool_whitelist**：允許調用的工具白名單（空列表 = 繼承全部工具）
+- **max_tool_round**：最大工具調用輪次（默認 5）
+- **timeout**：執行超時時間（默認 60 秒）
+- **on_complete**：完成後的動作：write_memory（寫入記憶）、notify_curator（通知管理者）、broadcast（廣播）、none
+- **trigger_mode**：觸發模式：manual（手動/AI 自主調用）或 auto（自動定時觸發）
+- **auto_trigger_condition**：自動觸發條件（如 daily 09:00、interval 6h、cron 表達式）
+
+## 如何使用技能
+
+### 1. 通過聊天觸發
+
+在聊天中直接請求硅基人執行技能，例如：
+
+> 「請幫我總結這份文檔」
+
+如果硅基人註冊了 summarize_document 技能，它會自動識別並調用。
+
+### 2. 通過 skill 工具管理
+
+硅基人可使用 skill 工具執行以下操作：
+
+- **create**：創建新技能（需提供 id 和 system_prompt）
+- **list**：列出所有已註冊技能
+- **update**：更新現有技能
+- **update_from_md**：從 Markdown 更新技能
+- **delete**：刪除技能
+- **export / export_md**：導出為 JSON 或 Markdown
+- **import / import_md**：從 JSON 或 Markdown 導入
+
+### 3. 通過 Web 界面管理
+
+在 Web 界面的「技能」頁面可以：
+- 查看所有技能列表
+- 創建/編輯/刪除自定義技能
+- 導入/導出技能定義
+- 查看技能執行歷史
+
+## 技能文件格式
+
+技能優先以 Markdown 格式持久化，存儲在硅基人的 skills/ 目錄下。
+
+**Markdown 格式示例：**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**說明：**
+- --- 包裹的部分是 YAML front matter（元數據）
+- 剩餘部分是系統提示詞模板（system_prompt）
+- 缺失的元數據可由 AI 自動補全
+- .md 文件優先於同名的 .json 文件
+
+## 自動觸發技能
+
+將技能的 trigger_mode 設為 auto 並配置 auto_trigger_condition，技能會按設定的時間自動執行。
+
+**支持的調度格式：**
+- daily 09:00 — 每天上午 9 點
+- interval 6h — 每 6 小時
+- 標準 cron 表達式 — 如 0 9 * * 1-5（工作日 9 點）
+
+自動執行結果默認寫入硅基人記憶，也可配置為通知管理者或廣播到頻道。
+
+## 權限與安全
+
+- 管理者（Curator）可以修改所有技能
+- 普通硅基人只能修改自己創建的技能（source = being）或用戶導入的技能
+- 技能受工具動作權限（ToolActionPermissions）約束
+- 白名單為空時繼承硅基人全部工具權限
+
+## 數量限制
+
+每個硅基人最多可創建 50 個自定義技能（可通過配置調整）。
+
+## 常見問題
+
+**Q: 技能執行超時怎麼辦？**
+A: 可在技能定義中增大 timeout 值，或在全局配置中調整 GlobalSkillTimeoutSeconds。
+
+**Q: 技能調用工具失敗？**
+A: 檢查 tool_whitelist 是否包含了所需工具，以及硅基人是否有該工具的權限。
+
+**Q: 如何備份技能？**
+A: 使用 export 或 export_md 導出為 JSON/Markdown，保存到安全位置後可用 import 恢復。
+
+**Q: 技能能否遞歸調用自身？**
+A: 不可以。技能執行期間不允許遞歸調用，防止死循環。
 ";
 
     #endregion

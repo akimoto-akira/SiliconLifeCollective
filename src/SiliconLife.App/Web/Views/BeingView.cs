@@ -353,6 +353,12 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "taskCount"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
 
+        var skillLink = Js.Str(() => "<a class='detail-link' href='/skill?beingId=")
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
+            .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "skillCount"))
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => "</a>"));
+
         var memoryLink = Js.Str(() => "<a class='detail-link' href='/memory?beingId=")
             .Op(() => "+", () => (JsSyntax)Js.Id(() => "data").Prop(() => "id"))
             .Op(() => "+", () => (JsSyntax)Js.Str(() => "'>"))
@@ -395,6 +401,8 @@ public class BeingView : ViewBase
             .Op(() => "+", () => (JsSyntax)timerLink)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailTasksLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)taskLink)
+            .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.SkillsPageHeader}</span>"))
+            .Op(() => "+", () => (JsSyntax)skillLink)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailMemoryLabel}</span>"))
             .Op(() => "+", () => (JsSyntax)memoryLink)
             .Op(() => "+", () => (JsSyntax)Js.Str(() => $"</div><div class=\"detail-row\"><span class=\"detail-label\">{loc.BeingsDetailPermissionLabel}</span>"))

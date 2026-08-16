@@ -562,6 +562,33 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
     public override string ProjectWorkNotesEmptyState => "Žádné pracovní poznámky pro tento projekt";
     public override string ProjectWorkNotesTotalPages => "Celkem stránek: {0}";
 
+    // ===== Skills Page Localization =====
+
+    public override string PageTitleSkills => "Správa dovedností";
+    public override string SkillsPageHeader => "Dovednosti";
+    public override string SkillsPageSubtitle => "Dovednosti = opakovaně použitelná orchestrace nástrojů + šablony promptů (Markdown; metadata v YAML front matter)";
+    public override string SkillsStatFormat => "{0} dovedností · vlastní {1}/{2}";
+    public override string SkillsEmptyState => "Zatím žádné dovednosti";
+    public override string SkillsBackToBeings => "← Zpět na beings";
+    public override string SkillBtnNew => "Nová dovednost";
+    public override string SkillBtnImportMd => "Importovat Markdown";
+    public override string SkillBtnImportJson => "Importovat JSON";
+    public override string SkillBtnRefresh => "Obnovit";
+    public override string SkillBtnEdit => "Upravit";
+    public override string SkillBtnTest => "Otestovat";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "Odstranit";
+    public override string SkillCurrentEditingFormat => "Úprava: {0}";
+    public override string SkillNewSkillLabel => "Nová dovednost (neuloženo)";
+    public override string SkillConfirmDeleteFormat => "Odstranit dovednost {0}?";
+    public override string SkillPromptImportMd => "Vložte Markdown dovednosti (YAML front matter + tělo; chybějící metadata budou doplněna automaticky)";
+    public override string SkillPromptImportJson => "Vložte JSON SkillDefinition";
+    public override string SkillPromptTestParams => "Zadejte JSON testovacích parametrů (např. {\"source\": \"...\"}), prázdné = žádné";
+    public override string SkillTestResultPrefix => "Výsledek: ";
+    public override string SkillLoadFailedFormat => "Nepodařilo se načíst: {0}";
+    public override string SkillRequestFailed => "Požadavek se nezdařil";
+
     // ===== Executor =====
     public override string ExecutorPageHeader => "Executor";
 
@@ -672,7 +699,8 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
         ["AI"] = "Nastavení AI",
         ["Web"] = "Webová nastavení",
         ["User"] = "Uživatelská nastavení",
-        ["IM"] = "Konfigurace IM"
+        ["IM"] = "Konfigurace IM",
+        ["Skill"] = "Konfigurace dovedností"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -787,14 +815,13 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (nízká latence)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (open-source agent, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (vlajková loď, 128K, multimodální)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, cenově výhodný)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, úsporný)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, dlouhý kontext)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, zdarma)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, zdarma) — doporučeno pro ladění",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, zdarma)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M kontext, vede v dlouhých úlohách)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (vylepšené kódování, inženýrské výsledky)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (milión kontextu, vede v Agent/reasoning)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (efektivní lehký, milión kontextu)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (dlouhý kód, vstup text/obrázek)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (nejnovější Wenxin, agent/reasoning vylepšen)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (řízeno konzolí)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) — doporučeno",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (zdarma, 256K)",
@@ -837,7 +864,11 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
         ["IMHelp_webui"] = "Vestavěné chatovací rozhraní v prohlížeči poskytované přímo touto aplikací. Nejsou potřeba žádné externí přihlašovací údaje — stačí jej povolit a chatovat z webové stránky.",
         ["IMHelp_feishu"] = "Vytvořte vlastní aplikaci na Feishu Open Platform, povolte funkci bota a publikujte vydání. Zkopírujte App ID a App Secret ze sekce 'Credentials & Basic Info' a Verification Token / Encrypt Key ze sekce 'Event Subscriptions'. Nasměrujte URL požadavků odběru událostí na cestu zpětného volání této aplikace; Feishu povoluje zpětná volání na localhost, takže pro lokální testování není potřeba veřejná adresa.",
         ["IMHelp_wecom"] = "Vytvořte samostatně sestavenou aplikaci v administrátorské konzoli WeCom (Apps → Create App). Vyplňte Corp ID (My Company → Company Info), Agent ID a App Secret aplikace a dále Token a Encoding AES Key vygenerované při konfiguraci 'serveru pro příjem zpráv'. URL zpětného volání musí být veřejně dostupná HTTPS adresa směřující na cestu zpětného volání této aplikace a IP adresu serveru může být nutné přidat na seznam důvěryhodných IP.",
-        ["IMHelp_dingtalk"] = "Vytvořte interní podnikovou aplikaci s robotem na DingTalk Open Platform. Vyplňte App Key, App Secret a Robot Code ze stránky přihlašovacích údajů aplikace. Režim Stream (výchozí) přijímá zprávy přes WebSocket připojení a nepotřebuje veřejnou adresu; režim HTTP callback vyžaduje veřejně dostupnou HTTPS URL zpětného volání."
+        ["IMHelp_dingtalk"] = "Vytvořte interní podnikovou aplikaci s robotem na DingTalk Open Platform. Vyplňte App Key, App Secret a Robot Code ze stránky přihlašovacích údajů aplikace. Režim Stream (výchozí) přijímá zprávy přes WebSocket připojení a nepotřebuje veřejnou adresu; režim HTTP callback vyžaduje veřejně dostupnou HTTPS URL zpětného volání.",
+        ["SkillEnabled"] = "Povolit dovednosti",
+        ["GlobalMaxToolRound"] = "Globální maximum kol nástrojů",
+        ["GlobalSkillTimeoutSeconds"] = "Globální časový limit dovedností (s)",
+        ["MaxCustomSkillsPerBeing"] = "Max. vlastních dovedností na bytost"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -900,7 +931,11 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
         ["WebSkin"] = "Název vzhledu webu",
         ["UserNickname"] = "Přezdívka lidského uživatele",
         ["PluginDirectories"] = "Seznam adresářů pluginů pro automatické vyhledávání; podporuje relativní i absolutní cesty",
-        ["IMPlatforms"] = "Konfigurace připojených IM platforem; lze přidat více, pomocí ručních přihlašovacích údajů nebo autorizace naskenováním"
+        ["IMPlatforms"] = "Konfigurace připojených IM platforem; lze přidat více, pomocí ručních přihlašovacích údajů nebo autorizace naskenováním",
+        ["SkillEnabled"] = "Povolit systém dovedností (registrace dovedností, přiřazování pomocí AI a automatické spouštěče)",
+        ["GlobalMaxToolRound"] = "Horní limit kol volání nástrojů na každé provedení dovednosti",
+        ["GlobalSkillTimeoutSeconds"] = "Horní limit doby trvání provedení dovednosti v sekundách",
+        ["MaxCustomSkillsPerBeing"] = "Maximální počet vlastních (nevestavěných) dovedností, které může každá křemíková bytost vlastnit"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -941,7 +976,8 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
         ["project"] = "Projekt",
         ["project_task"] = "Projektový úkol",
         ["project_work_note"] = "Projektová pracovní poznámka",
-        ["webview_browser"] = "Prohlížeč WebView"
+        ["webview_browser"] = "Prohlížeč WebView",
+        ["skill"] = "Dovednost"
     };
 
     public override string GetToolDisplayName(string toolName) =>

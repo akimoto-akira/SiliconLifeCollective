@@ -52,6 +52,7 @@ public class HelpLocalizationFrFR : HelpLocalizationBase
     public override string WorkNotes_Title => "Notes de travail";
     public override string Projects_Title => "Gestion de projets";
     public override string Logging_Title => "Système de journalisation";
+    public override string Skills_Title => "Compétences";
 
     public override string[] GettingStarted_Tags => new[]
         { "installer", "démarrer", "configuration", "démarrage rapide", "commencer", "lancer", "initialiser" };
@@ -154,7 +155,7 @@ public class HelpLocalizationFrFR : HelpLocalizationBase
 
     public override string[] Logging_Tags => new[]
         { "système de journalisation", "journal", "enregistrements", "débogage", "erreur", "avertissement", "surveiller", "trace", "console", "fichier" };
-
+    public override string[] Skills_Tags => new[] { "compétences", "skill", "orchestration", "prompt", "automatisation", "plugin", "personnalisé" };
     #endregion
 
     #region Help Document Content
@@ -1913,7 +1914,7 @@ Baidu ERNIE est la série de grands modèles de langage de Baidu, accessible via
 
 ### Étape 1 : Inscription à Baidu Cloud
 
-1. Visitez `https://qianfan.cloud.baidu.com`
+1. Visitez `https://cloud.baidu.com/product-s/qianfan_home`
 2. Connectez-vous avec votre compte Baidu
 3. Effectuez l'authentification réelle
 
@@ -1931,28 +1932,19 @@ Sur la plateforme Qianfan, accédez à **Gestion des modèles** et activez les m
 
 ## Modèles disponibles
 
-- **ernie-4.5-turbo-128k** : modèle phare (contexte 128K)
-- **ernie-4.0-turbo-8k** : modèle Turbo (contexte 8K)
-- **ernie-4.0-turbo-8k-latest** : dernier Turbo (contexte 8K)
-- **ernie-speed-pro-128k** : modèle Speed Pro (contexte 128K)
-- **ernie-speed-128k** : modèle Speed (contexte 128K)
-- **ernie-speed-8k** : modèle Speed (contexte 8K)
-- **ernie-lite-pro-128k** : modèle Lite Pro (contexte 128K)
-- **ernie-lite-8k** : modèle Lite (contexte 8K)
+- **GLM-5.2** : Prend en charge un contexte 1M réellement utilisable, continue de mener dans les tâches à long terme
+- **GLM-5.1** : Capacités de codage considérablement renforcées, amélioration notable des tâches à long terme, livre des résultats de niveau ingénierie
+- **DeepSeek-V4-Pro** : Prend en charge un contexte ultra-long de millions de tokens, leader dans les capacités d'agent, la connaissance du monde et les performances de raisonnement, tant au niveau national que dans le domaine open-source
+- **DeepSeek-V4-Flash** : Modèle léger efficace prenant en charge un contexte ultra-long de millions de tokens
+- **Kimi-K2.6** : Capacité de rédaction de code à long terme plus forte et plus stable, prend en charge les entrées texte et image
+- **ERNIE-5.1** : Dernier modèle de la série Wenxin, capacités fondamentales entièrement améliorées, progrès significatifs en matière d'agents, de connaissances, de raisonnement et de recherche approfondie
+- **qianfan-code-latest** : Le choix du modèle est déterminé par la console Qianfan
 
-## Configuration dans Silicon Life
-
-1. Sélectionnez **Baidu ERNIE** comme type de client IA
+1. Sélectionnez **Baidu Qianfan** comme type de client IA
 2. Définissez la **Clé API** sur votre clé API Qianfan
-3. Définissez le **Modèle** sur le nom du modèle ERNIE activé
+3. Définissez le **Modèle** sur le nom du modèle Qianfan activé
 4. Définissez le **Point de terminaison** sur l'adresse API Qianfan (laissez vide pour la valeur par défaut)
 5. Laissez la **Fenêtre de contexte Tokens** vide pour la détection automatique
-
-## Mode de facturation
-
-- Les séries ERNIE Speed et Lite disposent de quotas gratuits
-- Les modèles payants sont facturés à l'usage
-- Consultez `https://qianfan.cloud.baidu.com/pricing` pour plus de détails
 
 ## FAQ
 
@@ -2624,5 +2616,143 @@ Dans le répertoire `data/Log/`, indexés par temps.
 3. **Éviter l'impact sur les performances** : Augmentez la verbosité si les fichiers de journal deviennent trop volumineux
 ";
 
-    #endregion
+    
+    public override string Skills => @"
+# Compétences
+
+## Qu'est-ce qu'une compétence ?
+
+Une compétence (Skill) est une unité de capacité réutilisable encapsulant l'orchestration d'outils et des modèles de prompts. Elle représente une « capacité » concrète d'un être en silicium, et peut être invoquée automatiquement par l'IA (function calling) ou déclenchée explicitement par l'utilisateur ou le conservateur.
+
+**Compétence vs Outil :**
+- **Outil (Tool)** : une opération atomique unique (ex. lecture de fichier, recherche web) — un appel accomplit une tâche
+- **Compétence (Skill)** : orchestration multi-étapes + modèle de prompt système. Coordonne plusieurs outils pour accomplir des tâches complexes
+
+## Sources des compétences
+
+Le système prend en charge 4 sources de compétences :
+
+| Source | Description | Exemple |
+|--------|-------------|---------|
+| Intégrée (Builtin) | Intégrée au framework, non modifiable | Fonctionnalités système |
+| Plugin (Plugin) | Enregistrée via l'interface `ISkillProvider` | Extensions tierces |
+| Créée par l'être (Being) | Créée par l'être en silicium à l'exécution | Auto-évolution de l'IA |
+| Créée par l'utilisateur (User) | Créée via l'UI Web ou l'outil `skill` | Flux de travail personnalisés |
+
+## Configuration principale
+
+Lors de la création d'une compétence, vous pouvez configurer :
+
+- **id** : identifiant unique (ex. `summarize_document`)
+- **description** : description en une phrase utilisée lors du function calling
+- **system_prompt** : modèle de prompt système. Supporte les espaces réservés `{param}`, remplis automatiquement à l'exécution
+- **parameter_schema** : JSON Schema déclarant les paramètres acceptés
+- **tool_whitelist** : liste blanche des outils autorisés à l'exécution (liste vide = hérite de tous les outils)
+- **max_tool_round** : nombre maximum de rounds d'appels d'outils (5 par défaut)
+- **timeout** : délai d'exécution (60 secondes par défaut)
+- **on_complete** : action après completion : `write_memory` (écrire en mémoire), `notify_curator` (notifier le conservateur), `broadcast` (diffuser), `none`
+- **trigger_mode** : mode de déclenchement : `manual` (manuel/appel auto IA) ou `auto` (déclenchement programmé)
+- **auto_trigger_condition** : condition de déclenchement auto (ex. `daily 09:00`, `interval 6h`, expression cron)
+
+## Utilisation des compétences
+
+### 1. Déclenchement depuis le chat
+
+Demandez directement à l'être en silicium d'exécuter une compétence dans le chat. Ex :
+
+> « Résume ce document »
+
+Si la compétence `summarize_document` est enregistrée, elle sera reconnue et invoquée automatiquement.
+
+### 2. Gestion avec l'outil `skill`
+
+L'être en silicium peut utiliser l'outil `skill` pour :
+
+- **create** : créer une nouvelle compétence (`id` et `system_prompt` requis)
+- **list** : lister toutes les compétences enregistrées
+- **update** : mettre à jour une compétence existante
+- **update_from_md** : mettre à jour depuis un Markdown
+- **delete** : supprimer une compétence
+- **export / export_md** : exporter en JSON ou Markdown
+- **import / import_md** : importer depuis JSON ou Markdown
+
+### 3. Gestion via l'UI Web
+
+La page « Compétences » de l'UI Web permet de :
+- Visualiser toutes les compétences
+- Créer/modifier/supprimer des compétences personnalisées
+- Importer/exporter des définitions de compétences
+- Consulter l'historique d'exécution
+
+## Format de fichier de compétence
+
+Les compétences sont persistées par défaut au format Markdown, dans le répertoire `skills/` de l'être.
+
+**Exemple de format Markdown :**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**Explications :**
+- La partie entre `---` est le YAML front matter (métadonnées)
+- Le reste est le modèle de prompt système (`system_prompt`)
+- Les métadonnées manquantes sont automatiquement complétées par l'IA
+- Un fichier `.md` prime sur un fichier `.json` de même ID
+
+## Compétences à déclenchement automatique
+
+Configurez `trigger_mode` sur `auto` et définissez `auto_trigger_condition` pour exécuter la compétence automatiquement à l'heure programmée.
+
+**Formats de planification supportés :**
+- `daily 09:00` — tous les jours à 9h
+- `interval 6h` — toutes les 6 heures
+- Expression cron standard — ex. `0 9 * * 1-5` (9h en semaine)
+
+Les résultats d'exécution automatique sont écrits par défaut dans la mémoire de l'être, avec option de notification au conservateur ou de diffusion sur un canal.
+
+## Permissions et sécurité
+
+- Le conservateur (Curator) peut modifier toutes les compétences
+- Un être ordinaire ne peut modifier que les compétences qu'il a créées (source = being) ou celles importées par l'utilisateur
+- Les compétences sont soumises aux permissions d'actions d'outils (ToolActionPermissions)
+- Une liste blanche vide hérite de toutes les permissions d'outils de l'être
+
+## Limite de quantité
+
+Chaque être en silicium peut créer jusqu'à 50 compétences personnalisées (ajustable via configuration).
+
+## FAQ
+
+**Q : Que faire si l'exécution d'une compétence expire ?**
+R : Augmentez la valeur `timeout` dans la définition de la compétence, ou ajustez `GlobalSkillTimeoutSeconds` dans la configuration globale.
+
+**Q : Que faire si une compétence échoue à appeler un outil ?**
+R : Vérifiez que `tool_whitelist` contient l'outil nécessaire et que l'être possède la permission pour cet outil.
+
+**Q : Comment sauvegarder une compétence ?**
+R : Utilisez `export` ou `export_md` pour l'exporter en JSON/Markdown, stockez-la en lieu sûr, puis restaurez-la avec `import`.
+
+**Q : Une compétence peut-elle s'appeler elle-même récursivement ?**
+R : Non. Les compétences en cours d'exécution sont bloquées contre les appels récursifs pour éviter les boucles infinies.
+";
+
+#endregion
 }

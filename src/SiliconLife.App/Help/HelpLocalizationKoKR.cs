@@ -54,6 +54,7 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
     public override string WorkNotes_Title => "작업 노트";
     public override string Projects_Title => "프로젝트 관리";
     public override string Logging_Title => "로깅 시스템";
+    public override string Skills_Title => "스킬";
 
     public override string[] GettingStarted_Tags => new[] { "설치", "시작", "입문", "빠른 시작", "시작하기", "초기화", "실행", "환경 구성" };
 
@@ -125,7 +126,7 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
         new[] { "프로젝트 관리", "프로젝트", "협업", "작업", "멤버", "아카이브", "팀", "워크스페이스", "진행" };
 
     public override string[] Logging_Tags => new[] { "로깅 시스템", "로그", "기록", "디버그", "오류", "경고", "모니터", "추적", "콘솔", "파일" };
-
+    public override string[] Skills_Tags => new[] { "스킬", "Skill", "툻 오케스트레이션", "프롬프트 템플릿", "자동화", "커스텀 스킬", "플러그인" };
     public override string GettingStarted => @"
 # 빠른 시작
 
@@ -2568,7 +2569,7 @@ MiniMax 는 종량제, 모델별로 요금이 다릅니다. 플랫폼에서 현�
 
 ### 1단계: 바이두 클라우드 계정 등록
 
-1. `https://qianfan.cloud.baidu.com` 에 접속
+1. `https://cloud.baidu.com/product-s/qianfan_home` 에 접속
 2. 바이두 계정으로 로그인
 3. 실명 인증 완료
 
@@ -2586,28 +2587,19 @@ MiniMax 는 종량제, 모델별로 요금이 다릅니다. 플랫폼에서 현�
 
 ## 사용 가능한 모델
 
-- **ernie-4.5-turbo-128k**: 플래그십 모델 (128K 컨텍스트)
-- **ernie-4.0-turbo-8k**: Turbo 모델 (8K 컨텍스트)
-- **ernie-4.0-turbo-8k-latest**: 최신 Turbo (8K 컨텍스트)
-- **ernie-speed-pro-128k**: Speed Pro 모델 (128K 컨텍스트)
-- **ernie-speed-128k**: Speed 모델 (128K 컨텍스트)
-- **ernie-speed-8k**: Speed 모델 (8K 컨텍스트)
-- **ernie-lite-pro-128k**: Lite Pro 모델 (128K 컨텍스트)
-- **ernie-lite-8k**: Lite 모델 (8K 컨텍스트)
+- **GLM-5.2**: 진정으로 사용 가능한 1M 컨텍스트를 지원하며, 장기 작업에서 계속해서 선두를 유지
+- **GLM-5.1**: 코드 능력이 크게 향상되었고, 장기 작업이 현저히 개선되어 엔지니어링 수준의 결과를 제공
+- **DeepSeek-V4-Pro**: 백만 레벨의 초장 컨텍스트를 지원하며, 에이전트 능력, 세계 지식, 추론 성능 면에서 국내 및 오픈소스 분야에서 선두
+- **DeepSeek-V4-Flash**: 효율적인 경량 모델로, 백만 레벨의 초장 컨텍스트를 지원
+- **Kimi-K2.6**: 더 강하고 안정적인 장기 코드 작성 능력을 갖추고 있으며, 텍스트와 이미지 입력을 모두 지원
+- **ERNIE-5.1**: 문심 시리즈의 최신 모델로, 기초 능력이 전면 업그레이드되어 에이전트, 지식, 추론, 심층 검색 등의 면에서 현저한 향상
+- **qianfan-code-latest**: 모델 선택은 천범 콘솔에서 결정됩니다
 
-## 실리콘 라이프에서 설정
-
-1. **바이두 ERNIE** 를 AI 클라이언트 유형으로 선택
+1. **바이두 천범** 을 AI 클라이언트 유형으로 선택
 2. **API 키** 를 천범 API Key 로 설정
-3. **모델** 을 개통한 ERNIE 모델명으로 설정
+3. **모델** 을 개통한 천범 모델명으로 설정
 4. **엔드포인트** 를 천범 API 주소로 설정 (비워두면 기본값 사용)
 5. **컨텍스트 윈도우 Tokens** 는 비워두면 자동 감지
-
-## 과금 방식
-
-- ERNIE Speed 와 Lite 시리즈에 무료 할당량 있음
-- 유료 모델은 종량제
-- `https://qianfan.cloud.baidu.com/pricing` 에서 상세 정보 확인
 
 ## 자주 묻는 질문
 
@@ -4494,5 +4486,143 @@ AI 도구로 프로젝트 생성:
 - 대량의 로그 쓰기 시 적절히 로그 레벨을 높이는 것을 권장합니다
 ";
 
-    #endregion
+    
+    public override string Skills => @"
+# 스킬
+
+## 스킬이란?
+
+스킬(Skill)은 툴 오케스트레이션과 프롬프트 템플릿을 캡슐화한 재사용 가능한 기능 단위입니다. 실리콘 비잉의 구체적인 ""능력""을 나타내며, AI에 의한 자동 호출(함수 호출) 또는 사용자/큐레이터의 명시적 트리거가 가능합니다.
+
+**스킬 vs 툴:**
+- **툴(Tool)**: 단일 원자 작업(예: 파일 읽기, 웹 검색) — 한 번의 호출로 한 가지 작업 완료
+- **스킬(Skill)**: 다중 단계 오케스트레이션 + 시스템 프롬프트 템플릿. 여러 툴을 조율하여 복잡한 작업을 완료할 수 있음
+
+## 스킬 소스
+
+시스템은 4가지 스킬 소스를 지원합니다:
+
+| 소스 | 설명 | 예시 |
+|------|------|------|
+| 내장(Builtin) | 프레임워크에 내장되어 있으며 수정 불가 | 시스템 수준 기능 |
+| 플러그인(Plugin) | `ISkillProvider` 인터페이스를 통해 등록 | 서드파티 확장 |
+| 비잉 생성(Being) | 실리콘 비잉이 실행 중에 자체 생성 | AI 자기 진화 |
+| 사용자 생성(User) | Web UI 또는 `skill` 툴을 통해 생성 | 사용자 정의 워크플로우 |
+
+## 스킬의 핵심 설정
+
+스킬 생성 시 다음 매개변수를 설정할 수 있습니다:
+
+- **id**: 고유 식별자(예: `summarize_document`)
+- **description**: AI 함수 호출 시 사용되는 한 문장 설명
+- **system_prompt**: 시스템 프롬프트 템플릿. `{param}` 플레이스홀더를 지원하며 실행 시 자동 채움
+- **parameter_schema**: JSON Schema. 스킬이 수락하는 매개변수를 선언
+- **tool_whitelist**: 실행 시 허용되는 툴 화이트리스트(빈 목록 = 모든 툴 상속)
+- **max_tool_round**: 최대 툴 호출 라운드 수(기본값 5)
+- **timeout**: 실행 타임아웃(기본값 60초)
+- **on_complete**: 완료 후 동작: `write_memory`(메모리에 기록), `notify_curator`(큐레이터에게 알림), `broadcast`(브로드캐스트), `none`
+- **trigger_mode**: 트리거 모드: `manual`(수동/AI 자동 호출) 또는 `auto`(자동 스케줄 트리거)
+- **auto_trigger_condition**: 자동 트리거 조건(예: `daily 09:00`, `interval 6h`, cron 표현식)
+
+## 스킬 사용 방법
+
+### 1. 채팅에서 트리거
+
+채팅에서 실리콘 비잉에게 스킬 실행을 직접 요청합니다. 예:
+
+> ""이 문서를 요약해 주세요""
+
+`summarize_document` 스킬이 등록되어 있다면 자동으로 인식하여 호출합니다.
+
+### 2. `skill` 툴로 관리
+
+실리콘 비잉은 `skill` 툴을 사용하여 다음을 실행할 수 있습니다:
+
+- **create**: 새로운 스킬 생성(`id` 및 `system_prompt` 필요)
+- **list**: 등록된 모든 스킬 목록 표시
+- **update**: 기존 스킬 업데이트
+- **update_from_md**: Markdown에서 스킬 업데이트
+- **delete**: 스킬 삭제
+- **export / export_md**: JSON 또는 Markdown으로 내보내기
+- **import / import_md**: JSON 또는 Markdown에서 가져오기
+
+### 3. Web UI에서 관리
+
+Web UI의 ""스킬"" 페이지에서 다음이 가능합니다:
+- 모든 스킬 목록 보기
+- 커스텀 스킬 생성/편집/삭제
+- 스킬 정의 가져오기/내보내기
+- 스킬 실행 기록 보기
+
+## 스킬 파일 형식
+
+스킬은 기본적으로 Markdown 형식으로 영구 저장되며, 비잉의 `skills/` 디렉터리에 저장됩니다.
+
+**Markdown 형식 예시:**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**설명:**
+- `---`로 둘러싸인 부분은 YAML front matter(메타데이터)
+- 나머지 부분은 시스템 프롬프트 템플릿(`system_prompt`)
+- 누락된 메타데이터는 AI에 의해 자동 보완됩니다
+- `.md` 파일은 동일한 ID의 `.json` 파일보다 우선합니다
+
+## 자동 트리거 스킬
+
+스킬의 `trigger_mode`를 `auto`로 설정하고 `auto_trigger_condition`을 구성하면, 설정된 시간에 자동으로 실행됩니다.
+
+**지원되는 스케줄 형식:**
+- `daily 09:00` — 매일 오전 9시
+- `interval 6h` — 6시간마다
+- 표준 cron 표현식 — 예: `0 9 * * 1-5`(평일 9시)
+
+자동 실행 결과는 기본적으로 비잉의 메모리에 기록되며, 큐레이터에게 알리거나 채널에 브로드캐스트하도록 설정할 수도 있습니다.
+
+## 권한 및 보안
+
+- 큐레이터(Curator)는 모든 스킬을 수정할 수 있습니다
+- 일반 비잉은 자신이 생성한 스킬(source = being) 또는 사용자가 가져온 스킬만 수정할 수 있습니다
+- 스킬은 툴 액션 권한(ToolActionPermissions)의 제약을 받습니다
+- 화이트리스트가 비어 있는 경우 비잉의 모든 툴 권한을 상속합니다
+
+## 수량 제한
+
+각 실리콘 비잉은 최대 50개의 커스텀 스킬을 생성할 수 있습니다(구성으로 조정 가능).
+
+## 자주 묻는 질문
+
+**Q: 스킬 실행이 타임아웃되면 어떻게 합니까?**
+A: 스킬 정의의 `timeout` 값을 늘리거나, 글로벌 구성의 `GlobalSkillTimeoutSeconds`를 조정하세요.
+
+**Q: 스킬이 툴 호출에 실패하면 어떻게 합니까?**
+A: `tool_whitelist`에 필요한 툴이 포함되어 있는지, 비잉이 해당 툴의 권한을 가지고 있는지 확인하세요.
+
+**Q: 스킬을 백업하려면 어떻게 합니까?**
+A: `export` 또는 `export_md`를 사용하여 JSON/Markdown으로 내보내고, 안전한 위치에 저장한 후 `import`로 복원하세요.
+
+**Q: 스킬이 재귀적으로 자신을 호출할 수 있습니까?**
+A: 아니요. 실행 중인 스킬은 재귀 호출이 차단되어 무한 루프를 방지합니다.
+";
+
+#endregion
 }

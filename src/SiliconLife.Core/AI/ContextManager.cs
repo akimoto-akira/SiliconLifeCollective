@@ -499,6 +499,15 @@ public class ContextManager
                 toolDefTokens = EstimateToolDefinitionTokens(toolDefs);
             }
 
+            // Skill definitions are appended to the tool list (function-calling format, aligned with tools)
+            List<ToolDefinition>? skillDefs = GetSkillDefinitionsForRequest();
+            if (skillDefs != null)
+            {
+                toolDefs ??= new List<ToolDefinition>();
+                toolDefs.AddRange(skillDefs);
+                toolDefTokens += EstimateToolDefinitionTokens(skillDefs);
+            }
+
             int remainingAfterCoreAndTools = inputBudget - systemTokensUsed - toolDefTokens;
 
             // Add ProjectInfoContext if budget allows (Layer 7 - lowest priority)
@@ -671,6 +680,14 @@ public class ContextManager
                         ? toolManager.GetToolDefinitions(scenario, _being.Id, effectivePermissions)
                         : toolManager.GetToolDefinitions(scenario);
                 }
+            }
+
+            // Skill definitions are appended to the tool list (function-calling format, aligned with tools)
+            List<ToolDefinition>? legacySkillDefs = GetSkillDefinitionsForRequest();
+            if (legacySkillDefs != null)
+            {
+                request.Tools ??= new List<ToolDefinition>();
+                request.Tools.AddRange(legacySkillDefs);
             }
 
             _logger.Debug(_being.Id, "Building AI request (legacy): {0} messages, {1} tools, memory={2}",
@@ -1014,8 +1031,45 @@ public class ContextManager
     }
 
     /// <summary>
+    /// Gets skill definitions to inject into the AIRequest tool list.
+    /// Skills are presented to the AI as ordinary functions (the AI cannot
+    /// distinguish them from tools — dispatch happens on the execution side).
+    /// Skills whose id collides with a registered tool name are skipped to
+    /// avoid ambiguity. Returns null when no skills are injectable.
+    /// </summary>
+    private List<ToolDefinition>? GetSkillDefinitionsForRequest()
+    {
+        SkillManager? skillManager = _being.SkillManager;
+        if (skillManager == null || !SkillManager.SkillEnabled || _aiClient.SupportsToolCalls == false)
+        {
+            return null;
+        }
+
+        List<ToolDefinition> skillDefs = skillManager.GetSkillDefinitions(_being.Id, _being.ToolActionPermissions);
+        if (skillDefs.Count == 0)
+        {
+            return null;
+        }
+
+        // Skip skills whose id collides with a registered tool name
+        ToolManager? toolManager = _being.ToolManager;
+        if (toolManager != null)
+        {
+            skillDefs = skillDefs.Where(s => !toolManager.HasTool(s.Name)).ToList();
+            if (skillDefs.Count == 0)
+            {
+                return null;
+            }
+        }
+
+        return skillDefs;
+    }
+
+    /// <summary>
     /// Executes tool calls and returns tool result messages.
     /// Each tool result is added to the context messages.
+    /// Skill calls (toolCall.Name matching a registered skill) are dispatched
+    /// to SkillManager.ExecuteSkill; everything else goes to ToolManager.
     /// Passes projectId to ToolManager.ExecuteTool so that project-level
     /// permission restrictions are enforced at runtime.
     /// </summary>
@@ -1025,11 +1079,22 @@ public class ContextManager
 
         List<ChatMessage> toolResultMessages = new List<ChatMessage>();
         ToolManager? toolManager = _being.ToolManager;
+        SkillManager? skillManager = _being.SkillManager;
 
         foreach (ToolCall toolCall in toolCalls)
         {
             ToolResult result;
-            if (toolManager != null)
+
+            // Skill calls take precedence over tool calls with the same name
+            SkillDefinition? skill = (skillManager != null && SkillManager.SkillEnabled)
+                ? skillManager.GetSkill(toolCall.Name)
+                : null;
+
+            if (skill != null)
+            {
+                result = skillManager!.ExecuteSkill(toolCall.Name, toolCall.Arguments, _being);
+            }
+            else if (toolManager != null)
             {
                 result = toolManager.ExecuteTool(toolCall.Name, toolCall.Arguments, being: _being, projectId: projectId);
             }

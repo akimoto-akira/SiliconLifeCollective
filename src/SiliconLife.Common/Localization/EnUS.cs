@@ -435,6 +435,30 @@ Usage: Call the chat tool with action=""mark_read"", target_id=partner's GUID, n
     public override string ProjectWorkNotesPageHeader => "Project Work Notes";
     public override string ProjectWorkNotesEmptyState => "No work notes for this project";
     public override string ProjectWorkNotesTotalPages => "Total Pages: {0}";
+    public override string PageTitleSkills => "Skill Management";
+    public override string SkillsPageHeader => "Skills";
+    public override string SkillsPageSubtitle => "Skills = reusable tool orchestration + prompt templates (Markdown; metadata in YAML front matter)";
+    public override string SkillsStatFormat => "{0} skill(s) · custom {1}/{2}";
+    public override string SkillsEmptyState => "No skills yet";
+    public override string SkillsBackToBeings => "← Back to beings";
+    public override string SkillBtnNew => "New Skill";
+    public override string SkillBtnImportMd => "Import Markdown";
+    public override string SkillBtnImportJson => "Import JSON";
+    public override string SkillBtnRefresh => "Refresh";
+    public override string SkillBtnEdit => "Edit";
+    public override string SkillBtnTest => "Test";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "Delete";
+    public override string SkillCurrentEditingFormat => "Editing: {0}";
+    public override string SkillNewSkillLabel => "New skill (unsaved)";
+    public override string SkillConfirmDeleteFormat => "Delete skill {0}?";
+    public override string SkillPromptImportMd => "Paste skill Markdown (YAML front matter + body; missing metadata will be auto-completed)";
+    public override string SkillPromptImportJson => "Paste SkillDefinition JSON";
+    public override string SkillPromptTestParams => "Enter test parameters JSON (e.g. {\"source\": \"...\"}), leave empty for none";
+    public override string SkillTestResultPrefix => "Result: ";
+    public override string SkillLoadFailedFormat => "Failed to load: {0}";
+    public override string SkillRequestFailed => "Request failed";
 
     // ===== Tasks Page Localization =====
 
@@ -867,7 +891,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["AI"] = "AI Settings",
         ["Web"] = "Web Settings",
         ["User"] = "User Settings",
-        ["IM"] = "IM Configuration"
+        ["IM"] = "IM Configuration",
+        ["Skill"] = "Skill Configuration"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -982,14 +1007,13 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (Low latency)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (Agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (Open-source Agent, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (Flagship, 128K, Multimodal)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, Cost-effective)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, Economy)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, Long context)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, Free)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, Free) - Recommended for debugging",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, Free)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M context, leads in long-range tasks)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (enhanced coding, engineering-grade results)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (million context, leads in Agent/reasoning)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (efficient lightweight, million context)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (long-range code, text/image input)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (latest Wenxin, agent/reasoning upgraded)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (controlled by console)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) - Recommended",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (Free, 256K)",
@@ -1032,7 +1056,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["IMHelp_webui"] = "Built-in browser chat interface served directly by this application. No external credentials are required — just enable it and chat from the web page.",
         ["IMHelp_feishu"] = "Create a custom app on the Feishu Open Platform, enable the bot capability and publish a release. Copy App ID and App Secret from 'Credentials & Basic Info', and Verification Token / Encrypt Key from 'Event Subscriptions'. Point the event subscription request URL to this app's callback path; Feishu allows localhost callbacks, so no public address is needed for local testing.",
         ["IMHelp_wecom"] = "Create a self-built app in the WeCom admin console (Apps → Create App). Fill in the Corp ID (My Company → Company Info), the app's Agent ID and App Secret, plus the Token and Encoding AES Key generated when configuring the 'message receiving server'. The callback URL must be a publicly reachable HTTPS address pointing to this app's callback path, and the server IP may need to be added to the trusted IP list.",
-        ["IMHelp_dingtalk"] = "Create an internal enterprise app with a robot on the DingTalk Open Platform. Fill in the App Key, App Secret and Robot Code from the app's credentials page. Stream mode (default) receives messages over a WebSocket connection and needs no public address; HTTP callback mode requires a publicly reachable HTTPS callback URL."
+        ["IMHelp_dingtalk"] = "Create an internal enterprise app with a robot on the DingTalk Open Platform. Fill in the App Key, App Secret and Robot Code from the app's credentials page. Stream mode (default) receives messages over a WebSocket connection and needs no public address; HTTP callback mode requires a publicly reachable HTTPS callback URL.",
+        ["SkillEnabled"] = "Enable Skills",
+        ["GlobalMaxToolRound"] = "Global Max Tool Rounds",
+        ["GlobalSkillTimeoutSeconds"] = "Global Skill Timeout (s)",
+        ["MaxCustomSkillsPerBeing"] = "Max Custom Skills Per Being"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1095,7 +1123,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebSkin"] = "Web skin name",
         ["UserNickname"] = "Nickname of the human user",
         ["PluginDirectories"] = "List of plugin directories for auto-discovery, supports relative or absolute paths",
-        ["IMPlatforms"] = "Configure connected IM platforms; add multiple, via manual credentials or scan authorization"
+        ["IMPlatforms"] = "Configure connected IM platforms; add multiple, via manual credentials or scan authorization",
+        ["SkillEnabled"] = "Enable the skill system (skill registration, AI dispatch and auto triggers)",
+        ["GlobalMaxToolRound"] = "Upper limit of tool call rounds per skill execution",
+        ["GlobalSkillTimeoutSeconds"] = "Upper limit of skill execution duration in seconds",
+        ["MaxCustomSkillsPerBeing"] = "Maximum number of custom (non-builtin) skills each silicon being may hold"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -1169,7 +1201,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["project"] = "Project",
         ["project_task"] = "Project Task",
         ["project_work_note"] = "Project Work Note",
-        ["webview_browser"] = "WebView Browser"
+        ["webview_browser"] = "WebView Browser",
+        ["skill"] = "Skill"
     };
 
     public override string GetToolDisplayName(string toolName) =>

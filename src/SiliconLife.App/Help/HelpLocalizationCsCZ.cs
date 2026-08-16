@@ -52,6 +52,7 @@ public class HelpLocalizationCsCZ : HelpLocalizationBase
   public override string WorkNotes_Title => "Pracovní Poznámky";
   public override string Projects_Title => "Správa Projektů";
   public override string Logging_Title => "Systém Protokolování";
+  public override string Skills_Title => "Dovednosti";
 
   public override string[] GettingStarted_Tags => new[]
   {
@@ -158,7 +159,7 @@ public class HelpLocalizationCsCZ : HelpLocalizationBase
     "systém protokolování", "protokol", "záznamy", "debug", "chyba", "varování", "monitor", "sledování", "konzole",
     "soubor"
   };
-
+  public override string[] Skills_Tags => new[] { "dovednosti", "skill", "orchestrace", "prompt", "automatizace", "plugin", "uživatelské" };
   public override string GettingStarted => @"
 # Rychlý start
 
@@ -3025,7 +3026,7 @@ Baidu ERNIE je řada velkých jazykových modelů společnosti Baidu, přístupn
 
 ### Krok 1: Registrace v Baidu Cloud
 
-1. Navštivte `https://qianfan.cloud.baidu.com`
+1. Navštivte `https://cloud.baidu.com/product-s/qianfan_home`
 2. Přihlaste se pomocí účtu Baidu
 3. Proveďte ověření identity
 
@@ -3043,28 +3044,19 @@ Na platformě Qianfan přejděte na **Správa modelů** a aktivujte modely, kter
 
 ## Dostupné modely
 
-- **ernie-4.5-turbo-128k**: vlajkový model (kontext 128K)
-- **ernie-4.0-turbo-8k**: model Turbo (kontext 8K)
-- **ernie-4.0-turbo-8k-latest**: nejnovější Turbo (kontext 8K)
-- **ernie-speed-pro-128k**: model Speed Pro (kontext 128K)
-- **ernie-speed-128k**: model Speed (kontext 128K)
-- **ernie-speed-8k**: model Speed (kontext 8K)
-- **ernie-lite-pro-128k**: model Lite Pro (kontext 128K)
-- **ernie-lite-8k**: model Lite (kontext 8K)
+- **GLM-5.2**: Podporuje skutečně použitelný kontext 1M, nadále vede v dlouhodobých úkolech
+- **GLM-5.1**: Výrazně posílené schopnosti kódování, výrazné zlepšení dlouhodobých úkolů, poskytuje výsledky na inženýrské úrovni
+- **DeepSeek-V4-Pro**: Podporuje ultra-dlouhý kontext na úrovni milionů, vede v agentních schopnostech, znalostech světa a výkonu uvažování, jak na národní úrovni, tak v oblasti open source
+- **DeepSeek-V4-Flash**: Efektivní lehký model podporující ultra-dlouhý kontext na úrovni milionů
+- **Kimi-K2.6**: Silnější a stabilnější schopnost psaní kódu na dlouhou trať, podporuje jak textové, tak obrazové vstupy
+- **ERNIE-5.1**: Nejnovější model série Wenxin, komplexně vylepšené základní schopnosti, výrazné zlepšení v agentech, znalostech, uvažování a hlubokém vyhledávání
+- **qianfan-code-latest**: Výběr modelu je určen konzolí Qianfan
 
-## Konfigurace v Silicon Life
-
-1. Vyberte **Baidu ERNIE** jako typ AI klienta
+1. Vyberte **Baidu Qianfan** jako typ AI klienta
 2. Nastavte **Klíč API** na svůj klíč API Qianfan
-3. Nastavte **Model** na název aktivovaného modelu ERNIE
+3. Nastavte **Model** na název aktivovaného modelu Qianfan
 4. Nastavte **Koncový bod** na adresu API Qianfan (ponechte prázdné pro výchozí hodnotu)
 5. Ponechte **Okno kontextu Tokens** prázdné pro automatickou detekci
-
-## Způsob fakturace
-
-- Řady ERNIE Speed a Lite mají bezplatné kvóty
-- Placené modely fakturovány podle spotřeby
-- Podrobnosti na `https://qianfan.cloud.baidu.com/pricing`
 
 ## Časté otázky
 
@@ -5078,5 +5070,143 @@ Systém NEZAZNAMENÁVÁ následující citlivé informace do protokolů:
 - Při zápisu velkého množství protokolů se doporučuje přiměřeně zvýšit úroveň protokolu
 ";
 
-  #endregion
+  
+  public override string Skills => @"
+# Dovednosti
+
+## Co je dovednost?
+
+Dovednost (Skill) je opakovane pouzitelna jednotka schopnosti, ktera zapouzdruje orchestraci nastroju a sablon promptu. Predstavuje konkretni ""schopnost"" kremikove bytosti a muze byt vyvolana automaticky AI (function calling) nebo explicitne spustena uzivatelem/kuratorem.
+
+**Dovednost vs Nastroj:**
+- **Nastroj (Tool)**: Jedna atomicka operace (napr. cteni souboru, webove hledani) — jedno volani splni jeden ukol
+- **Dovednost (Skill)**: Vicekroka orchestrace + sablona systemoveho promptu. Koordinuje vice nastroju pro splneni slozitych ukolu
+
+## Zdroje dovednosti
+
+System podporuje 4 zdroje dovednosti:
+
+| Zdroj | Popis | Priklad |
+|-------|-------|---------|
+| Vestavena (Builtin) | Integrovana do frameworku, neupravitelna | Funkce na urovni systemu |
+| Plugin | Registrovana pres rozhrani `ISkillProvider` | Rozsireni tretich stran |
+| Vytvorena bytosti (Being) | Vytvorena kremikovou bytosti za behu | Samovyvoj AI |
+| Vytvorena uzivatelem (User) | Vytvorena pres Web UI nebo nastroj `skill` | Uzivatelske pracovni toky |
+
+## Hlavni konfigurace
+
+Pri vytvareni dovednosti muzete konfigurovat:
+
+- **id**: Unikatni identifikator (napr. `summarize_document`)
+- **description**: Jednovetny popis pouzivany pri function calling
+- **system_prompt**: Sablona systemoveho promptu. Podporuje placeholdery `{param}`, automaticky vyplnovane za behu
+- **parameter_schema**: JSON Schema deklarujici prijimane parametry
+- **tool_whitelist**: Whitelist nastroju povolenych pri vykonavani (prazdny seznam = dedi vsechny nastroje)
+- **max_tool_round**: Maximalni pocet kol volani nastroju (defaultne 5)
+- **timeout**: Casovy limit vykonavani (defaultne 60 sekund)
+- **on_complete**: Akce po dokonceni: `write_memory` (zapis do pameti), `notify_curator` (upozornit kuratora), `broadcast` (vysilani), `none`
+- **trigger_mode**: Rezim spusteni: `manual` (manualni/auto AI) nebo `auto` (automaticke planovani)
+- **auto_trigger_condition**: Podminka automatickeho spusteni (napr. `daily 09:00`, `interval 6h`, cron vyraz)
+
+## Pouzivani dovednosti
+
+### 1. Spusteni z chatu
+
+Poproste kremikovou bytost primo v chatu o provedeni dovednosti. Priklad:
+
+> ""Shrn tento dokument""
+
+Pokud je dovednost `summarize_document` registrovana, bude automaticky rozpoznana a vyvolana.
+
+### 2. Sprava pomoci nastroje `skill`
+
+Kremikova bytost muze pouzit nastroj `skill` pro:
+
+- **create**: Vytvorit novou dovednost (`id` a `system_prompt` pozadovany)
+- **list**: Vypsat vsechny registrovane dovednosti
+- **update**: Aktualizovat existujici dovednost
+- **update_from_md**: Aktualizovat z Markdownu
+- **delete**: Smazat dovednost
+- **export / export_md**: Exportovat jako JSON nebo Markdown
+- **import / import_md**: Importovat z JSON nebo Markdown
+
+### 3. Sprava pres Web UI
+
+Stranka ""Dovednosti"" ve Web UI umoznuje:
+- Prohlizeni vsech dovednosti
+- Vytvareni/upravovani/mazani uzivatelskych dovednosti
+- Import/export definic dovednosti
+- Prohlizeni historie vykonavani
+
+## Format souboru dovednosti
+
+Dovednosti jsou defaultne ukladany ve formatu Markdown, v adresari `skills/` bytosti.
+
+**Priklad formatu Markdown:**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**Vysvetleni:**
+- Cast mezi `---` je YAML front matter (metadata)
+- Zbytek je sablona systemoveho promptu (`system_prompt`)
+- Chybejici metadata jsou automaticky doplnena AI
+- Soubor `.md` ma prednost pred souborem `.json` se stejnym ID
+
+## Automaticky spustene dovednosti
+
+Nastavte `trigger_mode` na `auto` a definujte `auto_trigger_condition` pro automaticke spusteni dovednosti v naplanovany cas.
+
+**Podporovane formaty planovani:**
+- `daily 09:00` — kazdy den v 9:00
+- `interval 6h` — kazdych 6 hodin
+- Standardni cron vyraz — napr. `0 9 * * 1-5` (9:00 v pracovni dny)
+
+Vysledky automatickeho vykonavani jsou defaultne zapisovany do pameti bytosti, s moznosti upozorneni kuratora nebo vysilani na kanal.
+
+## Opravneni a bezpecnost
+
+- Kurator muze menit vsechny dovednosti
+- Bezna bytost muze menit pouze dovednosti, ktere sama vytvorila (source = being) nebo importovane uzivatelem
+- Dovednosti podlehaji opravnenim akci nastroju (ToolActionPermissions)
+- Prazdna whitelist dedi vsechna opravneni nastroju bytosti
+
+## Limit mnozstvi
+
+Kazda kremikova bytost muze vytvorit az 50 uzivatelskych dovednosti (upravitelne pres konfiguraci).
+
+## Caste dotazy
+
+**Q: Co delat, kdyz vykonavani dovednosti vyprsi?**
+A: Zvyste hodnotu `timeout` v definici dovednosti nebo upravte `GlobalSkillTimeoutSeconds` v globalni konfiguraci.
+
+**Q: Co delat, kdyz dovednost nemuze zavolat nastroj?**
+A: Zkontrolujte, zda `tool_whitelist` obsahuje pozadovany nastroj a zda bytost ma opravneni pro tento nastroj.
+
+**Q: Jak zalohovat dovednost?**
+A: Pouzijte `export` nebo `export_md` pro export jako JSON/Markdown, ulozte na bezpecne misto a obnovte pomoci `import`.
+
+**Q: Muze dovednost rekurzivne volat sama sebe?**
+A: Ne. Prave vykonavane dovednosti jsou blokovany proti rekurzivnim volanim, aby se zabranilo nekonecnym smyckam.
+";
+
+#endregion
 }

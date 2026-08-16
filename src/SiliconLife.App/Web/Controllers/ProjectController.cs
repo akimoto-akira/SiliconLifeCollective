@@ -2138,17 +2138,19 @@ public class ProjectController : Controller
         private static Dictionary<string, string> GetToolDisplayNames(SiliconBeingBase? being)
         {
             var result = new Dictionary<string, string>();
-            if (being?.ToolManager == null)
-                return result;
-
-            var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
-            foreach (var toolName in being.ToolManager.GetToolNames())
+            if (being?.ToolManager != null)
             {
-                if (result.ContainsKey(toolName)) continue;
-                var tool = being.ToolManager.GetTool(toolName);
-                if (tool != null)
-                    result[toolName] = tool.GetDisplayName(language);
+                var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+                foreach (var toolName in being.ToolManager.GetToolNames())
+                {
+                    if (result.ContainsKey(toolName)) continue;
+                    var tool = being.ToolManager.GetTool(toolName);
+                    if (tool != null)
+                        result[toolName] = tool.GetDisplayName(language);
+                }
             }
+            // Skills are injected as tool calls too but have no tool translations
+            AppendSkillDisplayNames(result, being?.SkillManager);
             return result;
         }
 

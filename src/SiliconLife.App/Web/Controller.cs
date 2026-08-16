@@ -14,6 +14,8 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using SiliconLife.Collective;
+using SiliconLife.Common.Localization;
 
 namespace SiliconLife.App.Web;
 
@@ -147,6 +149,32 @@ public abstract class Controller
             ip = Request.RemoteEndPoint?.Address?.ToString();
         }
         return ip ?? "unknown";
+    }
+
+    /// <summary>
+    /// Appends skill display names to the frontend tool-name lookup map.
+    /// Skills have no tool translations, so each registered skill id is mapped
+    /// to "[Skill]skillId" where "Skill" is localized via the "skill" tool
+    /// display name and skillId is kept verbatim. Existing entries win.
+    /// </summary>
+    protected static void AppendSkillDisplayNames(Dictionary<string, string> toolDisplayNames, SkillManager? skillManager)
+    {
+        if (skillManager == null)
+            return;
+
+        string skillLabel = "Skill";
+        var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
+        if (LocalizationManager.Instance.TryGetLocalization(language, out var loc) && loc is DefaultLocalizationBase defaultLoc)
+        {
+            skillLabel = defaultLoc.GetToolDisplayName("skill");
+        }
+
+        foreach (var skill in skillManager.GetAllSkills())
+        {
+            if (string.IsNullOrEmpty(skill.Id) || toolDisplayNames.ContainsKey(skill.Id))
+                continue;
+            toolDisplayNames[skill.Id] = $"[{skillLabel}]{skill.Id}";
+        }
     }
 }
 

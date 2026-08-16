@@ -14,6 +14,7 @@
 using SiliconLife.Collective;
 using SiliconLife.Common.AI;
 using SiliconLife.Common.Calendar;
+using SiliconLife.Common.Skills;
 
 namespace SiliconLife.Common.SiliconBeing;
 
@@ -168,6 +169,17 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
             toolManager.ScanAllPluginAssemblies();
         }
         being.ToolManager = toolManager;
+
+        // Skill system: builtin skills + persisted skills + plugin-provided skills
+        SkillManager skillManager = new();
+        foreach (var skill in BuiltinSkills.GetAllSkills())
+        {
+            skillManager.RegisterSkill(skill);
+        }
+        skillManager.RefreshFromStorage(beingStorage);
+        skillManager.ScanAllPluginAssemblies();
+        being.SkillManager = skillManager;
+        skillManager.SyncAutoSkillTickObjects(being);
 
         GlobalACL? globalAcl = ServiceLocator.Instance.GlobalAcl;
         if (globalAcl != null)

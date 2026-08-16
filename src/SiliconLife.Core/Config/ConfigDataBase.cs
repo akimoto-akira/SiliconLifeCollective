@@ -110,6 +110,31 @@ public abstract class ConfigDataBase
     public abstract List<IMPlatformConfig> IMPlatforms { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the skill system is enabled (default true).
+    /// </summary>
+    [ConfigGroup("Skill", Order = 0, DisplayNameKey = "SkillEnabled", DescriptionKey = "SkillEnabled")]
+    public virtual bool SkillEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the global maximum tool round limit for a single skill execution
+    /// (prevents runaway loops, default 10).
+    /// </summary>
+    [ConfigGroup("Skill", Order = 1, DisplayNameKey = "GlobalMaxToolRound", DescriptionKey = "GlobalMaxToolRound")]
+    public virtual int GlobalMaxToolRound { get; set; } = 10;
+
+    /// <summary>
+    /// Gets or sets the global skill execution timeout limit in seconds (default 300).
+    /// </summary>
+    [ConfigGroup("Skill", Order = 2, DisplayNameKey = "GlobalSkillTimeoutSeconds", DescriptionKey = "GlobalSkillTimeoutSeconds")]
+    public virtual int GlobalSkillTimeoutSeconds { get; set; } = 300;
+
+    /// <summary>
+    /// Gets or sets the maximum number of custom (being/user-created) skills per being (default 50).
+    /// </summary>
+    [ConfigGroup("Skill", Order = 3, DisplayNameKey = "MaxCustomSkillsPerBeing", DescriptionKey = "MaxCustomSkillsPerBeing")]
+    public virtual int MaxCustomSkillsPerBeing { get; set; } = 50;
+
+    /// <summary>
     /// Gets the configuration file path
     /// </summary>
     /// <returns>The full path to the configuration file</returns>

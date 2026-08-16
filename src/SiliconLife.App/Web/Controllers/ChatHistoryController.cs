@@ -177,6 +177,8 @@ public class ChatHistoryController : Controller
                     toolDisplayNames[toolName] = tool.GetDisplayName(language);
             }
         }
+        // Skills are injected as tool calls too but have no tool translations
+        AppendSkillDisplayNames(toolDisplayNames, being?.SkillManager);
         
         // Build member names list (empty for Broadcast)
         var memberNames = new List<string>();
@@ -390,6 +392,8 @@ public class ChatHistoryController : Controller
                     toolDisplayNames[toolName] = tool.GetDisplayName(language);
             }
         }
+        // Skills are injected as tool calls too but have no tool translations
+        AppendSkillDisplayNames(toolDisplayNames, being?.SkillManager);
         
         // Build member names list for group chat
         var memberNames = new List<string>();
@@ -458,6 +462,8 @@ public class ChatHistoryController : Controller
                     toolDisplayNames[toolName] = tool.GetDisplayName(language);
             }
         }
+        // Skills are injected as tool calls too but have no tool translations
+        AppendSkillDisplayNames(toolDisplayNames, being?.SkillManager);
         
         var vm = new ChatHistoryDetailViewModel
         {

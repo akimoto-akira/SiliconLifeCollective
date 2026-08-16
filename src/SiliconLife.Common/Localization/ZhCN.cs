@@ -435,6 +435,30 @@ _ => permissionType.ToString()
     public override string ProjectWorkNotesPageHeader => "项目工作笔记";
     public override string ProjectWorkNotesEmptyState => "该项目暂无工作笔记";
     public override string ProjectWorkNotesTotalPages => "总页数：{0}";
+    public override string PageTitleSkills => "技能管理";
+    public override string SkillsPageHeader => "技能";
+    public override string SkillsPageSubtitle => "技能 = 可复用的工具编排 + 提示词模板（Markdown 格式，元数据在 YAML front matter 中）";
+    public override string SkillsStatFormat => "共 {0} 个技能 · 自定义 {1}/{2}";
+    public override string SkillsEmptyState => "暂无技能";
+    public override string SkillsBackToBeings => "← 返回生命体列表";
+    public override string SkillBtnNew => "新建技能";
+    public override string SkillBtnImportMd => "导入 Markdown";
+    public override string SkillBtnImportJson => "导入 JSON";
+    public override string SkillBtnRefresh => "刷新列表";
+    public override string SkillBtnEdit => "编辑";
+    public override string SkillBtnTest => "试运行";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "删除";
+    public override string SkillCurrentEditingFormat => "当前编辑：{0}";
+    public override string SkillNewSkillLabel => "新技能（未保存）";
+    public override string SkillConfirmDeleteFormat => "确定删除技能 {0}？";
+    public override string SkillPromptImportMd => "粘贴技能 Markdown（YAML front matter + 正文；缺失的元数据将自动补全）";
+    public override string SkillPromptImportJson => "粘贴 SkillDefinition JSON";
+    public override string SkillPromptTestParams => "输入测试参数 JSON（例如 {\"source\": \"...\"}），留空表示无参数";
+    public override string SkillTestResultPrefix => "执行结果：";
+    public override string SkillLoadFailedFormat => "加载失败：{0}";
+    public override string SkillRequestFailed => "请求失败";
 
     // ===== Tasks Page Localization =====
 
@@ -867,7 +891,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["AI"] = "AI 配置",
         ["Web"] = "Web 配置",
         ["User"] = "用户配置",
-        ["IM"] = "IM 配置"
+        ["IM"] = "IM 配置",
+        ["Skill"] = "技能配置"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -982,14 +1007,13 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed（低延迟）",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5（Agent SOTA，200K）",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2（开源 Agent，192K）",
-        ["ErnieModel_ernie-5.1"] = "文心 5.1（旗舰，128K，多模态）",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "文心 4.0 Turbo（8K，性价比）",
-        ["ErnieModel_ernie-4.0-8k"] = "文心 4.0（8K）",
-        ["ErnieModel_ernie-3.5-8k"] = "文心 3.5（8K，经济版）",
-        ["ErnieModel_ernie-3.5-128k"] = "文心 3.5（128K，长上下文）",
-        ["ErnieModel_ernie-speed-128k"] = "文心 Speed（128K，免费）",
-        ["ErnieModel_ernie-speed-8k"] = "文心 Speed（8K，免费）- 调试推荐",
-        ["ErnieModel_ernie-tiny-8k"] = "文心 Tiny（8K，免费）",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M上下文，长程领先)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (代码增强，工程级成果)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (百万上下文，Agent/推理领先)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (高效轻量，百万上下文)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (长程代码，文本图片输入)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (文心最新，智能体/推理升级)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (由控制台决定)",
         ["HunyuanModel_hy3"] = "混元 Hy3（TokenHub，256K）- 推荐",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview（TokenHub，256K，Agent）",
         ["HunyuanModel_hunyuan-lite"] = "混元 Lite（免费，256K）",
@@ -1032,7 +1056,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["IMHelp_webui"] = "内置的浏览器聊天界面，由本程序直接提供，无需任何外部凭证，启用后在网页中即可对话。",
         ["IMHelp_feishu"] = "在飞书开放平台创建企业自建应用，开启机器人能力并发布版本。在「凭证与基础信息」获取 App ID 与 App Secret，在「事件订阅」获取 Verification Token 与 Encrypt Key。将事件订阅请求地址指向本程序的回调路径；飞书支持 localhost 回调，本地调试无需公网地址。",
         ["IMHelp_wecom"] = "在企业微信管理后台「应用管理 → 创建应用」创建自建应用。需填写企业 ID（我的企业 → 企业信息）、应用的 Agent ID 与 Secret，以及配置「接收消息服务器」时生成的 Token 和 EncodingAESKey。回调地址必须是公网可达的 HTTPS 地址并指向本程序的回调路径，服务器 IP 还可能需加入可信 IP 列表。",
-        ["IMHelp_dingtalk"] = "在钉钉开放平台创建企业内部应用并添加机器人。在应用凭证页获取 App Key、App Secret 与 Robot Code。事件模式默认使用 Stream（WebSocket 长连接），无需公网地址；如改用 HTTP 回调模式，则需要公网可达的 HTTPS 回调地址。"
+        ["IMHelp_dingtalk"] = "在钉钉开放平台创建企业内部应用并添加机器人。在应用凭证页获取 App Key、App Secret 与 Robot Code。事件模式默认使用 Stream（WebSocket 长连接），无需公网地址；如改用 HTTP 回调模式，则需要公网可达的 HTTPS 回调地址。",
+        ["SkillEnabled"] = "启用技能",
+        ["GlobalMaxToolRound"] = "全局最大工具轮数",
+        ["GlobalSkillTimeoutSeconds"] = "全局技能超时（秒）",
+        ["MaxCustomSkillsPerBeing"] = "每个生命体最大自定义技能数"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1095,7 +1123,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebSkin"] = "Web 皮肤名称",
         ["UserNickname"] = "人类用户的昵称",
         ["PluginDirectories"] = "插件加载目录列表，支持相对路径（基于程序目录）或绝对路径",
-        ["IMPlatforms"] = "配置对接的 IM 平台，可添加多个，支持手填凭证或扫码授权"
+        ["IMPlatforms"] = "配置对接的 IM 平台，可添加多个，支持手填凭证或扫码授权",
+        ["SkillEnabled"] = "启用技能系统（技能注册、AI 调度与自动触发）",
+        ["GlobalMaxToolRound"] = "单次技能执行中工具调用轮数的上限",
+        ["GlobalSkillTimeoutSeconds"] = "技能执行时长上限（秒）",
+        ["MaxCustomSkillsPerBeing"] = "每个硅基生命可持有的自定义（非内置）技能数量上限"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -1169,7 +1201,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["project"] = "项目",
         ["project_task"] = "项目任务",
         ["project_work_note"] = "项目工作笔记",
-        ["webview_browser"] = "WebView浏览器"
+        ["webview_browser"] = "WebView浏览器",
+        ["skill"] = "技能"
     };
 
     public override string GetToolDisplayName(string toolName) =>

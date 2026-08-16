@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿﻿﻿﻿﻿﻿﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -115,6 +115,7 @@ public class BeingController : Controller
             soulContent = being.SoulContent ?? "",
             timerCount = being.TimerSystem?.Count ?? 0,
             taskCount = being.TaskSystem?.Count ?? 0,
+            skillCount = being.SkillManager?.SkillCount ?? 0,
             aiClientType = being.AIClientType ?? "",
             aiClientConfig = (being.AIClientConfig != null && being.AIClientConfig.Count > 0) 
                 ? System.Text.Json.JsonSerializer.Serialize(being.AIClientConfig) 

@@ -52,6 +52,7 @@ public class HelpLocalizationEnUS : HelpLocalizationBase
     public override string WorkNotes_Title => "Work Notes";
     public override string Projects_Title => "Project Management";
     public override string Logging_Title => "Logging System";
+    public override string Skills_Title => "Skills";
 
     public override string[] GettingStarted_Tags => new[]
         { "install", "start", "setup", "quick start", "getting started", "begin", "launch", "initialize" };
@@ -153,6 +154,8 @@ public class HelpLocalizationEnUS : HelpLocalizationBase
 
     public override string[] Logging_Tags => new[]
         { "logging system", "log", "records", "debug", "error", "warning", "monitor", "trace", "console", "file" };
+    public override string[] Skills_Tags => new[]
+        { "skills", "skill", "tool orchestration", "prompt template", "automation", "custom skill", "plugin", "workflow" };
 
     public override string GettingStarted => @"
 # Quick Start
@@ -2942,7 +2945,7 @@ Baidu ERNIE is Baidu's large language model series, accessible through the Qianf
 
 ### Step 1: Register a Baidu Cloud Account
 
-1. Visit `https://qianfan.cloud.baidu.com`
+1. Visit `https://cloud.baidu.com/product-s/qianfan_home`
 2. Log in with your Baidu account
 3. Complete identity verification
 
@@ -2960,28 +2963,19 @@ On the Qianfan platform, go to **Model Management** and enable the models you wa
 
 ## Available Models
 
-- **ernie-4.5-turbo-128k**: Flagship model (128K context)
-- **ernie-4.0-turbo-8k**: Turbo model (8K context)
-- **ernie-4.0-turbo-8k-latest**: Latest Turbo (8K context)
-- **ernie-speed-pro-128k**: Speed Pro model (128K context)
-- **ernie-speed-128k**: Speed model (128K context)
-- **ernie-speed-8k**: Speed model (8K context)
-- **ernie-lite-pro-128k**: Lite Pro model (128K context)
-- **ernie-lite-8k**: Lite model (8K context)
+- **GLM-5.2**: Supports truly usable 1M context, continues to lead in long-range tasks
+- **GLM-5.1**: Significantly enhanced coding capabilities, notable improvement in long-range tasks, delivers engineering-grade results
+- **DeepSeek-V4-Pro**: Supports million-level ultra-long context, leading in Agent capabilities, world knowledge and reasoning performance both domestically and in the open-source domain
+- **DeepSeek-V4-Flash**: Efficient lightweight model with million-level ultra-long context capability
+- **Kimi-K2.6**: Stronger and more stable long-range code writing ability, supports both text and image input
+- **ERNIE-5.1**: The latest model in the Wenxin series, with fully upgraded foundational capabilities, significant improvements in agentic abilities, knowledge, reasoning, and deep search
+- **qianfan-code-latest**: Model selection is determined by the Qianfan console
 
-## Configuration in Silicon Life
-
-1. Select **Baidu ERNIE** as the AI client type
+1. Select **Baidu Qianfan** as the AI client type
 2. Set the **API Key** to your Qianfan API Key
-3. Set the **Model** to the enabled ERNIE model name
+3. Set the **Model** to the enabled Qianfan model name
 4. Set the **Endpoint** to the Qianfan API address (leave empty for default)
 5. Leave **Context Window Tokens** empty for auto-detection
-
-## Billing
-
-- ERNIE Speed and Lite series have free quotas
-- Paid models are billed per usage
-- Check `https://qianfan.cloud.baidu.com/pricing` for details
 
 ## FAQ
 
@@ -4544,6 +4538,143 @@ The system will NOT record the following sensitive information in logs:
 - The logging system ensures stable operation; failure of a single output target won't affect other targets
 - If log files become too large, you can increase the log verbosity setting (e.g., change to ""Warning"" or ""Error"") to reduce logging volume
 - When writing large amounts of logs, it's recommended to appropriately increase the log level
+";
+
+    public override string Skills => @"
+# Skills
+
+## What is a Skill?
+
+A Skill is a reusable capability unit that encapsulates tool orchestration and a prompt template. It represents a specific ""ability"" of a silicon being and can be invoked autonomously by the AI (via function calling) or explicitly by the user or curator.
+
+**Skill vs Tool:**
+- **Tool**: A single atomic operation (e.g., read a file, search the web) — one call, one task
+- **Skill**: Multi-step orchestration + system prompt template, capable of coordinating multiple tools to accomplish complex tasks
+
+## Skill Sources
+
+The system supports four types of skill sources:
+
+| Source | Description | Example |
+|--------|-------------|---------|
+| Builtin | Built into the framework, read-only | System-level capabilities |
+| Plugin | Registered by plugins via `ISkillProvider` interface | Third-party extensions |
+| Being | Created by a silicon being at runtime | AI self-evolution |
+| User | Created via the Web UI or `skill` tool | Custom workflows |
+
+## Core Skill Configuration
+
+When creating a skill, the following parameters can be configured:
+
+- **id**: Unique identifier (e.g., `summarize_document`)
+- **description**: One-sentence description for AI function calling
+- **system_prompt**: System prompt template, supports `{param}` placeholders filled at execution time
+- **parameter_schema**: JSON Schema declaring the parameters the skill accepts
+- **tool_whitelist**: Allowed tools during execution (empty list = inherit all being's tools)
+- **max_tool_round**: Maximum tool-call rounds (default 5)
+- **timeout**: Execution timeout (default 60s)
+- **on_complete**: Post-completion action: `write_memory`, `notify_curator`, `broadcast`, or `none`
+- **trigger_mode**: `manual` (AI-triggered or user-triggered) or `auto` (scheduled trigger)
+- **auto_trigger_condition**: Schedule condition, e.g., `daily 09:00`, `interval 6h`, or a cron expression
+
+## How to Use Skills
+
+### 1. Trigger via Chat
+
+Request a silicon being to execute a skill directly in chat, e.g.:
+
+> ""Please summarize this document for me""
+
+If the being has a `summarize_document` skill registered, it will recognize and invoke it automatically.
+
+### 2. Manage via the `skill` Tool
+
+Silicon beings can use the `skill` tool to perform the following actions:
+
+- **create**: Create a new skill (requires `id` and `system_prompt`)
+- **list**: List all registered skills
+- **update**: Update an existing skill
+- **update_from_md**: Update a skill from Markdown
+- **delete**: Delete a skill
+- **export / export_md**: Export as JSON or Markdown
+- **import / import_md**: Import from JSON or Markdown
+
+### 3. Manage via Web UI
+
+On the ""Skills"" page of the Web UI, you can:
+- View the list of all skills
+- Create / edit / delete custom skills
+- Import / export skill definitions
+- View skill execution history
+
+## Skill File Format
+
+Skills are persisted in Markdown format by default, stored in the being's `skills/` directory.
+
+**Markdown Format Example:**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**Notes:**
+- The part wrapped by `---` is the YAML front matter (metadata)
+- The remaining part is the system prompt template (`system_prompt`)
+- Missing metadata can be auto-completed by AI
+- `.md` files take precedence over `.json` files with the same id
+
+## Auto-Trigger Skills
+
+Set the skill's `trigger_mode` to `auto` and configure `auto_trigger_condition`, and the skill will execute automatically at the scheduled time.
+
+**Supported Schedule Formats:**
+- `daily 09:00` — Every day at 9:00 AM
+- `interval 6h` — Every 6 hours
+- Standard cron expressions — e.g., `0 9 * * 1-5` (weekdays at 9 AM)
+
+Results are written to the being's memory by default, or can be configured to notify the curator or broadcast to a channel.
+
+## Permissions and Security
+
+- The curator can modify all skills
+- Ordinary beings can only modify skills they created themselves (source = being) or user-imported skills
+- Skills are subject to tool action permissions (ToolActionPermissions)
+- When the whitelist is empty, the skill inherits all of the being's tool permissions
+
+## Quota Limits
+
+Each silicon being can create up to 50 custom skills (adjustable via configuration).
+
+## FAQ
+
+**Q: What if a skill execution times out?**
+A: Increase the `timeout` value in the skill definition, or adjust `GlobalSkillTimeoutSeconds` in the global configuration.
+
+**Q: Why did a skill fail to call a tool?**
+A: Check whether the `tool_whitelist` includes the required tool, and whether the being has permission to use that tool.
+
+**Q: How do I back up skills?**
+A: Use `export` or `export_md` to export as JSON/Markdown, save to a secure location, and restore later with `import`.
+
+**Q: Can a skill recursively call itself?**
+A: No. Recursive skill calls are blocked during execution to prevent infinite loops.
 ";
 
     #endregion

@@ -410,6 +410,33 @@ _ => permissionType.ToString()
     public override string ProjectWorkNotesEmptyState => "Questo progetto non ha ancora note di lavoro";
     public override string ProjectWorkNotesTotalPages => "Totale pagine: {0}";
 
+    // ===== Skills Page Localization =====
+
+    public override string PageTitleSkills => "Gestione competenze";
+    public override string SkillsPageHeader => "Competenze";
+    public override string SkillsPageSubtitle => "Competenze = orchestrazione riutilizzabile di strumenti + modelli di prompt (Markdown; metadati nel front matter YAML)";
+    public override string SkillsStatFormat => "{0} competenze · personalizzate {1}/{2}";
+    public override string SkillsEmptyState => "Nessuna competenza";
+    public override string SkillsBackToBeings => "← Torna ai beings";
+    public override string SkillBtnNew => "Nuova competenza";
+    public override string SkillBtnImportMd => "Importa Markdown";
+    public override string SkillBtnImportJson => "Importa JSON";
+    public override string SkillBtnRefresh => "Aggiorna";
+    public override string SkillBtnEdit => "Modifica";
+    public override string SkillBtnTest => "Test";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "Elimina";
+    public override string SkillCurrentEditingFormat => "In modifica: {0}";
+    public override string SkillNewSkillLabel => "Nuova competenza (non salvata)";
+    public override string SkillConfirmDeleteFormat => "Eliminare la competenza {0}?";
+    public override string SkillPromptImportMd => "Incolla il Markdown della competenza (front matter YAML + corpo; i metadati mancanti verranno completati automaticamente)";
+    public override string SkillPromptImportJson => "Incolla il JSON della SkillDefinition";
+    public override string SkillPromptTestParams => "Inserisci il JSON dei parametri di test (es. {\"source\": \"...\"}), lascia vuoto per nessuno";
+    public override string SkillTestResultPrefix => "Risultato: ";
+    public override string SkillLoadFailedFormat => "Caricamento non riuscito: {0}";
+    public override string SkillRequestFailed => "Richiesta non riuscita";
+
     // ===== Code Browser Page Localization =====
 
     public override string CodeBrowserPageHeader => "Navigatore di codice";
@@ -876,7 +903,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["task"] = "Attività",
         ["system"] = "Sistema",
         ["project_work_note"] = "Nota di lavoro progetto",
-        ["webview_browser"] = "Browser WebView"
+        ["webview_browser"] = "Browser WebView",
+        ["skill"] = "Competenza"
     };
 
     public override string GetToolDisplayName(string toolName) =>
@@ -979,7 +1007,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["AI"] = "Configurazione AI",
         ["Web"] = "Configurazione Web",
         ["User"] = "Configurazione utente",
-        ["IM"] = "Configurazione IM"
+        ["IM"] = "Configurazione IM",
+        ["Skill"] = "Configurazione competenze"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1094,14 +1123,13 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (Low latency)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (Agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (Open-source Agent, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (Flagship, 128K, Multimodal)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, Cost-effective)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, Economy)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, Long context)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, Free)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, Free) - Recommended for debugging",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, Free)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M contesto, leader in compiti lunghi)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (codifica avanzata, risultati di livello ingegneristico)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (milione di contesto, leader in Agent/ragionamento)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (leggero efficiente, milione di contesto)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (codice lungo, input testo/immagine)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (ultimo Wenxin, agente/ragionamento aggiornato)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (controllato dalla console)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) - Recommended",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (Free, 256K)",
@@ -1144,7 +1172,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["IMHelp_webui"] = "Interfaccia di chat integrata nel browser servita direttamente da questa applicazione. Non sono richieste credenziali esterne — basta abilitarla e chattare dalla pagina web.",
         ["IMHelp_feishu"] = "Crea un'app personalizzata sulla Feishu Open Platform, abilita la funzionalità bot e pubblica una release. Copia App ID e App Secret da 'Credentials & Basic Info' e Verification Token / Encrypt Key da 'Event Subscriptions'. Punta l'URL di richiesta della sottoscrizione eventi al percorso di callback di questa applicazione; Feishu consente callback su localhost, quindi per i test locali non serve un indirizzo pubblico.",
         ["IMHelp_wecom"] = "Crea un'app self-built nella console di amministrazione WeCom (Apps → Create App). Inserisci il Corp ID (My Company → Company Info), l'Agent ID e l'App Secret dell'app, oltre al Token e alla Encoding AES Key generati durante la configurazione del 'server di ricezione messaggi'. L'URL di callback deve essere un indirizzo HTTPS raggiungibile pubblicamente che punti al percorso di callback di questa applicazione, e potrebbe essere necessario aggiungere l'IP del server all'elenco degli IP attendibili.",
-        ["IMHelp_dingtalk"] = "Crea un'app aziendale interna con un robot sulla DingTalk Open Platform. Inserisci App Key, App Secret e Robot Code dalla pagina delle credenziali dell'app. La modalità Stream (predefinita) riceve i messaggi tramite una connessione WebSocket e non richiede un indirizzo pubblico; la modalità callback HTTP richiede un URL di callback HTTPS raggiungibile pubblicamente."
+        ["IMHelp_dingtalk"] = "Crea un'app aziendale interna con un robot sulla DingTalk Open Platform. Inserisci App Key, App Secret e Robot Code dalla pagina delle credenziali dell'app. La modalità Stream (predefinita) riceve i messaggi tramite una connessione WebSocket e non richiede un indirizzo pubblico; la modalità callback HTTP richiede un URL di callback HTTPS raggiungibile pubblicamente.",
+        ["SkillEnabled"] = "Abilita competenze",
+        ["GlobalMaxToolRound"] = "Round massimi di strumenti globali",
+        ["GlobalSkillTimeoutSeconds"] = "Timeout competenze globale (s)",
+        ["MaxCustomSkillsPerBeing"] = "Competenze personalizzate massime per essere"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1207,7 +1239,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebSkin"] = "Nome del tema Web",
         ["UserNickname"] = "Nome utente umano",
         ["PluginDirectories"] = "Elenco delle directory dei plugin per il rilevamento automatico, supporta percorsi relativi o assoluti",
-        ["IMPlatforms"] = "Configura le piattaforme IM collegate; è possibile aggiungerne più di una, tramite credenziali manuali o autorizzazione con codice QR"
+        ["IMPlatforms"] = "Configura le piattaforme IM collegate; è possibile aggiungerne più di una, tramite credenziali manuali o autorizzazione con codice QR",
+        ["SkillEnabled"] = "Abilita il sistema di competenze (registrazione delle competenze, smistamento tramite IA e attivatori automatici)",
+        ["GlobalMaxToolRound"] = "Limite superiore dei round di chiamate degli strumenti per ogni esecuzione di una competenza",
+        ["GlobalSkillTimeoutSeconds"] = "Limite superiore della durata di esecuzione di una competenza in secondi",
+        ["MaxCustomSkillsPerBeing"] = "Numero massimo di competenze personalizzate (non incorporate) che ogni essere in silicio può possedere"
     };
 
     public override string GetConfigGroupName(string groupKey) =>

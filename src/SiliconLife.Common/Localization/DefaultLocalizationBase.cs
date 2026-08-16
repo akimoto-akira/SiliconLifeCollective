@@ -1628,6 +1628,128 @@ public abstract string AboutFailedPluginListLabel { get; }
     /// </summary>
     public abstract string ProjectWorkNotesTotalPages { get; }
 
+    // ===== Skills Page Localization =====
+
+    /// <summary>
+    /// Gets the browser page title for the skills page
+    /// </summary>
+    public abstract string PageTitleSkills { get; }
+
+    /// <summary>
+    /// Gets the skills page header text
+    /// </summary>
+    public abstract string SkillsPageHeader { get; }
+
+    /// <summary>
+    /// Gets the skills page subtitle text
+    /// </summary>
+    public abstract string SkillsPageSubtitle { get; }
+
+    /// <summary>
+    /// Gets the skills statistics format ({0}=total, {1}=custom, {2}=max)
+    /// </summary>
+    public abstract string SkillsStatFormat { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no skills exist
+    /// </summary>
+    public abstract string SkillsEmptyState { get; }
+
+    /// <summary>
+    /// Gets the back-to-beings link text for the skills page
+    /// </summary>
+    public abstract string SkillsBackToBeings { get; }
+
+    /// <summary>
+    /// Gets the "new skill" toolbar button text
+    /// </summary>
+    public abstract string SkillBtnNew { get; }
+
+    /// <summary>
+    /// Gets the "import markdown" toolbar button text
+    /// </summary>
+    public abstract string SkillBtnImportMd { get; }
+
+    /// <summary>
+    /// Gets the "import JSON" toolbar button text
+    /// </summary>
+    public abstract string SkillBtnImportJson { get; }
+
+    /// <summary>
+    /// Gets the "refresh list" toolbar button text
+    /// </summary>
+    public abstract string SkillBtnRefresh { get; }
+
+    /// <summary>
+    /// Gets the "edit" skill card button text
+    /// </summary>
+    public abstract string SkillBtnEdit { get; }
+
+    /// <summary>
+    /// Gets the "test run" skill card button text
+    /// </summary>
+    public abstract string SkillBtnTest { get; }
+
+    /// <summary>
+    /// Gets the "export JSON" skill card button text
+    /// </summary>
+    public abstract string SkillBtnExportJson { get; }
+
+    /// <summary>
+    /// Gets the "export Markdown" skill card button text
+    /// </summary>
+    public abstract string SkillBtnExportMd { get; }
+
+    /// <summary>
+    /// Gets the "delete" skill card button text
+    /// </summary>
+    public abstract string SkillBtnDelete { get; }
+
+    /// <summary>
+    /// Gets the "currently editing" label format ({0}=skill id)
+    /// </summary>
+    public abstract string SkillCurrentEditingFormat { get; }
+
+    /// <summary>
+    /// Gets the label shown when a new (unsaved) skill is being edited
+    /// </summary>
+    public abstract string SkillNewSkillLabel { get; }
+
+    /// <summary>
+    /// Gets the delete confirmation format ({0}=skill id)
+    /// </summary>
+    public abstract string SkillConfirmDeleteFormat { get; }
+
+    /// <summary>
+    /// Gets the prompt text for importing skill Markdown
+    /// </summary>
+    public abstract string SkillPromptImportMd { get; }
+
+    /// <summary>
+    /// Gets the prompt text for importing skill JSON
+    /// </summary>
+    public abstract string SkillPromptImportJson { get; }
+
+    /// <summary>
+    /// Gets the prompt text for skill test parameters
+    /// </summary>
+    public abstract string SkillPromptTestParams { get; }
+
+    /// <summary>
+    /// Gets the prefix text before a skill test result
+    /// </summary>
+    public abstract string SkillTestResultPrefix { get; }
+
+    /// <summary>
+    /// Gets the load-failed message format ({0}=error)
+    /// </summary>
+    public abstract string SkillLoadFailedFormat { get; }
+
+    /// <summary>
+    /// Gets the generic request-failed message
+    /// </summary>
+    public abstract string SkillRequestFailed { get; }
+
     // ===== Tasks Page Localization =====
 
     /// <summary>

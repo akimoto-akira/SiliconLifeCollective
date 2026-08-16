@@ -111,6 +111,9 @@ public abstract class HelpLocalizationBase
     /// <summary>Logging System</summary>
     public abstract string Logging { get; }
 
+    /// <summary>Skills</summary>
+    public abstract string Skills { get; }
+
     #endregion
 
     #region Help Document Titles (Display Titles)
@@ -205,6 +208,9 @@ public abstract class HelpLocalizationBase
     /// <summary>Logging System Title</summary>
     public abstract string Logging_Title { get; }
 
+    /// <summary>Skills Title</summary>
+    public abstract string Skills_Title { get; }
+
     #endregion
 
     #region Help Document Tags (Search Tags)
@@ -298,6 +304,9 @@ public abstract class HelpLocalizationBase
 
     /// <summary>Logging System Tags</summary>
     public abstract string[] Logging_Tags { get; }
+
+    /// <summary>Skills Tags</summary>
+    public abstract string[] Skills_Tags { get; }
 
     #endregion
 }

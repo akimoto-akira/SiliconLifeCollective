@@ -54,6 +54,7 @@ public class HelpLocalizationJaJP : HelpLocalizationBase
     public override string WorkNotes_Title => "作業ノート";
     public override string Projects_Title => "プロジェクト管理";
     public override string Logging_Title => "ログシステム";
+    public override string Skills_Title => "スキル";
 
     public override string[] GettingStarted_Tags =>
         new[] { "インストール", "起動", "入門", "クイックスタート", "はじめに", "初期化", "実行", "環境設定" };
@@ -133,6 +134,8 @@ public class HelpLocalizationJaJP : HelpLocalizationBase
 
     public override string[] Logging_Tags => new[]
         { "ログシステム", "ログ", "記録", "デバッグ", "エラー", "警告", "モニタ", "追跡", "コンソール", "ファイル" };
+    public override string[] Skills_Tags => new[]
+        { "スキル", "Skill", "ツールオーケストレーション", "プロンプトテンプレート", "自動化", "カスタムスキル", "プラグイン" };
 
     public override string GettingStarted => @"
 # クイックスタート
@@ -2589,7 +2592,7 @@ MiniMax は従量課金、モデルごとに料金が異なります。プラッ
 
 ### ステップ 1：百度雲アカウント登録
 
-1. `https://qianfan.cloud.baidu.com` にアクセス
+1. `https://cloud.baidu.com/product-s/qianfan_home` にアクセス
 2. 百度アカウントでログイン
 3. 実名認証を完了
 
@@ -2607,28 +2610,19 @@ MiniMax は従量課金、モデルごとに料金が異なります。プラッ
 
 ## 利用可能なモデル
 
-- **ernie-4.5-turbo-128k**：フラッグシップモデル（128K コンテキスト）
-- **ernie-4.0-turbo-8k**：Turbo モデル（8K コンテキスト）
-- **ernie-4.0-turbo-8k-latest**：最新 Turbo（8K コンテキスト）
-- **ernie-speed-pro-128k**：Speed Pro モデル（128K コンテキスト）
-- **ernie-speed-128k**：Speed モデル（128K コンテキスト）
-- **ernie-speed-8k**：Speed モデル（8K コンテキスト）
-- **ernie-lite-pro-128k**：Lite Pro モデル（128K コンテキスト）
-- **ernie-lite-8k**：Lite モデル（8K コンテキスト）
+- **GLM-5.2**：真正に使える 1M コンテキストをサポートし、長期タスクで引き続きリード
+- **GLM-5.1**：コード能力が大幅に強化され、長期タスクが顕著に向上し、エンジニアリング級の成果を提供
+- **DeepSeek-V4-Pro**：百万レベルの超長コンテキストをサポートし、Agent 能力、世界知識、推論性能の面で国内およびオープンソース領域でリード
+- **DeepSeek-V4-Flash**：効率的な軽量モデルで、百万レベルの超長コンテキストをサポート
+- **Kimi-K2.6**：より強く安定した長期コード作成能力を持ち、テキストと画像の入力を両方サポート
+- **ERNIE-5.1**：文心シリーズの最新モデルで、基礎能力が全面アップグレードされ、エージェント、知識、推論、深い検索などの面で顕著な向上
+- **qianfan-code-latest**：モデルの選択は千帆コンソールに依存します
 
-## シリコンライフでの設定
-
-1. **百度 ERNIE** を AI クライアントタイプとして選択
+1. **百度千帆** を AI クライアントタイプとして選択
 2. **API キー** を千帆 API Key に設定
-3. **モデル** を開通済みの ERNIE モデル名に設定
+3. **モデル** を開通済みの千帆モデル名に設定
 4. **エンドポイント** を千帆 API アドレスに設定（空欄でデフォルト値を使用）
 5. **コンテキストウィンドウ Tokens** は空欄で自動検出
-
-## 課金方式
-
-- ERNIE Speed と Lite シリーズに無料枠あり
-- 有料モデルは従量課金
-- `https://qianfan.cloud.baidu.com/pricing` で詳細を確認
 
 ## よくある質問
 
@@ -4639,5 +4633,143 @@ AIツールでプロジェクトを作成：
 - 大量のログ書き込み時は、適切にログレベルを上げることをお勧めします
 ";
 
-    #endregion
+    
+    public override string Skills => @"
+# スキル
+
+## スキルとは？
+
+スキル（Skill）は、ツールのオーケストレーションとプロンプトテンプレートをカプセル化した再利用可能な能力ユニットです。シリコンベイングの具体的な「能力」を表し、AI による自動呼び出し（関数呼び出し）またはユーザー/キュレーターによる明示的なトリガーが可能です。
+
+**スキル vs ツール：**
+- **ツール（Tool）**：単一の原子操作（ファイル読み込み、Web 検索など）— 1 回の呼び出しで 1 つのタスクを完了
+- **スキル（Skill）**：複数ステップのオーケストレーション + システムプロンプトテンプレート。複数のツールを協調させて複雑なタスクを完了できます
+
+## スキルのソース
+
+システムは 4 種類のスキルソースをサポートします：
+
+| ソース | 説明 | 例 |
+|------|------|------|
+| ビルトイン（Builtin） | フレームワークに組み込まれ、変更不可 | システムレベルの機能 |
+| プラグイン（Plugin） | ISkillProvider インターフェースを通じて登録 | サードパーティ拡張 |
+| ビーイング作成（Being） | シリコンベイングが実行時に自己作成 | AI の自己進化 |
+| ユーザー作成（User） | Web UI または skill ツールを通じて作成 | カスタムワークフロー |
+
+## スキルの核心設定
+
+スキル作成時に以下のパラメータを設定できます：
+
+- **id**：一意の識別子（例：summarize_document）
+- **description**：AI 関数呼び出し時に使用する 1 文の説明
+- **system_prompt**：システムプロンプトテンプレート。{param} プレースホルダーをサポートし、実行時に自動填充
+- **parameter_schema**：JSON Schema。スキルが受け入れるパラメータを宣言
+- **tool_whitelist**：実行時に許可するツールのホワイトリスト（空リスト = すべてのツールを継承）
+- **max_tool_round**：最大ツール呼び出しラウンド数（デフォルト 5）
+- **timeout**：実行タイムアウト（デフォルト 60 秒）
+- **on_complete**：完了後のアクション：write_memory（記憶に書き込み）、notify_curator（キュレーターに通知）、broadcast（ブロードキャスト）、none
+- **trigger_mode**：トリガーモード：manual（手動/AI 自動呼び出し）または auto（自動スケジュールトリガー）
+- **auto_trigger_condition**：自動トリガー条件（例：daily 09:00、interval 6h、cron 式）
+
+## スキルの使用方法
+
+### 1. チャットからのトリガー
+
+チャットでシリコンベイングにスキル実行を直接依頼します。例：
+
+> 「この文書を要約してください」
+
+summarize_document スキルが登録されていれば、自動的に認識して呼び出します。
+
+### 2. skill ツールでの管理
+
+シリコンベイングは skill ツールを使用して以下を実行できます：
+
+- **create**：新しいスキルを作成（id と system_prompt が必要）
+- **list**：登録済みのすべてのスキルを一覧表示
+- **update**：既存のスキルを更新
+- **update_from_md**：Markdown からスキルを更新
+- **delete**：スキルを削除
+- **export / export_md**：JSON または Markdown としてエクスポート
+- **import / import_md**：JSON または Markdown からインポート
+
+### 3. Web UI での管理
+
+Web UI の「スキル」ページでは以下が可能です：
+- すべてのスキルリストを表示
+- カスタムスキルの作成/編集/削除
+- スキル定義のインポート/エクスポート
+- スキル実行履歴の表示
+
+## スキルファイル形式
+
+スキルはデフォルトで Markdown 形式で永続化され、ベイングの skills/ ディレクトリに保存されます。
+
+**Markdown 形式の例：**
+
+```markdown
+---
+id: summarize_document
+version: ""1.0.0""
+description: Summarize a long document into key points
+parameter_schema:
+  type: object
+  properties:
+    document:
+      type: string
+      description: The document content to summarize
+    max_length:
+      type: integer
+      description: Maximum summary length in characters
+---
+
+You are a document summarization assistant. Summarize the following document into {max_length} characters or less, highlighting the key points:
+
+{document}
+```
+
+**説明：**
+- --- で囲まれた部分は YAML front matter（メタデータ）
+- 残りの部分はシステムプロンプトテンプレート（system_prompt）
+- 欠落しているメタデータは AI によって自動補完されます
+- .md ファイルは同じ ID の .json ファイルより優先されます
+
+## 自動トリガースキル
+
+スキルの trigger_mode を auto に設定し、auto_trigger_condition を構成すると、設定された時間に自動的に実行されます。
+
+**サポートされているスケジュール形式：**
+- daily 09:00 — 毎日午前 9 時
+- interval 6h — 6 時間ごと
+- 標準 cron 式 — 例：0 9 * * 1-5（平日 9 時）
+
+自動実行結果はデフォルトでベイングの記憶に書き込まれますが、キュレーターへの通知やチャンネルへのブロードキャストも設定できます。
+
+## 権限とセキュリティ
+
+- キュレーター（Curator）はすべてのスキルを変更できます
+- 通常のベイングは、自分が作成したスキル（source = being）またはユーザーがインポートしたスキルのみ変更できます
+- スキルはツールアクション権限（ToolActionPermissions）の制約を受けます
+- ホワイトリストが空の場合、ベイングのすべてのツール権限を継承します
+
+## 数量制限
+
+各シリコンベイングは最大 50 個のカスタムスキルを作成できます（構成で調整可能）。
+
+## よくある質問
+
+**Q: スキル実行がタイムアウトした場合はどうすればよいですか？**
+A: スキル定義の timeout 値を増やすか、グローバル構成の GlobalSkillTimeoutSeconds を調整してください。
+
+**Q: スキルがツールの呼び出しに失敗した場合はどうすればよいですか？**
+A: tool_whitelist に必要なツールが含まれているか、ベイングがそのツールの権限を持っているか確認してください。
+
+**Q: スキルをバックアップするにはどうすればよいですか？**
+A: export または export_md を使用して JSON/Markdown としてエクスポートし、安全な場所に保存してから import で復元してください。
+
+**Q: スキルは再帰的に自分自身を呼び出せますか？**
+A: できません。実行中のスキルは再帰呼び出しがブロックされ、無限ループを防止します。
+";
+
+#endregion
 }

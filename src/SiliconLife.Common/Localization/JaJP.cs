@@ -435,6 +435,30 @@ _ => permissionType.ToString()
     public override string ProjectWorkNotesPageHeader => "プロジェクト作業ノート";
     public override string ProjectWorkNotesEmptyState => "このプロジェクトには作業ノートがありません";
     public override string ProjectWorkNotesTotalPages => "総ページ数：{0}";
+    public override string PageTitleSkills => "スキル管理";
+    public override string SkillsPageHeader => "スキル";
+    public override string SkillsPageSubtitle => "スキル = 再利用可能なツール編成 + プロンプトテンプレート（Markdown 形式、メタデータは YAML front matter に記述）";
+    public override string SkillsStatFormat => "スキル {0} 件 · カスタム {1}/{2}";
+    public override string SkillsEmptyState => "スキルなし";
+    public override string SkillsBackToBeings => "← 生命体一覧に戻る";
+    public override string SkillBtnNew => "新規スキル";
+    public override string SkillBtnImportMd => "Markdown をインポート";
+    public override string SkillBtnImportJson => "JSON をインポート";
+    public override string SkillBtnRefresh => "更新";
+    public override string SkillBtnEdit => "編集";
+    public override string SkillBtnTest => "テスト実行";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "削除";
+    public override string SkillCurrentEditingFormat => "編集中：{0}";
+    public override string SkillNewSkillLabel => "新規スキル（未保存）";
+    public override string SkillConfirmDeleteFormat => "スキル {0} を削除しますか？";
+    public override string SkillPromptImportMd => "スキル Markdown を貼り付け（YAML front matter + 本文、不足しているメタデータは自動補完されます）";
+    public override string SkillPromptImportJson => "SkillDefinition JSON を貼り付け";
+    public override string SkillPromptTestParams => "テストパラメータ JSON を入力（例：{\"source\": \"...\"}）、なければ空欄のまま";
+    public override string SkillTestResultPrefix => "実行結果：";
+    public override string SkillLoadFailedFormat => "読み込み失敗：{0}";
+    public override string SkillRequestFailed => "リクエスト失敗";
 
     // ===== Tasks Page Localization =====
 
@@ -867,7 +891,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["AI"] = "AI設定",
         ["Web"] = "Web設定",
         ["User"] = "ユーザー設定",
-        ["IM"] = "IM設定"
+        ["IM"] = "IM設定",
+        ["Skill"] = "スキル設定"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -982,14 +1007,13 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (Low latency)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (Agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (Open-source Agent, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (Flagship, 128K, Multimodal)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, Cost-effective)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, Economy)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, Long context)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, Free)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, Free) - Recommended for debugging",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, Free)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M context, leads in long-range tasks)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (enhanced coding, engineering-grade results)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (million context, leads in Agent/reasoning)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (efficient lightweight, million context)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (long-range code, text/image input)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (latest Wenxin, agent/reasoning upgraded)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (controlled by console)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) - Recommended",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (Free, 256K)",
@@ -1032,7 +1056,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["IMHelp_webui"] = "このアプリケーションが直接提供するブラウザー内蔵チャットインターフェースです。外部の認証情報は不要で、有効にするだけでWebページからチャットできます。",
         ["IMHelp_feishu"] = "Feishu Open Platform でカスタムアプリを作成し、ボット機能を有効にしてリリースを公開します。「Credentials & Basic Info」から App ID と App Secret を、「Event Subscriptions」から Verification Token / Encrypt Key をコピーします。イベントサブスクリプションのリクエストURLを本アプリのコールバックパスに向けてください。Feishu は localhost へのコールバックを許可しているため、ローカルテストに公開アドレスは不要です。",
         ["IMHelp_wecom"] = "WeCom 管理コンソールで自社アプリを作成します（アプリ → アプリを作成）。Corp ID（マイ企業 → 企業情報）、アプリの Agent ID と App Secret、さらに「メッセージ受信サーバー」設定時に生成される Token と Encoding AES Key を入力します。コールバックURLは本アプリのコールバックパスを指す公開到達可能な HTTPS アドレスである必要があり、サーバーのIPを信頼済みIPリストに追加する必要がある場合があります。",
-        ["IMHelp_dingtalk"] = "DingTalk Open Platform でロボット付きの企業内部アプリを作成します。アプリの資格情報ページから App Key、App Secret、Robot Code を入力します。Stream モード（デフォルト）は WebSocket 接続でメッセージを受信し、公開アドレスは不要です。HTTP コールバックモードには公開到達可能な HTTPS コールバックURLが必要です。"
+        ["IMHelp_dingtalk"] = "DingTalk Open Platform でロボット付きの企業内部アプリを作成します。アプリの資格情報ページから App Key、App Secret、Robot Code を入力します。Stream モード（デフォルト）は WebSocket 接続でメッセージを受信し、公開アドレスは不要です。HTTP コールバックモードには公開到達可能な HTTPS コールバックURLが必要です。",
+        ["SkillEnabled"] = "スキルを有効化",
+        ["GlobalMaxToolRound"] = "グローバル最大ツールラウンド数",
+        ["GlobalSkillTimeoutSeconds"] = "グローバルスキルタイムアウト（秒）",
+        ["MaxCustomSkillsPerBeing"] = "生命体ごとの最大カスタムスキル数"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1095,7 +1123,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebSkin"] = "Webスキン名",
         ["UserNickname"] = "人間ユーザーのニックネーム",
         ["PluginDirectories"] = "プラグインの自動検出ディレクトリリスト、相対パスまたは絶対パスに対応",
-        ["IMPlatforms"] = "接続するIMプラットフォームを設定します。複数追加でき、資格情報の手動入力またはQRコード認証に対応"
+        ["IMPlatforms"] = "接続するIMプラットフォームを設定します。複数追加でき、資格情報の手動入力またはQRコード認証に対応",
+        ["SkillEnabled"] = "スキルシステムを有効にします（スキル登録、AIディスパッチ、自動トリガー）",
+        ["GlobalMaxToolRound"] = "スキル実行ごとのツール呼び出しラウンド数の上限",
+        ["GlobalSkillTimeoutSeconds"] = "スキル実行時間の上限（秒）",
+        ["MaxCustomSkillsPerBeing"] = "各シリコン生命体が保持できるカスタム（非ビルトイン）スキル数の上限"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -1169,7 +1201,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["project"] = "プロジェクト",
         ["project_task"] = "プロジェクトタスク",
         ["project_work_note"] = "プロジェクト作業ノート",
-        ["webview_browser"] = "WebViewブラウザ"
+        ["webview_browser"] = "WebViewブラウザ",
+        ["skill"] = "スキル"
     };
 
     public override string GetToolDisplayName(string toolName) =>

@@ -435,6 +435,30 @@ _ => permissionType.ToString()
     public override string ProjectWorkNotesPageHeader => "프로젝트 작업 노트";
     public override string ProjectWorkNotesEmptyState => "이 프로젝트에 작업 노트가 없습니다";
     public override string ProjectWorkNotesTotalPages => "총 페이지 수: {0}";
+    public override string PageTitleSkills => "스킬 관리";
+    public override string SkillsPageHeader => "스킬";
+    public override string SkillsPageSubtitle => "스킬 = 재사용 가능한 도구 오케스트레이션 + 프롬프트 템플릿(Markdown 형식, 메타데이터는 YAML front matter에 저장)";
+    public override string SkillsStatFormat => "스킬 {0}개 · 사용자 지정 {1}/{2}";
+    public override string SkillsEmptyState => "스킬 없음";
+    public override string SkillsBackToBeings => "← 생명체 목록으로 돌아가기";
+    public override string SkillBtnNew => "새 스킬";
+    public override string SkillBtnImportMd => "Markdown 가져오기";
+    public override string SkillBtnImportJson => "JSON 가져오기";
+    public override string SkillBtnRefresh => "새로 고침";
+    public override string SkillBtnEdit => "편집";
+    public override string SkillBtnTest => "테스트 실행";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "삭제";
+    public override string SkillCurrentEditingFormat => "편집 중: {0}";
+    public override string SkillNewSkillLabel => "새 스킬(저장되지 않음)";
+    public override string SkillConfirmDeleteFormat => "스킬 {0}을(를) 삭제하시겠습니까?";
+    public override string SkillPromptImportMd => "스킬 Markdown을 붙여넣으세요(YAML front matter + 본문, 누락된 메타데이터는 자동 완성됩니다)";
+    public override string SkillPromptImportJson => "SkillDefinition JSON을 붙여넣으세요";
+    public override string SkillPromptTestParams => "테스트 매개변수 JSON을 입력하세요(예: {\"source\": \"...\"}), 없으면 비워 두세요";
+    public override string SkillTestResultPrefix => "실행 결과: ";
+    public override string SkillLoadFailedFormat => "로드 실패: {0}";
+    public override string SkillRequestFailed => "요청 실패";
 
     // ===== Tasks Page Localization =====
 
@@ -867,7 +891,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["AI"] = "AI 설정",
         ["Web"] = "Web 설정",
         ["User"] = "사용자 설정",
-        ["IM"] = "IM 설정"
+        ["IM"] = "IM 설정",
+        ["Skill"] = "스킬 설정"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -982,14 +1007,13 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (Low latency)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (Agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (Open-source Agent, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (Flagship, 128K, Multimodal)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, Cost-effective)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, Economy)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, Long context)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, Free)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, Free) - Recommended for debugging",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, Free)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M context, leads in long-range tasks)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (enhanced coding, engineering-grade results)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (million context, leads in Agent/reasoning)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (efficient lightweight, million context)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (long-range code, text/image input)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (latest Wenxin, agent/reasoning upgraded)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (controlled by console)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) - Recommended",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (Free, 256K)",
@@ -1032,7 +1056,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["IMHelp_webui"] = "이 애플리케이션이 직접 제공하는 브라우저 내장 채팅 인터페이스입니다. 외부 자격 증명이 필요 없으며, 활성화만 하면 웹 페이지에서 바로 채팅할 수 있습니다.",
         ["IMHelp_feishu"] = "Feishu Open Platform에서 커스텀 앱을 만들고 봇 기능을 활성화한 뒤 릴리스를 게시하세요. 'Credentials & Basic Info'에서 App ID와 App Secret을, 'Event Subscriptions'에서 Verification Token / Encrypt Key를 복사하세요. 이벤트 구독 요청 URL을 이 앱의 콜백 경로로 지정하세요. Feishu는 localhost 콜백을 허용하므로 로컬 테스트에는 공용 주소가 필요하지 않습니다.",
         ["IMHelp_wecom"] = "WeCom 관리 콘솔에서 자체 개발 앱을 만드세요(앱 → 앱 만들기). Corp ID(내 회사 → 회사 정보), 앱의 Agent ID와 App Secret, 그리고 '메시지 수신 서버' 구성 시 생성된 Token과 Encoding AES Key를 입력하세요. 콜백 URL은 이 앱의 콜백 경로를 가리키는 공개적으로 접근 가능한 HTTPS 주소여야 하며, 서버 IP를 신뢰할 수 있는 IP 목록에 추가해야 할 수 있습니다.",
-        ["IMHelp_dingtalk"] = "DingTalk Open Platform에서 로봇이 포함된 기업 내부 앱을 만드세요. 앱 자격 증명 페이지의 App Key, App Secret, Robot Code를 입력하세요. Stream 모드(기본값)는 WebSocket 연결로 메시지를 수신하며 공용 주소가 필요 없습니다. HTTP 콜백 모드는 공개적으로 접근 가능한 HTTPS 콜백 URL이 필요합니다."
+        ["IMHelp_dingtalk"] = "DingTalk Open Platform에서 로봇이 포함된 기업 내부 앱을 만드세요. 앱 자격 증명 페이지의 App Key, App Secret, Robot Code를 입력하세요. Stream 모드(기본값)는 WebSocket 연결로 메시지를 수신하며 공용 주소가 필요 없습니다. HTTP 콜백 모드는 공개적으로 접근 가능한 HTTPS 콜백 URL이 필요합니다.",
+        ["SkillEnabled"] = "스킬 활성화",
+        ["GlobalMaxToolRound"] = "전역 최대 도구 라운드 수",
+        ["GlobalSkillTimeoutSeconds"] = "전역 스킬 시간 초과(초)",
+        ["MaxCustomSkillsPerBeing"] = "생명체별 최대 커스텀 스킬 수"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1095,7 +1123,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebSkin"] = "Web 스킨 이름",
         ["UserNickname"] = "사용자 닉네임",
         ["PluginDirectories"] = "플러그인 자동 감지 디렉터리 목록, 상대 경로 또는 절대 경로 지원",
-        ["IMPlatforms"] = "연동할 IM 플랫폼을 설정합니다. 여러 개 추가 가능하며, 자격 증명 직접 입력 또는 QR 코드 인증을 지원합니다"
+        ["IMPlatforms"] = "연동할 IM 플랫폼을 설정합니다. 여러 개 추가 가능하며, 자격 증명 직접 입력 또는 QR 코드 인증을 지원합니다",
+        ["SkillEnabled"] = "스킬 시스템을 활성화합니다(스킬 등록, AI 디스패치 및 자동 트리거)",
+        ["GlobalMaxToolRound"] = "스킬 실행당 도구 호출 라운드 수의 상한",
+        ["GlobalSkillTimeoutSeconds"] = "스킬 실행 시간의 상한(초)",
+        ["MaxCustomSkillsPerBeing"] = "각 실리콘 생명체가 보유할 수 있는 커스텀(내장되지 않은) 스킬 수의 상한"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -1169,7 +1201,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["project"] = "프로젝트",
         ["project_task"] = "프로젝트 작업",
         ["project_work_note"] = "프로젝트 작업 노트",
-        ["webview_browser"] = "WebView 브라우저"
+        ["webview_browser"] = "WebView 브라우저",
+        ["skill"] = "스킬"
     };
 
     public override string GetToolDisplayName(string toolName) =>

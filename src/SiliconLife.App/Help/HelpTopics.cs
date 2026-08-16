@@ -254,6 +254,14 @@ public static class HelpTopics
         },
         new()
         {
+            Id = "skills",
+            PropertyName = nameof(HelpLocalizationBase.Skills),
+            TitlePropertyName = nameof(HelpLocalizationBase.Skills_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.Skills_Tags),
+            Icon = "🔧"
+        },
+        new()
+        {
             Id = "logging",
             PropertyName = nameof(HelpLocalizationBase.Logging),
             TitlePropertyName = nameof(HelpLocalizationBase.Logging_Title),

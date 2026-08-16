@@ -111,27 +111,41 @@ public sealed class SpeedyStorage : IStorage, IDisposable
         {
             return keys;
         }
-        
+
+        // The prefix must be mapped into the pack's key space the same way
+        // Write/Read map their keys (base path prepended), otherwise entries
+        // stored under the base path are never matched. Note: do not use
+        // MapKey here — it appends ".json" to extension-less prefixes.
+        string mappedPrefix = prefix.Replace("..", string.Empty).Replace('\\', '/');
+        if (!string.IsNullOrEmpty(_basePath))
+        {
+            mappedPrefix = _basePath + mappedPrefix;
+        }
+
+        // Entries inside the pack are normalized to lowercase, so the base
+        // path prefix must be lowercased before stripping.
+        string normalizedBase = _basePath.ToLowerInvariant();
+
         // List entries (files) in the prefix directory
-        foreach (string entry in _pack.ListEntries(prefix))
+        foreach (string entry in _pack.ListEntries(mappedPrefix))
         {
             // Remove the base path prefix to get the relative key
             string relativeKey = entry;
-            if (!string.IsNullOrEmpty(_basePath) && relativeKey.StartsWith(_basePath))
+            if (!string.IsNullOrEmpty(normalizedBase) && relativeKey.StartsWith(normalizedBase, StringComparison.Ordinal))
             {
-                relativeKey = relativeKey[_basePath.Length..];
+                relativeKey = relativeKey[normalizedBase.Length..];
             }
             keys.Add(relativeKey);
         }
 
         // List subdirectories
-        foreach (string dir in _pack.ListDirectories(prefix))
+        foreach (string dir in _pack.ListDirectories(mappedPrefix))
         {
             // Remove the base path prefix to get the relative key
             string relativeKey = dir;
-            if (!string.IsNullOrEmpty(_basePath) && relativeKey.StartsWith(_basePath))
+            if (!string.IsNullOrEmpty(normalizedBase) && relativeKey.StartsWith(normalizedBase, StringComparison.Ordinal))
             {
-                relativeKey = relativeKey[_basePath.Length..];
+                relativeKey = relativeKey[normalizedBase.Length..];
             }
             // Ensure directory keys end with '/'
             if (!relativeKey.EndsWith("/"))

@@ -190,14 +190,18 @@ public class ChatController : Controller
         var language = Config.Instance?.Data?.Language ?? Language.ZhCN;
         foreach (var being in beings)
         {
-            if (being.ToolManager == null) continue;
-            foreach (var toolName in being.ToolManager.GetToolNames())
+            if (being.ToolManager != null)
             {
-                if (vm.ToolDisplayNames.ContainsKey(toolName)) continue;
-                var tool = being.ToolManager.GetTool(toolName);
-                if (tool != null)
-                    vm.ToolDisplayNames[toolName] = tool.GetDisplayName(language);
+                foreach (var toolName in being.ToolManager.GetToolNames())
+                {
+                    if (vm.ToolDisplayNames.ContainsKey(toolName)) continue;
+                    var tool = being.ToolManager.GetTool(toolName);
+                    if (tool != null)
+                        vm.ToolDisplayNames[toolName] = tool.GetDisplayName(language);
+                }
             }
+            // Skills are injected as tool calls too but have no tool translations
+            AppendSkillDisplayNames(vm.ToolDisplayNames, being.SkillManager);
         }
 
         // Build activity status name map for the frontend status badge

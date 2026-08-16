@@ -435,6 +435,30 @@ Uso: Llama a la herramienta de chat con action=""mark_read"", target_id=GUID del
     public override string ProjectWorkNotesPageHeader => "Notas de trabajo del proyecto";
     public override string ProjectWorkNotesEmptyState => "No hay notas de trabajo para este proyecto";
     public override string ProjectWorkNotesTotalPages => "Páginas totales: {0}";
+    public override string PageTitleSkills => "Gestión de habilidades";
+    public override string SkillsPageHeader => "Habilidades";
+    public override string SkillsPageSubtitle => "Habilidades = orquestación de herramientas reutilizable + plantillas de prompts (Markdown; metadatos en el front matter YAML)";
+    public override string SkillsStatFormat => "{0} habilidad(es) · personalizadas {1}/{2}";
+    public override string SkillsEmptyState => "Aún no hay habilidades";
+    public override string SkillsBackToBeings => "← Volver a los seres";
+    public override string SkillBtnNew => "Nueva habilidad";
+    public override string SkillBtnImportMd => "Importar Markdown";
+    public override string SkillBtnImportJson => "Importar JSON";
+    public override string SkillBtnRefresh => "Actualizar";
+    public override string SkillBtnEdit => "Editar";
+    public override string SkillBtnTest => "Probar";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "Eliminar";
+    public override string SkillCurrentEditingFormat => "Editando: {0}";
+    public override string SkillNewSkillLabel => "Nueva habilidad (sin guardar)";
+    public override string SkillConfirmDeleteFormat => "¿Eliminar la habilidad {0}?";
+    public override string SkillPromptImportMd => "Pega el Markdown de la habilidad (front matter YAML + cuerpo; los metadatos que falten se completarán automáticamente)";
+    public override string SkillPromptImportJson => "Pega el JSON de SkillDefinition";
+    public override string SkillPromptTestParams => "Introduce el JSON de parámetros de prueba (p. ej. {\"source\": \"...\"}), déjalo vacío para ninguno";
+    public override string SkillTestResultPrefix => "Resultado: ";
+    public override string SkillLoadFailedFormat => "Error al cargar: {0}";
+    public override string SkillRequestFailed => "Error en la solicitud";
 
     // ===== Tasks Page Localization =====
 
@@ -867,7 +891,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["AI"] = "Configuración de IA",
         ["Web"] = "Configuración web",
         ["User"] = "Configuración de usuario",
-        ["IM"] = "Configuración de IM"
+        ["IM"] = "Configuración de IM",
+        ["Skill"] = "Configuración de habilidades"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -982,14 +1007,13 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (Low latency)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (Agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (Open-source Agent, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (Flagship, 128K, Multimodal)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, Cost-effective)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, Economy)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, Long context)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, Free)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, Free) - Recommended for debugging",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, Free)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M contexto, líder en tareas largas)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (codificación mejorada, resultados de ingeniería)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (millón de contexto, líder en Agent/razonamiento)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (ligero eficiente, millón de contexto)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (código largo, entrada texto/imagen)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (último Wenxin, agente/razonamiento mejorado)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (controlado por consola)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) - Recommended",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (Free, 256K)",
@@ -1032,7 +1056,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["IMHelp_webui"] = "Interfaz de chat integrada en el navegador servida directamente por esta aplicación. No se requieren credenciales externas — solo actívala y chatea desde la página web.",
         ["IMHelp_feishu"] = "Crea una aplicación personalizada en la Feishu Open Platform, habilita la capacidad de bot y publica una versión. Copia el App ID y el App Secret desde 'Credentials & Basic Info', y el Verification Token / Encrypt Key desde 'Event Subscriptions'. Apunta la URL de solicitud de suscripción de eventos a la ruta de callback de esta aplicación; Feishu permite callbacks a localhost, por lo que no se necesita una dirección pública para pruebas locales.",
         ["IMHelp_wecom"] = "Crea una aplicación propia en la consola de administración de WeCom (Apps → Create App). Rellena el Corp ID (My Company → Company Info), el Agent ID y el App Secret de la aplicación, además del Token y la Encoding AES Key generados al configurar el 'servidor de recepción de mensajes'. La URL de callback debe ser una dirección HTTPS accesible públicamente que apunte a la ruta de callback de esta aplicación, y puede ser necesario añadir la IP del servidor a la lista de IP de confianza.",
-        ["IMHelp_dingtalk"] = "Crea una aplicación empresarial interna con un robot en la DingTalk Open Platform. Rellena el App Key, el App Secret y el Robot Code desde la página de credenciales de la aplicación. El modo Stream (predeterminado) recibe mensajes a través de una conexión WebSocket y no necesita dirección pública; el modo de callback HTTP requiere una URL de callback HTTPS accesible públicamente."
+        ["IMHelp_dingtalk"] = "Crea una aplicación empresarial interna con un robot en la DingTalk Open Platform. Rellena el App Key, el App Secret y el Robot Code desde la página de credenciales de la aplicación. El modo Stream (predeterminado) recibe mensajes a través de una conexión WebSocket y no necesita dirección pública; el modo de callback HTTP requiere una URL de callback HTTPS accesible públicamente.",
+        ["SkillEnabled"] = "Habilitar habilidades",
+        ["GlobalMaxToolRound"] = "Rondas máximas de herramientas globales",
+        ["GlobalSkillTimeoutSeconds"] = "Tiempo de espera global de habilidades (s)",
+        ["MaxCustomSkillsPerBeing"] = "Habilidades personalizadas máx. por ser"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1095,7 +1123,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebSkin"] = "Nombre del tema web",
         ["UserNickname"] = "Apodo del usuario humano",
         ["PluginDirectories"] = "Lista de directorios de plugins para descubrimiento automático, admite rutas relativas o absolutas",
-        ["IMPlatforms"] = "Configura las plataformas de IM conectadas; añade varias, mediante credenciales manuales o autorización por código QR"
+        ["IMPlatforms"] = "Configura las plataformas de IM conectadas; añade varias, mediante credenciales manuales o autorización por código QR",
+        ["SkillEnabled"] = "Habilitar el sistema de habilidades (registro de habilidades, dispatch de IA y disparadores automáticos)",
+        ["GlobalMaxToolRound"] = "Límite superior de rondas de llamadas a herramientas por ejecución de habilidad",
+        ["GlobalSkillTimeoutSeconds"] = "Límite superior de la duración de ejecución de una habilidad en segundos",
+        ["MaxCustomSkillsPerBeing"] = "Número máximo de habilidades personalizadas (no integradas) que cada ser de silicio puede poseer"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -1169,7 +1201,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["project"] = "Proyecto",
         ["project_task"] = "Tarea de proyecto",
         ["project_work_note"] = "Nota de trabajo de proyecto",
-        ["webview_browser"] = "Navegador WebView"
+        ["webview_browser"] = "Navegador WebView",
+        ["skill"] = "Habilidad"
     };
 
     public override string GetToolDisplayName(string toolName) =>

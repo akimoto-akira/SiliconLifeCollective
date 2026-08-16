@@ -26,6 +26,20 @@ public class MarkdownEditorComponent : ComponentBase
     private string _initialMode = "edit";
     private string _saveEndpoint = "";
 
+    // CDN sources for editor libraries: primary + fallback mirror (jsdelivr is
+    // unreliable in some regions). Even when every source fails the widget
+    // degrades to a plain textarea instead of becoming unresponsive.
+    private const string CodeMirrorCssUrl = "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css";
+    private const string CodeMirrorCssFallbackUrl = "https://unpkg.com/codemirror@5.65.16/lib/codemirror.css";
+    private const string CodeMirrorJsUrl = "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js";
+    private const string CodeMirrorJsFallbackUrl = "https://unpkg.com/codemirror@5.65.16/lib/codemirror.js";
+    private const string CodeMirrorMarkdownModeUrl = "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.js";
+    private const string CodeMirrorMarkdownModeFallbackUrl = "https://unpkg.com/codemirror@5.65.16/mode/markdown/markdown.js";
+    private const string MarkedJsUrl = "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js";
+    private const string MarkedJsFallbackUrl = "https://unpkg.com/marked@15.0.12/marked.min.js";
+    private const string HighlightJsUrl = "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js";
+    private const string HighlightJsFallbackUrl = "https://unpkg.com/@highlightjs/cdn-assets@11.9.0/highlight.min.js";
+
     /// <summary>
     /// Set initial markdown content
     /// </summary>
@@ -352,6 +366,13 @@ public class MarkdownEditorComponent : ComponentBase
                 .Property("display", "block")
                 .Property("flex", "1")
                 .Property("border-left", "1px solid var(--border)")
+            .EndSelector()
+            // Raw-text preview fallback (used when marked.js is unavailable)
+            .Selector(".md-editor-preview-fallback")
+                .Property("white-space", "pre-wrap")
+                .Property("word-break", "break-word")
+                .Property("font-family", "'JetBrains Mono', 'Fira Code', 'Consolas', monospace")
+                .Property("font-size", "13px")
             .EndSelector();
     }
 
@@ -381,26 +402,39 @@ public class MarkdownEditorComponent : ComponentBase
                     WebJs.Return(() => WebJs.Str(() => ""))
                 })
             }))
-            // Initialize CodeMirror editor
-            .Add(() => WebJs.Let(() => "editor", () => WebJs.Id(() => "window").Prop(() => "CodeMirror").Call(() => "fromTextArea", () => WebJs.Id(() => "textarea"), () => WebJs.Obj()
-                .Prop(() => "mode", () => WebJs.Str(() => "text/x-markdown"))
-                .Prop(() => "lineNumbers", () => WebJs.Bool(() => true))
-                .Prop(() => "lineWrapping", () => WebJs.Bool(() => true))
-                .Prop(() => "tabSize", () => WebJs.Num(() => "4"))
-                .Prop(() => "indentWithTabs", () => WebJs.Bool(() => true))
-                .Prop(() => "theme", () => WebJs.Str(() => "default")))))
-            .Add(() => WebJs.Id(() => "editor").Call(() => "on", () => WebJs.Str(() => "change"), () => WebJs.Arrow(() => new List<string> { "instance" }, () => WebJs.Block()
-                .Add(() => WebJs.Assign(() => WebJs.Id(() => "dirtyFlag").Prop(() => "value"), () => WebJs.Str(() => "1")))
-                .Add(() => WebJs.Id(() => "instance").Call(() => "save").Stmt())
-                .Add(() => WebJs.Assign(() => WebJs.Id(() => "textarea").Prop(() => "value"), () => WebJs.Id(() => "instance").Call(() => "getValue")).Stmt()))))
+            // Initialize CodeMirror when available; otherwise keep the plain
+            // textarea so edit/save/preview still work without CDN libraries
+            .Add(() => WebJs.Let(() => "editor", () => WebJs.Null()))
+            .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "CodeMirror")).Op(() => "!==", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
+                {
+                    WebJs.Assign(() => WebJs.Id(() => "editor"), () => WebJs.Id(() => "window").Prop(() => "CodeMirror").Call(() => "fromTextArea", () => WebJs.Id(() => "textarea"), () => WebJs.Obj()
+                        .Prop(() => "mode", () => WebJs.Str(() => "text/x-markdown"))
+                        .Prop(() => "lineNumbers", () => WebJs.Bool(() => true))
+                        .Prop(() => "lineWrapping", () => WebJs.Bool(() => true))
+                        .Prop(() => "tabSize", () => WebJs.Num(() => "4"))
+                        .Prop(() => "indentWithTabs", () => WebJs.Bool(() => true))
+                        .Prop(() => "theme", () => WebJs.Str(() => "default")))).Stmt(),
+                    WebJs.Id(() => "editor").Call(() => "on", () => WebJs.Str(() => "change"), () => WebJs.Arrow(() => new List<string> { "instance" }, () => WebJs.Block()
+                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "dirtyFlag").Prop(() => "value"), () => WebJs.Str(() => "1")))
+                        .Add(() => WebJs.Id(() => "instance").Call(() => "save").Stmt())
+                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "textarea").Prop(() => "value"), () => WebJs.Id(() => "instance").Call(() => "getValue")).Stmt()))).Stmt(),
+                    WebJs.Id(() => "editor").Call(() => "refresh").Stmt()
+                }),
+                (null, new List<JsSyntax>
+                {
+                    // Plain textarea fallback: track edits via the input event
+                    WebJs.Id(() => "textarea").Call(() => "addEventListener", () => WebJs.Str(() => "input"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
+                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "dirtyFlag").Prop(() => "value"), () => WebJs.Str(() => "1")).Stmt()))).Stmt()
+                })
+            }))
             .Add(() => WebJs.Assign(() => WebJs.Id(() => "window").Index(() => WebJs.Str(() => safeEditorId)), () => WebJs.Obj()
                 .Prop(() => "editor", () => WebJs.Id(() => "editor"))
                 .Prop(() => "textarea", () => WebJs.Id(() => "textarea"))
                 .Prop(() => "dirtyFlag", () => WebJs.Id(() => "dirtyFlag"))
                 .Prop(() => "modeInput", () => WebJs.Id(() => "modeInput"))
                 .Prop(() => "widget", () => WebJs.Id(() => "widget"))))
-            // Refresh CodeMirror to ensure proper rendering
-            .Add(() => WebJs.Id(() => "editor").Call(() => "refresh").Stmt())
             .Add(() => WebJs.Id(() => $"mdEditorSetMode_{safeEditorId}").Invoke(() => WebJs.Id(() => "modeInput").Prop(() => "value")).Stmt())
             .Add(() => WebJs.Id(() => $"mdEditorRender_{safeEditorId}").Invoke().Stmt());
 
@@ -421,13 +455,15 @@ public class MarkdownEditorComponent : ComponentBase
                     WebJs.Return(() => WebJs.Str(() => ""))
                 })
             }))
-            // Get markdown content from CodeMirror editor
-            .Add(() => WebJs.Let(() => "md", () => WebJs.Id(() => "state").Prop(() => "editor").Call(() => "getValue")))
+            .Add(() => WebJs.Let(() => "md", () => WebJs.Ternary(() => WebJs.Id(() => "state").Prop(() => "editor"),
+                () => WebJs.Id(() => "state").Prop(() => "editor").Call(() => "getValue"),
+                () => WebJs.Id(() => "state").Prop(() => "textarea").Prop(() => "value"))))
             .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "marked")).Op(() => "!==", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
                 {
                     // Render markdown to HTML
+                    WebJs.Id(() => "previewEl").Prop(() => "classList").Call(() => "remove", () => WebJs.Str(() => "md-editor-preview-fallback")).Stmt(),
                     WebJs.Assign(() => WebJs.Id(() => "previewEl").Prop(() => "innerHTML"), () => WebJs.Id(() => "marked").Call(() => "parse", () => WebJs.Id(() => "md"))).Stmt(),
                     // Apply highlight.js to code blocks in preview pane
                     WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -442,8 +478,9 @@ public class MarkdownEditorComponent : ComponentBase
                 }),
                 (null, new List<JsSyntax>
                 {
-                    // Fallback: just show the markdown as-is if marked is not loaded
-                    WebJs.Assign(() => WebJs.Id(() => "previewEl").Prop(() => "innerHTML"), () => WebJs.Id(() => "md")).Stmt()
+                    // Fallback: show the raw markdown as plain text when marked is unavailable
+                    WebJs.Id(() => "previewEl").Prop(() => "classList").Call(() => "add", () => WebJs.Str(() => "md-editor-preview-fallback")).Stmt(),
+                    WebJs.Assign(() => WebJs.Id(() => "previewEl").Prop(() => "textContent"), () => WebJs.Id(() => "md")).Stmt()
                 })
             }));
 
@@ -497,7 +534,9 @@ public class MarkdownEditorComponent : ComponentBase
                     WebJs.Return(() => WebJs.Str(() => ""))
                 })
             }))
-            .Add(() => WebJs.Let(() => "md", () => WebJs.Id(() => "state").Prop(() => "editor").Call(() => "getValue")))
+            .Add(() => WebJs.Let(() => "md", () => WebJs.Ternary(() => WebJs.Id(() => "state").Prop(() => "editor"),
+                () => WebJs.Id(() => "state").Prop(() => "editor").Call(() => "getValue"),
+                () => WebJs.Id(() => "state").Prop(() => "textarea").Prop(() => "value"))))
             .Add(() => WebJs.Let(() => "dirtyFlag", () => WebJs.Id(() => "state").Prop(() => "dirtyFlag")));
 
         if (!string.IsNullOrEmpty(saveEndpoint))
@@ -516,8 +555,18 @@ public class MarkdownEditorComponent : ComponentBase
                     {
                         (WebJs.Id(() => "data").Prop(() => "success"), new List<JsSyntax>
                         {
-                            // Success: clear dirty flag
+                            // Success: clear dirty flag and give visible feedback on the save button
                             WebJs.Assign(() => WebJs.Id(() => "dirtyFlag").Prop(() => "value"), () => WebJs.Str(() => "0")).Stmt(),
+                            WebJs.Let(() => "saveBtn", () => WebJs.Id(() => "state").Prop(() => "widget").Call(() => "querySelector", () => WebJs.Str(() => ".md-editor-btn-save"))).Stmt(),
+                            WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                            {
+                                (WebJs.Id(() => "saveBtn"), new List<JsSyntax>
+                                {
+                                    WebJs.Assign(() => WebJs.Id(() => "saveBtn").Prop(() => "textContent"), () => WebJs.Str(() => "✅")).Stmt(),
+                                    WebJs.Id(() => "window").Call(() => "setTimeout", () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
+                                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "saveBtn").Prop(() => "textContent"), () => WebJs.Str(() => "💾")).Stmt())), () => WebJs.Num(() => "1500")).Stmt()
+                                })
+                            }).Stmt(),
                             WebJs.Id(() => "console").Call(() => "log", () => WebJs.Str(() => "Save successful")).Stmt()
                         }),
                         (null, new List<JsSyntax>
@@ -548,64 +597,120 @@ public class MarkdownEditorComponent : ComponentBase
                 .Add(() => WebJs.Assign(() => WebJs.Id(() => "dirtyFlag").Prop(() => "value"), () => WebJs.Str(() => "0")));
         }
 
+        // Try each URL in order until one loads; call onfail if all fail.
+        var tryNextScriptBody = WebJs.Block()
+            .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (WebJs.Id(() => "i").Op(() => ">=", () => WebJs.Id(() => "urls").Prop(() => "length")), new List<JsSyntax>
+                {
+                    WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+                    {
+                        (WebJs.Id(() => "onfail"), new List<JsSyntax>
+                        {
+                            WebJs.Id(() => "onfail").Invoke().Stmt()
+                        })
+                    }),
+                    WebJs.Return(() => WebJs.Null())
+                })
+            }))
+            .Add(() => WebJs.Const(() => "s", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
+            .Add(() => WebJs.Assign(() => WebJs.Id(() => "s").Prop(() => "src"), () => WebJs.Id(() => "urls").Index(() => WebJs.Id(() => "i"))))
+            .Add(() => WebJs.Assign(() => WebJs.Id(() => "s").Prop(() => "onload"), () => WebJs.Id(() => "onload")))
+            .Add(() => WebJs.Assign(() => WebJs.Id(() => "s").Prop(() => "onerror"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
+                .Add(() => WebJs.Assign(() => WebJs.Id(() => "i"), () => WebJs.Op(() => WebJs.Id(() => "i"), () => "+", () => WebJs.Num(() => "1"))))
+                .Add(() => WebJs.Id(() => "tryNext").Invoke().Stmt()))))
+            .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "s")).Stmt());
+
+        JsBlock loadScriptBody = WebJs.Block()
+            .Add(() => WebJs.Let(() => "i", () => WebJs.Num(() => "0")))
+            .Add(() => WebJs.Func(() => "tryNext", () => new List<string>(), () => tryNextScriptBody))
+            // Kick off the load chain OUTSIDE tryNext's body
+            .Add(() => WebJs.Id(() => "tryNext").Invoke().Stmt());
+
+        // Same retry logic for stylesheets (CSS failures are purely cosmetic).
+        var tryNextCssBody = WebJs.Block()
+            .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (WebJs.Id(() => "i").Op(() => ">=", () => WebJs.Id(() => "urls").Prop(() => "length")), new List<JsSyntax>
+                {
+                    WebJs.Return(() => WebJs.Null())
+                })
+            }))
+            .Add(() => WebJs.Const(() => "l", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "link"))))
+            .Add(() => WebJs.Assign(() => WebJs.Id(() => "l").Prop(() => "rel"), () => WebJs.Str(() => "stylesheet")))
+            .Add(() => WebJs.Assign(() => WebJs.Id(() => "l").Prop(() => "href"), () => WebJs.Id(() => "urls").Index(() => WebJs.Id(() => "i"))))
+            .Add(() => WebJs.Assign(() => WebJs.Id(() => "l").Prop(() => "onerror"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
+                .Add(() => WebJs.Assign(() => WebJs.Id(() => "i"), () => WebJs.Op(() => WebJs.Id(() => "i"), () => "+", () => WebJs.Num(() => "1"))))
+                .Add(() => WebJs.Id(() => "tryNext").Invoke().Stmt()))))
+            .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "l")).Stmt());
+
+        JsBlock loadCssBody = WebJs.Block()
+            .Add(() => WebJs.Let(() => "i", () => WebJs.Num(() => "0")))
+            .Add(() => WebJs.Func(() => "tryNext", () => new List<string>(), () => tryNextCssBody))
+            // Kick off the load chain OUTSIDE tryNext's body
+            .Add(() => WebJs.Id(() => "tryNext").Invoke().Stmt());
+
+        // marked / hljs only enhance preview rendering; they must never gate
+        // editor initialization. Re-render the preview once marked arrives.
+        JsBlock loadLibsBody = WebJs.Block()
+            .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "marked")).Op(() => "===", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
+                {
+                    WebJs.Id(() => $"mdEditorLoadScript_{safeEditorId}").Invoke(
+                        () => WebJs.Array().Add(() => WebJs.Str(() => MarkedJsUrl)).Add(() => WebJs.Str(() => MarkedJsFallbackUrl)),
+                        () => WebJs.Arrow(() => new List<string>(), () => WebJs.Id(() => $"mdEditorRender_{safeEditorId}").Invoke()),
+                        () => WebJs.Null()).Stmt()
+                })
+            }))
+            .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "hljs")).Op(() => "===", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
+                {
+                    WebJs.Id(() => $"mdEditorLoadScript_{safeEditorId}").Invoke(
+                        () => WebJs.Array().Add(() => WebJs.Str(() => HighlightJsUrl)).Add(() => WebJs.Str(() => HighlightJsFallbackUrl)),
+                        () => WebJs.Null(),
+                        () => WebJs.Null()).Stmt()
+                })
+            }));
+
+        // Bootstrap: if CodeMirror already exists (multi-widget page) init now;
+        // otherwise load it from the CDN chain and degrade to a plain textarea
+        // when every source is unreachable.
+        JsBlock bootstrapBody = WebJs.Block()
+            .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "CodeMirror")).Op(() => "!==", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
+                {
+                    WebJs.Id(() => $"mdEditorLoadLibs_{safeEditorId}").Invoke().Stmt(),
+                    WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke().Stmt()
+                }),
+                (null, new List<JsSyntax>
+                {
+                    WebJs.Id(() => $"mdEditorLoadCss_{safeEditorId}").Invoke(
+                        () => WebJs.Array().Add(() => WebJs.Str(() => CodeMirrorCssUrl)).Add(() => WebJs.Str(() => CodeMirrorCssFallbackUrl))).Stmt(),
+                    WebJs.Id(() => $"mdEditorLoadScript_{safeEditorId}").Invoke(
+                        () => WebJs.Array().Add(() => WebJs.Str(() => CodeMirrorJsUrl)).Add(() => WebJs.Str(() => CodeMirrorJsFallbackUrl)),
+                        () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
+                            .Add(() => WebJs.Id(() => $"mdEditorLoadScript_{safeEditorId}").Invoke(
+                                () => WebJs.Array().Add(() => WebJs.Str(() => CodeMirrorMarkdownModeUrl)).Add(() => WebJs.Str(() => CodeMirrorMarkdownModeFallbackUrl)),
+                                () => WebJs.Null(),
+                                () => WebJs.Null()).Stmt())
+                            .Add(() => WebJs.Id(() => $"mdEditorLoadLibs_{safeEditorId}").Invoke().Stmt())
+                            .Add(() => WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke().Stmt())),
+                        // All CDN sources unreachable: keep the plain textarea working
+                        () => WebJs.Arrow(() => new List<string>(), () => WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())).Stmt()
+                })
+            }));
+
         return WebJs.Block()
             .Add(() => WebJs.Func(() => $"mdEditorInit_{safeEditorId}", () => new List<string>(), () => initBody))
             .Add(() => WebJs.Func(() => $"mdEditorRender_{safeEditorId}", () => new List<string>(), () => renderBody))
             .Add(() => WebJs.Func(() => $"mdEditorSetMode_{safeEditorId}", () => new List<string> { "mode" }, () => setModeBody))
             .Add(() => WebJs.Func(() => $"mdEditorSave_{safeEditorId}", () => new List<string>(), () => saveBody))
-            .Add(() => WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-            {
-                (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "CodeMirror")).Op(() => "!==", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
-                {
-                    // CodeMirror is loaded, check if marked is also loaded
-                    WebJs.If(() => new List<(JsSyntax?, List<JsSyntax>)>
-                    {
-                        (WebJs.Id(() => "typeof").Invoke(() => WebJs.Id(() => "marked")).Op(() => "!==", () => WebJs.Str(() => "undefined")), new List<JsSyntax>
-                        {
-                            WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke().Stmt()
-                        }),
-                        (null, new List<JsSyntax>
-                        {
-                            // Load marked.js and highlight.js
-                            WebJs.Let(() => "scriptMarked", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))),
-                            WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js")),
-                            WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
-                                .Add(() => WebJs.Let(() => "scriptHljs", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
-                                .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHljs").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js")))
-                                .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHljs").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())))
-                                .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptHljs")).Stmt()))),
-                            WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptMarked")).Stmt()
-                        })
-                    })
-                }),
-                (null, new List<JsSyntax>
-                {
-                    // Load CodeMirror first, then other libraries
-                    // Load CodeMirror CSS
-                    WebJs.Let(() => "linkCss", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "link"))),
-                    WebJs.Assign(() => WebJs.Id(() => "linkCss").Prop(() => "rel"), () => WebJs.Str(() => "stylesheet")),
-                    WebJs.Assign(() => WebJs.Id(() => "linkCss").Prop(() => "href"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.css")),
-                    WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "linkCss")).Stmt(),
-                    
-                    // Load CodeMirror JS
-                    WebJs.Let(() => "scriptCodeMirror", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))),
-                    WebJs.Assign(() => WebJs.Id(() => "scriptCodeMirror").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.min.js")),
-                    WebJs.Assign(() => WebJs.Id(() => "scriptCodeMirror").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
-                        // Load Markdown mode
-                        .Add(() => WebJs.Let(() => "scriptMdMode", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
-                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptMdMode").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/markdown/markdown.min.js")))
-                        // Load marked.js
-                        .Add(() => WebJs.Let(() => "scriptMarked", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
-                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js")))
-                        .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptMarked").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Block()
-                            .Add(() => WebJs.Let(() => "scriptHljs", () => WebJs.Id(() => "document").Call(() => "createElement", () => WebJs.Str(() => "script"))))
-                            .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHljs").Prop(() => "src"), () => WebJs.Str(() => "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js")))
-                            .Add(() => WebJs.Assign(() => WebJs.Id(() => "scriptHljs").Prop(() => "onload"), () => WebJs.Arrow(() => new List<string>(), () => WebJs.Id(() => $"mdEditorInit_{safeEditorId}").Invoke())))
-                            .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptHljs")).Stmt()))))
-                        .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptMarked")).Stmt())
-                        .Add(() => WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptMdMode")).Stmt()))),
-                    WebJs.Id(() => "document").Prop(() => "head").Call(() => "appendChild", () => WebJs.Id(() => "scriptCodeMirror")).Stmt()
-                })
-            }));
+            .Add(() => WebJs.Func(() => $"mdEditorLoadScript_{safeEditorId}", () => new List<string> { "urls", "onload", "onfail" }, () => loadScriptBody))
+            .Add(() => WebJs.Func(() => $"mdEditorLoadCss_{safeEditorId}", () => new List<string> { "urls" }, () => loadCssBody))
+            .Add(() => WebJs.Func(() => $"mdEditorLoadLibs_{safeEditorId}", () => new List<string>(), () => loadLibsBody))
+            .Add(() => bootstrapBody);
     }
 }

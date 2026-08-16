@@ -409,6 +409,30 @@ _ => permissionType.ToString()
     public override string ProjectWorkNotesPageHeader => "Notes de travail du projet";
     public override string ProjectWorkNotesEmptyState => "Ce projet n'a pas encore de notes de travail";
     public override string ProjectWorkNotesTotalPages => "Total des pages : {0}";
+    public override string PageTitleSkills => "Gestion des compétences";
+    public override string SkillsPageHeader => "Compétences";
+    public override string SkillsPageSubtitle => "Compétences = orchestration d'outils réutilisable + modèles de prompts (Markdown; métadonnées dans l'en-tête YAML)";
+    public override string SkillsStatFormat => "{0} compétence(s) · personnalisées {1}/{2}";
+    public override string SkillsEmptyState => "Aucune compétence pour le moment";
+    public override string SkillsBackToBeings => "← Retour aux êtres";
+    public override string SkillBtnNew => "Nouvelle compétence";
+    public override string SkillBtnImportMd => "Importer du Markdown";
+    public override string SkillBtnImportJson => "Importer du JSON";
+    public override string SkillBtnRefresh => "Actualiser";
+    public override string SkillBtnEdit => "Modifier";
+    public override string SkillBtnTest => "Tester";
+    public override string SkillBtnExportJson => "JSON";
+    public override string SkillBtnExportMd => "MD";
+    public override string SkillBtnDelete => "Supprimer";
+    public override string SkillCurrentEditingFormat => "Modification : {0}";
+    public override string SkillNewSkillLabel => "Nouvelle compétence (non enregistrée)";
+    public override string SkillConfirmDeleteFormat => "Supprimer la compétence {0} ?";
+    public override string SkillPromptImportMd => "Collez le Markdown de la compétence (front matter YAML + corps ; les métadonnées manquantes seront complétées automatiquement)";
+    public override string SkillPromptImportJson => "Collez le JSON SkillDefinition";
+    public override string SkillPromptTestParams => "Entrez le JSON des paramètres de test (ex. {\"source\": \"...\"}), laissez vide pour aucun";
+    public override string SkillTestResultPrefix => "Résultat : ";
+    public override string SkillLoadFailedFormat => "Échec du chargement : {0}";
+    public override string SkillRequestFailed => "Échec de la requête";
 
     // ===== Code Browser Page Localization =====
 
@@ -880,7 +904,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["task"] = "Tâche",
         ["system"] = "Système",
         ["project_work_note"] = "Note de travail de projet",
-        ["webview_browser"] = "Navigateur WebView"
+        ["webview_browser"] = "Navigateur WebView",
+        ["skill"] = "Compétence"
     };
 
     public override string GetToolDisplayName(string toolName) =>
@@ -983,7 +1008,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["AI"] = "Configuration IA",
         ["Web"] = "Configuration Web",
         ["User"] = "Configuration utilisateur",
-        ["IM"] = "Configuration IM"
+        ["IM"] = "Configuration IM",
+        ["Skill"] = "Configuration des compétences"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1098,14 +1124,13 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["MiniMaxModel_MiniMax-M2.7-highspeed"] = "MiniMax M2.7 Highspeed (Low latency)",
         ["MiniMaxModel_MiniMax-M2.5"] = "MiniMax M2.5 (Agent SOTA, 200K)",
         ["MiniMaxModel_MiniMax-M2"] = "MiniMax M2 (Open-source Agent, 192K)",
-        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (Flagship, 128K, Multimodal)",
-        ["ErnieModel_ernie-4.0-turbo-8k"] = "ERNIE 4.0 Turbo (8K, Cost-effective)",
-        ["ErnieModel_ernie-4.0-8k"] = "ERNIE 4.0 (8K)",
-        ["ErnieModel_ernie-3.5-8k"] = "ERNIE 3.5 (8K, Economy)",
-        ["ErnieModel_ernie-3.5-128k"] = "ERNIE 3.5 (128K, Long context)",
-        ["ErnieModel_ernie-speed-128k"] = "ERNIE Speed (128K, Free)",
-        ["ErnieModel_ernie-speed-8k"] = "ERNIE Speed (8K, Free) - Recommended for debugging",
-        ["ErnieModel_ernie-tiny-8k"] = "ERNIE Tiny (8K, Free)",
+        ["ErnieModel_glm-5.2"] = "GLM 5.2 (1M contexte, leader en tâches longues)",
+        ["ErnieModel_glm-5.1"] = "GLM 5.1 (codage amélioré, résultats de niveau ingénierie)",
+        ["ErnieModel_deepseek-v4-pro"] = "DeepSeek V4 Pro (million contexte, leader en Agent/raisonnement)",
+        ["ErnieModel_deepseek-v4-flash"] = "DeepSeek V4 Flash (léger efficace, million contexte)",
+        ["ErnieModel_kimi-k2.6"] = "Kimi K2.6 (code long, entrée texte/image)",
+        ["ErnieModel_ernie-5.1"] = "ERNIE 5.1 (dernier Wenxin, agent/raisonnement amélioré)",
+        ["ErnieModel_qianfan-code-latest"] = "qianfan-code-latest (contrôlé par la console)",
         ["HunyuanModel_hy3"] = "Hy3 (TokenHub, 256K) - Recommended",
         ["HunyuanModel_hy3-preview"] = "Hy3 Preview (TokenHub, 256K, Agent)",
         ["HunyuanModel_hunyuan-lite"] = "Hunyuan Lite (Free, 256K)",
@@ -1148,7 +1173,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["IMHelp_webui"] = "Interface de chat intégrée au navigateur, servie directement par cette application. Aucun identifiant externe n'est requis — il suffit de l'activer et de discuter depuis la page web.",
         ["IMHelp_feishu"] = "Créez une application personnalisée sur la Feishu Open Platform, activez la fonctionnalité de bot et publiez une version. Copiez l'App ID et l'App Secret depuis 'Credentials & Basic Info', ainsi que le Verification Token / Encrypt Key depuis 'Event Subscriptions'. Faites pointer l'URL de requête d'abonnement aux événements vers le chemin de rappel de cette application ; Feishu autorise les rappels vers localhost, aucune adresse publique n'est donc nécessaire pour les tests locaux.",
         ["IMHelp_wecom"] = "Créez une application auto-construite dans la console d'administration WeCom (Apps → Create App). Renseignez le Corp ID (My Company → Company Info), l'Agent ID et l'App Secret de l'application, ainsi que le Token et l'Encoding AES Key générés lors de la configuration du 'serveur de réception des messages'. L'URL de rappel doit être une adresse HTTPS accessible publiquement pointant vers le chemin de rappel de cette application, et l'IP du serveur peut devoir être ajoutée à la liste des IP de confiance.",
-        ["IMHelp_dingtalk"] = "Créez une application d'entreprise interne avec un robot sur la DingTalk Open Platform. Renseignez l'App Key, l'App Secret et le Robot Code depuis la page des identifiants de l'application. Le mode Stream (par défaut) reçoit les messages via une connexion WebSocket et ne nécessite aucune adresse publique ; le mode de rappel HTTP nécessite une URL de rappel HTTPS accessible publiquement."
+        ["IMHelp_dingtalk"] = "Créez une application d'entreprise interne avec un robot sur la DingTalk Open Platform. Renseignez l'App Key, l'App Secret et le Robot Code depuis la page des identifiants de l'application. Le mode Stream (par défaut) reçoit les messages via une connexion WebSocket et ne nécessite aucune adresse publique ; le mode de rappel HTTP nécessite une URL de rappel HTTPS accessible publiquement.",
+        ["SkillEnabled"] = "Activer les compétences",
+        ["GlobalMaxToolRound"] = "Tours d'outils max. globaux",
+        ["GlobalSkillTimeoutSeconds"] = "Délai d'expiration global des compétences (s)",
+        ["MaxCustomSkillsPerBeing"] = "Compétences personnalisées max. par être"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1211,7 +1240,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["WebSkin"] = "Nom du thème Web",
         ["UserNickname"] = "Pseudonyme de l'utilisateur humain",
         ["PluginDirectories"] = "Liste des répertoires de plugins pour la découverte automatique, prend en charge les chemins relatifs ou absolus",
-        ["IMPlatforms"] = "Configurer les plateformes IM connectées ; plusieurs ajouts possibles, via identifiants manuels ou autorisation par QR code"
+        ["IMPlatforms"] = "Configurer les plateformes IM connectées ; plusieurs ajouts possibles, via identifiants manuels ou autorisation par QR code",
+        ["SkillEnabled"] = "Activer le système de compétences (enregistrement des compétences, dispatch IA et déclencheurs automatiques)",
+        ["GlobalMaxToolRound"] = "Limite supérieure des tours d'appels d'outils par exécution de compétence",
+        ["GlobalSkillTimeoutSeconds"] = "Limite supérieure de la durée d'exécution d'une compétence en secondes",
+        ["MaxCustomSkillsPerBeing"] = "Nombre maximal de compétences personnalisées (non intégrées) que chaque être de silicium peut détenir"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
