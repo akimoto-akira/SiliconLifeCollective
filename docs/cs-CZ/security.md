@@ -383,3 +383,82 @@ Systém poskytuje předdefinované šablony oprávnění pro zajištění bezpe�
 - **Granularita operací** — každá operace každého nástroje je řízena nezávisle (např. `network:get` povoleno, ale `network:post` zamítnuto)
 - **Správa Kurátorem** — oprávnění nástrojů může konfigurovat pouze Kurátor Křemíku
 - **Auditní stopa** — změny oprávnění nástrojů jsou zaznamenávány v auditním protokolu
+
+---
+
+## Bezpečnost dovedností
+
+Systém dovedností znovu využívá systém oprávnění nástrojů a poskytuje vícevrstvé zábrany:
+
+### Oprávnění provádění
+
+- ID dovednosti slouží jako název nástroje, je začleněno do matrice oprávnění `ToolActionPermissionConfig` jako akce `execute`
+- Zakázané dovednosti se neobjevují v AI viditelné definici nástrojů (filtrování na úrovni schématu + runtime kontrola, dvojitá záruka)
+- Kurátor může vždy provádět; běžné bytosti vyžadují `IsActionAllowed(skillId, "execute")`
+
+### Whitelist nástrojů a sjednocení oprávnění
+
+- Během provádění dovednosti jsou povoleny pouze nástroje v `ToolWhitelist` (prázdný seznam = dědění všech nástrojů bytosti)
+- Omezení akcí dovednosti a oprávnění bytosti tvoří **striktní sjednocení** (`MergePermissions`): dovednost může pouze dále zužovat oprávnění, nikdy je nemůže rozšiřovat
+- Volání nástrojů mimo whitelist selže přímo (`Tool not in whitelist`)
+
+### Zábrany spotřeby prostředků
+
+- **Globální přepínač**: `SkillEnabled` jedním kliknutím zakáže celý systém dovedností
+- **Kvóta množství**: Počet vlastních dovedností každé bytosti je omezen na `MaxCustomSkillsPerBeing` (výchozí 50)
+- **Omezení kol**: `maxToolRound = Min(hodnota deklarovaná dovedností, GlobalMaxToolRound výchozí 10)`, zabraňuje nezvládnutelným smyčkám
+- **Omezení timeoutu**: `timeout = Min(hodnota deklarovaná dovedností, GlobalSkillTimeoutSeconds výchozí 300s)`
+- **Ochrana proti rekurzi**: Dovednost nesmí znovu volat samu sebe během provádění
+
+### Oprávnění úpravy
+
+- Kurátor může upravovat všechny dovednosti; běžné bytosti mohou upravovat pouze dovednosti se zdrojem `Being`/`User`
+- Automatické doplnění metadat vyplňuje pouze chybějící pole, uživatelem poskytnutá pole nejsou AI nikdy přepsána
+
+---
+
+## Bezpečnost MCP
+
+Integrace MCP se řídí principem "suverenita uživatele + konzistence oprávnění":
+
+### Suverenita uživatele
+
+- Přidávání, odstraňování, spouštění/zastavování a znovupřipojování MCP serverů **může provádět pouze uživatel prostřednictvím Web UI** (/mcp nebo konfigurační stránka)
+- Nástroj `mcp` na straně AI je dotaz pouze pro čtení (status/list_servers/list_tools), nemůže upravovat seznam serverů
+- Globální přepínač `McpEnabled` může jedním kliknutím odpojit všechny externí nástroje
+
+### Izolace nástrojů a oprávnění
+
+- Obalové nástroje jsou pojmenovány `mcp_{serverId}_{toolName}`, izolovány od jmenného prostoru vestavěných/zásuvných nástrojů
+- Každý obalový nástroj automaticky deklaruje jedinou akci `execute`, je začleněn do dvouúrovňové matrice oprávnění nástrojů, lze jej individuálně zakázat podle bytosti/projektu
+- Po zákazu serveru jsou jeho nástroje okamžitě odhlášeny ze všech bytostí
+
+### Hranice přenosu a procesů
+
+- `stdio` servery běží jako podprocesy, dědí pouze explicitně nakonfigurované proměnné prostředí (pole `env`)
+- `http` servery komunikují prostřednictvím nakonfigurovaného koncového bodu, při selhání připojení automaticky přecházejí do stavu error a vystavují `lastError`
+
+---
+
+## Bezpečnost IM tajných klíčů
+
+### Zástupné symboly proměnných prostředí
+
+Konfigurační hodnoty IM platformy podporují `${ENV_VAR}` zástupné symboly (např. `"${FEISHU_APP_SECRET}"`):
+
+- `ConfigSecretResolver` řeší zástupné symboly na **hluboké kopii**, původní `config.json` vždy zachovává zástupné symboly v původním stavu
+- Následné `SaveConfig` nezapisuje vyřešené tajné klíče v prostém textu zpět na disk
+- Podpora zástupných symbolů pro celou hodnotu i vložených zástupných symbolů (např. `prefix-${VAR}`)
+
+### Bezpečnost OAuth autorizace
+
+- **state ochrana proti CSRF**: 16bajtový kryptografický náhodný počet, přísná validace při zpětném volání
+- **5minutový timeout**: Autorizační relace automaticky expiruje při timeoutu, při přepsání staré relace je okamžitě zrušena
+- **Uložení tokenu**: accessToken/refreshToken/tokenExpiresAt jsou zapsány zpět do konfigurace platformy a perzistovány, `authMode` je označen jako `oauth`
+- URL zpětného volání podporuje konfiguraci `redirectBaseUrl` (scénáře veřejného zpětného volání)
+
+### Bezpečnost zpráv
+
+- Feishu: Ověření podpisu (`X-Lark-Signature`, SHA256) + AES-256-CBC dešifrování událostí + deduplikace událostí (10minutové okno)
+- WeChat Enterprise: WXBizMsgCrypt šifrování/dešifrování a ověření podpisu
+- DingTalk: Stream režim používá šifrovaný WebSocket; HTTP režim ověřuje zpětné volání

@@ -316,6 +316,42 @@ Gestionar permisos de herramientas a través de la Web UI:
 | `/api/projects/{id}/tool-permissions` | GET | Obtener permisos de herramientas del proyecto |
 | `/api/projects/{id}/tool-permissions` | PUT | Actualizar permisos de herramientas del proyecto |
 
+### Permisos de acción de las habilidades
+
+Las habilidades reutilizan el mecanismo de permisos de acción de herramientas: el id de la habilidad sirve como nombre de herramienta, con la acción `execute`.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- Las habilidades deshabilitadas no aparecen en las definiciones de herramientas visibles para la IA (la IA no las "ve")
+- La ejecución de la habilidad también tiene una verificación en tiempo de ejecución, incluso un esquema obsoleto no puede eludirla
+- Los permisos de las herramientas internas de la habilidad = permisos del ser ∪ restricciones de la propia habilidad (unión del lado restrictivo, solo puede restringir, no ampliar)
+
+### Permisos de acción de las herramientas wrapper MCP
+
+Cada herramienta wrapper inyectada por un servidor MCP (`mcp_{serverId}_{toolName}`) declara automáticamente una única acción `execute`:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- La disponibilidad de herramientas externas se puede controlar con precisión por ser o proyecto
+- Cuando todas las acciones `execute` de un servidor están deshabilitadas, la herramienta se elimina por completo del esquema visible para la IA
+- La deshabilitación/eliminación de un servidor (vía Web UI) revoca inmediatamente todas sus herramientas
+
 ---
 
 ## Mejores Prácticas

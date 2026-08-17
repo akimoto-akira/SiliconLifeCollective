@@ -368,6 +368,116 @@ Plugin load failed: Security check failed
 
 ---
 
+### Skill Issues
+
+#### Issue: Skill not appearing in skill list or invisible to AI
+
+**Symptoms**:
+- Web UI skill page saves successfully, but the skill doesn't appear in the list / AI doesn't call the skill
+
+**Solution**:
+1. Check that the skill `id` and `description` are non-empty (drafts are not exposed to AI)
+2. Skills with incomplete metadata (`NeedsCompletion`) are not injected into AI — complete the YAML frontmatter metadata or let AI complete it before saving
+3. Check if the permission matrix has disabled `{skillId}:execute` (disabled skills are invisible to AI)
+4. Confirm the global switch `SkillEnabled` is true
+5. Hot-reload takes up to 30 seconds to take effect, wait and refresh or restart
+
+#### Issue: Skill execution fails with "not in whitelist"
+
+**Symptoms**:
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**Solution**:
+- Add the tool to the skill's `tool_whitelist`, or clear the whitelist to inherit all Silicon Being tools
+
+#### Issue: Skill count limit reached
+
+**Symptoms**:
+```
+Custom skill limit reached (50)
+```
+
+**Solution**:
+1. Delete unused custom skills
+2. Or increase the config `MaxCustomSkillsPerBeing`
+
+---
+
+### MCP Issues
+
+#### Issue: MCP server connection failed
+
+**Symptoms**:
+- Server status shows `error` or `disconnected`, `lastError` is non-empty
+
+**Solution**:
+1. stdio server: confirm `command` is executable (e.g., `npx` is in PATH), `arguments` are correct
+2. http server: check that `endpoint` URL is reachable (firewall, proxy)
+3. Click **Reconnect** on the /mcp page
+4. Check `lastError` details, common causes are command not found, version incompatibility, endpoint 404
+
+#### Issue: MCP tools not injected into Silicon Being
+
+**Symptoms**:
+- Server is connected (`connected`) but AI cannot call `mcp_xxx_yyy` tools
+
+**Solution**:
+1. Confirm the server `enabled` is true
+2. Confirm the global switch `McpEnabled` is true
+3. Check the permission matrix: whether `mcp_{serverId}_{toolName}:execute` is disabled
+4. Use the `mcp` tool (`list_tools`) in Silicon Being conversation to verify the actual injected tool names
+
+#### Issue: Adding server returns ID format error
+
+**Symptoms**:
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**Solution**:
+- Server ID only allows lowercase letters, digits, and underscores (e.g., `filesystem`, `github_tools`)
+
+---
+
+### IM Platform Issues
+
+#### Issue: Feishu messages not received
+
+**Solution**:
+1. Check the Feishu Open Platform event subscription callback address and port (`listenPort` + `callbackPath`)
+2. Confirm `Encrypt Key` / `Verification Token` match the configuration
+3. For local development, use the OAuth authorization wizard (one-click authorization on the config page); event callbacks require public network accessibility or use an intranet tunnel
+4. Check logs for signature verification/decryption errors
+
+#### Issue: OAuth authorization timeout
+
+**Symptoms**:
+- Authorization page shows `timeout` status
+
+**Solution**:
+1. The authorization session is valid for 5 minutes, click the authorization button again after timeout
+2. Confirm the callback address `/im/feishu/callback` is accessible by Feishu (`redirectBaseUrl` configured correctly)
+3. Frontend status display relies on SSE, if SSE disconnects, poll `/im/{platform}/status` as fallback
+
+#### Issue: `${ENV_VAR}` placeholder not resolved
+
+**Symptoms**:
+- IM platform connection fails, config value is still placeholder text
+
+**Solution**:
+1. Confirm the environment variable is set before starting the process (restart the application to take effect)
+2. Check variable name spelling (only supports `[A-Za-z_][A-Za-z0-9_]*`)
+3. Note: keeping placeholders in config.json is by design, resolution happens in the in-memory copy
+
+#### Issue: Only one of multiple IM platforms receives messages
+
+**Solution**:
+- Outbound messages are broadcast to all enabled platforms, single platform send failures are silently isolated — check if that platform's token has expired (re-authorize or update credentials)
+
+---
+
 ### Work Note Issues
 
 #### Issue: Cannot create work note

@@ -905,3 +905,110 @@ MemoryFadeService.OnTick()
 | `ProjectTaskTool` | 项目任务管理（创建、分配、状态更新） |
 | `ProjectWorkNoteTool` | 项目工作笔记（创建、搜索、目录生成） |
 | `ProjectWorkTool` | 项目工作操作（创建任务、群聊、广播、完成项目） |
+
+---
+
+## 技能系统
+
+技能（Skill）是"工具编排 + 提示词模板"的复用抽象层，把常见工作流封装为可声明、可进化、可调度的能力单元。
+
+### 分层结构
+
+| 层 | 位置 | 职责 |
+|------|------|------|
+| 核心层 | `SiliconLife.Core/Skills/` | SkillDefinition、SkillManager（注册+执行引擎）、SkillMarkdownParser、SkillFileManager、AutoSkillTickObject、SkillMetadataCompleter |
+| 通用层 | `SiliconLife.Common` | BuiltinSkills（3 个内置技能）、SkillTool（`skill` 工具） |
+| 应用层 | `SiliconLife.App/Web/` | SkillController + SkillView（技能管理页面） |
+
+### 执行流程
+
+```
+AI 函数调用（技能 id）或调度器触发
+        ↓
+SkillManager.ExecuteSkill
+  ├─ 全局开关 / 权限 / 递归防护检查
+  ├─ 参数钳制：maxToolRound = Min(技能值, GlobalMaxToolRound)
+  │            timeout = Min(技能值, GlobalSkillTimeoutSeconds)
+  ├─ MergePermissions：生命体权限 ∪ 技能限制（严格侧胜出）
+  ├─ FillTemplate：{param} 占位符填充 → 子 AIRequest
+  └─ 子循环（最多 maxToolRound 轮）：AI ↔ 工具（仅白名单内）
+        ↓
+HandleCompletion（OnCompleteAction）
+  none / write_memory / notify_curator / broadcast
+```
+
+### 关键设计
+
+- **透明调度**：技能以 `ToolDefinition` 形式注入 `AIRequest.Tools`，AI 无感知；`ContextManager.ExecuteToolCalls` 中技能调用优先于同名工具
+- **四种来源**：`Builtin`（框架）/ `Plugin`（ISkillProvider）/ `Being`（生命体运行时）/ `User`（Web UI），热重载保留前两类、替换后两类
+- **Markdown 优先**：`skills/{id}.md`（YAML 前置 + 正文）优先于 `.json`；纯 Markdown 保存时由 AI 补全元数据（用户字段不被覆盖）
+- **自动调度**：`AutoSkillTickObject`（30 秒检查间隔）支持 `HH:mm`、`N s|m|h|d`、cron 子集三种调度表达式，带防重入保护
+- **多重护栏**：全局开关、自定义配额（`MaxCustomSkillsPerBeing`，默认 50）、全局轮数/超时上限、技能级 `execute` 动作权限、工具白名单、递归防护
+
+---
+
+## MCP 集成
+
+MCP（Model Context Protocol）集成允许硅基生命体调用外部 MCP 服务器提供的工具，无需编写代码即可扩展能力边界。
+
+### 架构
+
+```
+用户（Web UI /mcp）──添加/启停/删除──→ McpManager（单例）
+                                          │
+                              ┌───────────┼───────────┐
+                              ↓           ↓           ↓
+                        McpClientConnection × N（stdio / http）
+                              │
+                              └→ ListTools → 包装为 SiliconLife.Collective.McpTool
+                                            命名 mcp_{serverId}_{toolName}
+                                                  │
+                          McpManager.SyncToolsForBeing(being) 注入
+                                                  ↓
+                                    ToolManager（与内置工具同等待遇）
+```
+
+### 关键设计
+
+- **双传输**：`stdio`（本地子进程：command + arguments + env）与 `http`（远程端点）
+- **工具命名隔离**：`mcp_{serverId}_{toolName}` 前缀避免与内置/插件工具冲突
+- **用户主权**：服务器增删启停只能通过 Web UI，AI 侧 `mcp` 工具仅提供只读查询（status/list_servers/list_tools）
+- **权限一致**：包装工具自动声明单一 `execute` 动作，纳入工具动作权限矩阵，可按生命体/项目禁用
+- **配置持久化**：`McpServers` 列表存于 config.json，`McpEnabled` 全局开关
+
+---
+
+## IM 平台多实例架构
+
+IM 平台采用"多实例配置 + 聚合提供者"架构，可同时接入多个聊天平台。
+
+### 核心组件
+
+| 组件 | 职责 |
+|------|------|
+| `IMPlatformConfig` | 单实例配置（platform/enabled/config 字典），`IMPlatforms` 为列表，每实例独立启停 |
+| `IMProviderRegistry` | 平台元数据注册表：配置字段 schema、OAuth 端点模板、Provider 工厂、帮助链接 |
+| `AggregateIMProvider` | 聚合多平台：消息接收（任一平台触发）、消息发送（广播、单平台失败静默隔离）、权限询问（首响应者获胜竞速） |
+| `ImOAuthService` | OAuth 授权向导（单例）：state 防 CSRF、5 分钟超时、令牌写回配置、SSE 状态推送 |
+| `ConfigSecretResolver` | `${ENV_VAR}` 占位符解析：深拷贝替换，明文密钥不写回 config.json |
+| `IMManager` | 消息路由：按 ChannelId 入队（串行处理）→ ChatSystem → 触发硅基生命体思考 |
+
+### 支持平台
+
+| 平台 | AuthModes | 事件接入 | 备注 |
+|------|-----------|---------|------|
+| Web UI | manual | SSE（内置） | 始终可用，自动补齐 |
+| 飞书 | manual / **oauth** | HTTP 回调（签名验证 + AES 解密） | 支持一键 OAuth 授权向导 |
+| 企业微信 | manual | HTTP 回调（WXBizMsgCrypt） | 需公网回调 |
+| 钉钉 | manual | Stream（WebSocket）/ HTTP | 默认 Stream 模式，无需公网 |
+
+### 消息流转
+
+```
+飞书/企微/钉钉/WebUI（入站）
+  → IIMProvider.MessageReceived
+  → IMManager.OnMessageReceived（按 ChannelId 入队，串行）
+  → ChatSystem.AddMessage → 硅基生命体 AI 思考
+  → IMManager.SendMessageAsync / SendStreamChunkAsync（出站）
+  → AggregateIMProvider 广播到所有启用平台
+```

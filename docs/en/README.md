@@ -30,6 +30,24 @@
   - 3-level permission validation chain: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → Deny by default)
   - Complete audit logging of all permission decisions
 
+### Skill System
+- **Reusable Capability Units** — Encapsulate "tool orchestration + prompt templates" as declarable, evolvable, schedulable skills; AI calls skills just like calling tools
+- **Dual Trigger Modes** — Manual (AI function call decides autonomously) + Auto (schedule-based: daily fixed time / interval cycle / cron subset)
+- **Markdown-First** — YAML frontmatter metadata + prompt body; pure Markdown saved with AI auto-completing missing metadata (user fields are never overwritten)
+- **Hot Reload & Version Archiving** — 30-second fingerprint detection for auto-effect; each update archived to `skills/archive/{id}/{version}.md` forming an evolution history
+- **Multiple Guardrails** — Global switch, quota limits (default 50/being), global round and timeout clamps, tool whitelist, recursion protection, skill-level action permissions
+
+### MCP Integration
+- **External Tool Access** — Connect to external MCP (Model Context Protocol) servers; their tools are auto-injected into all Silicon Beings with `mcp_{serverId}_{toolName}` naming, no code required
+- **Dual Transport** — stdio (local subprocess) and http (remote endpoint)
+- **User Sovereignty** — Server add/remove/enable/disable is Web UI only; AI-side `mcp` tool is read-only query
+- **Consistent Permissions** — MCP wrapper tools are included in the two-level tool permission matrix, can be disabled per being/project
+
+### IM Integration
+- **Multi-Instance Architecture** — Simultaneously connect to multiple IM platforms (Web UI / Feishu / WeChat Enterprise / DingTalk), each instance independently started/stopped, messages aggregated and routed
+- **OAuth Authorization Wizard** — Feishu one-click authorization (state for CSRF protection, SSE real-time status push), tokens auto-written back to config
+- **Key Security** — Config values support `${ENV_VAR}` environment variable placeholders, plaintext keys never stored on disk
+
 ### AI & Knowledge
 - **Multiple AI Backend Support**
   - **Ollama** — Local model deployment, using native HTTP API
@@ -234,10 +252,10 @@ SiliconLifeCollective.sln
 │   ├── en/                                # English documentation
 │   └── ...                                # Other language documentation
 │
-└── 总文档/                                 # Requirements and architecture documentation
-    ├── 需求文档.md
-    ├── 架构大纲.md
-    └── 实现顺序.md
+└── docs/                                 # Requirements and architecture documentation
+    ├── Requirements.md
+    ├── Architecture_Outline.md
+    └── Implementation_Order.md
 ```
 
 ## 🏗️ Architecture Overview
@@ -453,7 +471,7 @@ This project is licensed under the Apache License 2.0 — see the [LICENSE](../.
 
 ## 👨‍💻 Author
 
-**天源垦骥**
+**Hoshino Kennji**
 
 - GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
 - Gitee: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)

@@ -28,7 +28,7 @@
   - 7종 스킨 테마, 자동 발견 및 전환 지원
   - Linux 자동 브라우저 열기로 Web UI 접속, `--no-tray` 매개변수 지원
 - **성능 향상**: 스토리지 읽기 지연 1000배 감소, 쓰기 지연 15000배 감소
-- **역할 설명**: 심도 있게 최적화된 프로덕션급 구현으로, 시스템 트레이 백그라운드 실행, SpeedyPack 엔진 + 자동 압축 등의 기능을 갖추고 있어 장기 실행 및 실제 프로덕션 환경의首选
+- **역할 설명**: 심도 있게 최적화된 프로덕션급 구현으로, 시스템 트레이 백그라운드 실행, SpeedyPack 엔진 + 자동 압축 등의 기능을 갖추고 있어 장기 실행 및 실제 프로덕션 환경의 최적 선택
 
 > **참고**: 본 문서에서 설명하는 아키텍처는 두 버전 모두에 적용되며, 스토리지 구현 부분에서만 차이가 있습니다. SiliconLife.Default는 아키텍처 검증 기준으로, SiliconLife.Fast는 프로덕션 환경 주력 버전으로 사용됩니다.
 
@@ -137,7 +137,7 @@
 │  ┌──────────────────────────────────────────────────┐   │
 │  │              IM 프로바이더                          │   │
 │  │  ┌──────────┐ ┌──────────┐ ┌──────────────────┐  │   │
-│  │  │  콘솔     │  │  Web     │  │  페이슈 / ...    │  │   │
+│  │  │ 콘솔     │  │  Web     │  │  Feishu / ...    │  │   │
 │  │  │프로바이더 │  │프로바이더 │  │  프로바이더       │  │   │
 │  │  └──────────┘ └──────────┘ └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────┘   │
@@ -420,7 +420,7 @@
 | Herdsman | ✅ | 로컬/클라우드 | 인증 없는 추론 엔진, OpenAI API 형식 호환 |
 | Meituan LongCat | ✅ | 클라우드 | 메이퇀 자체 개발 대형 모델, OpenAI API 형식 호환, API 키 인증 |
 | Qiniu Cloud AI | ✅ | 클라우드 | 치니우 클라우드 대형 모델 추론 서비스, OpenAI API 형식 호환, API 키 인증 |
-| 링이완우(零一万物) | ⚠️ | 클라우드 | 폐기됨: 신규 사용자 등록 중단 |
+| 링이완우(01.AI) | ⚠️ | 클라우드 | 폐기됨: 신규 사용자 등록 중단 |
 | OpenAI | 💡 | 클라우드 | OpenAI API 서비스(GPT 시리즈) |
 | Anthropic | 💡 | 클라우드 | Anthropic Claude AI 서비스 |
 | Google DeepMind | 💡 | 클라우드 | Google Gemini AI 서비스 |
@@ -903,3 +903,110 @@ MemoryFadeService.OnTick()
 | `ProjectTaskTool` | 프로젝트 태스크 관리(생성, 할당, 상태 업데이트) |
 | `ProjectWorkNoteTool` | 프로젝트 워크 노트(생성, 검색, 디렉토리 생성) |
 | `ProjectWorkTool` | 프로젝트 작업(태스크 생성, 그룹 채팅, 브로드캐스트, 프로젝트 완료) |
+
+---
+
+## 스킬 시스템
+
+스킬(Skill)은 "툴 오케스트레이션 + 프롬프트 템플릿"의 재사용 가능한 추상화 계층으로, 일반적인 워크플로우를 선언 가능하고, 진화 가능하며, 스케줄링 가능한 능력 단위로 캡슐화합니다.
+
+### 계층 구조
+
+| 계층 | 위치 | 역할 |
+|------|------|------|
+| 코어 계층 | `SiliconLife.Core/Skills/` | SkillDefinition, SkillManager(등록+실행 엔진), SkillMarkdownParser, SkillFileManager, AutoSkillTickObject, SkillMetadataCompleter |
+| 공통 계층 | `SiliconLife.Common` | BuiltinSkills(3개 내장 스킬), SkillTool(`skill` 툴) |
+| 애플리케이션 계층 | `SiliconLife.App/Web/` | SkillController + SkillView(스킬 관리 페이지) |
+
+### 실행 흐름
+
+```
+AI 함수 호출(스킬 id) 또는 스케줄러 트리거
+        ↓
+SkillManager.ExecuteSkill
+  ├─ 글로벌 스위치 / 권한 / 재귀 방호 검사
+  ├─ 매개변수 클램핑: maxToolRound = Min(스킬값, GlobalMaxToolRound)
+  │            timeout = Min(스킬값, GlobalSkillTimeoutSeconds)
+  ├─ MergePermissions: 비잉 권한 ∪ 스킬 제한(엄격한 측이 승리)
+  ├─ FillTemplate: {param} 자리표시자 채우기 → 하위 AIRequest
+  └─ 하위 루프(최대 maxToolRound 라운드): AI ↔ 툴(화이트리스트 내만)
+        ↓
+HandleCompletion(OnCompleteAction)
+  none / write_memory / notify_curator / broadcast
+```
+
+### 핵심 설계
+
+- **투명 스케줄링**: 스킬이 `ToolDefinition` 형태로 `AIRequest.Tools`에 주입되며, AI는 인지하지 못함; `ContextManager.ExecuteToolCalls`에서 스킬 호출이 동일한 이름의 툴보다 우선
+- **네 가지 소스**: `Builtin`(프레임워크) / `Plugin`(ISkillProvider) / `Being`(비잉 런타임) / `User`(Web UI), 핫 리로드 시 전자 두 종류는 유지하고 후자 두 종류는 교체
+- **Markdown 우선**: `skills/{id}.md`(YAML 프론트 + 본문)이 `.json`보다 우선; 순수 Markdown 저장 시 AI가 메타데이터를 보완(사용자 필드는 덮어쓰지 않음)
+- **자동 스케줄링**: `AutoSkillTickObject`(30초 검사 간격)가 `HH:mm`, `N s|m|h|d`, cron 서브셋 세 가지 스케줄 표현식을 지원하며, 재진입 방지 보호 내장
+- **다중 가드레일**: 글로벌 스위치, 커스텀 할당량(`MaxCustomSkillsPerBeing`, 기본값 50), 글로벌 라운드/타임아웃 상한, 스킬 수준 `execute` 동작 권한, 툴 화이트리스트, 재귀 방호
+
+---
+
+## MCP 통합
+
+MCP(Model Context Protocol) 통합을 통해 실리콘 비잉이 외부 MCP 서버가 제공하는 툴을 호출할 수 있으며, 코드 작성 없이 능력 경계를 확장할 수 있습니다.
+
+### 아키텍처
+
+```
+사용자(Web UI /mcp) ──추가/활성화·비활성화/삭제──→ McpManager(싱글톤)
+                                           │
+                               ┌───────────┼───────────┐
+                               ↓           ↓           ↓
+                         McpClientConnection × N(stdio / http)
+                               │
+                               └→ ListTools → SiliconLife.Collective.McpTool로 래핑
+                                             명명 mcp_{serverId}_{toolName}
+                                                   │
+                           McpManager.SyncToolsForBeing(being) 주입
+                                                   ↓
+                                     ToolManager(내장 툴과 동등한 대우)
+```
+
+### 핵심 설계
+
+- **듀얼 전송**: `stdio`(로컬 서브프로세스: command + arguments + env)와 `http`(원격 엔드포인트)
+- **툴 명명 격리**: `mcp_{serverId}_{toolName}` 접두사로 내장/플러그인 툴과의 충돌 방지
+- **사용자 주권**: 서버 추가/삭제/활성화/비활성화는 Web UI를 통해서만 가능, AI 측 `mcp` 툴은 읽기 전용 쿼리만 제공(status/list_servers/list_tools)
+- **권한 일관성**: 래핑된 툴은 단일 `execute` 동작을 자동 선언하며, 툴 동작 권한 매트릭스에 편입되어 비잉/프로젝트별로 비활성화 가능
+- **설정 영속화**: `McpServers` 목록은 config.json에 저장, `McpEnabled` 글로벌 스위치
+
+---
+
+## IM 플랫폼 다중 인스턴스 아키텍처
+
+IM 플랫폼은 "다중 인스턴스 설정 + 집계 프로바이더" 아키텍처를 채택하여, 여러 채팅 플랫폼을 동시에 연동할 수 있습니다.
+
+### 핵심 컴포넌트
+
+| 컴포넌트 | 역할 |
+|------|------|
+| `IMPlatformConfig` | 단일 인스턴스 설정(platform/enabled/config 사전), `IMPlatforms`는 목록이며 각 인스턴스가 독립적으로 활성화/비활성화 |
+| `IMProviderRegistry` | 플랫폼 메타데이터 레지스트리: 설정 필드 schema, OAuth 엔드포인트 템플릿, Provider 팩토리, 도움말 링크 |
+| `AggregateIMProvider` | 다중 플랫폼 집계: 메시지 수신(임의의 플랫폼 트리거), 메시지 송신(브로드캐스트, 단일 플랫폼 실패 시 자동 격리), 권한 문의(첫 응답자 승리 경쟁) |
+| `ImOAuthService` | OAuth 인증 마법사(싱글톤): state CSRF 방지, 5분 타임아웃, 토큰 설정에 기록, SSE 상태 푸시 |
+| `ConfigSecretResolver` | `${ENV_VAR}` 자리표시자 해석: 깊은 복사 교체, 평문 비밀키는 config.json에 기록하지 않음 |
+| `IMManager` | 메시지 라우팅: ChannelId별 큐잉(직렬 처리) → ChatSystem → 실리콘 비잉 사고 트리거 |
+
+### 지원 플랫폼
+
+| 플랫폼 | AuthModes | 이벤트 연동 | 비고 |
+|------|-----------|---------|------|
+| Web UI | manual | SSE(내장) | 항상 사용 가능, 자동 보완 |
+| Feishu | manual / **oauth** | HTTP 콜백(서명 검증 + AES 복호화) | 원클릭 OAuth 인증 마법사 지원 |
+| WeChat Enterprise | manual | HTTP 콜백(WXBizMsgCrypt) | 공용망 콜백 필요 |
+| DingTalk | manual | Stream(WebSocket) / HTTP | 기본 Stream 모드, 공용망 불필요 |
+
+### 메시지 흐름
+
+```
+Feishu/WeChat Enterprise/DingTalk/WebUI(인바운드)
+  → IIMProvider.MessageReceived
+  → IMManager.OnMessageReceived(ChannelId별 큐잉, 직렬 처리)
+  → ChatSystem.AddMessage → 실리콘 비잉 AI 사고
+  → IMManager.SendMessageAsync / SendStreamChunkAsync(아웃바운드)
+  → AggregateIMProvider가 모든 활성화된 플랫폼에 브로드캐스트
+```

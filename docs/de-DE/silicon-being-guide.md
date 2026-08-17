@@ -188,6 +188,78 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
+## Fähigkeitensystem
+
+Fähigkeiten (Skills) sind wiederverwendbare Fähigkeitseinheiten von Silicon Beings — sie kapseln „Werkzeugorchestrierung + Prompt-Vorlagen" in eine deklarierbare, evolutionäre und automatisch planbare Funktion, die die KI wie ein reguläres Werkzeug aufruft.
+
+### Fähigkeitsstruktur
+
+| Element | Beschreibung |
+|---------|--------------|
+| `id` / `description` | Eindeutiger Bezeichner und einzeilige Beschreibung (wird der KI angezeigt, bestimmt wann die KI diese Fähigkeit wählt) |
+| `parameter_schema` | Parameter-JSON-Schema, deklariert jeden `{param}`-Platzhalter im Prompt |
+| `system_prompt_template` | System-Prompt-Vorlage, bei der Ausführung werden Platzhalter mit Parametern gefüllt |
+| `tool_whitelist` | Liste der während der Ausführung erlaubten Werkzeuge (leer = erbt alle Werkzeuge des Beings) |
+| `max_tool_round` / `timeout` | Grenzwerte für Werkzeugrunden und Timeout (durch globale Grenzwerte begrenzt) |
+| `on_complete` | Abschlussaktion: `none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual` (KI ruft autonom auf) oder `Auto` + `schedule`-Planung |
+
+### Vier Quellen
+
+- **Builtin** — Framework-integriert (`summarize_document` Dokumentzusammenfassung, `code_review` Code-Review, `research_topic` Themenrecherche)
+- **Plugin** — Plugins registrieren über `ISkillProvider`
+- **Being** — Being erstellt zur Laufzeit über das `skill`-Werkzeug selbst
+- **User** — Benutzer erstellt über die Web-UI-Fähigkeitsverwaltungsseite
+
+### Auslösearten
+
+1. **Manuell (Manual)**: Die Fähigkeit wird als reguläre Werkzeugdefinition in die KI-Anfrage injiziert; die KI entscheidet, wann sie aufgerufen wird; die Planungsseite priorisiert gleichnamige Aufrufe und leitet sie an die Fähigkeit weiter
+2. **Automatisch (Auto + schedule)**: Der Planungsausdruck wird in `metadata.schedule` gespeichert, unterstützt drei Formate:
+   - `"09:30"` — Täglich zur festen Uhrzeit
+   - `"6h"` / `"30 m"` / `"2 d"` — Intervallperiode
+   - `"0 9 * * *"` / `"*/15 * * * *"` — Cron-Teilmenge
+
+### Markdown-Erstellung
+
+Fähigkeiten werden als Markdown gespeichert (`skills/{id}.md`, YAML-Frontmatter + Prompt-Text):
+
+```markdown
+---
+id: daily_news_digest
+description: Heutige Technologie-Nachrichten suchen und Zusammenfassung generieren
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+Bitte verwenden Sie das network-Werkzeug, um die neuesten Nachrichten zu {topic} zu suchen, erstellen Sie eine 500-Zeichen-Zusammenfassung und speichern Sie sie in den Arbeitsnotizen.
+```
+
+Es genügt auch, nur den Text zu schreiben (YAML weglassen): Beim Speichern ergänzt die KI automatisch Metadaten wie id, description, Parameterschema usw. — bereits vom Benutzer ausgefüllte Felder werden niemals überschrieben.
+
+### Being-Selbstverwaltung
+
+Das Being kann seinen eigenen Fähigkeitskatalog über das `skill`-Werkzeug verwalten:
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### Heißladen und Evolution
+
+- Das Being prüft alle 30 Sekunden Änderungen im `skills/`-Verzeichnis (Fingerabdruck-Vergleich); Änderungen über die Web-UI oder durch andere Beings werden automatisch wirksam, ohne Neustart
+- Jede Fähigkeitsaktualisierung archiviert automatisch eine historische Version unter `skills/archive/{id}/{version}.md` und bildet so eine Fähigkeitsevolutionsgeschichte
+- Die Anzahl benutzerdefinierter Fähigkeiten ist durch ein Kontingent begrenzt (`MaxCustomSkillsPerBeing`, Standard 50)
+
+### Ausführungs-Leitplanken
+
+- Fähigkeitsberechtigung für `execute`-Aktion (kann durch die Berechtigungsmatrix deaktiviert werden; nach Deaktivierung für die KI unsichtbar)
+- Ausführungsparameter werden durch globale Grenzwerte begrenzt: Runden ≤ `GlobalMaxToolRound` (Standard 10), Timeout ≤ `GlobalSkillTimeoutSeconds` (Standard 300 Sekunden)
+- Fähigkeiten können sich nicht rekursiv selbst aufrufen
+- Werkzeugaufrufe außerhalb der Whitelist schlagen direkt fehl
+
 ## Speichersystem
 
 ### Speichertypen

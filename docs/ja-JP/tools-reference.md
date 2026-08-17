@@ -314,7 +314,33 @@
 
 ---
 
-### 11. ログツール (LogTool)
+### 11. MCP クエリツール (McpTool)
+
+**ツール名**: `mcp`
+
+**機能説明**: MCP（Model Context Protocol）統合状態のクエリ —— 接続済みの外部サーバー、それらが提供するツール、および呼び出し方法。これは読み取り専用ツールです：サーバーの追加/削除はユーザーが Web UI でのみ実行可能で、AI はサーバーリストを変更できません。
+
+**サポートされる操作**:
+- `status` — グローバル概要（有効状態、サーバー数、ツール数）
+- `list_servers` — 設定済みサーバーの一覧（接続状態とツール数を含む）
+- `list_tools` — 利用可能ツールの一覧（`mcp_{server}_{tool}` プレフィックス名、説明、パラメータ schema 付き。オプション `server_id` で単一サーバーをフィルタリング）
+
+**使用例**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**MCP ラップツール**: 各接続済み MCP サーバーが提供するツールは、独立したツールとしてシリコンビーイングに動的に登録され、命名形式は `mcp_{serverId}_{toolName}`（例：`mcp_filesystem_read_file`）。AI は通常のツールと同様にプレフィックス名で直接呼び出し可能で、本クエリツールを経由する必要はありません。ラップツールはパーミッションマトリクスで単一の `execute` アクションとして表現され、個別に無効化できます。
+
+**シナリオ**: 全シナリオ（`All`）
+
+---
+
+### 12. ログツール (LogTool)
 
 **ツール名**: `log`
 
@@ -338,7 +364,7 @@
 
 ---
 
-### 12. メモリツール (MemoryTool)
+### 13. メモリツール (MemoryTool)
 
 **ツール名**: `memory`
 
@@ -367,7 +393,7 @@
 
 ---
 
-### 13. ネットワークツール (NetworkTool)
+### 14. ネットワークツール (NetworkTool)
 
 **ツール名**: `network`
 
@@ -393,7 +419,7 @@
 
 ---
 
-### 14. 権限ツール (PermissionTool) 🔒
+### 15. 権限ツール (PermissionTool) 🔒
 
 **ツール名**: `permission`
 
@@ -420,7 +446,7 @@
 
 ---
 
-### 15. プロジェクトツール (ProjectTool) 🔒
+### 16. プロジェクトツール (ProjectTool) 🔒
 
 **ツール名**: `project`
 
@@ -456,7 +482,7 @@
 
 ---
 
-### 16. プロジェクトタスクツール (ProjectTaskTool)
+### 17. プロジェクトタスクツール (ProjectTaskTool)
 
 **ツール名**: `project_task`
 
@@ -490,7 +516,7 @@
 
 ---
 
-### 17. プロジェクト作業ノートツール (ProjectWorkNoteTool)
+### 18. プロジェクト作業ノートツール (ProjectWorkNoteTool)
 
 **ツール名**: `project_work_note`
 
@@ -520,7 +546,7 @@
 
 ---
 
-### 18. プロジェクト作業ツール (ProjectWorkTool) 🔒
+### 19. プロジェクト作業ツール (ProjectWorkTool) 🔒
 
 **ツール名**: `project_work`
 
@@ -549,7 +575,55 @@
 
 ---
 
-### 19. システムツール (SystemTool)
+### 20. スキルツール (SkillTool)
+
+**ツール名**: `skill`
+
+**機能説明**: シリコンビーイングのスキル（再利用可能な「ツールオーケストレーション + プロンプトテンプレート」能力ユニット）を管理。作成、一覧、更新、削除、インポート/エクスポートをサポート。欠落したメタデータ（id、説明、パラメータ schema など）は AI が自動補完します。
+
+**サポートされる操作**:
+- `create` — 新規スキル作成（`id` と `system_prompt` 必須、オプション `description`、`parameter_schema`、`tool_whitelist`、`tags`、`max_tool_round`、`timeout`、`on_complete`、`trigger_mode`、`auto_trigger_condition`）
+- `list` — 利用可能な全スキルの一覧（サマリー付き）
+- `update` — パラメータによる既存スキルの更新（`skill_id` 必須）
+- `update_from_md` — Markdown 文字列からのスキル更新（YAML フロントメタデータ + プロンプト本文）
+- `delete` — スキルの削除（`skill_id` 必須）
+- `export` — スキルを JSON でエクスポート（`skill_id` 必須）
+- `export_md` — スキルを Markdown でエクスポート（`skill_id` 必須）
+- `import` — JSON からスキルをインポート（`json` 必須）
+- `import_md` — Markdown からスキルをインポート（`markdown` 必須）
+
+**使用例**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "今日のテクノロジーニュースを検索して要約を生成",
+  "system_prompt": "network ツールを使用して {topic} の最新ニュースを検索し、500 字の要約を生成してください。",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "ニューストピック" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**変更パーミッション**: シリコンキュレーターは全スキルを変更可能。通常ビーイングはソースが `Being` または `User` のスキルのみ変更可能（組み込み・プラグインスキルは変更不可）。
+
+**数量制限**: 各ビーイングのカスタムスキル数は設定 `MaxCustomSkillsPerBeing`（デフォルト 50）で制限されます。
+
+**シナリオ**: 全シナリオ（`All`）
+
+> スキルシステム（トリガーモード、ホワイトリスト、ホットリロード、自動スケジュールなど）の完全な説明については、[シリコンビーイングガイド](silicon-being-guide.md#スキルシステム)を参照してください。
+
+---
+
+### 21. システムツール (SystemTool)
 
 **ツール名**: `system`
 
@@ -570,7 +644,7 @@
 
 ---
 
-### 20. タスクツール (TaskTool)
+### 22. タスクツール (TaskTool)
 
 **ツール名**: `task`
 
@@ -595,7 +669,7 @@
 
 ---
 
-### 21. タイマーツール (TimerTool)
+### 23. タイマーツール (TimerTool)
 
 **ツール名**: `timer`
 
@@ -621,7 +695,7 @@
 
 ---
 
-### 22. トークン使用監査ツール (TokenAuditTool) 🔒
+### 24. トークン使用監査ツール (TokenAuditTool) 🔒
 
 **ツール名**: `token_audit`
 
@@ -651,7 +725,7 @@
 
 ---
 
-### 23. WebView ブラウザツール (WebViewBrowserTool)
+### 25. WebView ブラウザツール (WebViewBrowserTool)
 
 **ツール名**: `webview_browser`
 
@@ -692,7 +766,7 @@
 
 ---
 
-### 24. 作業ノートツール (WorkNoteTool)
+### 26. 作業ノートツール (WorkNoteTool)
 
 **ツール名**: `work_note`
 
@@ -820,6 +894,13 @@ public class AdminOnlyTool : ITool
     // シリコンキュレーターのみアクセス可能
 }
 ```
+
+### 代替案：スキルと MCP ツール
+
+C# ツールクラスを作成する以外に、コンパイル不要の拡張方法が 2 つあります：
+
+- **スキル（Skill）**：Web UI または `skill` ツールで「ツールオーケストレーション + プロンプトテンプレート」を作成。よく使うワークフローを再利用可能な能力としてカプセル化するのに適しています。[シリコンビーイングガイド — スキルシステム](silicon-being-guide.md#スキルシステム)を参照してください。
+- **MCP サーバー**：Web UI で外部 MCP サーバーを設定すると、そのツールが `mcp_{serverId}_{toolName}` 形式で自動注入され、コード記述不要です。[Web UI ガイド — MCP 管理](web-ui-guide.md)を参照してください。
 
 ## ベストプラクティス
 

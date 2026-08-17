@@ -401,7 +401,7 @@ SiliconLifeCollective/
 
 ## 도움이 필요하신가요?
 
-- 📖 [도움말 문서 시스템](web-ui-guide.md#帮助文档系统新增) 확인 (다국어 지원)
+- 📖 [도움말 문서 시스템](web-ui-guide.md#도움말-문서-시스템-신규) 확인 (다국어 지원)
 - 📚 [전체 문서](docs/) 읽기
 - 🐛 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)에 문제 보고
 - 💬 커뮤니티 토론 참여

@@ -188,6 +188,78 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
+## 技能系統
+
+技能（Skill）是矽基生命體的可重複使用能力單元——把「工具編排 + 提示詞模板」封裝成一個可宣告、可進化、可自動排程的函式，AI 像呼叫普通工具一樣呼叫技能。
+
+### 技能結構
+
+| 要素 | 說明 |
+|------|------|
+| `id` / `description` | 唯一標識與一句話描述（展示給 AI，決定 AI 何時選用該技能） |
+| `parameter_schema` | 參數 JSON Schema，宣告提示詞中使用的每個 `{param}` 佔位符 |
+| `system_prompt_template` | 系統提示詞模板，執行時用參數填充佔位符 |
+| `tool_whitelist` | 執行期間允許的工具列表（空 = 繼承生命體全部工具） |
+| `max_tool_round` / `timeout` | 工具輪數與逾時上限（受全域上限鉗制） |
+| `on_complete` | 完成動作：`none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual`（AI 自主呼叫）或 `Auto` + `schedule` 排程 |
+
+### 四種來源
+
+- **Builtin** — 框架內建（`summarize_document` 文件摘要、`code_review` 程式碼審查、`research_topic` 主題調研）
+- **Plugin** — 外掛程式透過 `ISkillProvider` 註冊
+- **Being** — 生命體執行階段透過 `skill` 工具自建
+- **User** — 使用者透過 Web UI 技能管理頁面建立
+
+### 觸發方式
+
+1. **手動（Manual）**：技能以普通工具定義注入 AI 請求，AI 判斷何時呼叫；排程側優先將同名呼叫路由到技能
+2. **自動（Auto + schedule）**：排程表示式存於 `metadata.schedule`，支援三種格式：
+   - `"09:30"` — 每日定點
+   - `"6h"` / `"30 m"` / `"2 d"` — 間隔週期
+   - `"0 9 * * *"` / `"*/15 * * * *"` — cron 子集
+
+### Markdown 編寫
+
+技能以 Markdown 儲存（`skills/{id}.md`，YAML 前置中繼資料 + 提示詞本文）：
+
+```markdown
+---
+id: daily_news_digest
+description: 搜尋今日科技新聞並產生摘要
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+請使用 network 工具搜尋 {topic} 的最新新聞，產生 500 字摘要並儲存到工作筆記。
+```
+
+只寫本文（省略 YAML）也可以：儲存時 AI 會自動補全 id、description、參數 schema 等中繼資料——使用者已填寫的欄位永不被覆蓋。
+
+### 生命體自管理
+
+生命體可透過 `skill` 工具管理自己的技能庫：
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### 熱重載與進化
+
+- 生命體每 30 秒偵測 `skills/` 目錄變更（指紋比對），Web UI 或其他生命體的修改自動生效，無需重啟
+- 每次技能更新自動歸檔歷史版本到 `skills/archive/{id}/{version}.md`，形成技能進化史
+- 自訂技能數量受配額限制（`MaxCustomSkillsPerBeing`，預設 50）
+
+### 執行護欄
+
+- 技能級 `execute` 動作權限（可被權限矩陣停用，停用後 AI 不可見）
+- 執行參數被全域上限鉗制：輪數 ≤ `GlobalMaxToolRound`（預設 10），逾時 ≤ `GlobalSkillTimeoutSeconds`（預設 300 秒）
+- 技能不能遞迴呼叫自身
+- 白名單外工具呼叫直接失敗
+
 ## 記憶系統
 
 ### 記憶類型

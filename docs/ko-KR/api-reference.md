@@ -632,6 +632,38 @@ AI 설정 편집기 인터페이스를 반환합니다.
 
 사용 가능한 AI 클라이언트 유형 및 동적 옵션(사용 가능한 모델, 리전 등)을 반환합니다.
 
+### IM 플랫폼 옵션 가져오기
+
+**GET** `/config/imoptions`
+
+IM 플랫폼 메타데이터를 반환합니다 (설정 마법사가 폼을 동적으로 렌더링하는 데 사용):
+
+```json
+{
+  "success": true,
+  "platforms": [
+    {
+      "value": "feishu",
+      "display": "Feishu",
+      "authModes": ["manual", "oauth"],
+      "needsPublicCallback": false,
+      "help": "...",
+      "helpUrl": "https://open.feishu.cn/app",
+      "fields": [
+        { "key": "appId", "label": "App ID", "type": "text", "required": true },
+        { "key": "appSecret", "label": "App Secret", "type": "password", "required": true, "isSecret": true }
+      ]
+    }
+  ]
+}
+```
+
+### 설정 둘러보기
+
+**GET** `/config/browse`
+
+설정 항목의 둘러보기 데이터를 반환합니다 (설정 인터페이스의 그룹 표시에 사용).
+
 ---
 
 ## 메모리 시스템
@@ -1204,6 +1236,230 @@ AI 설정 편집기 인터페이스를 반환합니다.
 
 ---
 
+## 스킬 관리
+
+### 스킬 관리 페이지
+
+**GET** `/skill` 또는 **GET** `/skill/index`
+
+쿼리 매개변수: `beingId` — 비잉 ID (필수)
+
+지정된 Silicon Being의 스킬 관리 페이지 (스킬 목록 + Markdown 편집기)를 반환합니다.
+
+### 스킬 목록 가져오기
+
+**GET** `/api/skills/list`
+
+쿼리 매개변수: `beingId` — 비잉 ID (필수)
+
+비잉의 모든 스킬 (id, description, version, tags, source, triggerMode, toolWhitelist, maxToolRound, timeoutSeconds, parameterCount)과 통계 정보 (스킬 총수 / 커스텀 스킬 수 / 할당량 상한)를 반환합니다.
+
+### 스킬 Markdown 가져오기
+
+**GET** `/api/skills/get-md`
+
+쿼리 매개변수: `beingId`, `skillId`
+
+지정된 스킬의 Markdown 텍스트 (YAML 프론트 메타데이터 + 프롬프트 본문)를 반환합니다.
+
+### 스킬 Markdown 저장
+
+**POST** `/api/skills/update-md?beingId={beingId}`
+
+요청 본문 (`application/json`):
+
+```json
+{
+  "markdown": "---\nid: my_skill\n...\n---\n\n프롬프트 본문",
+  "skillId": "my_skill"
+}
+```
+
+Markdown으로 스킬을 업데이트하거나 새로 만듭니다 (upsert 의미). 누락된 메타데이터는 AI가 자동으로 보완합니다. Web UI를 통해 저장된 스킬의 `Source`는 `User`로 표시됩니다. 할당량 `MaxCustomSkillsPerBeing`의 제한을 받습니다.
+
+### 스킬 가져오기 (JSON)
+
+**POST** `/api/skills/import?beingId={beingId}`
+
+요청 본문: `{ "json": "<스킬 정의 JSON>" }`
+
+JSON에서 스킬을 가져오며, 마찬가지로 할당량 제한을 받습니다.
+
+### 스킬 가져오기 (Markdown)
+
+**POST** `/api/skills/import-md?beingId={beingId}`
+
+요청 본문: `{ "markdown": "<Markdown 텍스트>" }`
+
+Markdown에서 새 스킬을 가져오며, 누락된 메타데이터는 AI가 자동으로 보완합니다.
+
+### 스킬 삭제
+
+**POST** `/api/skills/delete?beingId={beingId}`
+
+요청 본문: `{ "skillId": "my_skill" }`
+
+스킬을 삭제합니다 (해당하는 `.md` 및 `.json` 영속화 파일도 함께 삭제).
+
+### 스킬 내보내기 (JSON)
+
+**GET** `/api/skills/export?beingId={beingId}&skillId={skillId}`
+
+스킬 정의를 JSON 첨부 파일로 다운로드합니다 (`{id}.json`).
+
+### 스킬 내보내기 (Markdown)
+
+**GET** `/api/skills/export-md?beingId={beingId}&skillId={skillId}`
+
+스킬을 Markdown 첨부 파일로 다운로드합니다 (`{id}.md`).
+
+### 스킬 테스트 실행
+
+**POST** `/api/skills/test?beingId={beingId}`
+
+요청 본문:
+
+```json
+{
+  "skillId": "my_skill",
+  "parametersJson": "{ \"topic\": \"AI 뉴스\" }"
+}
+```
+
+주어진 매개변수로 스킬을 한 번 실행하고 `ToolResult`를 반환합니다 (AI 실행 라운드 수와 최종 출력 포함).
+
+---
+
+## MCP 관리
+
+### MCP 관리 페이지
+
+**GET** `/mcp`
+
+쿼리 매개변수: `beingId` — 비잉 ID (선택, 해당 비잉에 표시되는 MCP 도구 표시에 사용)
+
+MCP 서버 관리 페이지를 반환합니다.
+
+### 서버 목록 가져오기
+
+**GET** `/api/mcp/list-servers`
+
+구성된 모든 MCP 서버 상태를 반환합니다:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "state": "connected",
+      "enabled": true,
+      "toolCount": 8,
+      "endpoint": null,
+      "lastError": null
+    }
+  ],
+  "mcpEnabled": true,
+  "connected": 1,
+  "toolTotal": 8
+}
+```
+
+`state` 값: `connected` / `disconnected` / `connecting` / `error`.
+
+### 서버 도구 목록 가져오기
+
+**GET** `/api/mcp/list-tools?serverId={serverId}`
+
+지정된 서버가 제공하는 도구를 반환합니다 (`name`은 접두사가 포함된 전체 이름 `mcp_{serverId}_{toolName}`, `description`, `schema`). 서버가 연결되지 않은 경우 오류를 반환합니다.
+
+### 서버 추가
+
+**POST** `/api/mcp/add-server`
+
+요청 본문 (`McpServerConfig`):
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "env": {},
+  "endpoint": null,
+  "enabled": true
+}
+```
+
+`transport`는 `stdio`(로컬 프로세스: `command` + `arguments`)와 `http`(원격 엔드포인트: `endpoint`)를 지원합니다. 서버 ID는 소문자, 숫자, 밑줄만 허용됩니다. 추가 즉시 연결되고 모든 Silicon Being에 동기화됩니다.
+
+### 서버 활성화/비활성화
+
+**POST** `/api/mcp/toggle`
+
+요청 본문: `{ "serverId": "filesystem", "enabled": true }`
+
+### 서버 삭제
+
+**POST** `/api/mcp/remove-server`
+
+요청 본문: `{ "serverId": "filesystem" }`
+
+서버 구성을 삭제하고 모든 비잉에서 해당 도구를 등록 해제합니다.
+
+### 서버 재연결
+
+**POST** `/api/mcp/reconnect`
+
+요청 본문: `{ "serverId": "filesystem" }`
+
+연결을 강제로 끊고 다시 설정하며, 도구 목록을 새로고침합니다.
+
+### 도구 호출 테스트
+
+**POST** `/api/mcp/test-tool`
+
+요청 본문:
+
+```json
+{
+  "serverId": "filesystem",
+  "toolName": "read_file",
+  "argumentsJson": "{ \"path\": \"/data/hello.txt\" }"
+}
+```
+
+AI 개입 없이 MCP 서버의 도구를 직접 호출합니다 (연결 확인용).
+
+---
+
+## IM 플랫폼 OAuth 인증
+
+### 인증 시작
+
+**GET** `/im/{platform}/authorize`
+
+경로 매개변수: `platform` — IM 플랫폼 식별자 (예: `feishu`)
+
+CSRF 방지용 난수 `state`를 생성하고, 5분간 유효한 인증 세션을 등록한 후, 인증 URL을 반환하고 시스템 기본 브라우저를 자동으로 엽니다. 동일한 플랫폼에 대해 반복 시작하면 이전 세션을 덮어씁니다.
+
+### 인증 콜백
+
+**GET** `/im/{platform}/callback?code={code}&state={state}`
+
+IM 플랫폼의 리디렉트에 의해 호출됩니다. `state`를 검증한 후 인증 코드로 액세스 토큰을 교환하고, `accessToken`, `refreshToken`, `tokenExpiresAt`, `authMode=oauth`를 해당 플랫폼의 구성에 기록하여 영속화한 후, 인증 결과 랜딩 페이지 (성공/실패)를 렌더링합니다.
+
+### 인증 상태 조회
+
+**GET** `/im/{platform}/status`
+
+`{ platform, status, tokenExpiresAt }`을 반환합니다. `status` 값: `pending` / `success` / `failed` / `timeout` / `none`. 프론트엔드는 우선 SSE 이벤트 `im_auth_status`를 통해 상태 푸시를 수신하며, 이 인터페이스는 폴링 백업용으로 사용됩니다.
+
+---
+
 ## 도움말 문서 시스템
 
 ### 도움말 페이지
@@ -1359,6 +1615,20 @@ eventSource.onmessage = (event) => {
       break;
   }
 };
+```
+
+### IM 인증 상태 이벤트
+
+IM 플랫폼 OAuth 인증 마법사는 공유 SSE 연결을 통해 상태를 푸시합니다 (이벤트명 `im_auth_status`):
+
+```javascript
+eventSource.addEventListener('im_auth_status', (event) => {
+  const data = JSON.parse(event.data);
+  // data.platform — 플랫폼 식별자 (feishu / wecom / dingtalk)
+  // data.status  — pending / success / failed / timeout
+  // data.message — 추가 설명
+  updateAuthStatus(data.platform, data.status);
+});
 ```
 
 ---

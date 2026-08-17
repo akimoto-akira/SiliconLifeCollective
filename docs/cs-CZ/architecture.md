@@ -942,3 +942,110 @@ Projektový pracovní prostor je mechanismus správy prostoru podporující spol
 | `ProjectTaskTool` | Správa projektových úkolů (vytvoření, přiřazení, aktualizace stavu) |
 | `ProjectWorkNoteTool` | Pracovní poznámky projektu (vytvoření, vyhledávání, generování obsahu) |
 | `ProjectWorkTool` | Pracovní operace projektu (vytvoření úkolů, skupinový chat, vysílání, dokončení projektu) |
+
+---
+
+## Systém dovedností
+
+Dovednost (Skill) je abstrakční vrstva znovupoužitelnosti "orchestrace nástrojů + šablona promptů", která zapouzdřuje běžné pracovní postupy do deklarativních, vyvíjejících se a plánovatelných jednotek schopností.
+
+### Vrstvená struktura
+
+| Vrstva | Umístění | Odpovědnost |
+|------|------|------|
+| Jádrová vrstva | `SiliconLife.Core/Skills/` | SkillDefinition, SkillManager (registrace + exekuční engine), SkillMarkdownParser, SkillFileManager, AutoSkillTickObject, SkillMetadataCompleter |
+| Běžná vrstva | `SiliconLife.Common` | BuiltinSkills (3 vestavěné dovednosti), SkillTool (nástroj `skill`) |
+| Aplikační vrstva | `SiliconLife.App/Web/` | SkillController + SkillView (stránka správy dovedností) |
+
+### Proces spouštění
+
+```
+Volání AI funkce (id dovednosti) nebo spuštění plánovačem
+        ↓
+SkillManager.ExecuteSkill
+  ├─ Globální přepínač / oprávnění / ochrana proti rekurzi
+  ├─ Upřesnění parametrů: maxToolRound = Min(hodnota dovednosti, GlobalMaxToolRound)
+  │            timeout = Min(hodnota dovednosti, GlobalSkillTimeoutSeconds)
+  ├─ MergePermissions: oprávnění Bytosti ∪ omezení dovednosti (přísnější strana vítězí)
+  ├─ FillTemplate: vyplnění zástupných symbolů {param} → podřazený AIRequest
+  └─ Podřazený cyklus (maximálně maxToolRound kol): AI ↔ nástroj (pouze whitelist)
+        ↓
+HandleCompletion (OnCompleteAction)
+  none / write_memory / notify_curator / broadcast
+```
+
+### Klíčový design
+
+- **Transparentní dispatch**: Dovednost je injektována jako `ToolDefinition` do `AIRequest.Tools`, AI ji nevnímá; v `ContextManager.ExecuteToolCalls` má volání dovednosti prioritu před nástrojem se stejným názvem
+- **Čtyři zdroje**: `Builtin` (framework) / `Plugin` (ISkillProvider) / `Being` (Bytost za běhu) / `User` (Web UI), hot-reload zachovává první dva a nahrazuje poslední dva
+- **Markdown prioritní**: `skills/{id}.md` (YAML frontmatter + tělo) má prioritu před `.json`; při ukládání čistého Markdownu AI doplňuje metadata (uživatelská pole nejsou přepsána)
+- **Automatické plánování**: `AutoSkillTickObject` (interval kontroly 30 sekund) podporuje tři výrazy plánování `HH:mm`, `N s|m|h|d`, cron podmnožina, s ochranou proti vícenásobnému vstupu
+- **Víceúrovňové zábrany**: globální přepínač, kvóta vlastních dovedností (`MaxCustomSkillsPerBeing`, výchozí 50), globální limit kol/timeoutu, akce `execute` na úrovni dovednosti, whitelist nástrojů, ochrana proti rekurzi
+
+---
+
+## MCP integrace
+
+Integrace MCP (Model Context Protocol) umožňuje Křemíkovým Bytostem volat nástroje poskytované externími MCP servery a rozšiřovat hranice schopností bez psaní kódu.
+
+### Architektura
+
+```
+Uživatel (Web UI /mcp)──přidat/start/stop/smazat──→ McpManager (singleton)
+                                          │
+                              ┌───────────┼───────────┐
+                              ↓           ↓           ↓
+                        McpClientConnection × N (stdio / http)
+                              │
+                              └→ ListTools → zabalení jako SiliconLife.Collective.McpTool
+                                            pojmenování mcp_{serverId}_{toolName}
+                                                  │
+                          McpManager.SyncToolsForBeing(being) injektování
+                                                  ↓
+                                    ToolManager (stejná úroveň jako vestavěné nástroje)
+```
+
+### Klíčový design
+
+- **Duální transport**: `stdio` (lokální podproces: command + arguments + env) a `http` (vzdálený endpoint)
+- **Izolace pojmenování nástrojů**: prefix `mcp_{serverId}_{toolName}` zabraňuje konfliktům s vestavěnými/plugin nástroji
+- **Suverenita uživatele**: přidávání/odebírání/start/stop serverů lze provést pouze přes Web UI, na straně AI poskytuje nástroj `mcp` pouze dotazy pro čtení (status/list_servers/list_tools)
+- **Konzistentní oprávnění**: zabalené nástroje automaticky deklarují jedinou akci `execute`, jsou začleněny do matice oprávnění akcí nástrojů, lze zakázat podle Bytosti/projektu
+- **Perzistence konfigurace**: seznam `McpServers` uložen v config.json, globální přepínač `McpEnabled`
+
+---
+
+## Architektura multi-instance IM platformy
+
+IM platforma používá architekturu "multi-instance konfigurace + agregovaný provider", která umožňuje současné připojení k více chatovacím platformám.
+
+### Klíčové komponenty
+
+| Komponenta | Odpovědnost |
+|------|------|
+| `IMPlatformConfig` | Konfigurace jedné instance (platform/enabled/slovník config), `IMPlatforms` je seznam, každá instance má nezávislý start/stop |
+| `IMProviderRegistry` | Registr metadat platforem: schema konfiguračních polí, šablony OAuth endpointů, Provider factory, odkazy na nápovědu |
+| `AggregateIMProvider` | Agregace více platforem: příjem zpráv (spuštění libovolnou platformou), odesílání zpráv (broadcast, tiché izolování selhání jedné platformy), dotazy na oprávnění (první respondér vyhrává závod) |
+| `ImOAuthService` | Průvodce OAuth autorizací (singleton): ochrana state proti CSRF, 5minutový timeout, zápis tokenu zpět do konfigurace, SSE push stavu |
+| `ConfigSecretResolver` | Analýza zástupných symbolů `${ENV_VAR}`: hluboká kopie nahrazení, plaintext klíče se nezapisují do config.json |
+| `IMManager` | Směrování zpráv: zařazení do fronty podle ChannelId (sériové zpracování) → ChatSystem → spuštění myšlení Křemíkové Bytosti |
+
+### Podporované platformy
+
+| Platforma | AuthModes | Příjem událostí | Poznámka |
+|------|-----------|---------|------|
+| Web UI | manual | SSE (vestavěné) | Vždy dostupné, automatické doplnění |
+| Feishu | manual / **oauth** | HTTP callback (ověření podpisu + AES dešifrování) | Podpora průvodce jedno-klik OAuth autorizací |
+| WeChat Enterprise | manual | HTTP callback (WXBizMsgCrypt) | Vyžaduje veřejný callback |
+| DingTalk | manual | Stream (WebSocket) / HTTP | Výchozí režim Stream, nevyžaduje veřejnou síť |
+
+### Tok zpráv
+
+```
+Feishu/WeChat Enterprise/DingTalk/WebUI (příchozí)
+  → IIMProvider.MessageReceived
+  → IMManager.OnMessageReceived (zařazení do fronty podle ChannelId, sériově)
+  → ChatSystem.AddMessage → myšlení AI Křemíkové Bytosti
+  → IMManager.SendMessageAsync / SendStreamChunkAsync (odchozí)
+  → AggregateIMProvider broadcast do všech aktivních platforem
+```

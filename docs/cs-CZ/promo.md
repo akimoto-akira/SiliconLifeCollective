@@ -121,6 +121,14 @@ Začněte s jednoduchým asistentem. Jakmile objevíte, co je možné, vytvořte
 
 Rozšiřte funkce pomocí zásuvných modulů — nástroje a schopnosti vytvořené komunitou lze snadno přidat. Každý zásuvný modul deklaruje požadované schopnosti pomocí atributu `[PluginCapability]`, což zaručuje bezpečnost systému.
 
+### Asistent, který se učí nové dovednosti
+
+Váš asistent může uchovat časté pracovní postupy jako **dovednosti** — popis v přirozeném jazyce plus orchestrace nástrojů, a mohou opakovaně a spolehlivě plnit stejné úkoly. Dovednosti lze spouštět automaticky v určený čas („každé ráno v 9 hodin mi pošli přehled technologických zpráv") a v průběhu času se vyvíjejí do zručnějších verzí.
+
+### Připojení ke světu externích nástrojů
+
+Podporuje MCP (Model Context Protocol) — připojte externí serverové nástroje jako souborový systém, databáze, vyhledávání a váš asistent okamžitě získá nové schopnosti, aniž byste napsali jediný řádek kódu. Všechna připojení jsou pod vaší kontrolou, asistent může používat pouze nástroje, které jste výslovně povolili.
+
 ### Výběr duálních verzí
 
 - **Verze Default**: Lehká konzolová aplikace, vhodná pro vývoj, ladění a prostředí s omezenými prostředky

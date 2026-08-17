@@ -121,6 +121,14 @@ Zacznij od prostego asystenta. Gdy odkryjesz, co jest możliwe, twórz bardziej 
 
 Rozszerzaj funkcjonalność przez wtyczki — narzędzia i możliwości budowane przez społeczność, które można łatwo dodać. Każda wtyczka działa w bezpiecznej piaskownicy, zapewniając bezpieczeństwo systemu.
 
+### Asystent, który uczy się nowych umiejętności
+
+Twój asystent może konsolidować często używane przepływy pracy w **umiejętności** — opis w języku naturalnym połączony z orchestracją narzędzi, pozwalający im powtarzalnie i niezawodnie wykonywać podobne zadania. Umiejętności mogą być wykonywane automatycznie według harmonogramu ("daj mi podsumowanie wiadomości technologicznych każdego dnia o 9 rano") i z czasem ewoluują w bardziej biegłe wersje.
+
+### Łączenie ze światem narzędzi zewnętrznych
+
+Obsługa MCP (Model Context Protocol) — podłącz serwery narzędzi zewnętrznych takie jak systemy plików, bazy danych, wyszukiwarki, a Twój asystent natychmiast zyska nowe możliwości bez pisania ani jednej linii kodu. Wszystkie połączenia są kontrolowane przez Ciebie; asystent może używać tylko narzędzi, które wyraźnie włączyłeś.
+
 ### Wybór dwóch wersji
 
 - **Wersja Default**: lekka aplikacja konsolowa, odpowiednia do debugowania rozwoju i środowisk z ograniczonymi zasobami

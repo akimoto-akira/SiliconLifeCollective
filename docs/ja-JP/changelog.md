@@ -1,4 +1,4 @@
-﻿# 変更ログ
+# 変更ログ
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | **日本語** | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -35,10 +35,10 @@
 
 #### Comate AI IDE / 文心快码（百度）
 - 文章やドキュメント作業に時折使用。
-- Comate AI IDE は百度文心が 2025 年 6 月 23 日にリリースした AI ネイティブ開発環境ツール。
+- Comate AI IDE はBaidu ERNIE が 2025 年 6 月 23 日にリリースした AI ネイティブ開発環境ツール。
 - 業界初のマルチモーダル、マルチエージェント協調 AI IDE。
 - デザインからコードへの変換や全プロセス AI 支援コーディングなどの機能を備えています。
-- 百度文心 4.0 X1 Turbo モデルによって駆動。
+- Baidu ERNIE 4.0 X1 Turbo モデルによって駆動。
 
 #### Trae（字節跳動）
 - 2025 年 10 月から 2026 年 4 月まで使用。
@@ -66,6 +66,55 @@
 
 ## [未リリース]
 
+### 2026-08-17
+
+#### 新機能
+- `c7b575b` - MCP 統合を実装——外部サーバーのツールアクセス、設定管理とヘルプドキュメント
+  - 新規 MCP コア（SiliconLife.Core/Mcp/）：McpManager によるサーバーライフサイクル管理、stdio/http デュアルトランスポート、McpClientConnection 接続カプセル化、サーバーごとにツールをラップし `mcp_{serverId}_{toolName}` として命名し全シリコンビーイングに注入
+  - 新規 Web 管理ページ（/mcp）と 7 つの API エンドポイント（list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool）
+  - 新規 McpTool クエリツール（status/list_servers/list_tools、読み取り専用）；サーバーの追加・削除はユーザーが Web UI 経由でのみ可能、AI はサーバーリストを変更できない
+  - 設定ページで MCP サーバー配列エディタをサポート（モーダルウィンドウ内でインライン追加/削除）
+  - MCP ヘルプトピック（🔌）を登録、10 言語で完全なヘルプドキュメントを実装
+  - MCP ラップツールはパーミッションマトリックスで `execute` アクションとして表示、ビーイング/プロジェクトごとに無効化可能
+  - 45 ファイル変更
+
+### 2026-08-16
+
+#### 新機能
+- `5d76c5a` - スキルシステムを実装——ツールオーケストレーションとプロンプトテンプレートの再利用抽象レイヤー
+  - 新規 SkillDefinition（id/説明/パラメータ schema/システムプロンプトテンプレート/ツールホワイトリスト/アクション制限/最大ラウンド数/タイムアウト/完了アクション/トリガーモード）
+  - 新規 SkillManager：スキル登録センター + 実行エンジン（子 AIRequest ループ、再帰防止、グローバルラウンド数とタイムアウト制限）
+  - デュアルトリガーモード：Manual（AI 関数呼び出し、スキルは ToolDefinition として注入、ディスパッチ側で優先ルーティング）+ Auto（schedule スケジューリング、`HH:mm` / `N s|m|h|d` / cron サブセットをサポート）
+  - Markdown 優先ストレージ（YAML フロントマター + プロンプト本文）、純 Markdown は AI が自動的にメタデータを補完（ユーザーフィールドは上書きされない）
+  - ホットリロード（30 秒フィンガープリント検出）、バージョンアーカイブ（skills/archive/）、3 つの組み込みスキル（summarize_document/code_review/research_topic）
+  - 新規 skill ツール（create/list/update/update_from_md/delete/export/export_md/import/import_md）
+  - 新規スキル管理ページ（/skill）と 10 の API エンドポイント；クォータ MaxCustomSkillsPerBeing（デフォルト 50）
+  - パーミッション：スキルレベルの `execute` アクションパーミッション、スキル内ツールホワイトリストとビーイングパーミッションの厳格側の和集合
+- `b60fc68` - 千帆モデルリストとコンテキストウィンドウマッピングを更新 - glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest モデルを追加、1M/128K 階層別コンテキストウィンドウとビジョン能力マッピング
+
+### 2026-08-15
+
+#### 新機能
+- `eaa8417` - IM プラットフォーム OAuth 認証ウィザードと設定シークレット環境変数解析を実装
+  - 新規 ImOAuthController/ImOAuthService が Feishu OAuth 認証フロー（authorize/callback/status）をサポート、state による CSRF 防止、5 分間タイムアウト、SSE ステータスプッシュを含む
+  - 新規 IMProviderRegistry で IM プラットフォームメタデータを統合管理（設定フィールド schema/OAuth エンドポイントテンプレート/Provider ファクトリ）
+  - 新規 ConfigSecretResolver が設定中の `${ENV_VAR}` プレースホルダーを解析、ディープコピーで置換し元の設定には書き戻さない
+  - 設定ページに IM 認証ウィザード UI を統合（インライン認証エリア + SSE リアルタイムステータス）
+  - 13 言語ファイルの IM 認証ステータス/ヘルプ文案の翻訳を補完
+
+### 2026-07-26
+
+#### リファクタリング
+- `ffc45c2` - IM プラットフォームをマルチインスタンス設定アーキテクチャにリファクタリング - IMPlatforms をリスト化（各プラットフォーム独立した有効化/無効化）、AggregateIMProvider がマルチプラットフォームのメッセージ送受信とパーミッション競合を集約、設定ページにマルチインスタンスエディタ
+
+### 2026-07-19
+
+#### 新機能
+- `9bf2103` - Speedy.Manager ツリーボックスに複数選択削除と複数選択エクスポートを統合
+
+#### 修正
+- `0df0674` - Speedy.Manager の複数選択削除で最初の項目のみ削除される問題を修正
+
 ### 2026-07-16
 
 #### 新機能
@@ -86,7 +135,7 @@
 #### 新機能
 - `c007263` - 10個のAIクライアントのヘルプドキュメントを補完 - HelpTopicsに10個のトピックを登録、HelpLocalizationBaseに30個の抽象プロパティを追加、12言語ファイルで完全なMarkdownヘルプ内容（プラットフォーム紹介/登録手順/設定方法/利用可能モデル/課金/FAQ）を実装、Herdsman/LongCat/QiniuAI/DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuanをカバー
   - 12 ファイル変更
-- `4634e33` - 国内7つのAIプラットフォームクライアントを実装（DeepSeek/智譜GLM/月之暗面Kimi/硅基流動/MiniMax/百度文心/騰訊混元）- 14個の独立クラスファイル、LongCatClientスタイルに準拠、継承なし、全てOpenAI互換 + Bearer Token、Tool Calling/ストリーミング/思考モード対応、DefaultSiliconBeingとDefaultSiliconBeingFactoryに登録
+- `4634e33` - 国内7つのAIプラットフォームクライアントを実装（DeepSeek/Zhipu GLM/Moonshot Kimi/SiliconFlow/MiniMax/Baidu ERNIE/Tencent Hunyuan）- 14個の独立クラスファイル、LongCatClientスタイルに準拠、継承なし、全てOpenAI互換 + Bearer Token、Tool Calling/ストリーミング/思考モード対応、DefaultSiliconBeingとDefaultSiliconBeingFactoryに登録
   - 16 ファイル変更
 
 #### ドキュメント
@@ -619,7 +668,7 @@
 
 #### AI クライアント
 - `24d2c86` - VolcengineArkClient を追加し Audit を Usage tracking に置き換え
-  - VolcengineArkClient 火山エンジン Ark AI クライアントを追加
+  - VolcengineArkClient Volcengine Ark AI クライアントを追加
   - ストリーミングおよび非ストリーミングモードをサポート
   - 内蔵2層レート制御（自己レート制御 + サーバーレート制限）
   - OpenAI API プロトコル互換

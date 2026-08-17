@@ -385,6 +385,116 @@ Plugin load failed: Security check failed
 
 ---
 
+### 스킬 문제
+
+#### 문제: 스킬이 스킬 목록에 나타나지 않거나 AI에 보이지 않음
+
+**증상**:
+- Web UI 스킬 페이지에서 저장 성공, 그러나 목록에 표시되지 않음 / AI가 해당 스킬을 호출하지 않음
+
+**해결책**:
+1. 스킬 `id`와 `description`이 비어 있지 않은지 확인(초안은 AI에 노출되지 않음)
+2. 메타데이터가 불완전한 스킬(`NeedsCompletion`)은 AI에 주입되지 않음——YAML 프론트 메타데이터를 보완하거나 AI가 보완한 후 저장
+3. 권한 매트릭스에서 `{skillId}:execute`가 비활성화되어 있는지 확인(비활성화된 스킬은 AI에 보이지 않음)
+4. 전역 스위치 `SkillEnabled`가 true인지 확인
+5. 핫 리로드는 최대 30초 후 적용, 잠시 후 새로고침 또는 재시작
+
+#### 문제: 스킬 실행 실패 시 "not in whitelist" 표시
+
+**증상**:
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**해결책**:
+- 해당 도구를 스킬의 `tool_whitelist`에 추가하거나, 화이트리스트를 비워 비잉의 전체 도구를 상속
+
+#### 문제: 스킬 수량 상한 도달
+
+**증상**:
+```
+Custom skill limit reached (50)
+```
+
+**해결책**:
+1. 더 이상 사용하지 않는 커스텀 스킬 삭제
+2. 또는 설정 `MaxCustomSkillsPerBeing` 값을 늘리기
+
+---
+
+### MCP 문제
+
+#### 문제: MCP 서버 연결 실패
+
+**증상**:
+- 서버 상태가 `error` 또는 `disconnected`로 표시, `lastError`가 비어 있지 않음
+
+**해결책**:
+1. stdio 서버: `command`가 실행 가능한지 확인(예: `npx`가 PATH에 있음), `arguments`가 올바른지 확인
+2. http 서버: `endpoint` URL이 도달 가능한지 확인(방화벽, 프록시)
+3. /mcp 페이지에서 **재연결** 클릭
+4. `lastError` 상세 정보 확인, 일반적으로 명령어 없음, 버전 비호환, 엔드포인트 404 등
+
+#### 문제: MCP 도구가 비잉에 주입되지 않음
+
+**증상**:
+- 서버가 연결됨(`connected`) 그러나 AI가 `mcp_xxx_yyy` 도구를 호출할 수 없음
+
+**해결책**:
+1. 서버 `enabled`가 true인지 확인
+2. 전역 스위치 `McpEnabled`가 true인지 확인
+3. 권한 매트릭스 확인: `mcp_{serverId}_{toolName}:execute`가 비활성화되어 있는지 확인
+4. 비잉 대화에서 `mcp` 도구(`list_tools`)로 실제 주입된 도구명 확인
+
+#### 문제: 서버 추가 시 ID 형식 오류 반환
+
+**증상**:
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**해결책**:
+- 서버 ID는 소문자, 숫자, 밑줄만 허용(예: `filesystem`, `github_tools`)
+
+---
+
+### IM 플랫폼 문제
+
+#### 문제: Feishu 메시지를 받을 수 없음
+
+**해결책**:
+1. Feishu 오픈 플랫폼 이벤트 구독 설정의 콜백 주소와 포트 확인(`listenPort` + `callbackPath`)
+2. `Encrypt Key` / `Verification Token`이 설정과 일치하는지 확인
+3. 로컬 개발 시 OAuth 인증 마법사 사용 가능(설정 페이지 원클릭 인증); 이벤트 콜백은 공인망 도달 가능 필요 또는 내부망 관통 사용
+4. 로그에서 서명 검증/복호화 오류 확인
+
+#### 문제: OAuth 인증 타임아웃
+
+**증상**:
+- 인증 페이지에 `timeout` 상태 표시
+
+**해결책**:
+1. 인증 세션 유효 기간 5분, 타임아웃 후 인증 버튼 다시 클릭
+2. 콜백 주소 `/im/feishu/callback`이 Feishu에 접근 가능한지 확인(`redirectBaseUrl` 설정이 올바른지)
+3. 프론트엔드 상태 표시는 SSE에 의존, SSE가 끊어진 경우 `/im/{platform}/status` 폴링으로 폴백
+
+#### 문제: `${ENV_VAR}` 플레이스홀더가 해석되지 않음
+
+**증상**:
+- IM 플랫폼 연결 실패, 설정 값이 여전히 플레이스홀더 텍스트
+
+**해결책**:
+1. 환경 변수가 프로세스 시작 전에 설정되어 있는지 확인(애플리케이션 재시작으로 적용)
+2. 변수명 철자 확인(`[A-Za-z_][A-Za-z0-9_]*`만 지원)
+3. 참고: config.json에 플레이스홀더를 유지하는 것은 설계 동작, 해석은 메모리 사본에서 발생
+
+#### 문제: 여러 IM 플랫폼 중 하나만 메시지를 받음
+
+**해결책**:
+- 아웃바운드 메시지는 모든 활성화된 플랫폼에 브로드캐스트, 단일 플랫폼 발송 실패는 조용히 격리됨——해당 플랫폼의 토큰이 만료되었는지 확인(재인증 또는 키 업데이트)
+
+---
+
 ### 워크 노트 문제
 
 #### 문제: 워크 노트를 생성할 수 없음

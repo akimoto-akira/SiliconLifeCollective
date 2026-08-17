@@ -1,4 +1,4 @@
-﻿# 权限系统
+# 权限系统
 
 > **版本：v0.2.0-alpha**
 
@@ -312,6 +312,42 @@ curl http://localhost:8080/api/permissions/list
 | `/api/beings/tool-permissions/apply-template` | POST | 应用权限模板 |
 | `/api/projects/{id}/tool-permissions` | GET | 获取项目工具权限 |
 | `/api/projects/{id}/tool-permissions` | PUT | 更新项目工具权限 |
+
+### 技能的动作权限
+
+技能复用工具动作权限机制：技能 id 作为工具名，动作为 `execute`。
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- 被禁用的技能不会出现在 AI 可见的工具定义中（AI 根本"看不见"它）
+- 技能执行时还有运行时复核，即使陈旧的 Schema 也无法绕过
+- 技能内部的工具权限 = 生命体权限 ∪ 技能自身限制（严格侧并集，只能收窄不能放权）
+
+### MCP 包装工具的动作权限
+
+每个 MCP 服务器注入的包装工具（`mcp_{serverId}_{toolName}`）自动声明单一 `execute` 动作：
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- 可按生命体或项目精确控制外部工具的可用性
+- 某服务器的全部 `execute` 动作都被禁用时，该工具从 AI 可见的 Schema 中整体移除
+- 禁用/删除服务器（Web UI 操作）会立即注销其所有工具
 
 ---
 

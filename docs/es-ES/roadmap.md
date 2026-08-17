@@ -320,6 +320,19 @@ Cada fase termina con un sistema **ejecutable y observable**. Ninguna fase produ
 
 ---
 
+## Fase 11.5: Sistema de Habilidades e Integración MCP
+
+**Objetivo**: Capa de abstracción de capacidad reutilizable y acceso al ecosistema de herramientas externas.
+
+| # | Módulo | Descripción |
+|---|--------|-------------|
+| 11.5.1 | ~~Sistema de Habilidades~~ ✅ Completado | Capa de abstracción reutilizable para orquestación de herramientas + plantilla de prompt (SkillManager, doble modo de activación, recarga en caliente, archivado de versiones, completado de metadatos por IA) |
+| 11.5.2 | ~~Integración MCP~~ ✅ Completado | Acceso a herramientas de servidores MCP externos (doble transporte stdio/http, inyección con nombrado `mcp_{serverId}_{toolName}`, página de gestión Web, integración de matriz de permisos) |
+
+**Entregables**: Página de gestión de habilidades (/skill), página de gestión MCP (/mcp), herramientas integradas `skill` y `mcp`, documentación de ayuda de habilidades/MCP.
+
+---
+
 ## Fase 12: Funciones avanzadas
 
 **Objetivo**: Funciones avanzadas opcionales para capacidades mejoradas.

@@ -84,7 +84,7 @@ SiliconLifeCollective supports 32 different calendar systems for date conversion
 **Response**:
 ```json
 {
-  "result": "农历丙午年四月初三",
+  "result": "Lunar: Bingwu Year, 4th Month, 3rd Day",
   "year": 2026,
   "month": 4,
   "day": 3,
@@ -133,13 +133,13 @@ public class MyCustomCalendar : CalendarBase
 
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
-        // 转换逻辑
+        // Conversion logic
         return new CalendarDate(year, month, day);
     }
 
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
-        // 反向转换
+        // Reverse conversion
         return new GregorianDate(year, month, day);
     }
 }
@@ -158,14 +158,14 @@ The Chinese Historical Calendar is a highlight of this system, supporting two co
 Uses a 60-year cycle composed of Heavenly Stems and Earthly Branches:
 
 ```
-天干（10）：甲、乙、丙、丁、戊、己、庚、辛、壬、癸
-地支（12）：子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
+Heavenly Stems (10): Jia, Yi, Bing, Ding, Wu, Ji, Geng, Xin, Ren, Gui
+Earthly Branches (12): Zi, Chou, Yin, Mao, Chen, Si, Wu, Wei, Shen, You, Xu, Hai
 ```
 
 **Examples**:
-- 2026 = 丙午年
-- 2025 = 乙巳年（蛇年）
-- 2024 = 甲辰年（龙年）
+- 2026 = Bingwu Year (Year of the Horse)
+- 2025 = Yisi Year (Year of the Snake)
+- 2024 = Jiachen Year (Year of the Dragon)
 
 **Usage Example**:
 ```json
@@ -180,9 +180,9 @@ Uses a 60-year cycle composed of Heavenly Stems and Earthly Branches:
 **Response**:
 ```json
 {
-  "result": "丙午年 三月 初九",
-  "ganzhi_year": "丙午",
-  "zodiac": "马"
+  "result": "Bingwu Year, 3rd Month, 9th Day",
+  "ganzhi_year": "Bingwu",
+  "zodiac": "Horse"
 }
 ```
 
@@ -210,10 +210,10 @@ Built-in complete database of Chinese historical dynasties and imperial era name
 **Response**:
 ```json
 {
-  "result": "康熙六十年 三月 十五日",
-  "era": "康熙",
+  "result": "Kangxi 60th Year, 3rd Month, 15th Day",
+  "era": "Kangxi",
   "era_year": 60,
-  "dynasty": "清"
+  "dynasty": "Qing"
 }
 ```
 
@@ -229,7 +229,7 @@ Calendars with leap months:
 {
   "isLeapMonth": true,
   "month": 4,
-  "note": "闰四月"
+  "note": "Leap 4th Month"
 }
 ```
 
@@ -295,7 +295,7 @@ Never assume the calendar system:
 ```json
 {
   "date": "2026-04-20",
-  "calendar": "gregorian"  // 明确指定！
+  "calendar": "gregorian"  // Explicitly specified!
 }
 ```
 

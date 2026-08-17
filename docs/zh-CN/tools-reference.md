@@ -20,6 +20,7 @@
 - **实用工具** — 系统信息、Token 审计、帮助文档、知识网络
 - **浏览器工具** — WebView 浏览器自动化
 - **项目工具** — 项目管理、项目任务、项目工作笔记、项目工作
+- **扩展工具** — MCP 外部服务器工具、技能管理
 - **插件工具** — 通过插件系统注册的第三方工具
 
 ### 工具场景系统
@@ -314,44 +315,68 @@
 
 ---
 
-### 11. 日志工具 (LogTool)
+### 11. MCP 查询工具 (McpTool)
 
-**工具名称**: `log`
+**工具名称**: `mcp`
 
-**功能描述**: 查询操作历史和对话历史。
+**功能描述**: 查询 MCP（Model Context Protocol）集成状态——已连接的外部服务器、它们提供的工具以及如何调用。这是只读工具：服务器的添加/删除只能由用户通过 Web UI 完成，AI 无法修改服务器列表。
 
 **支持的操作**:
-- `query_logs` — 查询系统日志
-- `query_conversations` — 查询对话历史
-- `get_stats` — 获取日志统计
+- `status` — 全局概览（启用状态、服务器数量、工具数量）
+- `list_servers` — 列出已配置的服务器（含连接状态和工具数量）
+- `list_tools` — 列出可用工具（带 `mcp_{server}_{tool}` 前缀名、描述和参数 schema；可选 `server_id` 过滤单个服务器）
 
 **使用示例**:
 ```json
 {
-  "action": "query_logs",
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**MCP 包装工具**: 每个已连接 MCP 服务器提供的工具会以独立工具形式动态注册到硅基生命体，命名格式为 `mcp_{serverId}_{toolName}`（如 `mcp_filesystem_read_file`）。AI 可以像调用普通工具一样直接按前缀名调用它们，无需通过本查询工具中转。包装工具在权限矩阵中以单一 `execute` 动作呈现，可被逐个禁用。
+
+**场景**: 所有场景（`All`）
+
+---
+
+### 12. 日志工具 (LogTool)
+
+**工具名称**: `log`
+
+**功能描述**: 查询操作历史、工具调用历史和对话历史。
+
+**支持的操作**:
+- `query_operations` — 查询操作历史
+- `query_tool_calls` — 查询工具调用历史
+- `query_conversations` — 查询对话历史
+- `export` — 导出日志
+- `get_system_info` — 获取系统信息
+
+**使用示例**:
+```json
+{
+  "action": "query_operations",
   "being_id": "being-uuid",
   "start_time": "2026-04-20T00:00:00Z",
-  "end_time": "2026-04-26T23:59:59Z",
-  "level": "info"
+  "end_time": "2026-04-26T23:59:59Z"
 }
 ```
 
 ---
 
-### 12. 记忆工具 (MemoryTool)
+### 13. 记忆工具 (MemoryTool)
 
 **工具名称**: `memory`
 
 **功能描述**: 管理硅基生命体的长期和短期记忆。
 
 **支持的操作**:
-- `read` — 读取记忆
-- `write` — 写入记忆
-- `search` — 搜索记忆
-- `delete` — 删除记忆
-- `list` — 列出记忆
-- `get_stats` — 获取记忆统计
-- `compress` — 压缩记忆
+- `add` — 添加记忆
+- `recent` — 获取最近的记忆
+- `query` — 搜索记忆
+- `stats` — 获取记忆统计
 
 **使用示例**:
 ```json
@@ -367,7 +392,7 @@
 
 ---
 
-### 13. 网络工具 (NetworkTool)
+### 14. 网络工具 (NetworkTool)
 
 **工具名称**: `network`
 
@@ -393,7 +418,7 @@
 
 ---
 
-### 14. 权限工具 (PermissionTool) 🔒
+### 15. 权限工具 (PermissionTool) 🔒
 
 **工具名称**: `permission`
 
@@ -420,7 +445,7 @@
 
 ---
 
-### 15. 项目工具 (ProjectTool) 🔒
+### 16. 项目工具 (ProjectTool) 🔒
 
 **工具名称**: `project`
 
@@ -456,7 +481,7 @@
 
 ---
 
-### 16. 项目任务工具 (ProjectTaskTool)
+### 17. 项目任务工具 (ProjectTaskTool)
 
 **工具名称**: `project_task`
 
@@ -490,7 +515,7 @@
 
 ---
 
-### 17. 项目工作笔记工具 (ProjectWorkNoteTool)
+### 18. 项目工作笔记工具 (ProjectWorkNoteTool)
 
 **工具名称**: `project_work_note`
 
@@ -520,7 +545,7 @@
 
 ---
 
-### 18. 项目工作工具 (ProjectWorkTool) 🔒
+### 19. 项目工作工具 (ProjectWorkTool) 🔒
 
 **工具名称**: `project_work`
 
@@ -549,7 +574,55 @@
 
 ---
 
-### 19. 系统工具 (SystemTool)
+### 20. 技能工具 (SkillTool)
+
+**工具名称**: `skill`
+
+**功能描述**: 管理硅基生命体的技能（可复用的"工具编排 + 提示词模板"能力单元），支持创建、列出、更新、删除、导入导出。缺失的元数据（id、描述、参数 schema 等）会由 AI 自动补全。
+
+**支持的操作**:
+- `create` — 创建新技能（需要 `id` 和 `system_prompt`，可选 `description`、`parameter_schema`、`tool_whitelist`、`tags`、`max_tool_round`、`timeout`、`on_complete`、`trigger_mode`、`auto_trigger_condition`）
+- `list` — 列出所有可用技能（含摘要）
+- `update` — 通过参数更新已有技能（需要 `skill_id`）
+- `update_from_md` — 从 Markdown 字符串更新技能（YAML 前置元数据 + 提示词正文）
+- `delete` — 删除技能（需要 `skill_id`）
+- `export` — 导出技能为 JSON（需要 `skill_id`）
+- `export_md` — 导出技能为 Markdown（需要 `skill_id`）
+- `import` — 从 JSON 导入技能（需要 `json`）
+- `import_md` — 从 Markdown 导入技能（需要 `markdown`）
+
+**使用示例**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "搜索今日科技新闻并生成摘要",
+  "system_prompt": "请使用 network 工具搜索 {topic} 的最新新闻，并生成一份 500 字摘要。",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "新闻主题" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**修改权限**: 硅基主理人可修改所有技能；普通生命体只能修改来源为 `Being` 或 `User` 的技能（不能修改内置与插件技能）。
+
+**数量限制**: 每个生命体的自定义技能数受配置 `MaxCustomSkillsPerBeing`（默认 50）限制。
+
+**场景**: 所有场景（`All`）
+
+> 关于技能系统（触发模式、白名单、热重载、自动调度等）的完整说明，参见 [硅基生命体指南](silicon-being-guide.md#技能系统)。
+
+---
+
+### 21. 系统工具 (SystemTool)
 
 **工具名称**: `system`
 
@@ -570,7 +643,7 @@
 
 ---
 
-### 20. 任务工具 (TaskTool)
+### 22. 任务工具 (TaskTool)
 
 **工具名称**: `task`
 
@@ -595,7 +668,7 @@
 
 ---
 
-### 21. 定时器工具 (TimerTool)
+### 23. 定时器工具 (TimerTool)
 
 **工具名称**: `timer`
 
@@ -621,7 +694,7 @@
 
 ---
 
-### 22. Token 审计工具 (TokenAuditTool) 🔒
+### 24. Token 审计工具 (TokenAuditTool) 🔒
 
 **工具名称**: `token_audit`
 
@@ -651,7 +724,7 @@
 
 ---
 
-### 23. WebView 浏览器工具 (WebViewBrowserTool)
+### 25. WebView 浏览器工具 (WebViewBrowserTool)
 
 **工具名称**: `webview_browser`
 
@@ -692,7 +765,7 @@
 
 ---
 
-### 24. 工作笔记工具 (WorkNoteTool)
+### 26. 工作笔记工具 (WorkNoteTool)
 
 **工具名称**: `work_note`
 
@@ -820,6 +893,13 @@ public class AdminOnlyTool : ITool
     // 仅硅基主理人可访问
 }
 ```
+
+### 替代方案：技能与 MCP 工具
+
+除编写 C# 工具类外，还有两种无需编译的扩展方式：
+
+- **技能（Skill）**：通过 Web UI 或 `skill` 工具创建"工具编排 + 提示词模板"组合，适合把常用工作流封装为可复用能力。参见 [硅基生命体指南 — 技能系统](silicon-being-guide.md#技能系统)。
+- **MCP 服务器**：在 Web UI 配置外部 MCP 服务器后，其工具自动以 `mcp_{serverId}_{toolName}` 形式注入，无需编写任何代码。参见 [Web UI 指南 — MCP 管理](web-ui-guide.md)。
 
 ## 最佳实践
 

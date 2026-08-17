@@ -383,3 +383,82 @@ Le système fournit des modèles d'autorisation prédéfinis garantissant une li
 - **Granularité d'opération** — Chaque opération de chaque outil est contrôlée indépendamment (par ex. `network:get` autorisé mais `network:post` refusé)
 - **Gestion par le curateur** — Les autorisations d'outil ne peuvent être configurées que par le Curateur de Silicium
 - **Piste d'audit** — Les modifications d'autorisations d'outil sont enregistrées dans le journal d'audit
+
+---
+
+## Sécurité des compétences
+
+Le système de compétences réutilise le système de permissions d'outils et fournit plusieurs garde-fous :
+
+### Permissions d'exécution
+
+- L'id de la compétence sert de nom d'outil, intégré à la matrice de permissions `ToolActionPermissionConfig` avec l'action `execute`
+- Les compétences désactivées n'apparaissent pas dans les définitions d'outils visibles par l'IA (double garantie : filtrage au niveau du schéma + vérification à l'exécution)
+- Le Curateur de Silicium peut toujours exécuter ; les Êtres ordinaires nécessitent `IsActionAllowed(skillId, "execute")`
+
+### Liste blanche d'outils et union de permissions
+
+- Pendant l'exécution de la compétence, seuls les outils de la `ToolWhitelist` sont autorisés (liste vide = héritage de tous les outils de l'Être)
+- Les restrictions d'actions de la compétence et les permissions de l'Être sont en **union stricte** (`MergePermissions`) : la compétence ne peut que restreindre davantage les permissions, jamais les élargir
+- Les appels d'outils hors liste blanche échouent directement (`Tool not in whitelist`)
+
+### Garde-fous de consommation de ressources
+
+- **Commutateur global** : `SkillEnabled` désactive d'un clic tout le système de compétences
+- **Quota de quantité** : le nombre de compétences personnalisées par Être est limité par `MaxCustomSkillsPerBeing` (50 par défaut)
+- **Limite de tours** : `maxToolRound = Min(valeur déclarée par la compétence, GlobalMaxToolRound, 10 par défaut)`, pour éviter les boucles incontrôlées
+- **Limite de délai d'attente** : `timeout = Min(valeur déclarée par la compétence, GlobalSkillTimeoutSeconds, 300s par défaut)`
+- **Protection contre la récursion** : une compétence en cours d'exécution ne peut pas s'appeler elle-même
+
+### Permissions de modification
+
+- Le Curateur de Silicium peut modifier toutes les compétences ; les Êtres ordinaires ne peuvent modifier que les compétences dont la source est `Being`/`User`
+- La complétion automatique des métadonnées ne remplit que les champs manquants ; les champs fournis par l'utilisateur ne sont jamais écrasés par l'IA
+
+---
+
+## Sécurité MCP
+
+L'intégration MCP suit le principe de « souveraineté de l'utilisateur + cohérence des permissions » :
+
+### Souveraineté de l'utilisateur
+
+- L'ajout, la suppression, l'activation/désactivation et la reconnexion des serveurs MCP **ne peuvent être effectués que par l'utilisateur via l'UI Web** (/mcp ou la page de configuration)
+- L'outil `mcp` côté IA est une requête en lecture seule (status/list_servers/list_tools), incapable de modifier la liste des serveurs
+- Le commutateur global `McpEnabled` permet de couper d'un clic tous les outils externes
+
+### Isolation des outils et permissions
+
+- Les outils encapsulés sont nommés `mcp_{serverId}_{toolName}`, isolés de l'espace de noms des outils intégrés/plugins
+- Chaque outil encapsulé déclare automatiquement une seule action `execute`, intégrée à la matrice de permissions d'outils à deux niveaux, désactivable individuellement par Être/projet
+- Après désactivation d'un serveur, ses outils sont immédiatement désactivés de tous les Êtres
+
+### Frontières de transport et de processus
+
+- Les serveurs `stdio` s'exécutent en tant que sous-processus, n'héritant que des variables d'environnement explicitement configurées (champ `env`)
+- Les serveurs `http` communiquent via l'endpoint configuré ; en cas d'échec de connexion, ils passent automatiquement en état error et exposent `lastError`
+
+---
+
+## Sécurité des clés IM
+
+### Espaces réservés de variables d'environnement
+
+Les valeurs de configuration des plateformes IM prennent en charge les espaces réservés `${ENV_VAR}` (par ex. `"${FEISHU_APP_SECRET}"`) :
+
+- `ConfigSecretResolver` résout les espaces réservés sur une **copie profonde**, le fichier `config.json` original conserve toujours les espaces réservés tels quels
+- Les `SaveConfig` ultérieurs ne réécrivent pas les clés secrètes en clair résolues sur le disque
+- Prise en charge des espaces réservés en valeur entière et des espaces réservés intégrés dans la valeur (par ex. `prefix-${VAR}`)
+
+### Sécurité de l'autorisation OAuth
+
+- **state anti-CSRF** : nombre aléatoire cryptographique de 16 octets, vérifié strictement lors du rappel
+- **Délai d'attente de 5 minutes** : les sessions d'autorisation expirées sont automatiquement invalidées ; lors du remplacement d'une ancienne session, celle-ci est immédiatement annulée
+- **Stockage des jetons** : accessToken/refreshToken/tokenExpiresAt sont réécrits dans la configuration de la plateforme et persistés, `authMode` est marqué comme `oauth`
+- L'URL de rappel prend en charge la configuration `redirectBaseUrl` (scénario de rappel public)
+
+### Sécurité des messages
+
+- Feishu : vérification de signature (`X-Lark-Signature`, SHA256) + déchiffrement d'événements AES-256-CBC + déduplication d'événements (fenêtre de 10 minutes)
+- WeChat Enterprise : chiffrement/déchiffrement WXBizMsgCrypt et vérification de signature
+- DingTalk : le mode Stream utilise un WebSocket chiffré ; le mode HTTP utilise la vérification de rappel

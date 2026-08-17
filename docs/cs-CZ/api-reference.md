@@ -637,6 +637,38 @@ Vrací stránku rozhraní pro konfiguraci systému.
 
 Vrací dostupné typy AI klientů a jejich dynamické možnosti (dostupné modely, regiony atd.).
 
+### Získání možností IM platforem
+
+**GET** `/config/imoptions`
+
+Vrací metadata IM platforem (pro dynamické vykreslování formulářů v průvodci konfigurací):
+
+```json
+{
+  "success": true,
+  "platforms": [
+    {
+      "value": "feishu",
+      "display": "Feishu",
+      "authModes": ["manual", "oauth"],
+      "needsPublicCallback": false,
+      "help": "...",
+      "helpUrl": "https://open.feishu.cn/app",
+      "fields": [
+        { "key": "appId", "label": "App ID", "type": "text", "required": true },
+        { "key": "appSecret", "label": "App Secret", "type": "password", "required": true, "isSecret": true }
+      ]
+    }
+  ]
+}
+```
+
+### Procházení konfigurace
+
+**GET** `/config/browse`
+
+Vrací data procházení konfiguračních položek (používá se pro seskupené zobrazení v rozhraní konfigurace).
+
 ---
 
 ## Paměťový systém
@@ -1209,6 +1241,230 @@ Zruší registraci sledování umístění v kódu, které již není potřeba.
 
 ---
 
+## Správa dovedností
+
+### Stránka správy dovedností
+
+**GET** `/skill` nebo **GET** `/skill/index`
+
+Parametry dotazu: `beingId` — ID bytosti (povinné)
+
+Vrací stránku správy dovedností pro zadanou Křemíkovou Bytost (seznam dovedností + editor Markdownu).
+
+### Získání seznamu dovedností
+
+**GET** `/api/skills/list`
+
+Parametry dotazu: `beingId` — ID bytosti (povinné)
+
+Vrací všechny dovednosti bytosti (id, description, version, tags, source, triggerMode, toolWhitelist, maxToolRound, timeoutSeconds, parameterCount) a statistické informace (celkový počet dovedností / počet vlastních dovedností / limit kvóty).
+
+### Získání Markdownu dovednosti
+
+**GET** `/api/skills/get-md`
+
+Parametry dotazu: `beingId`, `skillId`
+
+Vrací text Markdownu zadané dovednosti (YAML front matter + tělo promptu).
+
+### Uložení Markdownu dovednosti
+
+**POST** `/api/skills/update-md?beingId={beingId}`
+
+Tělo požadavku (`application/json`):
+
+```json
+{
+  "markdown": "---\nid: my_skill\n...\n---\n\nTělo promptu",
+  "skillId": "my_skill"
+}
+```
+
+Aktualizuje nebo vytvoří dovednost pomocí Markdownu (sémantika upsert). Chybějící metadata jsou automaticky doplněna AI; dovednosti uložené přes webové rozhraní mají `Source` označenu jako `User`. Omezeno kvótou `MaxCustomSkillsPerBeing`.
+
+### Import dovednosti (JSON)
+
+**POST** `/api/skills/import?beingId={beingId}`
+
+Tělo požadavku: `{ "json": "<JSON definice dovednosti>" }`
+
+Importuje dovednost z JSON, rovněž omezeno kvótou.
+
+### Import dovednosti (Markdown)
+
+**POST** `/api/skills/import-md?beingId={beingId}`
+
+Tělo požadavku: `{ "markdown": "<text Markdownu>" }`
+
+Importuje novou dovednost z Markdownu, chybějící metadata jsou automaticky doplněna AI.
+
+### Smazání dovednosti
+
+**POST** `/api/skills/delete?beingId={beingId}`
+
+Tělo požadavku: `{ "skillId": "my_skill" }`
+
+Smaže dovednost (spolu s odpovídajícími soubory `.md` a `.json` pro trvalé uložení).
+
+### Export dovednosti (JSON)
+
+**GET** `/api/skills/export?beingId={beingId}&skillId={skillId}`
+
+Stáhne definici dovednosti jako přílohu JSON (`{id}.json`).
+
+### Export dovednosti (Markdown)
+
+**GET** `/api/skills/export-md?beingId={beingId}&skillId={skillId}`
+
+Stáhne dovednost jako přílohu Markdownu (`{id}.md`).
+
+### Testování provedení dovednosti
+
+**POST** `/api/skills/test?beingId={beingId}`
+
+Tělo požadavku:
+
+```json
+{
+  "skillId": "my_skill",
+  "parametersJson": "{ \"topic\": \"AI novinky\" }"
+}
+```
+
+Provede dovednost jednorázově se zadanými parametry a vrátí `ToolResult` (včetně počtu kol AI provedení a konečného výstupu).
+
+---
+
+## Správa MCP
+
+### Stránka správy MCP
+
+**GET** `/mcp`
+
+Parametry dotazu: `beingId` — ID bytosti (volitelné, pro zobrazení MCP nástrojů viditelných pro danou bytost)
+
+Vrací stránku správy MCP serverů.
+
+### Získání seznamu serverů
+
+**GET** `/api/mcp/list-servers`
+
+Vrací stav všech nakonfigurovaných MCP serverů:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "state": "connected",
+      "enabled": true,
+      "toolCount": 8,
+      "endpoint": null,
+      "lastError": null
+    }
+  ],
+  "mcpEnabled": true,
+  "connected": 1,
+  "toolTotal": 8
+}
+```
+
+Hodnoty `state`: `connected` / `disconnected` / `connecting` / `error`.
+
+### Získání seznamu nástrojů serveru
+
+**GET** `/api/mcp/list-tools?serverId={serverId}`
+
+Vrací nástroje poskytované zadaným serverem (`name` je úplný název s předponou `mcp_{serverId}_{toolName}`, `description`, `schema`). Pokud server není připojen, vrátí chybu.
+
+### Přidání serveru
+
+**POST** `/api/mcp/add-server`
+
+Tělo požadavku (`McpServerConfig`):
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "env": {},
+  "endpoint": null,
+  "enabled": true
+}
+```
+
+`transport` podporuje `stdio` (místní proces: `command` + `arguments`) a `http` (vzdálený koncový bod: `endpoint`). ID serveru může obsahovat pouze malá písmena, číslice a podtržítka. Po přidání se okamžitě připojí a synchronizuje se všemi Křemíkovými Bytostmi.
+
+### Povolení/zákaz serveru
+
+**POST** `/api/mcp/toggle`
+
+Tělo požadavku: `{ "serverId": "filesystem", "enabled": true }`
+
+### Smazání serveru
+
+**POST** `/api/mcp/remove-server`
+
+Tělo požadavku: `{ "serverId": "filesystem" }`
+
+Smaže konfiguraci serveru a odhlásí jeho nástroje ze všech bytostí.
+
+### Znovupřipojení serveru
+
+**POST** `/api/mcp/reconnect`
+
+Tělo požadavku: `{ "serverId": "filesystem" }`
+
+Vynutí odpojení a znovunavázání spojení, aktualizuje seznam nástrojů.
+
+### Testování volání nástroje
+
+**POST** `/api/mcp/test-tool`
+
+Tělo požadavku:
+
+```json
+{
+  "serverId": "filesystem",
+  "toolName": "read_file",
+  "argumentsJson": "{ \"path\": \"/data/hello.txt\" }"
+}
+```
+
+Přímo zavolá nástroj MCP serveru (bez účasti AI), pro ověření konektivity.
+
+---
+
+## OAuth autorizace IM platforem
+
+### Zahájení autorizace
+
+**GET** `/im/{platform}/authorize`
+
+Parametry cesty: `platform` — identifikátor IM platformy (např. `feishu`)
+
+Vygeneruje náhodný `state` pro ochranu proti CSRF, zaregistruje autorizační relaci platnou 5 minut, vrátí autorizační URL a automaticky otevře výchozí prohlížeč systému. Opakované zahájení na stejné platformě přepíše předchozí relaci.
+
+### Autorizační callback
+
+**GET** `/im/{platform}/callback?code={code}&state={state}`
+
+Voláno přesměrováním z IM platformy. Po ověření `state` vymění autorizační kód za přístupový token, zapíše `accessToken`, `refreshToken`, `tokenExpiresAt`, `authMode=oauth` zpět do konfigurace dané platformy a trvale je uloží, nakonec vyrenderuje výslednou stránku autorizace (úspěch/selhání).
+
+### Dotaz na stav autorizace
+
+**GET** `/im/{platform}/status`
+
+Vrací `{ platform, status, tokenExpiresAt }`. Hodnoty `status`: `pending` / `success` / `failed` / `timeout` / `none`. Front-end primárně přijímá stav přes SSE událost `im_auth_status`; toto rozhraní slouží jako záložní dotazování.
+
+---
+
 ## Systém dokumentace nápovědy
 
 ### Stránka nápovědy
@@ -1364,6 +1620,20 @@ eventSource.onmessage = (event) => {
       break;
   }
 };
+```
+
+### Události stavu IM autorizace
+
+Průvodce OAuth autorizací IM platformy odesílá stav přes sdílené SSE připojení (název události `im_auth_status`):
+
+```javascript
+eventSource.addEventListener('im_auth_status', (event) => {
+  const data = JSON.parse(event.data);
+  // data.platform — identifikátor platformy (feishu / wecom / dingtalk)
+  // data.status  — pending / success / failed / timeout
+  // data.message — doplňující informace
+  updateAuthStatus(data.platform, data.status);
+});
 ```
 
 ---

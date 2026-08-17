@@ -314,7 +314,33 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 11. Outil de journal (LogTool)
+### 11. Outil de requête MCP (McpTool)
+
+**Nom de l'outil** : `mcp`
+
+**Description** : Requête sur l'état d'intégration MCP (Model Context Protocol) — serveurs externes connectés, les outils qu'ils fournissent et comment les appeler. Outil en lecture seule : l'ajout/suppression de serveurs ne peut être effectué que par l'utilisateur via l'interface Web UI, l'IA ne peut pas modifier la liste des serveurs.
+
+**Opérations prises en charge** :
+- `status` — Vue d'ensemble globale (état d'activation, nombre de serveurs, nombre d'outils)
+- `list_servers` — Lister les serveurs configurés (avec état de connexion et nombre d'outils)
+- `list_tools` — Lister les outils disponibles (avec préfixe `mcp_{server}_{tool}`, description et schéma des paramètres ; `server_id` optionnel pour filtrer un seul serveur)
+
+**Exemple d'utilisation** :
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**Outil wrapper MCP** : Chaque outil fourni par un serveur MCP connecté est enregistré dynamiquement comme un outil indépendant dans les Êtres de Silicium, avec le format de nommage `mcp_{serverId}_{toolName}` (ex. `mcp_filesystem_read_file`). L'IA peut les appeler directement par nom comme des outils ordinaires, sans passer par cet outil de requête. L'outil wrapper présente une seule action `execute` dans la matrice d'autorisations et peut être désactivé individuellement.
+
+**Scénario** : Tous les scénarios (`All`)
+
+---
+
+### 12. Outil de journal (LogTool)
 
 **Nom de l'outil** : `log`
 
@@ -338,7 +364,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 12. Outil de mémoire (MemoryTool)
+### 13. Outil de mémoire (MemoryTool)
 
 **Nom de l'outil** : `memory`
 
@@ -367,7 +393,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 13. Outil réseau (NetworkTool)
+### 14. Outil réseau (NetworkTool)
 
 **Nom de l'outil** : `network`
 
@@ -393,7 +419,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 14. Outil d'autorisations (PermissionTool) 🔒
+### 15. Outil d'autorisations (PermissionTool) 🔒
 
 **Nom de l'outil** : `permission`
 
@@ -420,7 +446,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 15. Outil de projet (ProjectTool) 🔒
+### 16. Outil de projet (ProjectTool) 🔒
 
 **Nom de l'outil** : `project`
 
@@ -456,7 +482,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 16. Outil de tâches de projet (ProjectTaskTool)
+### 17. Outil de tâches de projet (ProjectTaskTool)
 
 **Nom de l'outil** : `project_task`
 
@@ -490,7 +516,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 17. Outil de notes de travail de projet (ProjectWorkNoteTool)
+### 18. Outil de notes de travail de projet (ProjectWorkNoteTool)
 
 **Nom de l'outil** : `project_work_note`
 
@@ -520,7 +546,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 18. Outil de travail de projet (ProjectWorkTool) 🔒
+### 19. Outil de travail de projet (ProjectWorkTool) 🔒
 
 **Nom de l'outil** : `project_work`
 
@@ -549,7 +575,55 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 19. Outil système (SystemTool)
+### 20. Outil de Compétence (SkillTool)
+
+**Nom de l'outil** : `skill`
+
+**Description** : Gestion des compétences des Êtres de Silicium (unité de capacité réutilisable "orchestration d'outils + modèle de prompt"), prend en charge la création, la liste, la mise à jour, la suppression, l'importation et l'exportation. Les métadonnées manquantes (id, description, schéma des paramètres, etc.) sont automatiquement complétées par l'IA.
+
+**Opérations prises en charge** :
+- `create` — Créer une nouvelle compétence (requiert `id` et `system_prompt` ; optionnels : `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — Lister toutes les compétences disponibles (avec résumé)
+- `update` — Mettre à jour une compétence existante via paramètres (requiert `skill_id`)
+- `update_from_md` — Mettre à jour une compétence à partir d'une chaîne Markdown (métadonnées YAML frontmatter + corps du prompt)
+- `delete` — Supprimer une compétence (requiert `skill_id`)
+- `export` — Exporter une compétence en JSON (requiert `skill_id`)
+- `export_md` — Exporter une compétence en Markdown (requiert `skill_id`)
+- `import` — Importer une compétence depuis JSON (requiert `json`)
+- `import_md` — Importer une compétence depuis Markdown (requiert `markdown`)
+
+**Exemple d'utilisation** :
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "Rechercher les actualités technologiques du jour et générer un résumé",
+  "system_prompt": "Utilisez l'outil network pour rechercher les dernières actualités sur {topic} et générez un résumé de 500 mots.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "Sujet des actualités" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**Autorisations de modification** : Le Curateur de Silicium peut modifier toutes les compétences ; les Êtres ordinaires ne peuvent modifier que les compétences dont l'origine est `Being` ou `User` (pas les compétences intégrées et de plugins).
+
+**Limite de quantité** : Le nombre de compétences personnalisées par être est limité par la configuration `MaxCustomSkillsPerBeing` (par défaut 50).
+
+**Scénario** : Tous les scénarios (`All`)
+
+> Pour la documentation complète du système de compétences (modes de déclenchement, liste blanche, rechargement à chaud, planification automatique, etc.), consultez le [Guide de l'Être de Silicium](silicon-being-guide.md#système-de-compétences).
+
+---
+
+### 21. Outil système (SystemTool)
 
 **Nom de l'outil** : `system`
 
@@ -570,7 +644,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 20. Outil de tâches (TaskTool)
+### 22. Outil de tâches (TaskTool)
 
 **Nom de l'outil** : `task`
 
@@ -595,7 +669,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 21. Outil de minuteurs (TimerTool)
+### 23. Outil de minuteurs (TimerTool)
 
 **Nom de l'outil** : `timer`
 
@@ -621,7 +695,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 22. Outil d'audit de tokens (TokenAuditTool) 🔒
+### 24. Outil d'audit de tokens (TokenAuditTool) 🔒
 
 **Nom de l'outil** : `token_audit`
 
@@ -651,7 +725,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 23. Outil de navigateur WebView (WebViewBrowserTool)
+### 25. Outil de navigateur WebView (WebViewBrowserTool)
 
 **Nom de l'outil** : `webview_browser`
 
@@ -692,7 +766,7 @@ De plus, les outils marqués avec l'attribut `[ChatOnly]` ne sont disponibles qu
 
 ---
 
-### 24. Outil de notes de travail (WorkNoteTool)
+### 26. Outil de notes de travail (WorkNoteTool)
 
 **Nom de l'outil** : `work_note`
 
@@ -820,6 +894,13 @@ public class AdminOnlyTool : ITool
     // Seul le Curateur de Silicium peut y accéder
 }
 ```
+
+### Alternative : Outils Compétence et MCP
+
+Outre l'écriture de classes d'outils en C#, il existe deux modes d'extension sans compilation :
+
+- **Compétence (Skill)** : Créer une combinaison "orchestration d'outils + modèle de prompt" via l'interface Web UI ou l'outil `skill`, adaptée pour consolider les flux de travail fréquents en capacités réutilisables. Consultez le [Guide de l'Être de Silicium — Système de Compétences](silicon-being-guide.md#système-de-compétences).
+- **Serveur MCP** : Après avoir configuré un serveur MCP externe dans l'interface Web UI, ses outils sont automatiquement injectés au format `mcp_{serverId}_{toolName}`, sans écrire de code. Consultez le [Guide Web UI — Gestion MCP](web-ui-guide.md).
 
 ## Bonnes pratiques
 

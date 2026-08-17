@@ -158,14 +158,14 @@ public class MyCustomCalendar : CalendarBase
 Používá 60letý cyklus, složený z nebeských kmenů a pozemských větví:
 
 ```
-Nebeské kmeny (10): 甲, 乙, 丙, 丁, 戊, 己, 庚, 辛, 壬, 癸
-Pozemské větve (12): 子, 丑, 寅, 卯, 辰, 巳, 午, 未, 申, 酉, 戌, 亥
+Nebeské kmeny (10): Jia, Yi, Bing, Ding, Wu, Ji, Geng, Xin, Ren, Gui
+Pozemské větve (12): Zi, Chou, Yin, Mao, Chen, Si, Wu, Wei, Shen, You, Xu, Hai
 ```
 
 **Příklady**:
-- Rok 2026 = 丙午年
-- Rok 2025 = 乙巳年 (Rok hada)
-- Rok 2024 = 甲辰年 (Rok draka)
+- Rok 2026 = Bingwu (Rok koně)
+- Rok 2025 = Yisi (Rok hada)
+- Rok 2024 = Jiachen (Rok draka)
 
 **Příklad použití**:
 ```json
@@ -180,8 +180,8 @@ Pozemské větve (12): 子, 丑, 寅, 卯, 辰, 巳, 午, 未, 申, 酉, 戌, �
 **Odpověď**:
 ```json
 {
-  "result": "丙午年 三月 初九",
-  "ganzhi_year": "丙午",
+  "result": "Bingwu, 3. měsíc, den 9",
+  "ganzhi_year": "Bingwu",
   "zodiac": "Kůň"
 }
 ```

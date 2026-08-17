@@ -313,6 +313,42 @@ Gérer les autorisations d'outils via l'interface Web UI :
 | `/api/projects/{id}/tool-permissions` | GET | Obtenir les autorisations d'outils du projet |
 | `/api/projects/{id}/tool-permissions` | PUT | Mettre à jour les autorisations d'outils du projet |
 
+### Autorisations d'action des compétences
+
+Les compétences réutilisent le mécanisme d'autorisation d'action des outils : l'id de la compétence sert de nom d'outil, avec l'action `execute`.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- Les compétences désactivées n'apparaissent pas dans les définitions d'outils visibles par l'IA (l'IA ne les "voit" pas du tout)
+- L'exécution de la compétence a également une vérification à l'exécution, même un schéma obsolète ne peut pas la contourner
+- Les autorisations des outils internes à la compétence = autorisations de l'être ∪ restrictions de la compétence elle-même (union côté restrictif, ne peut que restreindre, pas élargir)
+
+### Autorisations d'action des outils wrapper MCP
+
+Chaque outil wrapper injecté par un serveur MCP (`mcp_{serverId}_{toolName}`) déclare automatiquement une seule action `execute` :
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- Disponibilité des outils externes contrôlable avec précision par être ou projet
+- Lorsque toutes les actions `execute` d'un serveur sont désactivées, l'outil est entièrement retiré du schéma visible par l'IA
+- La désactivation/suppression d'un serveur (via l'interface Web UI) révoque immédiatement tous ses outils
+
 ---
 
 ## Bonnes pratiques

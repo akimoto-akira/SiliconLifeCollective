@@ -1,4 +1,4 @@
-# Tool-Referenz
+# Werkzeug-Referenz
 
 > **Version: v0.2.0-alpha**
 
@@ -314,7 +314,33 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 11. Protokoll-Werkzeug (LogTool)
+### 11. MCP-Abfrage-Werkzeug (McpTool)
+
+**Werkzeugname**: `mcp`
+
+**Funktionsbeschreibung**: MCP-Integrationsstatus (Model Context Protocol) abfragen — verbundene externe Server, deren verfügbare Werkzeuge und wie man sie aufruft. Dies ist ein Read-Only-Werkzeug: Server hinzufügen/entfernen kann nur vom Benutzer über die Web-UI erfolgen; die KI kann die Serverliste nicht ändern.
+
+**Unterstützte Operationen**:
+- `status` — Globale Übersicht (Aktivierungsstatus, Serveranzahl, Werkzeuganzahl)
+- `list_servers` — Konfigurierte Server auflisten (mit Verbindungsstatus und Werkzeuganzahl)
+- `list_tools` — Verfügbare Werkzeuge auflisten (mit `mcp_{server}_{tool}`-Präfixname, Beschreibung und Parameterschema; optionales `server_id` zum Filtern eines einzelnen Servers)
+
+**Verwendungsbeispiel**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**MCP-Wrapper-Werkzeuge**: Jedes von einem verbundenen MCP-Server bereitgestellte Werkzeug wird als unabhängiges Werkzeug für Silicon Beings dynamisch registriert, mit dem Namensformat `mcp_{serverId}_{toolName}` (z.B. `mcp_filesystem_read_file`). Die KI kann sie direkt über den Präfixnamen wie normale Werkzeuge aufrufen, ohne dieses Abfragewerkzeug zu verwenden. Wrapper-Werkzeuge präsentieren eine einzelne `execute`-Aktion in der Berechtigungsmatrix und können einzeln deaktiviert werden.
+
+**Szenario**: Alle Szenarien (`All`)
+
+---
+
+### 12. Protokoll-Werkzeug (LogTool)
 
 **Werkzeugname**: `log`
 
@@ -338,7 +364,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 12. Speicher-Werkzeug (MemoryTool)
+### 13. Speicher-Werkzeug (MemoryTool)
 
 **Werkzeugname**: `memory`
 
@@ -367,7 +393,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 13. Netzwerk-Werkzeug (NetworkTool)
+### 14. Netzwerk-Werkzeug (NetworkTool)
 
 **Werkzeugname**: `network`
 
@@ -393,7 +419,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 14. Berechtigungs-Werkzeug (PermissionTool) 🔒
+### 15. Berechtigungs-Werkzeug (PermissionTool) 🔒
 
 **Werkzeugname**: `permission`
 
@@ -420,7 +446,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 15. Projekt-Werkzeug (ProjectTool) 🔒
+### 16. Projekt-Werkzeug (ProjectTool) 🔒
 
 **Werkzeugname**: `project`
 
@@ -456,7 +482,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 16. Projektaufgaben-Werkzeug (ProjectTaskTool)
+### 17. Projektaufgaben-Werkzeug (ProjectTaskTool)
 
 **Werkzeugname**: `project_task`
 
@@ -490,7 +516,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 17. Projekt-Arbeitsnotiz-Werkzeug (ProjectWorkNoteTool)
+### 18. Projekt-Arbeitsnotiz-Werkzeug (ProjectWorkNoteTool)
 
 **Werkzeugname**: `project_work_note`
 
@@ -520,7 +546,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 18. Projektarbeit-Werkzeug (ProjectWorkTool) 🔒
+### 19. Projektarbeit-Werkzeug (ProjectWorkTool) 🔒
 
 **Werkzeugname**: `project_work`
 
@@ -549,7 +575,55 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 19. System-Werkzeug (SystemTool)
+### 20. Fähigkeits-Werkzeug (SkillTool)
+
+**Werkzeugname**: `skill`
+
+**Funktionsbeschreibung**: Verwaltung von Silicon-Being-Fähigkeiten (wiederverwendbare "Werkzeugorchestrierung + Prompt-Vorlage"-Fähigkeitseinheiten), unterstützt Erstellen, Auflisten, Aktualisieren, Löschen, Importieren und Exportieren. Fehlende Metadaten (ID, Beschreibung, Parameterschema usw.) werden von der KI automatisch ergänzt.
+
+**Unterstützte Operationen**:
+- `create` — Neue Fähigkeit erstellen (erfordert `id` und `system_prompt`; optional `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — Alle verfügbaren Fähigkeiten auflisten (mit Zusammenfassung)
+- `update` — Vorhandene Fähigkeit über Parameter aktualisieren (erfordert `skill_id`)
+- `update_from_md` — Fähigkeit aus Markdown-Zeichenfolge aktualisieren (YAML-Frontmatter + Prompt-Text)
+- `delete` — Fähigkeit löschen (erfordert `skill_id`)
+- `export` — Fähigkeit als JSON exportieren (erfordert `skill_id`)
+- `export_md` — Fähigkeit als Markdown exportieren (erfordert `skill_id`)
+- `import` — Fähigkeit aus JSON importieren (erfordert `json`)
+- `import_md` — Fähigkeit aus Markdown importieren (erfordert `markdown`)
+
+**Verwendungsbeispiel**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "Heutige Tech-News suchen und Zusammenfassung generieren",
+  "system_prompt": "Bitte verwenden Sie das network-Werkzeug, um die neuesten Nachrichten zu {topic} zu suchen, und generieren Sie eine 500-Wort-Zusammenfassung.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "Nachrichtenthema" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**Änderungsberechtigungen**: Der Silicon Curator kann alle Fähigkeiten ändern; reguläre Beings können nur Fähigkeiten mit der Quelle `Being` oder `User` ändern (eingebaute und Plugin-Fähigkeiten können nicht geändert werden).
+
+**Mengenlimit**: Die Anzahl benutzerdefinierter Fähigkeiten pro Being ist durch die Konfiguration `MaxCustomSkillsPerBeing` (Standard 50) begrenzt.
+
+**Szenario**: Alle Szenarien (`All`)
+
+> Vollständige Dokumentation zum Fähigkeitssystem (Trigger-Modi, Whitelist, heißes Neuladen, Auto-Scheduling usw.) finden Sie im [Silicon-Being-Leitfaden](silicon-being-guide.md#fähigkeitssystem).
+
+---
+
+### 21. System-Werkzeug (SystemTool)
 
 **Werkzeugname**: `system`
 
@@ -570,7 +644,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 20. Aufgaben-Werkzeug (TaskTool)
+### 22. Aufgaben-Werkzeug (TaskTool)
 
 **Werkzeugname**: `task`
 
@@ -595,7 +669,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 21. Timer-Werkzeug (TimerTool)
+### 23. Timer-Werkzeug (TimerTool)
 
 **Werkzeugname**: `timer`
 
@@ -621,7 +695,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 22. Token-Nutzungsaudit-Werkzeug (TokenAuditTool) 🔒
+### 24. Token-Nutzungsaudit-Werkzeug (TokenAuditTool) 🔒
 
 **Werkzeugname**: `token_audit`
 
@@ -651,7 +725,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 23. WebView-Browser-Werkzeug (WebViewBrowserTool)
+### 25. WebView-Browser-Werkzeug (WebViewBrowserTool)
 
 **Werkzeugname**: `webview_browser`
 
@@ -692,7 +766,7 @@ Darüber hinaus sind mit dem `[ChatOnly]`-Attribut markierte Werkzeuge nur im Ch
 
 ---
 
-### 24. Arbeitsnotiz-Werkzeug (WorkNoteTool)
+### 26. Arbeitsnotiz-Werkzeug (WorkNoteTool)
 
 **Werkzeugname**: `work_note`
 
@@ -821,6 +895,13 @@ public class AdminOnlyTool : ITool
     // Nur für Silicon Curator zugänglich
 }
 ```
+
+### Alternative: Fähigkeiten und MCP-Werkzeuge
+
+Zusätzlich zum Schreiben von C#-Werkzeugklassen gibt es zwei Erweiterungsmethoden, die keine Kompilierung erfordern:
+
+- **Fähigkeiten**: "Werkzeugorchestrierung + Prompt-Vorlage"-Kombinationen über die Web-UI oder das `skill`-Werkzeug erstellen, geeignet für das Kapseln häufiger Workflows in wiederverwendbare Fähigkeiten. Siehe [Silicon-Being-Leitfaden — Fähigkeitssystem](silicon-being-guide.md#fähigkeitssystem).
+- **MCP-Server**: Nach der Konfiguration externer MCP-Server in der Web-UI werden deren Werkzeuge automatisch im Format `mcp_{serverId}_{toolName}` injiziert, ohne Code zu schreiben. Siehe [Web-UI-Leitfaden — MCP-Verwaltung](web-ui-guide.md).
 
 ## Bewährte Praktiken
 

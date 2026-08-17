@@ -320,6 +320,19 @@ Every stage ends with a **runnable, observable** system. No stage produces "a pi
 
 ---
 
+## Stage 11.5: Skill System and MCP Integration
+
+**Goal**: Reusable capability abstraction layer and external tool ecosystem integration.
+
+| # | Module | Description |
+|---|--------|-------------|
+| 11.5.1 | ~~Skill System~~ ✅ Completed | Tool orchestration + prompt template reusable abstraction layer (SkillManager, dual trigger modes, hot reload, version archiving, AI metadata completion) |
+| 11.5.2 | ~~MCP Integration~~ ✅ Completed | External MCP server tool access (stdio/http dual transport, `mcp_{serverId}_{toolName}` naming injection, Web management page, permission matrix integration) |
+
+**Deliverables**: Skill management page (/skill), MCP management page (/mcp), `skill` and `mcp` built-in tools, skill/MCP help documentation.
+
+---
+
 ## Stage 12: Advanced Features
 
 **Goal**: Optional advanced features for enhanced capabilities.

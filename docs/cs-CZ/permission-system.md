@@ -313,6 +313,42 @@ Správa oprávnění nástrojů přes Web UI:
 | `/api/projects/{id}/tool-permissions` | GET | Získání oprávnění nástrojů projektu |
 | `/api/projects/{id}/tool-permissions` | PUT | Aktualizace oprávnění nástrojů projektu |
 
+### Akční oprávnění dovedností
+
+Dovednosti využívají mechanismus akčních oprávnění nástrojů: ID dovednosti slouží jako název nástroje, akce je `execute`.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- Zakázané dovednosti se neobjeví v AI viditelných definicích nástrojů (AI je vůbec "nevidí")
+- Během provádění dovednosti probíhá runtime kontrola, takže i zastaralé schéma nelze obejít
+- Oprávnění nástrojů uvnitř dovednosti = oprávnění bytosti ∪ vlastní omezení dovednosti (striektní sjednocení na straně omezení, lze pouze zužovat, ne rozšiřovat)
+
+### Akční oprávnění MCP obalových nástrojů
+
+Každý obalový nástroj injektovaný MCP serverem (`mcp_{serverId}_{toolName}`) automaticky deklaruje jedinou akci `execute`:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- Dostupnost externích nástrojů lze přesně řídit podle bytosti nebo projektu
+- Pokud jsou všechny akce `execute` určitého serveru zakázány, je nástroj jako celek odstraněn z AI viditelného schématu
+- Zakázání/odstranění serveru (operace Web UI) okamžitě zruší registraci všech jeho nástrojů
+
 ---
 
 ## Osvědčené postupy

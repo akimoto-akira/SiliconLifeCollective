@@ -315,6 +315,44 @@ Gestisci i permessi degli strumenti tramite la Web UI:
 
 ---
 
+### Permessi di azione delle competenze
+
+Le competenze riutilizzano il meccanismo dei permessi di azione degli strumenti: l'id della competenza funge da nome strumento, con azione `execute`.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- Le competenze disabilitate non appaiono nelle definizioni degli strumenti visibili all'AI (l'AI non le "vede" affatto)
+- L'esecuzione della competenza ha anche una verifica runtime, anche uno schema obsoleto non può aggirarla
+- I permessi degli strumenti interni alla competenza = permessi dell'essere ∪ restrizioni della competenza stessa (unione lato restrittivo, può solo restringere non ampliare)
+
+### Permessi di azione degli strumenti wrapper MCP
+
+Ogni strumento wrapper iniettato da un server MCP (`mcp_{serverId}_{toolName}`) dichiara automaticamente una singola azione `execute`:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- Disponibilità degli strumenti esterni controllabile con precisione per essere o progetto
+- Quando tutte le azioni `execute` di un server sono disabilitate, lo strumento viene rimosso dallo Schema visibile all'AI
+- La disabilitazione/eliminazione di un server (tramite Web UI) revoca immediatamente tutti i suoi strumenti
+
+---
+
 ## Best Practice
 
 ### 1. Principio del Privilegio Minimo

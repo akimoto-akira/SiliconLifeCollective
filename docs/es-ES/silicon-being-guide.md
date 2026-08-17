@@ -187,6 +187,78 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
+## Sistema de Habilidades
+
+Las habilidades (Skill) son unidades de capacidad reutilizables de los Seres de Silicio: encapsulan "orquestación de herramientas + plantillas de prompts" en una función declarable, evolutiva y de invocación automática, que la IA invoca como una herramienta ordinaria.
+
+### Estructura de Habilidades
+
+| Elemento | Descripción |
+|------|------|
+| `id` / `description` | Identificador único y descripción de una línea (mostrada a la IA, determina cuándo la IA selecciona esta habilidad) |
+| `parameter_schema` | Esquema JSON de parámetros, declara cada marcador `{param}` utilizado en el prompt |
+| `system_prompt_template` | Plantilla de prompt del sistema, los marcadores se rellenan con parámetros durante la ejecución |
+| `tool_whitelist` | Lista de herramientas permitidas durante la ejecución (vacío = hereda todas las herramientas del Ser) |
+| `max_tool_round` / `timeout` | Límites de rondas de herramientas y tiempo de espera (restringidos por límites globales) |
+| `on_complete` | Acción al completar: `none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual` (invocación autónoma por la IA) o `Auto` + programación `schedule` |
+
+### Cuatro Fuentes
+
+- **Integradas** — Integradas en el framework (`summarize_document` resumen de documentos, `code_review` revisión de código, `research_topic` investigación de temas)
+- **Plugin** — Los plugins se registran a través de `ISkillProvider`
+- **Ser** — El Ser las crea en tiempo de ejecución a través de la herramienta `skill`
+- **Usuario** — Creadas por el usuario a través de la página de gestión de habilidades de la Web UI
+
+### Modos de Disparador
+
+1. **Manual**: La habilidad se inyecta como definición de herramienta ordinaria en la solicitud de la IA, quien determina cuándo invocarla; el lado de programación prioriza el enrutamiento de llamadas del mismo nombre a la habilidad
+2. **Automático (Auto + schedule)**: La expresión de programación se almacena en `metadata.schedule`, soporta tres formatos:
+   - `"09:30"` — Punto fijo diario
+   - `"6h"` / `"30 m"` / `"2 d"` — Período de intervalo
+   - `"0 9 * * *"` / `"*/15 * * * *"` — Subconjunto cron
+
+### Escritura en Markdown
+
+Las habilidades se almacenan en Markdown (`skills/{id}.md`, metadatos YAML frontales + cuerpo del prompt):
+
+```markdown
+---
+id: daily_news_digest
+description: Buscar noticias de tecnología de hoy y generar un resumen
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+Utiliza la herramienta network para buscar las últimas noticias de {topic}, genera un resumen de 500 palabras y guárdalo en las notas de trabajo.
+```
+
+También se puede escribir solo el cuerpo (omitiendo YAML): al guardar, la IA completará automáticamente metadatos como id, description, esquema de parámetros, etc. — los campos ya rellenados por el usuario nunca se sobrescriben.
+
+### Autogestión del Ser
+
+El Ser puede gestionar su propia biblioteca de habilidades a través de la herramienta `skill`:
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### Recarga en Caliente y Evolución
+
+- El Ser detecta cambios en el directorio `skills/` cada 30 segundos (comparación de huellas), los cambios desde la Web UI u otros Seres surten efecto automáticamente, sin necesidad de reiniciar
+- Cada actualización de habilidad archiva automáticamente versiones históricas en `skills/archive/{id}/{version}.md`, formando un historial de evolución de habilidades
+- La cantidad de habilidades personalizadas está limitada por cuota (`MaxCustomSkillsPerBeing`, por defecto 50)
+
+### Barandillas de Ejecución
+
+- Permiso de acción `execute` a nivel de habilidad (puede ser deshabilitado por la matriz de permisos, al deshabilitarse es invisible para la IA)
+- Los parámetros de ejecución están restringidos por límites globales: rondas ≤ `GlobalMaxToolRound` (por defecto 10), tiempo de espera ≤ `GlobalSkillTimeoutSeconds` (por defecto 300 segundos)
+- Las habilidades no pueden llamarse a sí mismas recursivamente
+- Las llamadas a herramientas fuera de la lista blanca fallan directamente
+
 ## Sistema de Memoria
 
 ### Tipos de Memoria

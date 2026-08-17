@@ -402,13 +402,13 @@ SiliconLifeCollective/
 │   ├── ja-JP/                       # Japanese
 │   ├── ko-KR/                       # Korean
 │   └── cs-CZ/                       # Czech
-├── 总文档/                           # Requirements and architecture docs (Chinese)
+├── docs/                           # Requirements and architecture docs
 └── README.md                        # Project readme
 ```
 
 ## Need Help?
 
-- 📖 Check the [Help Documentation System](web-ui-guide.md#帮助文档系统新增) (multi-language support)
+- 📖 Check the [Help Documentation System](web-ui-guide.md#help-documentation-system) (multi-language support)
 - 📚 Read the [Full Documentation](docs/)
 - 🐛 Report issues on [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
 - 💬 Join community discussions

@@ -632,6 +632,38 @@ Restituisce la pagina dell'interfaccia di configurazione del sistema.
 
 Restituisce i tipi di client AI disponibili e le relative opzioni dinamiche (modelli disponibili, regioni, ecc.).
 
+### Ottieni Opzioni della Piattaforma IM
+
+**GET** `/config/imoptions`
+
+Restituisce i metadati della piattaforma IM (per il rendering dinamico dei form nella procedura guidata di configurazione):
+
+```json
+{
+  "success": true,
+  "platforms": [
+    {
+      "value": "feishu",
+      "display": "Feishu",
+      "authModes": ["manual", "oauth"],
+      "needsPublicCallback": false,
+      "help": "...",
+      "helpUrl": "https://open.feishu.cn/app",
+      "fields": [
+        { "key": "appId", "label": "App ID", "type": "text", "required": true },
+        { "key": "appSecret", "label": "App Secret", "type": "password", "required": true, "isSecret": true }
+      ]
+    }
+  ]
+}
+```
+
+### Sfoglia Configurazione
+
+**GET** `/config/browse`
+
+Restituisce i dati di navigazione delle voci di configurazione (per la visualizzazione raggruppata nell'interfaccia di configurazione).
+
 ---
 
 ## Sistema di Memoria
@@ -1204,6 +1236,230 @@ Deregistra il monitoraggio di una posizione del codice non più necessaria.
 
 ---
 
+## Gestione delle Competenze
+
+### Pagina Gestione Competenze
+
+**GET** `/skill` o **GET** `/skill/index`
+
+Parametro di query: `beingId` — ID dell'Essere di Silicio (obbligatorio)
+
+Restituisce la pagina di gestione delle competenze dell'Essere di Silicio specificato (elenco competenze + editor Markdown).
+
+### Ottieni Elenco delle Competenze
+
+**GET** `/api/skills/list`
+
+Parametro di query: `beingId` — ID dell'Essere di Silicio (obbligatorio)
+
+Restituisce tutte le competenze dell'Essere (id, description, version, tags, source, triggerMode, toolWhitelist, maxToolRound, timeoutSeconds, parameterCount), oltre alle statistiche (numero totale di competenze / numero di competenze personalizzate / limite massimo).
+
+### Ottieni Markdown della Competenza
+
+**GET** `/api/skills/get-md`
+
+Parametri di query: `beingId`, `skillId`
+
+Restituisce il testo Markdown della competenza specificata (metadati frontmatter YAML + corpo del prompt).
+
+### Salva Markdown della Competenza
+
+**POST** `/api/skills/update-md?beingId={beingId}`
+
+**Corpo della richiesta** (`application/json`):
+
+```json
+{
+  "markdown": "---\nid: my_skill\n...\n---\n\nCorpo del prompt",
+  "skillId": "my_skill"
+}
+```
+
+Aggiorna o crea una competenza tramite Markdown (semantica upsert). I metadati mancanti vengono completati automaticamente dall'AI; le competenze salvate tramite Web UI hanno `Source` contrassegnata come `User`. Soggetta al limite `MaxCustomSkillsPerBeing`.
+
+### Importa Competenza (JSON)
+
+**POST** `/api/skills/import?beingId={beingId}`
+
+**Corpo della richiesta**: `{ "json": "<JSON definizione competenza>" }`
+
+Importa una competenza da JSON, soggetta allo stesso limite.
+
+### Importa Competenza (Markdown)
+
+**POST** `/api/skills/import-md?beingId={beingId}`
+
+**Corpo della richiesta**: `{ "markdown": "<testo Markdown>" }`
+
+Importa una nuova competenza da Markdown; i metadati mancanti vengono completati automaticamente dall'AI.
+
+### Elimina Competenza
+
+**POST** `/api/skills/delete?beingId={beingId}`
+
+**Corpo della richiesta**: `{ "skillId": "my_skill" }`
+
+Elimina la competenza (elimina anche i file persistenti `.md` e `.json` corrispondenti).
+
+### Esporta Competenza (JSON)
+
+**GET** `/api/skills/export?beingId={beingId}&skillId={skillId}`
+
+Scarica la definizione della competenza come allegato JSON (`{id}.json`).
+
+### Esporta Competenza (Markdown)
+
+**GET** `/api/skills/export-md?beingId={beingId}&skillId={skillId}`
+
+Scarica la competenza come allegato Markdown (`{id}.md`).
+
+### Test Esecuzione Competenza
+
+**POST** `/api/skills/test?beingId={beingId}`
+
+**Corpo della richiesta**:
+
+```json
+{
+  "skillId": "my_skill",
+  "parametersJson": "{ \"topic\": \"AI notizie\" }"
+}
+```
+
+Esegue una competenza con i parametri forniti e restituisce `ToolResult` (include il numero di round di esecuzione AI e l'output finale).
+
+---
+
+## Gestione MCP
+
+### Pagina Gestione MCP
+
+**GET** `/mcp`
+
+Parametro di query: `beingId` — ID dell'Essere di Silicio (facoltativo, per visualizzare gli Strumenti MCP visibili a quell'Essere)
+
+Restituisce la pagina di gestione dei server MCP.
+
+### Ottieni Elenco dei Server
+
+**GET** `/api/mcp/list-servers`
+
+Restituisce lo stato di tutti i server MCP configurati:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "state": "connected",
+      "enabled": true,
+      "toolCount": 8,
+      "endpoint": null,
+      "lastError": null
+    }
+  ],
+  "mcpEnabled": true,
+  "connected": 1,
+  "toolTotal": 8
+}
+```
+
+Valori di `state`: `connected` / `disconnected` / `connecting` / `error`.
+
+### Ottieni Elenco degli Strumenti del Server
+
+**GET** `/api/mcp/list-tools?serverId={serverId}`
+
+Restituisce gli Strumenti forniti dal server specificato (`name` è il nome completo con prefisso `mcp_{serverId}_{toolName}`, `description`, `schema`). Restituisce un errore se il server non è connesso.
+
+### Aggiungi Server
+
+**POST** `/api/mcp/add-server`
+
+**Corpo della richiesta** (`McpServerConfig`):
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "env": {},
+  "endpoint": null,
+  "enabled": true
+}
+```
+
+`transport` supporta `stdio` (processo locale: `command` + `arguments`) e `http` (endpoint remoto: `endpoint`). L'ID del server consente solo lettere minuscole, numeri e underscore. Dopo l'aggiunta, si connette immediatamente e si sincronizza con tutti gli Esseri di Silicio.
+
+### Abilita/Disabilita Server
+
+**POST** `/api/mcp/toggle`
+
+**Corpo della richiesta**: `{ "serverId": "filesystem", "enabled": true }`
+
+### Elimina Server
+
+**POST** `/api/mcp/remove-server`
+
+**Corpo della richiesta**: `{ "serverId": "filesystem" }`
+
+Elimina la configurazione del server e deregistra i suoi Strumenti da tutti gli Esseri.
+
+### Riconnetti Server
+
+**POST** `/api/mcp/reconnect`
+
+**Corpo della richiesta**: `{ "serverId": "filesystem" }`
+
+Forza la disconnessione e ristabilisce la connessione, aggiornando l'elenco degli Strumenti.
+
+### Test Chiamata Strumento
+
+**POST** `/api/mcp/test-tool`
+
+**Corpo della richiesta**:
+
+```json
+{
+  "serverId": "filesystem",
+  "toolName": "read_file",
+  "argumentsJson": "{ \"path\": \"/data/hello.txt\" }"
+}
+```
+
+Chiama direttamente lo Strumento del server MCP (senza coinvolgimento dell'AI), per verificare la connettività.
+
+---
+
+## Autorizzazione OAuth della Piattaforma IM
+
+### Avvia Autorizzazione
+
+**GET** `/im/{platform}/authorize`
+
+Parametro di percorso: `platform` — identificatore della piattaforma IM (es. `feishu`)
+
+Genera un `state` casuale anti-CSRF, registra una sessione di autorizzazione valida per 5 minuti, restituisce l'URL di autorizzazione e apre automaticamente il browser predefinito di sistema. La riapertura per la stessa piattaforma sovrascrive la sessione precedente.
+
+### Callback di Autorizzazione
+
+**GET** `/im/{platform}/callback?code={code}&state={state}`
+
+Chiamato dal reindirizzamento della piattaforma IM. Dopo la verifica di `state`, utilizza il codice di autorizzazione per ottenere il token di accesso, scrive `accessToken`, `refreshToken`, `tokenExpiresAt`, `authMode=oauth` nella configurazione della piattaforma e li rende persistenti, infine renderizza la pagina dei risultati dell'autorizzazione (successo/fallimento).
+
+### Interroga Stato Autorizzazione
+
+**GET** `/im/{platform}/status`
+
+Restituisce `{ platform, status, tokenExpiresAt }`. Valori di `status`: `pending` / `success` / `failed` / `timeout` / `none`. Il frontend riceve primariamente gli aggiornamenti di stato tramite l'evento SSE `im_auth_status`; questa interfaccia funge da fallback per il polling.
+
+---
+
 ## Sistema di Documentazione di Aiuto
 
 ### Pagina di Aiuto
@@ -1359,6 +1615,22 @@ eventSource.onmessage = (event) => {
       break;
   }
 };
+```
+
+---
+
+### Eventi di Stato Autorizzazione IM
+
+La procedura guidata di autorizzazione OAuth della piattaforma IM invia lo stato tramite una connessione SSE condivisa (nome evento `im_auth_status`):
+
+```javascript
+eventSource.addEventListener('im_auth_status', (event) => {
+  const data = JSON.parse(event.data);
+  // data.platform — identificativo piattaforma (feishu / wecom / dingtalk)
+  // data.status  — pending / success / failed / timeout
+  // data.message — descrizione aggiuntiva
+  updateAuthStatus(data.platform, data.status);
+});
 ```
 
 ---

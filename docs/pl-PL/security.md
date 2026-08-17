@@ -385,3 +385,82 @@ System udostępnia predefiniowane szablony uprawnień zapewniające linię bazow
 - **Granularność operacji** — każda operacja każdego narzędzia jest kontrolowana niezależnie (np. `network:get` dozwolone, ale `network:post` odrzucone)
 - **Zarządzanie przez kuratora** — uprawnieniami narzędzi może zarządzać tylko Kurator Krzemowy
 - **Ślad audytu** — zmiany uprawnień narzędzi są rejestrowane w dzienniku audytu
+
+---
+
+## Bezpieczeństwo umiejętności
+
+System umiejętności wykorzystuje system uprawnień narzędzi i zapewnia wielowarstwowe zabezpieczenia:
+
+### Uprawnienia wykonania
+
+- ID umiejętności służy jako nazwa narzędzia, włączane do macierzy uprawnień `ToolActionPermissionConfig` jako akcja `execute`
+- Wyłączone umiejętności nie pojawiają się w definicjach narzędzi widocznych dla AI (podwójna ochrona: filtrowanie warstwy Schema + weryfikacja w czasie wykonywania)
+- Kurator zawsze może wykonać; zwykłe istoty wymagają `IsActionAllowed(skillId, "execute")`
+
+### Biała lista narzędzi i suma uprawnień
+
+- Podczas wykonywania umiejętności dozwolone są tylko narzędzia z `ToolWhitelist` (pusta lista = dziedziczenie wszystkich narzędzi istoty)
+- Ograniczenia akcji umiejętności i uprawnienia istoty stanowią **ścisłą sumę** (`MergePermissions`): umiejętność może tylko dalej zawężać uprawnienia, nigdy ich nie poszerzać
+- Wywołania narzędzi spoza białej listy kończą się niepowodzeniem (`Tool not in whitelist`)
+
+### Zabezpieczenia zużycia zasobów
+
+- **Globalny przełącznik**: `SkillEnabled` pozwala jednym kliknięciem wyłączyć cały system umiejętności
+- **Limit ilościowy**: liczba umiejętności niestandardowych na istotę jest ograniczona przez `MaxCustomSkillsPerBeing` (domyślnie 50)
+- **Ograniczenie rund**: `maxToolRound = Min(wartość zadeklarowana w umiejętności, GlobalMaxToolRound domyślnie 10)`, zapobiegające niekontrolowanym pętlom
+- **Ograniczenie limitu czasu**: `timeout = Min(wartość zadeklarowana w umiejętności, GlobalSkillTimeoutSeconds domyślnie 300s)`
+- **Ochrona przed rekurencją**: umiejętność nie może wywołać samej siebie podczas wykonywania
+
+### Uprawnienia modyfikacji
+
+- Kurator może modyfikować wszystkie umiejętności; zwykłe istoty mogą modyfikować tylko umiejętności ze źródłem `Being`/`User`
+- Automatyczne uzupełnianie metadanych wypełnia tylko brakujące pola, pola dostarczone przez użytkownika nigdy nie są nadpisywane przez AI
+
+---
+
+## Bezpieczeństwo MCP
+
+Integracja MCP jest zgodna z zasadą „suwerenność użytkownika + spójność uprawnień":
+
+### Suwerenność użytkownika
+
+- Dodawanie, usuwanie, włączanie/wyłączanie i ponowne łączenie serwerów MCP **może być wykonywane tylko przez użytkownika za pomocą Web UI** (/mcp lub strona konfiguracji)
+- Narzędzie `mcp` po stronie AI to zapytanie tylko do odczytu (status/list_servers/list_tools), nie może modyfikować listy serwerów
+- Globalny przełącznik `McpEnabled` pozwala jednym kliknięciem odciąć wszystkie zewnętrzne narzędzia
+
+### Izolacja narzędzi i uprawnienia
+
+- Narzędzia opakowujące są nazwane `mcp_{serverId}_{toolName}`, izolowane przestrzennie od nazw narzędzi wbudowanych/wtyczek
+- Każde narzędzie opakowujące automatycznie deklaruje pojedynczą akcję `execute`, włączaną do dwupoziomowej macierzy uprawnień narzędzi, wyłączalną indywidualnie dla każdej istoty/projektu
+- Po wyłączeniu serwera jego narzędzia są natychmiast wyrejestrowywane ze wszystkich istot
+
+### Granica transportu i procesów
+
+- Serwery `stdio` działają jako procesy potomne, dziedzicząc tylko jawnie skonfigurowane zmienne środowiskowe (pole `env`)
+- Serwery `http` komunikują się przez skonfigurowany endpoint, w przypadku niepowodzenia połączenia automatycznie przechodzą w stan error i udostępniają `lastError`
+
+---
+
+## Bezpieczeństwo kluczy IM
+
+### Placeholdery zmiennych środowiskowych
+
+Wartości konfiguracyjne platform IM obsługują placeholdery `${ENV_VAR}` (np. `"${FEISHU_APP_SECRET}"`):
+
+- `ConfigSecretResolver` rozwiązuje placeholdery na **kopii głębokiej**, oryginalny `config.json` zawsze zachowuje placeholdery w oryginalnej postaci
+- Kolejne `SaveConfig` nie zapisuje na dysku rozwiązanego klucza w postaci jawnej
+- Obsługa placeholderów całowartościowych i placeholderów osadzonych w wartości (np. `prefix-${VAR}`)
+
+### Bezpieczeństwo autoryzacji OAuth
+
+- **state ochrona przed CSRF**: 16-bajtowa kryptograficzna liczba losowa, ścisła weryfikacja podczas wywołania zwrotnego
+- **5-minutowy limit czasu**: sesja autoryzacji automatycznie traci ważność po przekroczeniu limitu czasu, stare sesje są natychmiast anulowane po nadpisaniu
+- **Przechowywanie tokenów**: accessToken/refreshToken/tokenExpiresAt są zapisywane w konfiguracji platformy i utrwalane, `authMode` oznaczane jako `oauth`
+- URL wywołania zwrotnego obsługuje konfigurację `redirectBaseUrl` (scenariusze publicznego wywołania zwrotnego)
+
+### Bezpieczeństwo wiadomości
+
+- Feishu: weryfikacja podpisu (`X-Lark-Signature`, SHA256) + odszyfrowywanie zdarzeń AES-256-CBC + deduplikacja zdarzeń (okno 10 minut)
+- WeChat Enterprise: szyfrowanie/deszyfrowanie i weryfikacja podpisu WXBizMsgCrypt
+- DingTalk: tryb Stream korzysta z szyfrowanego WebSocket; tryb HTTP weryfikuje wywołanie zwrotne

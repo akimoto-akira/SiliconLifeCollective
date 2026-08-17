@@ -368,6 +368,116 @@ Plugin load failed: Security check failed
 
 ---
 
+### Problemas de Competências
+
+#### Problema: A competência não aparece na lista de competências ou não é visível para a IA
+
+**Sintomas**:
+- A página de competências da Web UI guarda com sucesso, mas a lista não exibe / a IA não invoca a competência
+
+**Solução**:
+1. Verificar se `id` e `description` da competência não estão vazios (rascunhos não são expostos à IA)
+2. Competências com metadados incompletos (`NeedsCompletion`) não são injectadas na IA — preencha os metadados YAML frontmatter ou deixe a IA preencher antes de guardar
+3. Verificar se a matriz de permissões desactiva `{skillId}:execute` (competências desactivadas são invisíveis para a IA)
+4. Confirmar que o interruptor global `SkillEnabled` está definido como true
+5. O hot reload demora até 30 segundos a surtir efeito; aguarde e actualize ou reinicie
+
+#### Problema: A execução da competência falha com "not in whitelist"
+
+**Sintomas**:
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**Solução**:
+- Adicionar a ferramenta à `tool_whitelist` da competência, ou limpar a lista de permissões para herdar todas as ferramentas do being
+
+#### Problema: Limite de número de competências atingido
+
+**Sintomas**:
+```
+Custom skill limit reached (50)
+```
+
+**Solução**:
+1. Eliminar competências personalizadas que já não são necessárias
+2. Ou aumentar a configuração `MaxCustomSkillsPerBeing`
+
+---
+
+### Problemas de MCP
+
+#### Problema: Falha na ligação ao servidor MCP
+
+**Sintomas**:
+- O estado do servidor mostra `error` ou `disconnected`, `lastError` não está vazio
+
+**Solução**:
+1. Servidor stdio: confirmar que `command` é executável (ex.: `npx` no PATH), `arguments` correctos
+2. Servidor http: verificar se o URL `endpoint` é alcançável (firewall, proxy)
+3. Clicar em **Reconectar** na página /mcp
+4. Consultar os detalhes de `lastError`; causas comuns incluem comando inexistente, versão incompatível, endpoint 404
+
+#### Problema: Ferramentas MCP não injectadas no being
+
+**Sintomas**:
+- O servidor está ligado (`connected`) mas a IA não consegue invocar a ferramenta `mcp_xxx_yyy`
+
+**Solução**:
+1. Confirmar que `enabled` do servidor está como true
+2. Confirmar que o interruptor global `McpEnabled` está como true
+3. Verificar a matriz de permissões: `mcp_{serverId}_{toolName}:execute` está desactivado?
+4. Na conversa do being, pode usar a ferramenta `mcp` (`list_tools`) para verificar os nomes das ferramentas efectivamente injectadas
+
+#### Problema: Adicionar servidor retorna erro de formato de ID
+
+**Sintomas**:
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**Solução**:
+- O ID do servidor só permite letras minúsculas, dígitos e sublinhados (ex.: `filesystem`, `github_tools`)
+
+---
+
+### Problemas de Plataformas IM
+
+#### Problema: Mensagens do Feishu não recebidas
+
+**Solução**:
+1. Verificar a configuração da subscrição de eventos da plataforma Feishu Open — endereço de callback e porta (`listenPort` + `callbackPath`)
+2. Confirmar que a `Encrypt Key` / `Verification Token` corresponde à configuração
+3. Para desenvolvimento local, pode usar o assistente de autorização OAuth (autorização com um clique na página de configuração); o callback de eventos requer acessibilidade pública ou túnel de intranet
+4. Consultar erros de verificação de assinatura / desencriptação nos registos
+
+#### Problema: Timeout da autorização OAuth
+
+**Sintomas**:
+- A página de autorização mostra o estado `timeout`
+
+**Solução**:
+1. A sessão de autorização é válida por 5 minutos; após o timeout, clicar novamente no botão de autorização
+2. Confirmar que o endereço de callback `/im/feishu/callback` é acessível pelo Feishu (configuração `redirectBaseUrl` correcta)
+3. A apresentação do estado no frontend depende do SSE; se o SSE se desligar, pode usar polling de `/im/{platform}/status` como fallback
+
+#### Problema: Marcador `${ENV_VAR}` não resolvido
+
+**Sintomas**:
+- A ligação da plataforma IM falha; o valor de configuração ainda é texto do marcador
+
+**Solução**:
+1. Confirmar que a variável de ambiente foi definida antes de iniciar o processo (reiniciar a aplicação para entrar em vigor)
+2. Verificar a ortografia do nome da variável (apenas `[A-Za-z_][A-Za-z0-9_]*` é suportado)
+3. Nota: manter os marcadores no config.json é um comportamento de desenho; a resolução ocorre numa cópia em memória
+
+#### Problema: Apenas uma de múltiplas plataformas IM recebe mensagens
+
+**Solução**:
+- As mensagens de saída são difundidas para todas as plataformas activas; falhas de envio numa única plataforma são isoladas silenciosamente — verifique se o token dessa plataforma expirou (reautorizar ou actualizar a chave)
+
+---
+
 ### Problemas de Notas de Trabalho
 
 #### Problema: Não é possível criar notas de trabalho

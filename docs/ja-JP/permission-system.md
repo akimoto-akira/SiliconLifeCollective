@@ -105,7 +105,7 @@ if (IsCurator)
     if (_askHandler != null)
     {
         AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
-        // 用户在 Web UI 中确认或拒绝
+        // ユーザーが Web UI で確認または拒否
     }
 }
 ```
@@ -159,10 +159,10 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 {
     public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        // 通过即时通讯向用户发送消息
+        // IM 経由でユーザーにメッセージを送信
         SendMessageAsync($"Allow {resource}?");
 
-        // 等待用户响应
+        // ユーザー応答を待機
         var response = WaitForResponseAsync();
 
         return response.Approved 
@@ -313,6 +313,42 @@ Web UI でツールパーミッションを管理：
 | `/api/projects/{id}/tool-permissions` | GET | プロジェクトツールパーミッションの取得 |
 | `/api/projects/{id}/tool-permissions` | PUT | プロジェクトツールパーミッションの更新 |
 
+### スキルのアクションパーミッション
+
+スキルはツールアクションパーミッション機構を再利用します：スキル id をツール名とし、アクションは `execute` とします。
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- 無効化されたスキルは AI から見えるツール定義に表示されません（AI はそれを「見る」ことができません）
+- スキル実行時にランタイム再チェックがあり、古い Schema でもバイパスできません
+- スキル内部のツールパーミッション = ビーイングパーミッション ∪ スキル自身の制限（厳格側の和集合、狭くすることはできても権限を広げることはできません）
+
+### MCP ラップツールのアクションパーミッション
+
+各 MCP サーバーが注入するラップツール（`mcp_{serverId}_{toolName}`）は自動的に単一の `execute` アクションを宣言します：
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- ビーイングまたはプロジェクト単位で外部ツールの可用性を精密に制御可能
+- あるサーバーの全 `execute` アクションが無効化されると、そのツールは AI から見える Schema から全体が削除されます
+- サーバーの無効化/削除（Web UI 操作）は即座にその全ツールを登録解除します
+
 ---
 
 ## ベストプラクティス
@@ -347,13 +383,13 @@ Web UI でツールパーミッションを管理：
 ```csharp
 public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
-    // 基于时间的权限
+    // 時間ベースのパーミッション
     if (IsOutsideBusinessHours())
     {
         return PermissionResult.Denied;
     }
     
-    // 基于资源的权限
+    // リソースベースのパーミッション
     if (IsSensitiveResource(resource))
     {
         return PermissionResult.AskUser;

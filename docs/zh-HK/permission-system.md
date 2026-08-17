@@ -85,7 +85,7 @@ public class DefaultPermissionCallback : IPermissionCallback
         {
             return PermissionResult.Allowed;
         }
-
+        
         return PermissionResult.AskUser;
     }
 }
@@ -165,7 +165,7 @@ public class IMPermissionAskHandler : IPermissionAskHandler
         // 等待使用者回應
         var response = WaitForResponseAsync();
 
-        return response.Approved
+        return response.Approved 
             ? AskPermissionResult.Approved()
             : AskPermissionResult.Denied();
     }
@@ -287,9 +287,9 @@ curl http://localhost:8080/api/permissions/list
 }
 ```
 
-### 權限模板
+### 權限範本
 
-系統提供預先定義的工具權限模板，可快速套用到矽基生命體：
+系統提供預先定義的工具權限範本，可快速套用到矽基生命體：
 
 - **readonly** — 唯讀權限（允許讀取操作，拒絕寫入操作）
 - **full** — 完整權限（允許所有操作）
@@ -308,10 +308,46 @@ curl http://localhost:8080/api/permissions/list
 |------|------|------|
 | `/api/beings/tool-permissions` | GET | 取得矽基生命體工具權限 |
 | `/api/beings/tool-permissions` | PUT | 更新矽基生命體工具權限 |
-| `/api/beings/tool-permissions/templates` | GET | 取得權限模板清單 |
-| `/api/beings/tool-permissions/apply-template` | POST | 套用權限模板 |
+| `/api/beings/tool-permissions/templates` | GET | 取得權限範本清單 |
+| `/api/beings/tool-permissions/apply-template` | POST | 套用權限範本 |
 | `/api/projects/{id}/tool-permissions` | GET | 取得專案工具權限 |
 | `/api/projects/{id}/tool-permissions` | PUT | 更新專案工具權限 |
+
+### 技能的動作權限
+
+技能複用工具動作權限機制：技能 id 作為工具名，動作為 `execute`。
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- 被停用的技能不會出現在 AI 可見的工具定義中（AI 根本"看不見"它）
+- 技能執行時還有執行階段複核，即使陳舊的 Schema 也無法繞過
+- 技能內部的工具權限 = 生命體權限 ∪ 技能自身限制（嚴格側聯集，只能收窄不能放權）
+
+### MCP 包裝工具的動作權限
+
+每個 MCP 伺服器注入的包裝工具（`mcp_{serverId}_{toolName}`）自動宣告單一 `execute` 動作：
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- 可按生命體或專案精確控制外部工具的可用性
+- 某伺服器的全部 `execute` 動作都被停用時，該工具從 AI 可見的 Schema 中整體移除
+- 停用/刪除伺服器（Web UI 操作）會立即註銷其所有工具
 
 ---
 
@@ -352,13 +388,13 @@ public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, s
     {
         return PermissionResult.Denied;
     }
-
+    
     // 基於資源的權限
     if (IsSensitiveResource(resource))
     {
         return PermissionResult.AskUser;
     }
-
+    
     return PermissionResult.Allowed;
 }
 ```

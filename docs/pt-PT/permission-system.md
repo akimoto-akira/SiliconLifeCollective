@@ -313,6 +313,42 @@ Gerir permissões de ferramentas através da Web UI:
 | `/api/projects/{id}/tool-permissions` | GET | Obter permissões de ferramentas do projecto |
 | `/api/projects/{id}/tool-permissions` | PUT | Actualizar permissões de ferramentas do projecto |
 
+### Permissões de Ações de Competências
+
+As competências reutilizam o mecanismo de permissões de ações de ferramentas: o id da competência é usado como nome da ferramenta, e a ação é `execute`.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- As competências desactivadas não aparecem na definição de ferramentas visíveis para a IA (a IA não as "vê")
+- A execução de competências tem uma verificação adicional em tempo de execução; mesmo esquemas desactualizados não a podem contornar
+- As permissões de ferramentas internas da competência = permissões do ser ∪ restrições da própria competência (intersecção do lado restritivo; só pode restringir, nunca conceder)
+
+### Permissões de Ações de Ferramentas MCP Empacotadas
+
+Cada ferramenta empacotada injectada por um servidor MCP (`mcp_{serverId}_{toolName}`) declara automaticamente uma única ação `execute`:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- Pode controlar precisamente a disponibilidade de ferramentas externas por ser ou por projecto
+- Quando todas as ações `execute` de um servidor são negadas, a ferramenta é removida integralmente do esquema visível para a IA
+- Desactivar/eliminar um servidor (operação na Web UI) cancela imediatamente o registo de todas as suas ferramentas
+
 ---
 
 ## Melhores Práticas

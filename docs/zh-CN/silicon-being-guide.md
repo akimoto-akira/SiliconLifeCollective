@@ -188,6 +188,78 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
+## 技能系统
+
+技能（Skill）是硅基生命体的可复用能力单元——把"工具编排 + 提示词模板"封装成一个可声明、可进化、可自动调度的函数，AI 像调用普通工具一样调用技能。
+
+### 技能结构
+
+| 要素 | 说明 |
+|------|------|
+| `id` / `description` | 唯一标识与一句话描述（展示给 AI，决定 AI 何时选用该技能） |
+| `parameter_schema` | 参数 JSON Schema，声明提示词中使用的每个 `{param}` 占位符 |
+| `system_prompt_template` | 系统提示词模板，执行时用参数填充占位符 |
+| `tool_whitelist` | 执行期间允许的工具列表（空 = 继承生命体全部工具） |
+| `max_tool_round` / `timeout` | 工具轮数与超时上限（受全局上限钳制） |
+| `on_complete` | 完成动作：`none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual`（AI 自主调用）或 `Auto` + `schedule` 调度 |
+
+### 四种来源
+
+- **Builtin** — 框架内置（`summarize_document` 文档摘要、`code_review` 代码审查、`research_topic` 主题调研）
+- **Plugin** — 插件通过 `ISkillProvider` 注册
+- **Being** — 生命体运行时通过 `skill` 工具自建
+- **User** — 用户通过 Web UI 技能管理页面创建
+
+### 触发方式
+
+1. **手动（Manual）**：技能以普通工具定义注入 AI 请求，AI 判断何时调用；调度侧优先将同名调用路由到技能
+2. **自动（Auto + schedule）**：调度表达式存于 `metadata.schedule`，支持三种格式：
+   - `"09:30"` — 每日定点
+   - `"6h"` / `"30 m"` / `"2 d"` — 间隔周期
+   - `"0 9 * * *"` / `"*/15 * * * *"` — cron 子集
+
+### Markdown 编写
+
+技能以 Markdown 存储（`skills/{id}.md`，YAML 前置元数据 + 提示词正文）：
+
+```markdown
+---
+id: daily_news_digest
+description: 搜索今日科技新闻并生成摘要
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+请使用 network 工具搜索 {topic} 的最新新闻，生成 500 字摘要并保存到工作笔记。
+```
+
+只写正文（省略 YAML）也可以：保存时 AI 会自动补全 id、description、参数 schema 等元数据——用户已填写的字段永不被覆盖。
+
+### 生命体自管理
+
+生命体可通过 `skill` 工具管理自己的技能库：
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### 热重载与进化
+
+- 生命体每 30 秒检测 `skills/` 目录变更（指纹比对），Web UI 或其他生命体的修改自动生效，无需重启
+- 每次技能更新自动归档历史版本到 `skills/archive/{id}/{version}.md`，形成技能进化史
+- 自定义技能数量受配额限制（`MaxCustomSkillsPerBeing`，默认 50）
+
+### 执行护栏
+
+- 技能级 `execute` 动作权限（可被权限矩阵禁用，禁用后 AI 不可见）
+- 执行参数被全局上限钳制：轮数 ≤ `GlobalMaxToolRound`（默认 10），超时 ≤ `GlobalSkillTimeoutSeconds`（默认 300 秒）
+- 技能不能递归调用自身
+- 白名单外工具调用直接失败
+
 ## 记忆系统
 
 ### 记忆类型

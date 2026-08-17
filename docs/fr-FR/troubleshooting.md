@@ -74,7 +74,7 @@ ollama pull qwen2.5:7b
 ollama list
 ```
 
-#### Problème : Erreur 404 DashScope (百炼)
+#### Problème : Erreur 404 DashScope (Bailian)
 
 **Symptômes** :
 ```
@@ -87,7 +87,7 @@ HTTP 404: Model not found
 3. Vérifier que le point de terminaison régional est correct
 4. Vérifier que le compte a accès au modèle
 
-#### Problème : Échec de connexion Volcengine Ark (火山引擎)
+#### Problème : Échec de connexion Volcengine Ark
 
 **Symptômes** :
 ```
@@ -461,6 +461,116 @@ Plugin load failed: Security check failed
 2. Vérifier que la classe d'outil est publique
 3. Vérifier que `ToolManager.ScanAllPluginAssemblies()` est appelé
 4. Reconstruire le plugin et redémarrer l'application
+
+---
+
+### Problèmes avec les Compétences
+
+#### Problème : La compétence n'apparaît pas dans la liste des compétences ou n'est pas visible par l'IA
+
+**Symptômes** :
+- La page des compétences de l'UI Web enregistre avec succès, mais la liste ne l'affiche pas / l'IA n'appelle pas la compétence
+
+**Solution** :
+1. Vérifier que l'`id` et la `description` de la compétence ne sont pas vides (les brouillons ne sont pas exposés à l'IA)
+2. Les compétences dont les métadonnées sont incomplètes (`NeedsCompletion`) ne sont pas injectées dans l'IA — compléter les métadonnées du front-matter YAML ou laisser l'IA les compléter avant de sauvegarder
+3. Vérifier si la matrice d'autorisations a désactivé `{skillId}:execute` (les compétences désactivées sont invisibles pour l'IA)
+4. Confirmer que le commutateur global `SkillEnabled` est à true
+5. Le rechargement à chaud prend au maximum 30 secondes pour prendre effet, attendre puis rafraîchir ou redémarrer
+
+#### Problème : Échec de l'exécution de la compétence avec le message "not in whitelist"
+
+**Symptômes** :
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**Solution** :
+- Ajouter l'outil à la `tool_whitelist` de la compétence, ou vider la liste blanche pour hériter de tous les outils de l'Être de Silicium
+
+#### Problème : Limite du nombre de compétences atteinte
+
+**Symptômes** :
+```
+Custom skill limit reached (50)
+```
+
+**Solution** :
+1. Supprimer les compétences personnalisées inutilisées
+2. Ou augmenter la configuration `MaxCustomSkillsPerBeing`
+
+---
+
+### Problèmes MCP
+
+#### Problème : Échec de connexion au serveur MCP
+
+**Symptômes** :
+- Le statut du serveur affiche `error` ou `disconnected`, `lastError` n'est pas vide
+
+**Solution** :
+1. Serveur stdio : confirmer que `command` est exécutable (ex. : `npx` dans le PATH), `arguments` corrects
+2. Serveur http : vérifier que l'URL `endpoint` est accessible (pare-feu, proxy)
+3. Cliquer sur **Reconnecter** sur la page /mcp
+4. Consulter les détails de `lastError`, les causes courantes étant : commande inexistante, version incompatible, point de terminaison 404
+
+#### Problème : Les outils MCP ne sont pas injectés dans l'Être de Silicium
+
+**Symptômes** :
+- Le serveur est connecté (`connected`) mais l'IA ne peut pas appeler l'outil `mcp_xxx_yyy`
+
+**Solution** :
+1. Confirmer que `enabled` du serveur est à true
+2. Confirmer que le commutateur global `McpEnabled` est à true
+3. Vérifier la matrice d'autorisations : `mcp_{serverId}_{toolName}:execute` n'est pas désactivé
+4. Dans la conversation de l'Être de Silicium, utiliser l'outil `mcp` (`list_tools`) pour vérifier les noms d'outils réellement injectés
+
+#### Problème : L'ajout de serveur renvoie une erreur de format d'ID
+
+**Symptômes** :
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**Solution** :
+- L'ID du serveur ne permet que les minuscules, les chiffres et les tirets bas (ex. : `filesystem`, `github_tools`)
+
+---
+
+### Problèmes avec la Plateforme IM
+
+#### Problème : Les messages Feishu ne sont pas reçus
+
+**Solution** :
+1. Vérifier l'adresse de rappel et le port configurés dans l'abonnement aux événements de la plateforme ouverte Feishu (`listenPort` + `callbackPath`)
+2. Confirmer que l'`Encrypt Key` / `Verification Token` correspond à la configuration
+3. En développement local, l'assistant d'autorisation OAuth peut être utilisé (autorisation en un clic sur la page de configuration) ; le rappel d'événements nécessite un accès au réseau public ou un tunneling
+4. Consulter les journaux pour les erreurs de vérification de signature / déchiffrement
+
+#### Problème : Délai d'expiration de l'autorisation OAuth
+
+**Symptômes** :
+- La page d'autorisation affiche le statut `timeout`
+
+**Solution** :
+1. La session d'autorisation est valide 5 minutes, après expiration cliquer à nouveau sur le bouton d'autorisation
+2. Confirmer que l'adresse de rappel `/im/feishu/callback` est accessible par Feishu (`redirectBaseUrl` configuré correctement)
+3. L'affichage de l'état côté front-end dépend de SSE, en cas de déconnexion SSE, le sondage `/im/{platform}/status` peut servir de solution de repli
+
+#### Problème : L'espace réservé `${ENV_VAR}` n'est pas résolu
+
+**Symptômes** :
+- La connexion à la plateforme IM échoue, la valeur de configuration est toujours le texte de l'espace réservé
+
+**Solution** :
+1. Confirmer que la variable d'environnement a été définie avant le démarrage du processus (redémarrer l'application pour prise en compte)
+2. Vérifier l'orthographe du nom de variable (seuls `[A-Za-z_][A-Za-z0-9_]*` sont pris en charge)
+3. Note : conserver les espaces réservés dans config.json est un comportement de conception, la résolution se fait sur la copie en mémoire
+
+#### Problème : Un seul des plusieurs plateformes IM reçoit les messages
+
+**Solution** :
+- Les messages sortants sont diffusés vers toutes les plateformes activées, l'échec d'envoi sur une plateforme est isolé silencieusement — vérifier si le jeton de cette plateforme a expiré (réautoriser ou mettre à jour la clé)
 
 ---
 

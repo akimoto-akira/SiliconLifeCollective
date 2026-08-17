@@ -17,13 +17,13 @@ Výchozí URL: `http://localhost:8080`
 ### Hlavní sekce
 
 1. **Řídicí panel** - Přehled systému a metriky
-2. **Bytosti** - Správa Křemíkových Bytostí
+2. **Bytosti** - Správa Křemíkových Bytostí (včetně správy dovedností, konfigurace AI, Souboru Duše)
 3. **Chat** - Interakce s bytostmi (podpora nahrávání souborů, SSE v reálném čase)
 4. **Historie chatu** - Zobrazení historie chatu Křemíkových Bytostí (seznam relací, detaily zpráv)
 5. **Úkoly** - Správa úkolů (osobní úkoly)
 6. **Časovače** - Konfigurace časovačů (vytvoření, pozastavení, historie provádění)
-7. **Konfigurace** - Nastavení systému (AI klienti, lokalizace)
-8. **Oprávnění** - Řízení přístupu (správa ACL, dotazy na oprávnění)
+7. **Konfigurace** - Nastavení systému (AI klienti, IM platforma více instancí, MCP servery, lokalizace)
+8. **Oprávnění** - Řízení přístupu (správa ACL, dotazy na oprávnění, oprávnění akcí nástrojů)
 9. **Protokoly** - Systémové protokoly (filtrování podle úrovně, dotazy na časové rozsahy)
 10. **Audit** - Využití Tokenů a auditní stopa
 11. **Paměť** - Paměť bytostí (časová osa, pokročilé filtrování)
@@ -32,8 +32,9 @@ Výchozí URL: `http://localhost:8080`
 14. **Editor kódu** - Editace kódu s plovoucími tipy (Monaco Editor)
 15. **Projekty** - Správa projektů (pracovní prostor, úkoly, pracovní poznámky)
 16. **Exekutoři** - Správa exekutorů (disk, síť, příkazový řádek)
-17. **Nápověda** - Systém dokumentace nápovědy (vícejazyčná podpora, vyhledávání témat)
-18. **O projektu** - Informace o systému a verze
+17. **MCP** - Správa MCP serverů (přidání, spuštění/zastavení, znovupřipojení, testování)
+18. **Nápověda** - Systém dokumentace nápovědy (vícejazyčná podpora, vyhledávání témat)
+19. **O projektu** - Informace o systému a verze
 
 ---
 
@@ -135,6 +136,26 @@ Konfigurace AI backendu:
 - Moonshot / Kimi (cloud, thinking, multimodální, 262K kontext)
 - SiliconFlow (cloud, agregátor 100+ modelů, 1M kontext)
 - Vlastní klienti
+
+### IM platforma (více instancí)
+
+Konfigurace IM platformy podporuje architekturu více instancí, umožňující souběžné povolení více platforem:
+
+1. Klikněte na **Přidat platformu** a vyberte typ platformy:
+   - **Web UI** (vestavěné, ve výchozím stavu povoleno)
+   - **Feishu** (podpora ruční konfigurace a OAuth jednorázového autorizačního průvodce)
+   - **WeChat Enterprise** (ruční konfigurace)
+   - **DingTalk** (ruční konfigurace, podpora Stream / HTTP dvou režimů událostí)
+2. Vyplňte pole platformy podle dynamického formuláře (povinná pole jsou označena hvězdičkou, pole s tajnými klíči jsou heslové)
+3. Každou instanci lze nezávisle povolit/zakázat a odstranit
+
+**Proměnné prostředí pro tajné klíče**: Konfigurační hodnoty podporují `${ENV_VAR}` zástupné symboly (např. `"${FEISHU_APP_SECRET}"`), které jsou za běhu řešeny z proměnných prostředí, tajné klíče v prostém textu nejsou zapisovány do config.json.
+
+**Průvodce OAuth autorizací** (Feishu): Po uložení appId/appSecret se na konfigurační stránce objeví vložená autorizační oblast, kliknutí na tlačítko **Autorizovat** otevře systémový prohlížeč a přesměruje na autorizační stránku Feishu; po dokončení autorizace je token automaticky zapsán zpět do konfigurace, stránka prostřednictvím SSE v reálném čase zobrazuje stav autorizace (úspěch/selhání/timeout), bez nutnosti ručního kopírování a vkládání.
+
+### MCP servery
+
+Seznam MCP serverů je centralizovaně spravován na konfigurační stránce (editor polí): jeden server na řádek (ID, název, způsob přenosu stdio/http, příkaz nebo koncový bod, stav povolení), s podporou vloženého **přidání** a **odstranění**. Po uložení se server okamžitě připojí a jeho nástroje jsou automaticky injektovány do Křemíkových Bytostí. Viz následující sekce [Správa MCP](#správa-mcp).
 
 ### Nastavení úložiště
 
@@ -521,6 +542,104 @@ Osobní pracovní poznámky Křemíkové Bytosti, podobné deníku:
   - `/api/worknotes/search?q=keyword` - Vyhledávání poznámek
   - `/api/worknotes/directory` - Generování obsahu poznámek
   - `/api/projects` - API správy projektů
+
+---
+
+## Správa dovedností
+
+### Přehled funkcí
+
+Dovednost (Skill) je opakovatelně použitelná jednotka schopností "orchestrace nástrojů + šablona výzev". Stránka správy dovedností (`/skill?beingId={id}`) poskytuje vizuální správu dovedností pro každou Křemíkovou Bytost.
+
+### Rozložení stránky
+
+- **Seznam dovedností vlevo**: zobrazení v kartách (název, `verze · zdroj · spouštěč` odznaky, popis)
+- **Editor vpravo**: Markdown editor (YAML front matter metadata + tělo výzvy)
+- **Statistika nahoře**: celkový počet dovedností / počet vlastních dovedností / limit kvóty (např. `5 / 2 / 50`)
+
+### Operace panelu nástrojů
+
+- **Nový**: Načtení šablony dovednosti Markdown
+- **Import .md / Import .json**: Import dovednosti z lokálního souboru
+- **Obnovit**: Znovu načtení seznamu dovedností
+
+### Operace karty dovednosti
+
+Každá karta dovednosti poskytuje 5 operací:
+
+| Operace | Popis |
+|----------|------|
+| Upravit | Otevře Markdown v pravém editoru, lze uložit (upsert) |
+| Testovat | Zadání parametrů JSON, okamžité provedení dovednosti a zobrazení výsledku |
+| Export JSON | Stažení `{id}.json` |
+| Export Markdown | Stažení `{id}.md` |
+| Odstranit | Odstranění dovednosti (včetně perzistentních souborů) |
+
+### Psaní dovedností
+
+Dovednosti jsou psány v Markdownu, YAML front matter deklaruje id, popis, schéma parametrů, whitelist nástrojů, spouštěč atd.; tělo je šablona výzvy (podpora `{param}` zástupných symbolů). Lze psát pouze tělo (vynechání YAML) — při uložení AI automaticky doplní chybějící metadata a uživatelem poskytnutá pole nejsou nikdy přepsána.
+
+```markdown
+---
+id: daily_news_digest
+description: Vyhledat dnešní technologické zprávy a vygenerovat shrnutí
+tool_whitelist: [network, work_note]
+trigger_mode: Auto
+metadata:
+  schedule: "0 9 * * *"
+---
+
+Použijte nástroj network k vyhledání nejnovějších zpráv o {topic}, vygenerujte 500znakové shrnutí a uložte jej do pracovních poznámek.
+```
+
+### Technická implementace
+
+- **Kontroler**: `SkillController` (stránka + 10 API koncových bodů)
+- **Jádro**: `SkillManager` (registrace/provádění/hot reload), `SkillMetadataCompleter` (doplnění AI metadat)
+- **Hot reload**: Bytost každých 30 sekund kontroluje změny adresáře `skills/`, po uložení z Web UI není nutný restart
+- **Archivace verzí**: Každá aktualizace je automaticky archivována do `skills/archive/{id}/{version}.md`
+
+---
+
+## Správa MCP
+
+### Přehled funkcí
+
+Stránka správy MCP (Model Context Protocol, protokol kontextu modelu) (`/mcp`) slouží ke správě připojení k externím MCP serverům. Po připojení jsou nástroje poskytované serverem automaticky injektovány do všech Křemíkových Bytostí ve formátu `mcp_{serverId}_{toolName}`.
+
+### Seznam serverů
+
+Zobrazuje pro každý server: ID, název, způsob přenosu (stdio/http), stav připojení (connected/disconnected/connecting/error), stav povolení, počet nástrojů, poslední chyba.
+
+### Operace správy
+
+| Operace | Popis |
+|----------|------|
+| Přidat server | Vyplnění ID (malá písmena/číslice/podtržítko), názvu, způsobu přenosu; stdio vyžaduje příkaz a argumenty, http vyžaduje URL koncového bodu |
+| Povolit/Zakázat | Vložený přepínač, po zákazu jsou nástroje odhlášeny ze všech bytostí |
+| Znovu připojit | Odpojení a znovupřipojení, obnovení seznamu nástrojů |
+| Odstranit | Odebrání konfigurace serveru a všech jeho nástrojů |
+| Zobrazit nástroje | Rozbalení serveru, výpis názvů nástrojů (s předponou), popis, schéma parametrů |
+| Testovat nástroj | Přímé volání konkrétního MCP nástroje pro ověření konektivity (bez účasti AI) |
+
+### Příklad přidání stdio serveru
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "enabled": true
+}
+```
+
+### Bezpečnostní mechanismy
+
+- Přidávání/odstraňování/spouštění/zastavování serverů může provádět pouze uživatel prostřednictvím Web UI, AI nemůže upravovat seznam serverů (nástroj `mcp` poskytuje pouze dotazy pro čtení)
+- MCP obalové nástroje se v matrici oprávnění nástrojů prezentují jako jediná `execute` akce, lze je individuálně zakázat podle bytosti/projektu
+- Globální přepínač `McpEnabled` může jedním kliknutím vypnout celou MCP integraci
 
 ---
 

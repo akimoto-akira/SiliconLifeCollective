@@ -12,16 +12,17 @@ The permission system ensures all AI-initiated operations are properly validated
 
 ```
 ┌─────────────────────────────────────────────┐
-│          权限验证                            │
+│          Permission Verification            │
 ├─────────────────────────────────────────────┤
-│  级别 1：UserFrequencyCache                  │
-│  ↓ 高频用户决策缓存（HighDeny/HighAllow）    │
-│  级别 2：IPermissionCallback                 │
-│  ↓ 自定义逻辑（Allowed/Denied/AskUser）     │
-│  级别 3：IsCurator?                          │
-│  ↓ 是 → IPermissionAskHandler（询问用户）    │
-│  ↓ 否 → GlobalACL → 默认拒绝                │
-│  结果：允许或拒绝                            │
+│  Level 1: UserFrequencyCache                │
+│  ↓ High-frequency user decision cache       │
+│    (HighDeny/HighAllow)                     │
+│  Level 2: IPermissionCallback               │
+│  ↓ Custom logic (Allowed/Denied/AskUser)    │
+│  Level 3: IsCurator?                        │
+│  ↓ Yes → IPermissionAskHandler (ask user)   │
+│  ↓ No → GlobalACL → default deny            │
+│  Result: Allow or Deny                      │
 └─────────────────────────────────────────────┘
 ```
 
@@ -105,7 +106,7 @@ if (IsCurator)
     if (_askHandler != null)
     {
         AskPermissionResult userDecision = _askHandler.AskUser(callerId, permissionType, resource);
-        // 用户在 Web UI 中确认或拒绝
+        // User confirms or denies in Web UI
     }
 }
 ```
@@ -140,7 +141,7 @@ Rules are evaluated in order; the first matching rule takes effect. Only the Sil
 ```
 {type}:{path}
 
-示例：
+Example:
 - network:api.github.com
 - file:C:\\Windows
 - cli:rm -rf
@@ -159,10 +160,10 @@ public class IMPermissionAskHandler : IPermissionAskHandler
 {
     public AskPermissionResult AskUser(Guid callerId, PermissionType permissionType, string resource)
     {
-        // 通过即时通讯向用户发送消息
+        // Send message to user via IM
         SendMessageAsync($"Allow {resource}?");
 
-        // 等待用户响应
+        // Wait for user response
         var response = WaitForResponseAsync();
 
         return response.Approved 
@@ -313,6 +314,42 @@ Manage tool permissions via the Web UI:
 | `/api/projects/{id}/tool-permissions` | GET | Get project tool permissions |
 | `/api/projects/{id}/tool-permissions` | PUT | Update project tool permissions |
 
+### Skill Action Permissions
+
+Skills reuse the tool action permission mechanism: the skill id serves as the tool name, with `execute` as the action.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- Disabled skills do not appear in AI-visible tool definitions (the AI cannot "see" them at all)
+- Skill execution has runtime re-checks; even stale schemas cannot bypass permissions
+- Tool permissions within a skill = being permissions ∪ skill's own restrictions (strict-side union, can only narrow, never expand)
+
+### MCP Wrapper Tool Action Permissions
+
+Each wrapper tool injected by an MCP server (`mcp_{serverId}_{toolName}`) automatically declares a single `execute` action:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- Precisely control external tool availability per being or project
+- When all `execute` actions of a server are disabled, the tool is entirely removed from the AI-visible schema
+- Disabling/deleting a server (Web UI operation) immediately unregisters all its tools
+
 ---
 
 ## Best Practices
@@ -347,13 +384,13 @@ For complex logic, use `IPermissionCallback`:
 ```csharp
 public PermissionResult Evaluate(Guid callerId, PermissionType permissionType, string resource)
 {
-    // 基于时间的权限
+    // Time-based permission
     if (IsOutsideBusinessHours())
     {
         return PermissionResult.Denied;
     }
     
-    // 基于资源的权限
+    // Resource-based permission
     if (IsSensitiveResource(resource))
     {
         return PermissionResult.AskUser;

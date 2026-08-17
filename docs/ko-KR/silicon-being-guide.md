@@ -188,6 +188,78 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
+## 스킬 시스템
+
+스킬(Skill)은 실리콘 비잉의 재사용 가능한 능력 단위입니다 —— "툴 오케스트레이션 + 프롬프트 템플릿"을 선언 가능하고, 진화 가능하며, 자동 스케줄링 가능한 함수로 캡슐화하여, AI가 일반 툴을 호출하는 것처럼 스킬을 호출합니다.
+
+### 스킬 구조
+
+| 요소 | 설명 |
+|------|------|
+| `id` / `description` | 고유 식별자와 한 줄 설명(AI에게 표시되며, AI가 해당 스킬을 언제 선택할지 결정) |
+| `parameter_schema` | 매개변수 JSON Schema, 프롬프트에서 사용되는 각 `{param}` 자리표시자 선언 |
+| `system_prompt_template` | 시스템 프롬프트 템플릿, 실행 시 매개변수로 자리표시자 채움 |
+| `tool_whitelist` | 실행 중 허용되는 툴 목록(비어 있음 = 비잉의 모든 툴 상속) |
+| `max_tool_round` / `timeout` | 툴 라운드 수 및 타임아웃 상한(글로벌 상한에 의해 클램핑됨) |
+| `on_complete` | 완료 동작: `none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual`(AI 자율 호출) 또는 `Auto` + `schedule` 스케줄링 |
+
+### 네 가지 소스
+
+- **Builtin** — 프레임워크 내장(`summarize_document` 문서 요약, `code_review` 코드 리뷰, `research_topic` 주제 조사)
+- **Plugin** — 플러그인이 `ISkillProvider`를 통해 등록
+- **Being** — 비잉이 런타임에 `skill` 툴로 자체 생성
+- **User** — 사용자가 Web UI 스킬 관리 페이지에서 생성
+
+### 트리거 방식
+
+1. **수동(Manual)**: 스킬이 일반 툴 정의로 AI 요청에 주입되며, AI가 호출 시기를 판단; 스케줄링 측은 동일한 이름의 호출을 스킬로 우선 라우팅
+2. **자동(Auto + schedule)**: 스케줄 표현식이 `metadata.schedule`에 저장되며, 세 가지 형식을 지원:
+   - `"09:30"` — 매일 정시
+   - `"6h"` / `"30 m"` / `"2 d"` — 간격 주기
+   - `"0 9 * * *"` / `"*/15 * * * *"` — cron 서브셋
+
+### Markdown 작성
+
+스킬은 Markdown으로 저장됩니다(`skills/{id}.md`, YAML 프론트 메타데이터 + 프롬프트 본문):
+
+```markdown
+---
+id: daily_news_digest
+description: 搜索今日科技新闻并生成摘要
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+请使用 network 工具搜索 {topic} 的最新新闻，生成 500 字摘要并保存到工作笔记。
+```
+
+본문만 작성(YAML 생략)해도 됩니다: 저장 시 AI가 id, description, 매개변수 schema 등의 메타데이터를 자동으로 보완합니다 —— 사용자가 이미 작성한 필드는 덮어쓰지 않습니다.
+
+### 비잉 자기 관리
+
+비잉은 `skill` 툴을 통해 자신의 스킬 라이브러리를 관리할 수 있습니다:
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### 핫 리로드 및 진화
+
+- 비잉은 30초마다 `skills/` 디렉토리 변경을 감지(지문 비교)하며, Web UI 또는 다른 비잉의 수정 사항이 자동으로 적용되어 재시작이 불필요
+- 스킬 업데이트 시마다 이전 버전이 `skills/archive/{id}/{version}.md`에 자동 보관되어 스킬 진화 역사가 형성됨
+- 커스텀 스킬 수량은 할당량 제한(`MaxCustomSkillsPerBeing`, 기본값 50)
+
+### 실행 가드레일
+
+- 스킬 수준의 `execute` 동작 권한(권한 매트릭스로 비활성화 가능, 비활성화 시 AI에 보이지 않음)
+- 실행 매개변수가 글로벌 상한에 의해 클램핑됨: 라운드 수 ≤ `GlobalMaxToolRound`(기본값 10), 타임아웃 ≤ `GlobalSkillTimeoutSeconds`(기본값 300초)
+- 스킬은 자기 자신을 재귀적으로 호출할 수 없음
+- 화이트리스트 외의 툴 호출은 즉시 실패
+
 ## 메모리 시스템
 
 ### 메모리 유형
@@ -313,8 +385,8 @@ data/
 
 **예시**:
 - `Python` --`is_a`--> `programming_language`
-- `北京` --`capital_of`--> `中国`
-- `水` --`boiling_point`--> `100°C`
+- `서울` --`capital_of`--> `한국`
+- `물` --`boiling_point`--> `100°C`
 
 #### 신뢰도
 
@@ -423,11 +495,11 @@ Python → is_a → programming_language → belongs_to → computer_science
 
 1. **사실 저장**
    - 객관적 사실과 상식 저장
-   - 예시: `地球` --`is_a`--> `行星`
+   - 예시: `지구` --`is_a`--> `행성`
 
 2. **개념 관계**
    - 개념 간의 관계 기록
-   - 예시: `继承` --`is_a`--> `面向对象编程概念`
+   - 예시: `상속` --`is_a`--> `객체지향프로그래밍개념`
 
 3. **학습 축적**
    - 비잉이 학습을 통해 지식을 지속적으로 축적

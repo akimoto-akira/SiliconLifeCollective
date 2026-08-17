@@ -44,7 +44,7 @@ Each AI agent consists of:
 Tools are automatically discovered and registered via reflection:
 
 ```csharp
-// 所有工具实现 ITool 接口
+// All tools implement the ITool interface
 public interface ITool
 {
     string Name { get; }
@@ -64,10 +64,10 @@ UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler
 
 Global service registration and retrieval:
 ```csharp
-// 注册
+// Register
 ServiceLocator.Instance.Register<IAIClient>(ollamaClient);
 
-// 获取
+// Get
 var client = ServiceLocator.Instance.Get<IAIClient>();
 ```
 
@@ -87,13 +87,13 @@ public class MyCustomTool : ITool
 
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
-        // 解析参数
+        // Parse parameters
         var param1 = call.Parameters["param1"]?.ToString();
 
-        // 执行逻辑
+        // Execute logic
         var result = await DoSomething(param1);
 
-        // 返回结果
+        // Return result
         return new ToolResult
         {
             Success = true,
@@ -141,7 +141,7 @@ public class MyAIClient : IAIClient
 
     public async Task<AIResponse> ChatAsync(AIRequest request)
     {
-        // 调用您的 AI API
+        // Call your AI API
         var response = await CallMyAPI(request);
 
         return new AIResponse
@@ -154,7 +154,7 @@ public class MyAIClient : IAIClient
 
     public async IAsyncEnumerable<string> StreamChatAsync(AIRequest request)
     {
-        // 实现流式传输
+        // Implement streaming
         await foreach (var chunk in StreamFromAPI(request))
         {
             yield return chunk;
@@ -186,17 +186,17 @@ public class DatabaseStorage : IStorage, ITimeStorage
 {
     public async Task<string> ReadAsync(string key)
     {
-        // 从您的数据库读取
+        // Read from your database
     }
 
     public async Task WriteAsync(string key, string value)
     {
-        // 写入您的数据库
+        // Write to your database
     }
 
     public async Task<IEnumerable<string>> ReadByTimeAsync(DateTime start, DateTime end)
     {
-        // 时间索引查询
+        // Time-indexed query
     }
 }
 ```
@@ -329,38 +329,38 @@ SiliconLife.Fast/         # Version-specific directory
 ### 1. Setup Development Environment
 
 ```bash
-# 克隆仓库
+# Clone the repository
 git clone https://github.com/akimoto-akira/SiliconLifeCollective.git
 cd SiliconLifeCollective
 
-# 恢复依赖
+# Restore dependencies
 dotnet restore
 
-# 构建
+# Build
 dotnet build
 ```
 
 ### 2. Run Tests
 
 ```bash
-# 运行所有测试
+# Run all tests
 dotnet test
 
-# 运行特定测试项目
+# Run specific test project
 dotnet test tests/SiliconLife.Core.Tests
 ```
 
 ### 3. Debug
 
 ```bash
-# 以调试输出运行
+# Run with debug output
 dotnet run --project src/SiliconLife.Default --configuration Debug
 ```
 
 ### 4. Format Code
 
 ```bash
-# 格式化代码
+# Format code
 dotnet format
 ```
 
@@ -375,13 +375,13 @@ public class MyCustomCalendar : CalendarBase
 
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
-        // 您的转换逻辑
+        // Your conversion logic
         return new CalendarDate(year, month, day);
     }
 
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
-        // 反向转换
+        // Reverse conversion
         return new GregorianDate(year, month, day);
     }
 }
@@ -419,18 +419,18 @@ public class MyWorkflowTemplate : WorkflowTemplate
 
     public override void DefineStates()
     {
-        AddState("start", "开始", isInitial: true);
-        AddState("processing", "处理中");
-        AddState("review", "审核");
-        AddState("done", "完成", isFinal: true);
+        AddState("start", "Start", isInitial: true);
+        AddState("processing", "Processing");
+        AddState("review", "Review");
+        AddState("done", "Done", isFinal: true);
     }
 
     public override void DefineTransitions()
     {
-        AddTransition("start", "processing", "开始处理");
-        AddTransition("processing", "review", "提交审核");
-        AddTransition("review", "done", "审核通过");
-        AddTransition("review", "processing", "审核退回");
+        AddTransition("start", "processing", "Start processing");
+        AddTransition("processing", "review", "Submit for review");
+        AddTransition("review", "done", "Review approved");
+        AddTransition("review", "processing", "Review rejected");
     }
 }
 ```
@@ -450,7 +450,7 @@ public class MyToolTests
     [TestMethod]
     public async Task ExecuteAsync_ValidInput_ReturnsSuccess()
     {
-        // 安排
+        // Arrange
         var tool = new MyCustomTool();
         var call = new ToolCall
         {
@@ -461,10 +461,10 @@ public class MyToolTests
             }
         };
 
-        // 执行
+        // Act
         var result = await tool.ExecuteAsync(call);
 
-        // 断言
+        // Assert
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
     }

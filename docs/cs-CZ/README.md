@@ -22,13 +22,31 @@
 - **Integrace nástrojů** — zásuvné moduly mohou registrovat vlastní nástroje prostřednictvím rozhraní ITool, automaticky se integrují do smyčky volání nástrojů
 
 ### Nástroje a exekuce
-- **24 vestavěných nástrojů** — pokrývající kalendář, chat, konfiguraci, disk, síť, paměť, úkoly, časovače, znalostní bázi, pracovní poznámky, projektový pracovní prostor, WebView prohlížeč a další
+- **24 vestavěných nástrojů** — pokrývající kalendář, chat, konfiguraci, disk, síť, paměť, úkoly, časovače, znalostní bázi, pracovní poznámky, projektový pracovní prostor, WebView prohlížeč, dynamickou kompilaci, spouštění kódu, správu oprávnění, audit Tokenů, dotazy na protokoly, databázi, systémové informace, nápovědu, správu dovedností, dotazy MCP a další
 - **Izolace scénářů nástrojů** — každý nástroj deklaruje dostupné scénáře pomocí vlastnosti `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project), vlastnost `ChatOnly` omezuje nástroj pouze na scénář chatu
 - **Rozhraní schopností IAIClient** — AI klienti deklarují schopnosti pro streamovací režim, volání nástrojů, kontextové okno, vidění a audio, Správce Kontextu přizpůsobuje své chování odpovídajícím způsobem
 - **Smyčka volání nástrojů** — AI vrací volání nástroje → provede nástroj → výsledek je předán AI → smyčka pokračuje, dokud není vrácena čistě textová odpověď
 - **Exekutor-oprávnění zabezpečení** — všechny I/O operace procházejí exekutorem s přísným ověřováním oprávnění
   - 3-úrovňový řetězec ověření oprávnění: Uživatelská Frekvenční Mezipaměť → Rozhraní Zpětného Volání Oprávnění → (IsCurator: Zpracovatel Dotazů na Oprávnění | Non-curator: Globální ACL → výchozí zamítnutí)
   - Kompletní auditní protokol zaznamenává všechna rozhodnutí o oprávněních
+
+### Systém dovedností
+- **Znovupoužitelné jednotky schopností** — zapouzdření „orchestrace nástrojů + šablona výzev" do deklarovatelných, vyvíjejících se, plánovatelných dovedností, AI volá dovednosti jako nástroje
+- **Duální spouštěcí režim** — Manual (AI funkční volání samostatně rozhoduje) + Auto (plánování: denní pevný čas / intervalové období / podmnožina cron)
+- **Markdown prioritní** — YAML front matter + tělo výzvy; při ukládání čistého Markdown AI automaticky doplní chybějící metadata (uživatelská pole nejsou přepsána)
+- **Hot-reload a verzování archivace** — 30sekundová detekce otisku automaticky aktivuje; každá aktualizace archivována do `skills/archive/{id}/{version}.md` tvořící evoluční historii
+- **Víceúrovňové zábrany** — globální přepínač, omezení kvóty (výchozí 50/bytost), globální limit kol a timeout, whitelist nástrojů, rekurzní ochrana, akční oprávnění na úrovni dovedností
+
+### Integrace MCP
+- **Přístup k externím nástrojům** — připojení k externím MCP (Model Context Protocol) serverům, jejichž nástroje se automaticky injektují do všech Křemíkových Bytostí s názvem `mcp_{serverId}_{toolName}`, bez nutnosti psát kód
+- **Duální transport** — stdio (lokální podproces) a http (vzdálený endpoint)
+- **Suverenita uživatele** — přidávání/odstraňování/spouštění/zastavování serverů pouze přes Web UI, nástroj `mcp` na straně AI je pouze pro čtení
+- **Konzistentní oprávnění** — MCP obalové nástroje jsou začleněny do dvouúrovňové matice oprávnění nástrojů, lze zakázat podle bytosti/projektu
+
+### Integrace okamžitých zpráv
+- **Multi-instancní architektura** — současné připojení k více IM platformám (Web UI / Feishu / WeChat Enterprise / DingTalk), každá instance nezávisle spustitelná/zastavitelná, agregované směrování zpráv
+- **Průvodce OAuth autorizací** — jednorázová autorizace Feishu (state ochrana proti CSRF, SSE real-time stav), token automaticky zapsán zpět do konfigurace
+- **Bezpečnost klíčů** — konfigurační hodnoty podporují `${ENV_VAR}` zástupné symboly proměnných prostředí, hesla v čistém textu se neukládají na disk
 
 ### AI a znalosti
 - **Podpora více AI backendů**
@@ -234,10 +252,10 @@ SiliconLifeCollective.sln
 │   ├── en/                                # Dokumentace v angličtině
 │   └── ...                                # Dokumentace v dalších jazycích
 │
-└── 总文档/                                 # Dokumentace požadavků a architektury
-    ├── 需求文档.md
-    ├── 架构大纲.md
-    └── 实现顺序.md
+└── docs/                                    # Dokumentace požadavků a architektury
+    ├── Požadavky.md
+    ├── Architektura.md
+    └── Implementační_postup.md
 ```
 
 ## 🏗️ Přehled architektury
@@ -363,9 +381,11 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] Fáze 10.6: Dokončování a optimalizace (WebView, systém nápovědy, projektový pracovní prostor, Znalostní Síť, engine pracovních postupů)
 - [x] Fáze 11: Úložný engine SpeedyPack (náhrada LiteDB, mapování v paměti, asynchronní fronta zápisů, automatická komprimace)
 - [x] Fáze 12: Systém zásuvných modulů (rozhraní IPlugin, Deklarace schopností PluginLoader, izolované načítání, integrace nástrojů)
+- [x] Fáze 12.5: Rozšíření domácích AI platforem (DeepSeek / Zhipu GLM / Kimi / SiliconFlow / MiniMax / Qianfan ERNIE / Tencent Hunyuan, celkem 13 AI klientů)
+- [x] Fáze 13: Integrace externího IM (multi-instancní architektura: Feishu / WeChat Enterprise / DingTalk, Feishu OAuth průvodce autorizací)
+- [x] Fáze 13.5: Systém dovedností (orchestrace nástrojů + šablony výzev, duální spouštěcí režim, hot-reload, verzování archivace) + integrace MCP (přístup k nástrojům externích serverů, Webová stránka správy)
 
 ### 🚧 V plánu
-- [ ] Fáze 13: Integrace externího IM (Feishu / WhatsApp / Telegram)
 - [ ] Fáze 14: Ekosystém dovedností (tržiště zásuvných modulů, distribuce balíčků dovedností)
 
 ## 📚 Dokumentace

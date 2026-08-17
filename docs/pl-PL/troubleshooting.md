@@ -465,6 +465,116 @@ Plugin load failed: Security check failed
 
 ---
 
+### Problemy z umiejętnościami
+
+#### Problem: umiejętność nie pojawia się na liście umiejętności lub jest niewidoczna dla AI
+
+**Objawy**:
+- Strona umiejętności Web UI zapisuje się pomyślnie, ale lista nie wyświetla / AI nie wywołuje umiejętności
+
+**Rozwiązanie**:
+1. Sprawdź, czy `id` i `description` umiejętności nie są puste (wersje robocze nie są udostępniane AI)
+2. Umiejętności z niekompletnymi metadanymi (`NeedsCompletion`) nie są wstrzykiwane do AI — uzupełnij metadane nagłówka YAML lub pozwól AI je uzupełnić przed zapisaniem
+3. Sprawdź, czy macierz uprawnień nie wyłącza `{skillId}:execute` (wyłączone umiejętności są niewidoczne dla AI)
+4. Upewnij się, że globalny przełącznik `SkillEnabled` ma wartość true
+5. Gorące przeładowanie działa z opóźnieniem do 30 sekund — poczekaj, odśwież lub uruchom ponownie
+
+#### Problem: wykonanie umiejętności kończy się niepowodzeniem z komunikatem "not in whitelist"
+
+**Objawy**:
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**Rozwiązanie**:
+- Dodaj narzędzie do `tool_whitelist` umiejętności lub wyczyść białą listę, aby odziedziczyć wszystkie narzędzia Istoty
+
+#### Problem: osiągnięto limit liczby umiejętności
+
+**Objawy**:
+```
+Custom skill limit reached (50)
+```
+
+**Rozwiązanie**:
+1. Usuń nieużywane umiejętności niestandardowe
+2. Lub zwiększ konfigurację `MaxCustomSkillsPerBeing`
+
+---
+
+### Problemy z MCP
+
+#### Problem: niepowodzenie połączenia z serwerem MCP
+
+**Objawy**:
+- Status serwera wskazuje `error` lub `disconnected`, `lastError` nie jest puste
+
+**Rozwiązanie**:
+1. Serwer stdio: upewnij się, że `command` jest wykonywalny (np. `npx` znajduje się w PATH), `arguments` są poprawne
+2. Serwer http: sprawdź, czy URL `endpoint` jest osiągalny (zapora, proxy)
+3. Kliknij **Połącz ponownie** na stronie /mcp
+4. Sprawdź szczegóły `lastError`, najczęściej to nieistniejąca komenda, niezgodność wersji lub błąd 404 endpointu
+
+#### Problem: narzędzia MCP nie są wstrzykiwane do Istoty
+
+**Objawy**:
+- Serwer jest połączony (`connected`), ale AI nie może wywołać narzędzia `mcp_xxx_yyy`
+
+**Rozwiązanie**:
+1. Upewnij się, że `enabled` serwera ma wartość true
+2. Upewnij się, że globalny przełącznik `McpEnabled` ma wartość true
+3. Sprawdź macierz uprawnień: czy `mcp_{serverId}_{toolName}:execute` nie jest wyłączone
+4. W rozmowie z Istotą można użyć narzędzia `mcp` (`list_tools`), aby zweryfikować faktycznie wstrzyknięte nazwy narzędzi
+
+#### Problem: dodawanie serwera zwraca błąd formatu ID
+
+**Objawy**:
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**Rozwiązanie**:
+- ID serwera może zawierać tylko małe litery, cyfry i podkreślenia (np. `filesystem`, `github_tools`)
+
+---
+
+### Problemy z platformą IM
+
+#### Problem: nieodebrane wiadomości Feishu
+
+**Rozwiązanie**:
+1. Sprawdź konfigurację subskrypcji zdarzeń na platformie Feishu Open — adres wywołania zwrotnego i port (`listenPort` + `callbackPath`)
+2. Upewnij się, że `Encrypt Key` / `Verification Token` są zgodne z konfiguracją
+3. W środowisku lokalnym można użyć kreatora autoryzacji OAuth (jednoklikowa autoryzacja na stronie konfiguracji); wywołanie zwrotne zdarzeń wymaga dostępności publicznej lub tunelowania sieci wewnętrznej
+4. Sprawdź błędy weryfikacji podpisu/deszyfrowania w dziennikach
+
+#### Problem: limit czasu autoryzacji OAuth
+
+**Objawy**:
+- Strona autoryzacji wyświetla status `timeout`
+
+**Rozwiązanie**:
+1. Sesja autoryzacji jest ważna przez 5 minut — po upływie limitu czasu kliknij przycisk autoryzacji ponownie
+2. Upewnij się, że adres wywołania zwrotnego `/im/feishu/callback` jest dostępny dla Feishu (`redirectBaseUrl` skonfigurowane poprawnie)
+3. Wyświetlanie stanu na froncie zależy od SSE — w przypadku rozłączenia SSE można odpytywać `/im/{platform}/status` jako fallback
+
+#### Problem: symbol zastępczy `${ENV_VAR}` nie jest rozwiązywany
+
+**Objawy**:
+- Połączenie z platformą IM kończy się niepowodzeniem, wartość konfiguracji to nadal tekst symbolu zastępczego
+
+**Rozwiązanie**:
+1. Upewnij się, że zmienna środowiskowa została ustawiona przed uruchomieniem procesu (wymagany restart aplikacji)
+2. Sprawdź pisownię nazwy zmiennej (obsługiwane tylko `[A-Za-z_][A-Za-z0-9_]*`)
+3. Uwaga: zachowanie symbolu zastępczego w config.json jest celowe — rozwiązywanie odbywa się w kopii w pamięci
+
+#### Problem: tylko jedna platforma spośród wielu IM odbiera wiadomości
+
+**Rozwiązanie**:
+- Wiadomości wychodzące są rozsyłane do wszystkich włączonych platform, niepowodzenie wysyłania na pojedynczą platformę jest po cichu izolowane — sprawdź, czy token tej platformy nie wygasł (ponowna autoryzacja lub aktualizacja klucza)
+
+---
+
 ### Problemy z notatkami pracy
 
 #### Problem: nie można utworzyć notatki pracy

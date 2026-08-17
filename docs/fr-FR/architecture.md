@@ -950,3 +950,110 @@ L'espace de projet est un mécanisme de gestion d'espace prenant en charge la co
 | `ProjectTaskTool` | Gestion des tâches de projet (création, attribution, mise à jour de l'état) |
 | `ProjectWorkNoteTool` | Notes de travail de projet (création, recherche, génération de sommaires) |
 | `ProjectWorkTool` | Opérations de travail de projet (création de tâches, chat de groupe, diffusion, achèvement du projet) |
+
+---
+
+## Système de Compétences
+
+Les compétences (Compétence) sont une couche d'abstraction réutilisable de « orchestration d'outils + modèles de prompts », encapsulant les flux de travail courants en unités de capacité déclarables, évolutives et ordonnançables.
+
+### Structure en couches
+
+| Couche | Emplacement | Responsabilité |
+|------|------|------|
+| Couche cœur | `SiliconLife.Core/Skills/` | SkillDefinition, SkillManager (enregistrement + moteur d'exécution), SkillMarkdownParser, SkillFileManager, AutoSkillTickObject, SkillMetadataCompleter |
+| Couche commune | `SiliconLife.Common` | BuiltinSkills (3 compétences intégrées), SkillTool (outil `skill`) |
+| Couche applicative | `SiliconLife.App/Web/` | SkillController + SkillView (page de gestion des compétences) |
+
+### Flux d'exécution
+
+```
+Appel de fonction IA (id de compétence) ou déclenchement par ordonnanceur
+        ↓
+SkillManager.ExecuteSkill
+  ├─ Vérification : commutateur global / autorisations / protection anti-récursion
+  ├─ Limitation des paramètres : maxToolRound = Min(valeur compétence, GlobalMaxToolRound)
+  │            timeout = Min(valeur compétence, GlobalSkillTimeoutSeconds)
+  ├─ MergePermissions : autorisations de l'Être ∪ restrictions de compétence (côté strict gagne)
+  ├─ FillTemplate : remplissage des espaces réservés {param} → sous-AIRequest
+  └─ Sous-boucle (maximum maxToolRound tours) : IA ↔ outils (liste blanche uniquement)
+        ↓
+HandleCompletion (OnCompleteAction)
+  none / write_memory / notify_curator / broadcast
+```
+
+### Conceptions clés
+
+- **Ordonnancement transparent** : les compétences sont injectées sous forme de `ToolDefinition` dans `AIRequest.Tools`, l'IA n'en a pas conscience ; dans `ContextManager.ExecuteToolCalls`, les appels de compétence sont prioritaires sur les outils de même nom
+- **Quatre sources** : `Builtin` (framework) / `Plugin` (ISkillProvider) / `Being` (Être de Silicium à l'exécution) / `User` (UI Web), le rechargement à chaud conserve les deux premières catégories et remplace les deux dernières
+- **Markdown prioritaire** : `skills/{id}.md` (front-matter YAML + corps) prioritaire sur `.json` ; lors de la sauvegarde en Markdown pur, l'IA complète les métadonnées (les champs utilisateur ne sont pas écrasés)
+- **Ordonnancement automatique** : `AutoSkillTickObject` (intervalle de vérification de 30 secondes) prend en charge trois expressions d'ordonnancement : `HH:mm`, `N s|m|h|d`, sous-ensemble cron, avec protection anti-réentrée
+- **Garde-fous multiples** : commutateur global, quota personnalisé (`MaxCustomSkillsPerBeing`, 50 par défaut), limite globale de tours/délai d'expiration, autorisation d'action `execute` au niveau compétence, liste blanche d'outils, protection anti-récursion
+
+---
+
+## Intégration MCP
+
+L'intégration MCP (Model Context Protocol) permet aux Êtres de Silicium d'appeler les outils fournis par des serveurs MCP externes, étendant les capacités sans nécessiter de code.
+
+### Architecture
+
+```
+Utilisateur (UI Web /mcp) ──ajouter/activer/désactiver/supprimer──→ McpManager (singleton)
+                                          │
+                              ┌───────────┼───────────┐
+                              ↓           ↓           ↓
+                        McpClientConnection × N (stdio / http)
+                              │
+                              └→ ListTools → encapsulé en SiliconLife.Collective.McpTool
+                                            nommé mcp_{serverId}_{toolName}
+                                                  │
+                          McpManager.SyncToolsForBeing(being) injection
+                                                  ↓
+                                    ToolManager (même traitement que les outils intégrés)
+```
+
+### Conceptions clés
+
+- **Double transport** : `stdio` (sous-processus local : command + arguments + env) et `http` (point de terminaison distant)
+- **Isolation par nommage** : le préfixe `mcp_{serverId}_{toolName}` évite les conflits avec les outils intégrés/plugins
+- **Souveraineté utilisateur** : l'ajout, la suppression et l'activation/désactivation de serveurs ne sont possibles que via l'UI Web ; l'outil `mcp` côté IA ne fournit que des requêtes en lecture seule (status/list_servers/list_tools)
+- **Cohérence des autorisations** : les outils encapsulés déclarent automatiquement une seule action `execute`, intégrés dans la matrice d'autorisations d'outils, désactivables par Être de Silicium/projet
+- **Persistance de configuration** : la liste `McpServers` est stockée dans config.json, `McpEnabled` est le commutateur global
+
+---
+
+## Architecture Multi-instance de la Plateforme IM
+
+La plateforme IM adopte une architecture « configuration multi-instance + fournisseur agrégé », permettant la connexion simultanée à plusieurs plateformes de chat.
+
+### Composants principaux
+
+| Composant | Responsabilité |
+|------|------|
+| `IMPlatformConfig` | Configuration d'instance unique (platform/enabled/dictionnaire de configuration), `IMPlatforms` est une liste, chaque instance avec activation/désactivation indépendante |
+| `IMProviderRegistry` | Registre des métadonnées de plateforme : schema des champs de configuration, modèles de points de terminaison OAuth, fabrique de Provider, liens d'aide |
+| `AggregateIMProvider` | Agrégation multi-plateforme : réception de messages (déclenchement par toute plateforme), envoi de messages (diffusion, échec d'une plateforme isolé silencieusement), demande d'autorisation (le premier répondant gagne la course) |
+| `ImOAuthService` | Assistant d'autorisation OAuth (singleton) : protection state anti-CSRF, délai d'expiration de 5 minutes, écriture des jetons dans la configuration, push d'état SSE |
+| `ConfigSecretResolver` | Analyse des espaces réservés `${ENV_VAR}` : remplacement par copie profonde, les clés en clair ne sont pas réécrites dans config.json |
+| `IMManager` | Routage des messages : file d'attente par ChannelId (traitement séquentiel) → ChatSystem → déclenchement de la réflexion de l'Être de Silicium |
+
+### Plateformes prises en charge
+
+| Plateforme | AuthModes | Accès aux événements | Remarques |
+|------|-----------|---------|------|
+| UI Web | manual | SSE (intégré) | Toujours disponible, complétée automatiquement |
+| Feishu | manual / **oauth** | Rappel HTTP (vérification de signature + déchiffrement AES) | Prise en charge de l'assistant d'autorisation OAuth en un clic |
+| WeChat Enterprise | manual | Rappel HTTP (WXBizMsgCrypt) | Nécessite un rappel sur réseau public |
+| DingTalk | manual | Stream (WebSocket) / HTTP | Mode Stream par défaut, sans réseau public requis |
+
+### Flux de messages
+
+```
+Feishu/WeChat Enterprise/DingTalk/WebUI (entrant)
+  → IIMProvider.MessageReceived
+  → IMManager.OnMessageReceived (file d'attente par ChannelId, séquentiel)
+  → ChatSystem.AddMessage → réflexion IA de l'Être de Silicium
+  → IMManager.SendMessageAsync / SendStreamChunkAsync (sortant)
+  → AggregateIMProvider diffuse vers toutes les plateformes activées
+```

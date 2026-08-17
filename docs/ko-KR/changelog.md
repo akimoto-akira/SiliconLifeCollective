@@ -1,4 +1,4 @@
-﻿# 변경 로그
+# 변경 로그
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | **한국어** | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -65,6 +65,55 @@
 ---
 
 ## [미발표]
+
+### 2026-08-17
+
+#### 새로운 기능
+- `c7b575b` - MCP 통합 구현——외부 서버 도구 접속, 설정 관리 및 도움말 문서
+  - MCP 코어 신규 추가(SiliconLife.Core/Mcp/): McpManager 서버 라이프사이클 관리, stdio/http 듀얼 전송, McpClientConnection 연결 래핑, 서버별 도구 래핑 및 `mcp_{serverId}_{toolName}` 명명으로 모든 실리콘 비잉에 주입
+  - Web 관리 페이지(/mcp) 및 7개 API 엔드포인트 신규 추가(list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool)
+  - McpTool 쿼리 도구 신규 추가(status/list_servers/list_tools, 읽기 전용); 서버 추가/삭제는 사용자가 Web UI를 통해서만 가능, AI는 서버 목록 수정 불가
+  - 설정 페이지에서 MCP 서버 배열 에디터 지원(모달 창 내 인라인 추가/삭제)
+  - MCP 도움말 주제 등록(🔌), 10개 언어로 완전한 도움말 문서 구현
+  - MCP 래핑 도구는 권한 매트릭스에서 `execute` 액션으로 표시, 비잉/프로젝트별 비활성화 지원
+  - 45 파일 변경
+
+### 2026-08-16
+
+#### 새로운 기능
+- `5d76c5a` - 스킬 시스템 구현——도구 오케스트레이션 및 프롬프트 템플릿 재사용 추상화 계층
+  - SkillDefinition 신규 추가(id/설명/매개변수 schema/시스템 프롬프트 템플릿/도구 화이트리스트/액션 제한/최대 라운드/타임아웃/완료 액션/트리거 모드)
+  - SkillManager 신규 추가: 스킬 등록 센터 + 실행 엔진(하위 AIRequest 루프, 재귀 방지, 글로벌 라운드 및 타임아웃 제한)
+  - 듀얼 트리거 모드: Manual(AI 함수 호출, 스킬이 ToolDefinition으로 주입, 스케줄링 측 우선 라우팅) + Auto(schedule 스케줄링, `HH:mm` / `N s|m|h|d` / cron 서브셋 지원)
+  - Markdown 우선 저장(YAML 프론트 + 프롬프트 본문), 순수 Markdown은 AI가 자동으로 메타데이터 보완(사용자 필드는 덮어쓰지 않음)
+  - 핫 리로드(30초 지문 감지), 버전 아카이브(skills/archive/), 3개 내장 스킬(summarize_document/code_review/research_topic)
+  - skill 도구 신규 추가(create/list/update/update_from_md/delete/export/export_md/import/import_md)
+  - 스킬 관리 페이지(/skill) 및 10개 API 엔드포인트 신규 추가; 할당량 MaxCustomSkillsPerBeing(기본값 50)
+  - 권한: 스킬 레벨 `execute` 액션 권한, 스킬 내 도구 화이트리스트와 비잉 권한의 엄격한 측 합집합
+- `b60fc68` - 첸팬 모델 목록 및 컨텍스트 윈도우 매핑 업데이트 - glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest 모델 신규 추가, 1M/128K 계층별 컨텍스트 윈도우 및 시각 능력 매핑
+
+### 2026-08-15
+
+#### 새로운 기능
+- `eaa8417` - IM 플랫폼 OAuth 인증 마법사 및 설정 비밀 환경변수 해석 구현
+  - ImOAuthController/ImOAuthService 신규 추가, Feishu OAuth 인증 흐름 지원(authorize/callback/status), state CSRF 방지, 5분 타임아웃, SSE 상태 푸시 포함
+  - IMProviderRegistry 신규 추가, IM 플랫폼 메타데이터 통합 관리(설정 필드 schema/OAuth 엔드포인트 템플릿/Provider 팩토리)
+  - ConfigSecretResolver 신규 추가, 설정 내 `${ENV_VAR}` 플레이스홀더 해석, 딥카피 교체로 원본 설정에 기록하지 않음
+  - 설정 페이지에 IM 인증 마법사 UI 통합(인라인 인증 영역 + SSE 실시간 상태)
+  - 13개 언어 파일의 IM 인증 상태/도움말 문안 번역 완성
+
+### 2026-07-26
+
+#### 리팩토링
+- `ffc45c2` - IM 플랫폼을 다중 인스턴스 설정 아키텍처로 리팩토링 - IMPlatforms 목록화(각 플랫폼 독립 활성화/비활성화), AggregateIMProvider 다중 플랫폼 메시지 수발신 및 권한 경쟁, 설정 페이지 다중 인스턴스 에디터
+
+### 2026-07-19
+
+#### 새로운 기능
+- `9bf2103` - Speedy.Manager 트리뷰에 다중 선택 삭제 및 다중 선택 내보내기 통합
+
+#### 수정
+- `0df0674` - Speedy.Manager 다중 선택 삭제 시 첫 번째 항목만 삭제되는 문제 수정
 
 ### 2026-07-16
 

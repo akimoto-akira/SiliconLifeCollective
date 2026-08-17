@@ -4,7 +4,7 @@
 
 **版本：v0.2.0-alpha** | **矽基生命群** — 一個基於 .NET 9 的多智慧體協作平臺，AI 智慧體被稱為**矽基生命體**，透過 Roslyn 動態編譯實作自我進化。
 
-[English](../README.md) | [Deutsch](../de-DE/README.md) | [简体中文](../zh-CN/README.md) | **繁體中文** | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md) | [Polski](../pl-PL/README.md) | [Português](../pt-PT/README.md) | [Русский](../ru-RU/README.md)
+[English](../README.md) | [Deutsch](../de-DE/README.md) | [中文](../zh-CN/README.md) | **繁體中文** | [Español](../es-ES/README.md) | [日本語](../ja-JP/README.md) | [한국어](../ko-KR/README.md) | [Français](../fr-FR/README.md) | [Čeština](../cs-CZ/README.md) | [Italiano](../it-IT/README.md) | [Polski](../pl-PL/README.md) | [Português](../pt-PT/README.md) | [Русский](../ru-RU/README.md)
 
 ## 🌟 核心特性
 
@@ -13,21 +13,39 @@
 - **靈魂檔案驅動** — 每個矽基生命體由核心提示檔案（`soul.md`）驅動，定義獨特個性和行為模式
 - **身體-大腦架構** — *身體*（SiliconBeing）維持生命體徵並偵測觸發場景；*大腦*（ContextManager）負責載入歷史、呼叫 AI、執行工具和持久化回應
 - **自我進化能力** — 透過 Roslyn 動態編譯技術，矽基生命體可以重寫自己的程式碼實作進化
-- **活動狀態管理** — 支援 Idle（空閒）、SingleChat（一對一聊天）、GroupChat（群聊）、Task（任務）、Timer（定時器）、Broadcast（廣播）、Project（項目）、MemoryCompression（記憶壓縮）、Stopped（已停止）九種活動狀態，連續 10 次錯誤自動進入 Stopped 狀態
+- **活動狀態管理** — 支援 Idle（空閒）、SingleChat（一對一聊天）、GroupChat（群聊）、Task（任務）、Timer（定時器）、Broadcast（廣播）、Project（專案）、MemoryCompression（記憶壓縮）、Stopped（已停止）九種活動狀態，連續 10 次錯誤自動進入 Stopped 狀態
 
-### 插件系統
-- **插件擴充架構** — 透過 IPlugin 介面實作功能擴充，支援從目錄動態載入插件 DLL
-- **插件能力宣告** — 插件透過 `[PluginCapability]` 屬性宣告所需能力（Network、FileIO、Process、AI），載入器據此放寬安全掃描規則；不可宣告的能力（P/Invoke、Unsafe、反射發射等）始終被阻止
-- **隔離載入** — 使用自訂 AssemblyLoadContext 隔離載入，防止插件影響主程式穩定性
-- **工具整合** — 插件可透過 ITool 介面註冊自訂工具，自動整合到工具呼叫迴圈
+### 外掛程式系統
+- **外掛程式擴充架構** — 透過 IPlugin 介面實作功能擴充，支援從目錄動態載入外掛程式 DLL
+- **外掛程式能力宣告** — 外掛程式透過 `[PluginCapability]` 屬性宣告所需能力（Network、FileIO、Process、AI），載入器據此放寬安全掃描規則；不可宣告的能力（P/Invoke、Unsafe、反射發射等）始終被阻止
+- **隔離載入** — 使用自訂 AssemblyLoadContext 隔離載入，防止外掛程式影響主程式穩定性
+- **工具整合** — 外掛程式可透過 ITool 介面註冊自訂工具，自動整合到工具呼叫迴圈
 
 ### 工具與執行
-- **24 個內建工具** — 涵蓋日曆、聊天、設定、磁碟、網路、記憶、任務、定時器、知識庫、工作筆記、項目工作區、項目任務、項目工作筆記、項目工作、WebView 瀏覽器、動態編譯、程式碼執行、權限管理、Token 審計、日誌查詢、資料庫、系統資訊、說明文件等
+- **26 個內建工具** — 涵蓋日曆、聊天、設定、磁碟、網路、記憶、任務、定時器、知識庫、工作筆記、專案工作區、專案任務、專案工作筆記、專案工作、WebView 瀏覽器、動態編譯、程式碼執行、權限管理、Token 審計、日誌查詢、資料庫、系統資訊、說明文件、技能管理、MCP 查詢等
 - **工具場景隔離** — 每個工具透過 `ToolScenario` 屬性宣告可用場景（Chat、Task、Timer、MemoryCompression、Project），`ChatOnly` 屬性限制工具僅在聊天場景使用，`SiliconManagerOnly` 屬性限制工具僅主理人使用
 - **工具呼叫迴圈** — AI 回傳工具呼叫 → 執行工具 → 結果回饋給 AI → 持續迴圈直到回傳純文字回應
 - **執行器-權限安全** — 所有 I/O 操作透過執行器進行嚴格的權限驗證
   - 3 級權限驗證鏈：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → 預設拒絕)
   - 完整的審計日誌記錄所有權限決策
+
+### 技能系統
+- **可重用能力單元** — 把「工具編排 + 提示詞範本」封裝為可宣告、可進化、可排程的技能，AI 像呼叫工具一樣呼叫技能
+- **雙觸發模式** — Manual（AI 函式呼叫自主決定）+ Auto（schedule 排程：每日定點 / 間隔週期 / cron 子集）
+- **Markdown 優先** — YAML 前置元資料 + 提示詞正文；純 Markdown 儲存時 AI 自動補全缺失元資料（使用者欄位不被覆寫）
+- **熱重載與版本歸檔** — 30 秒指紋偵測自動生效；每次更新歸檔到 `skills/archive/{id}/{version}.md` 形成進化史
+- **多重護欄** — 全域開關、配額限制（預設 50/生命體）、全域輪數與逾時鉗制、工具白名單、遞迴防護、技能級動作權限
+
+### MCP 整合
+- **外部工具接入** — 連接外部 MCP（Model Context Protocol）伺服器，其工具以 `mcp_{serverId}_{toolName}` 命名自動注入所有矽基生命體，無需撰寫程式碼
+- **雙傳輸** — stdio（本地子程序）與 http（遠端端點）
+- **使用者主權** — 伺服器增刪啟停僅限 Web UI 操作，AI 側 `mcp` 工具唯讀查詢
+- **權限一致** — MCP 包裝工具納入兩級工具權限矩陣，可按生命體/專案停用
+
+### 即時通訊整合
+- **多實例架構** — 可同時接入多個 IM 平臺（Web UI / 飛書 / 企業微信 / 釘釘），每實例獨立啟停，訊息聚合路由
+- **OAuth 授權精靈** — 飛書一鍵授權（state 防 CSRF、SSE 即時狀態推送），權杖自動寫回設定
+- **金鑰安全** — 設定值支援 `${ENV_VAR}` 環境變數佔位符，明文金鑰不落磁碟
 
 ### AI 與知識
 - **多 AI 後端支援**
@@ -46,15 +64,15 @@
   - **矽基流動** — 矽基流動聚合平臺，支援動態模型清單，1,048,576 上下文
 - **AI 客戶端能力發現** — IAIClient 介面支援宣告串流模式、工具呼叫、視覺輸入、音訊輸入、上下文視窗大小等能力，ContextManager 據此自適應調整行為
 - **32 種日曆系統** — 全球主要曆法全覆蓋，包括公曆、農曆、伊斯蘭曆、希伯來曆、日本曆、波斯曆、瑪雅曆、中國歷史曆法等
-- **知識網絡系統** — 基於三元組（主體-關係-客體）的知識圖譜，支援儲存、查詢和路徑發現
-- **項目工作區** — 項目空間管理，支援項目建立/歸檔/銷毀、角色分配、工作筆記、任務追蹤和工具權限隔離
+- **知識網路系統** — 基於三元組（主體-關係-客體）的知識圖譜，支援儲存、查詢和路徑發現
+- **專案工作區** — 專案空間管理，支援專案建立/歸檔/銷毀、角色分配、工作筆記、任務追蹤和工具權限隔離
 - **工作流引擎** — 基於範本的狀態機引擎，支援自訂工作流範本、狀態轉換、Tick 驅動執行和實例生命週期管理
 - **記憶淡忘機制** — 定時衰減服務（MemoryFadeService），每小時自動對所有矽基生命體的記憶進行重要性衰減和自動歸檔
 
 ### Web 介面
 - **現代化 Web UI** — 內建 HTTP 伺服器，支援 SSE 即時更新
 - **7 種佈景主題** — 管理版、聊天版、創作版、開發版、高對比度、淺色、極簡，支援自動發現和切換
-- **24 個控制器** — 完整的系統管理、聊天、設定、監控功能
+- **27 個控制器** — 完整的系統管理、聊天、設定、技能、MCP、監控功能
 - **零前端框架依賴** — 透過 `H`、`CssBuilder` 和 `JsBuilder` 在伺服器端生成 HTML/CSS/JS
 
 ### 國際化與在地化
@@ -100,7 +118,6 @@
   - SpeedyPack 引擎 + 自動壓縮保證資料安全
   - Component UI 架構，27 個宣告式元件
   - 7 種佈景主題，支援自動發現和切換
-  - 熱重載工具支援線上更新和重啟
 - **效能提升**：儲存讀取延遲降低 1000 倍，寫入延遲降低 15000 倍，並行處理能力提升 50 倍
 - **角色說明**：經過深度最佳化的生產級實作，是長期執行和實際生產環境的首選
 - **啟動命令**：`dotnet run --project src/SiliconLife.Fast`
@@ -134,7 +151,7 @@
 | Web 伺服器 | HttpListener（.NET 內建） | HttpListener（.NET 內建） |
 | 動態編譯 | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
 | 瀏覽器自動化 | Playwright（WebView） | Playwright（WebView） |
-| 插件系統 | ✅ 支援（IPlugin + PluginLoader） | ✅ 支援（IPlugin + PluginLoader） |
+| 外掛程式系統 | ✅ 支援（IPlugin + PluginLoader） | ✅ 支援（IPlugin + PluginLoader） |
 | 系統匣 | ❌ 不支援 | ✅ Windows/macOS 支援（NotifyIcon）；Linux 無系統匣圖示 |
 | 授權條款 | Apache-2.0 | Apache-2.0 |
 
@@ -151,11 +168,11 @@ SiliconLifeCollective.sln
 │   │   ├── Config/                        # 設定管理系統
 │   │   ├── Executors/                     # 執行器（磁碟、網路、命令列）
 │   │   ├── IM/                            # 即時通訊提供者介面
-│   │   ├── Knowledge/                     # 知識網絡系統
+│   │   ├── Knowledge/                     # 知識網路系統
 │   │   ├── Localization/                  # 在地化系統
 │   │   ├── Logging/                       # 日誌系統
-│   │   ├── Plugins/                       # 插件系統（IPlugin 介面、PluginLoader 載入器）
-│   │   ├── Project/                       # 項目管理系統
+│   │   ├── Plugins/                       # 外掛程式系統（IPlugin 介面、PluginLoader 載入器）
+│   │   ├── Project/                       # 專案管理系統
 │   │   ├── Runtime/                       # 主迴圈、時鐘物件、核心主機
 │   │   ├── Security/                      # 權限管理系統
 │   │   ├── SiliconBeing/                  # 矽基生命體基類、管理器、工廠
@@ -173,7 +190,7 @@ SiliconLifeCollective.sln
 │   │   ├── Resources/                     # 共享資源檔案
 │   │   ├── Security/                      # 權限管理器
 │   │   ├── SiliconBeing/                  # 預設矽基生命體實作
-│   │   ├── Tools/                         # 23 個通用工具實作
+│   │   ├── Tools/                         # 25 個通用工具實作
 │   │   ├── Web/                           # Web 基礎設施
 │   │   └── WebView/                       # Playwright WebView 實作
 │   │
@@ -184,7 +201,7 @@ SiliconLifeCollective.sln
 │   │   ├── Tools/                         # HelpTool（說明文件查詢工具）
 │   │   └── Web/                           # Web UI 實作
 │   │       ├── Component/                 # UI 元件庫（27 個元件）
-│   │       ├── Controllers/               # 24 個控制器
+│   │       ├── Controllers/               # 27 個控制器
 │   │       ├── Models/                    # 視圖模型
 │   │       ├── Views/                     # HTML 視圖
 │   │       └── Skins/                     # 7 種佈景主題
@@ -192,18 +209,18 @@ SiliconLifeCollective.sln
 │   ├── SiliconLife.Default/               # 預設實作 + 應用程式入口（主控台版）
 │   │   ├── Program.cs                     # 進入點（裝配所有元件）
 │   │   ├── Config/                        # 預設設定資料
-│   │   ├── Knowledge/                     # 知識網絡實作
+│   │   ├── Knowledge/                     # 知識網路實作
 │   │   ├── Logging/                       # 日誌提供者實作（主控台 + 檔案系統）
-│   │   ├── Project/                       # 項目系統實作
+│   │   ├── Project/                       # 專案系統實作
 │   │   └── Storage/                       # 檔案系統儲存實作
 │   │
 │   ├── SiliconLife.Fast/                  # 高效能實作 + 應用程式入口（視窗版）
 │   │   ├── Program.cs                     # 進入點（視窗應用程式）
 │   │   ├── App.axaml / App.cs             # Avalonia 應用定義
 │   │   ├── Config/                        # 設定資料（與 Default 共享）
-│   │   ├── Knowledge/                     # 知識網絡實作（記憶體最佳化）
+│   │   ├── Knowledge/                     # 知識網路實作（記憶體最佳化）
 │   │   ├── Logging/                       # 高效能日誌提供者
-│   │   ├── Project/                       # 項目系統實作
+│   │   ├── Project/                       # 專案系統實作
 │   │   ├── Storage/                       # SpeedyPack 儲存配接器
 │   │   └── Tray/                          # 系統匣（34 種語言變體在地化）
 │   │
@@ -266,7 +283,7 @@ SiliconLifeCollective.sln
 ### 前置條件
 
 - **.NET 9 SDK** — [下載連結](https://dotnet.microsoft.com/download/dotnet/9.0)
-- **AI 後端**（擇一使用）：
+- **AI 後端**（選擇其一）：
   - **Ollama**：[安裝 Ollama](https://ollama.com) 並拉取模型（例如 `ollama pull llama3`）
   - **阿里雲百煉**：從[百煉主控台](https://bailian.console.aliyun.com/)取得 API 金鑰
   - **火山引擎 Ark**：從[火山引擎主控台](https://console.volcengine.com/ark)取得 API 金鑰
@@ -348,15 +365,17 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 - [x] 階段 7：動態編譯 + 自我進化（Roslyn）
 - [x] 階段 8：長期記憶 + 任務 + 定時器
 - [x] 階段 9：核心主機 + 多智慧體協作
-- [x] 階段 10：Web UI（HTTP + SSE，24 個控制器，7 種佈景主題）
+- [x] 階段 10：Web UI（HTTP + SSE，27 個控制器，7 種佈景主題）
 - [x] 階段 10.5：增量增強（廣播頻道、Token 審計、32 種日曆、工具增強、34 種語言變體在地化）
-- [x] 階段 10.6：完善與最佳化（WebView、說明系統、項目工作區、知識網絡、工作流引擎）
+- [x] 階段 10.6：完善與最佳化（WebView、說明系統、專案工作區、知識網路、工作流引擎）
 - [x] 階段 11：SpeedyPack 儲存引擎（替換 LiteDB、記憶體映射、非同步寫入佇列、自動壓縮）
-- [x] 階段 12：插件系統（IPlugin 介面、PluginLoader 能力宣告、隔離載入、工具整合）
+- [x] 階段 12：外掛程式系統（IPlugin 介面、PluginLoader 安全沙箱、隔離載入、工具整合、能力宣告系統）
+- [x] 階段 12.5：國內 AI 平臺擴充（DeepSeek / 智譜 GLM / Kimi / 矽基流動 / MiniMax / 千帆 ERNIE / 騰訊混元，共 13 個 AI 客戶端）
+- [x] 階段 13：外部即時通訊整合（多實例架構：飛書 / 企業微信 / 釘釘，飛書 OAuth 授權精靈）
+- [x] 階段 13.5：技能系統（工具編排 + 提示詞範本、雙觸發模式、熱重載、版本歸檔）+ MCP 整合（外部伺服器工具接入、Web 管理頁面）
 
 ### 🚧 計劃中
-- [ ] 階段 13：外部即時通訊整合（飛書 / WhatsApp / Telegram）
-- [ ] 階段 14：技能生態系統（插件市集、技能包分發）
+- [ ] 階段 14：技能生態系統（外掛程式市集、技能包分發）
 
 ## 📚 文件
 

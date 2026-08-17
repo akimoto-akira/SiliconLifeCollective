@@ -314,7 +314,33 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 11. Ferramenta de Registos (LogTool)
+### 11. Ferramenta de Consulta MCP (McpTool)
+
+**Nome da ferramenta**: `mcp`
+
+**Descrição**: Consultar o estado da integração MCP (Model Context Protocol) — servidores externos ligados, as ferramentas que fornecem e como as chamar. Esta é uma ferramenta apenas de leitura: a adição/remoção de servidores só pode ser feita pelo utilizador através da Web UI; a IA não pode modificar a lista de servidores.
+
+**Operações suportadas**:
+- `status` — Visão global (estado de ativação, número de servidores, número de ferramentas)
+- `list_servers` — Listar servidores configurados (com estado de ligação e número de ferramentas)
+- `list_tools` — Listar ferramentas disponíveis (com nome de prefixo `mcp_{server}_{tool}`, descrição e esquema de parâmetros; `server_id` opcional para filtrar um único servidor)
+
+**Exemplo de utilização**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**Ferramentas embrulhadas MCP**: As ferramentas fornecidas por cada servidor MCP ligado são registadas dinamicamente como ferramentas independentes no Ser de Silício, com o formato de nome `mcp_{serverId}_{toolName}` (ex.: `mcp_filesystem_read_file`). A IA pode chamá-las diretamente pelo nome de prefixo como ferramentas normais, sem necessidade de as encaminhar através desta ferramenta de consulta. As ferramentas embrulhadas são apresentadas na matriz de permissões com uma única ação `execute`, podendo ser desativadas individualmente.
+
+**Cenários**: Todos os cenários (`All`)
+
+---
+
+### 12. Ferramenta de Registos (LogTool)
 
 **Nome da ferramenta**: `log`
 
@@ -338,7 +364,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 12. Ferramenta de Memória (MemoryTool)
+### 13. Ferramenta de Memória (MemoryTool)
 
 **Nome da ferramenta**: `memory`
 
@@ -367,7 +393,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 13. Ferramenta de Rede (NetworkTool)
+### 14. Ferramenta de Rede (NetworkTool)
 
 **Nome da ferramenta**: `network`
 
@@ -393,7 +419,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 14. Ferramenta de Permissões (PermissionTool) 🔒
+### 15. Ferramenta de Permissões (PermissionTool) 🔒
 
 **Nome da ferramenta**: `permission`
 
@@ -420,7 +446,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 15. Ferramenta de Projecto (ProjectTool) 🔒
+### 16. Ferramenta de Projecto (ProjectTool) 🔒
 
 **Nome da ferramenta**: `project`
 
@@ -456,7 +482,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 16. Ferramenta de Tarefas de Projecto (ProjectTaskTool)
+### 17. Ferramenta de Tarefas de Projecto (ProjectTaskTool)
 
 **Nome da ferramenta**: `project_task`
 
@@ -490,7 +516,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 17. Ferramenta de Notas de Trabalho de Projecto (ProjectWorkNoteTool)
+### 18. Ferramenta de Notas de Trabalho de Projecto (ProjectWorkNoteTool)
 
 **Nome da ferramenta**: `project_work_note`
 
@@ -520,7 +546,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 18. Ferramenta de Trabalho de Projecto (ProjectWorkTool) 🔒
+### 19. Ferramenta de Trabalho de Projecto (ProjectWorkTool) 🔒
 
 **Nome da ferramenta**: `project_work`
 
@@ -549,7 +575,55 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 19. Ferramenta do Sistema (SystemTool)
+### 20. Ferramenta de Competências (SkillTool)
+
+**Nome da ferramenta**: `skill`
+
+**Descrição**: Gerir as competências do ser de silício (unidades de capacidade reutilizáveis de "orquestração de ferramentas + modelo de prompt"), suportando criação, listagem, atualização, eliminação, importação e exportação. Os metadados em falta (id, descrição, esquema de parâmetros, etc.) são preenchidos automaticamente pela IA.
+
+**Operações suportadas**:
+- `create` — Criar uma nova competência (requer `id` e `system_prompt`; opcionais: `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — Listar todas as competências disponíveis (com resumo)
+- `update` — Atualizar uma competência existente através de parâmetros (requer `skill_id`)
+- `update_from_md` — Atualizar uma competência a partir de uma string Markdown (metadados YAML + corpo do prompt)
+- `delete` — Eliminar uma competência (requer `skill_id`)
+- `export` — Exportar uma competência como JSON (requer `skill_id`)
+- `export_md` — Exportar uma competência como Markdown (requer `skill_id`)
+- `import` — Importar uma competência a partir de JSON (requer `json`)
+- `import_md` — Importar uma competência a partir de Markdown (requer `markdown`)
+
+**Exemplo de utilização**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "Pesquisar notícias de tecnologia de hoje e gerar um resumo",
+  "system_prompt": "Por favor, utilize a ferramenta network para pesquisar as últimas notícias sobre {topic} e gerar um resumo de 500 palavras.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "Tópico de notícias" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**Permissões de modificação**: O Curator de Silício pode modificar todas as competências; os seres comuns só podem modificar competências cuja origem seja `Being` ou `User` (não podem modificar competências incorporadas e de plugins).
+
+**Limite de quantidade**: O número de competências personalizadas por ser é limitado pela configuração `MaxCustomSkillsPerBeing` (predefinição: 50).
+
+**Cenário**: Todos os cenários (`All`)
+
+> Para uma descrição completa do sistema de competências (modos de acionamento, lista de permissões, recarregamento a quente, agendamento automático, etc.), consulte o [Guia do Ser de Silício](silicon-being-guide.md#sistema-de-competências).
+
+---
+
+### 21. Ferramenta do Sistema (SystemTool)
 
 **Nome da ferramenta**: `system`
 
@@ -570,7 +644,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 20. Ferramenta de Tarefas (TaskTool)
+### 22. Ferramenta de Tarefas (TaskTool)
 
 **Nome da ferramenta**: `task`
 
@@ -595,7 +669,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 21. Ferramenta de Temporizadores (TimerTool)
+### 23. Ferramenta de Temporizadores (TimerTool)
 
 **Nome da ferramenta**: `timer`
 
@@ -621,7 +695,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 22. Ferramenta de Auditoria de Tokens (TokenAuditTool) 🔒
+### 24. Ferramenta de Auditoria de Tokens (TokenAuditTool) 🔒
 
 **Nome da ferramenta**: `token_audit`
 
@@ -651,7 +725,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 23. Ferramenta de Navegador WebView (WebViewBrowserTool)
+### 25. Ferramenta de Navegador WebView (WebViewBrowserTool)
 
 **Nome da ferramenta**: `webview_browser`
 
@@ -692,7 +766,7 @@ Além disso, as ferramentas marcadas com `[ChatOnly]` estão disponíveis apenas
 
 ---
 
-### 24. Ferramenta de Notas de Trabalho (WorkNoteTool)
+### 26. Ferramenta de Notas de Trabalho (WorkNoteTool)
 
 **Nome da ferramenta**: `work_note`
 
@@ -820,6 +894,13 @@ public class AdminOnlyTool : ITool
     // Apenas o Silicon Curator tem acesso
 }
 ```
+
+### Alternativas: Competências e Ferramentas MCP
+
+Além de escrever classes de ferramentas em C#, existem duas formas de extensão sem necessidade de compilação:
+
+- **Competências (Skill)**: Criar combinações de "orquestração de ferramentas + modelo de prompt" através da Web UI ou da ferramenta `skill`, adequadas para encapsular fluxos de trabalho frequentes em capacidades reutilizáveis. Consulte o [Guia do Ser de Silício — Sistema de Competências](silicon-being-guide.md#sistema-de-competências).
+- **Servidor MCP**: Após configurar um servidor MCP externo na Web UI, as suas ferramentas são automaticamente injetadas no formato `mcp_{serverId}_{toolName}`, sem necessidade de escrever qualquer código. Consulte o [Guia da Web UI — Gestão MCP](web-ui-guide.md).
 
 ## Melhores Práticas
 

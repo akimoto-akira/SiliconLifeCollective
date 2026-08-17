@@ -313,6 +313,42 @@ Zarządzanie uprawnieniami narzędzi przez Web UI:
 | `/api/projects/{id}/tool-permissions` | GET | Pobierz uprawnienia narzędzi projektu |
 | `/api/projects/{id}/tool-permissions` | PUT | Aktualizuj uprawnienia narzędzi projektu |
 
+### Uprawnienia akcji umiejętności
+
+Umiejętności wykorzystują mechanizm uprawnień akcji narzędzi: id umiejętności jest używane jako nazwa narzędzia, a akcja to `execute`.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- Wyłączone umiejętności nie pojawiają się w definicjach narzędzi widocznych dla AI (AI ich w ogóle "nie widzi")
+- Wykonywanie umiejętności posiada dodatkową weryfikację w czasie wykonywania; nawet nieaktualne schematy nie mogą jej obejść
+- Uprawnienia narzędzi wewnętrznych umiejętności = uprawnienia Istoty ∪ ograniczenia samej umiejętności (przecięcie strony restrykcyjnej; może tylko zawężać, nigdy rozszerzać)
+
+### Uprawnienia akcji narzędzi opakowujących MCP
+
+Każde narzędzie opakowujące wstrzyknięte przez serwer MCP (`mcp_{serverId}_{toolName}`) automatycznie deklaruje pojedynczą akcję `execute`:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- Można precyzyjnie kontrolować dostępność narzędzi zewnętrznych per Istota lub per projekt
+- Gdy wszystkie akcje `execute` serwera są zabronione, narzędzie jest całkowicie usuwane ze schematu widocznego dla AI
+- Wyłączenie/usunięcie serwera (operacja w Web UI) natychmiast wyrejestrowuje wszystkie jego narzędzia
+
 ---
 
 ## Najlepsze praktyki

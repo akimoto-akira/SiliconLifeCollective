@@ -84,7 +84,7 @@ SiliconLifeCollective unterstützt 32 verschiedene Kalendersysteme für Datumsum
 **Antwort**:
 ```json
 {
-  "result": "农历丙午年四月初三",
+  "result": "Mondkalender: Bingwu-Jahr, 4. Monat, 3. Tag",
   "year": 2026,
   "month": 4,
   "day": 3,
@@ -158,14 +158,14 @@ Der chinesische historische Kalender ist ein Highlight dieses Systems und unters
 Verwendet einen 60-Jahres-Zyklus, der aus Himmelsstämmen und Erdzweigen kombiniert wird:
 
 ```
-Himmelsstämme (10): 甲、乙、丙、丁、戊、己、庚、辛、壬、癸
-Erdzweige (12): 子、丑、寅、卯、辰、巳、午、未、申、酉、戌、亥
+Himmelsstämme (10): Jia, Yi, Bing, Ding, Wu, Ji, Geng, Xin, Ren, Gui
+Erdzweige (12): Zi, Chou, Yin, Mao, Chen, Si, Wu, Wei, Shen, You, Xu, Hai
 ```
 
 **Beispiele**:
-- 2026 = 丙午年
-- 2025 = 乙巳年 (Schlangenjahr)
-- 2024 = 甲辰年 (Drachenjahr)
+- 2026 = Bingwu-Jahr (Pferdejahr)
+- 2025 = Yisi-Jahr (Schlangenjahr)
+- 2024 = Jiachen-Jahr (Drachenjahr)
 
 **Verwendungsbeispiel**:
 ```json
@@ -180,9 +180,9 @@ Erdzweige (12): 子、丑、寅、卯、辰、巳、午、未、申、酉、戌�
 **Antwort**:
 ```json
 {
-  "result": "丙午年 三月 初九",
-  "ganzhi_year": "丙午",
-  "zodiac": "马"
+  "result": "Bingwu-Jahr, 3. Monat, 9. Tag",
+  "ganzhi_year": "Bingwu",
+  "zodiac": "Pferd"
 }
 ```
 
@@ -210,10 +210,10 @@ Integrierte vollständige Datenbank chinesischer historischer Dynastien und Kais
 **Antwort**:
 ```json
 {
-  "result": "康熙六十年 三月 十五日",
-  "era": "康熙",
+  "result": "Kangxi 60. Jahr, 3. Monat, 15. Tag",
+  "era": "Kangxi",
   "era_year": 60,
-  "dynasty": "清"
+  "dynasty": "Qing"
 }
 ```
 

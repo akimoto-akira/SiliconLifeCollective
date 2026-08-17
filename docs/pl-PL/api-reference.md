@@ -643,6 +643,38 @@ Zwraca stronę interfejsu konfiguracji systemu.
 
 Zwraca dostępne typy klientów AI i ich opcje dynamiczne (dostępne modele, regiony itp.).
 
+### Pobranie opcji platformy IM
+
+**GET** `/config/imoptions`
+
+Zwraca metadane platformy IM (do dynamicznego renderowania formularzy przez kreator konfiguracji):
+
+```json
+{
+  "success": true,
+  "platforms": [
+    {
+      "value": "feishu",
+      "display": "Feishu",
+      "authModes": ["manual", "oauth"],
+      "needsPublicCallback": false,
+      "help": "...",
+      "helpUrl": "https://open.feishu.cn/app",
+      "fields": [
+        { "key": "appId", "label": "App ID", "type": "text", "required": true },
+        { "key": "appSecret", "label": "App Secret", "type": "password", "required": true, "isSecret": true }
+      ]
+    }
+  ]
+}
+```
+
+### Przegląd konfiguracji
+
+**GET** `/config/browse`
+
+Zwraca dane przeglądania elementów konfiguracji (używane do wyświetlania grupowanego w interfejsie konfiguracji).
+
 ---
 
 ## System pamięci
@@ -1215,6 +1247,230 @@ Wyrejestrowuje monitorowanie lokalizacji kodu, która nie jest już potrzebna.
 
 ---
 
+## Zarządzanie umiejętnościami
+
+### Strona zarządzania umiejętnościami
+
+**GET** `/skill` lub **GET** `/skill/index`
+
+Parametr zapytania: `beingId` — identyfikator Istoty (wymagany)
+
+Zwraca stronę zarządzania umiejętnościami określonej Istoty Krzemowej (lista umiejętności + edytor Markdown).
+
+### Pobranie listy umiejętności
+
+**GET** `/api/skills/list`
+
+Parametr zapytania: `beingId` — identyfikator Istoty (wymagany)
+
+Zwraca wszystkie umiejętności Istoty (id, description, version, tags, source, triggerMode, toolWhitelist, maxToolRound, timeoutSeconds, parameterCount) oraz statystyki (całkowita liczba umiejętności / liczba umiejętności niestandardowych / limit przydziału).
+
+### Pobranie Markdown umiejętności
+
+**GET** `/api/skills/get-md`
+
+Parametry zapytania: `beingId`, `skillId`
+
+Zwraca tekst Markdown określonej umiejętności (metadane YAML w nagłówku + treść promptu).
+
+### Zapisanie Markdown umiejętności
+
+**POST** `/api/skills/update-md?beingId={beingId}`
+
+Treść żądania (`application/json`):
+
+```json
+{
+  "markdown": "---\nid: my_skill\n...\n---\n\ntreść promptu",
+  "skillId": "my_skill"
+}
+```
+
+Aktualizuje lub tworzy umiejętność w formacie Markdown (semantyka upsert). Brakujące metadane są automatycznie uzupełniane przez AI; umiejętności zapisane przez interfejs Web mają `Source` oznaczony jako `User`. Ograniczone przez limit `MaxCustomSkillsPerBeing`.
+
+### Import umiejętności (JSON)
+
+**POST** `/api/skills/import?beingId={beingId}`
+
+Treść żądania: `{ "json": "<JSON definicji umiejętności>" }`
+
+Importuje umiejętność z JSON, również ograniczone przez limit przydziału.
+
+### Import umiejętności (Markdown)
+
+**POST** `/api/skills/import-md?beingId={beingId}`
+
+Treść żądania: `{ "markdown": "<tekst Markdown>" }`
+
+Importuje nową umiejętność z Markdown, brakujące metadane są automatycznie uzupełniane przez AI.
+
+### Usunięcie umiejętności
+
+**POST** `/api/skills/delete?beingId={beingId}`
+
+Treść żądania: `{ "skillId": "my_skill" }`
+
+Usuwa umiejętność (jednocześnie usuwa odpowiadające pliki trwałe `.md` i `.json`).
+
+### Eksport umiejętności (JSON)
+
+**GET** `/api/skills/export?beingId={beingId}&skillId={skillId}`
+
+Pobiera definicję umiejętności jako załącznik JSON (`{id}.json`).
+
+### Eksport umiejętności (Markdown)
+
+**GET** `/api/skills/export-md?beingId={beingId}&skillId={skillId}`
+
+Pobiera umiejętność jako załącznik Markdown (`{id}.md`).
+
+### Testowe wykonanie umiejętności
+
+**POST** `/api/skills/test?beingId={beingId}`
+
+Treść żądania:
+
+```json
+{
+  "skillId": "my_skill",
+  "parametersJson": "{ \"topic\": \"wiadomości AI\" }"
+}
+```
+
+Wykonuje umiejętność raz z podanymi parametrami i zwraca `ToolResult` (zawierający liczbę rund wykonania AI i końcowy wynik).
+
+---
+
+## Zarządzanie MCP
+
+### Strona zarządzania MCP
+
+**GET** `/mcp`
+
+Parametr zapytania: `beingId` — identyfikator Istoty (opcjonalny, używany do wyświetlenia narzędzi MCP widocznych dla tej Istoty)
+
+Zwraca stronę zarządzania serwerami MCP.
+
+### Pobranie listy serwerów
+
+**GET** `/api/mcp/list-servers`
+
+Zwraca status wszystkich skonfigurowanych serwerów MCP:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "state": "connected",
+      "enabled": true,
+      "toolCount": 8,
+      "endpoint": null,
+      "lastError": null
+    }
+  ],
+  "mcpEnabled": true,
+  "connected": 1,
+  "toolTotal": 8
+}
+```
+
+Wartości `state`: `connected` / `disconnected` / `connecting` / `error`.
+
+### Pobranie listy narzędzi serwera
+
+**GET** `/api/mcp/list-tools?serverId={serverId}`
+
+Zwraca narzędzia udostępniane przez określony serwer (`name` to pełna nazwa z prefiksem `mcp_{serverId}_{toolName}`, `description`, `schema`). Zwraca błąd, gdy serwer nie jest połączony.
+
+### Dodanie serwera
+
+**POST** `/api/mcp/add-server`
+
+Treść żądania (`McpServerConfig`):
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "env": {},
+  "endpoint": null,
+  "enabled": true
+}
+```
+
+`transport` obsługuje `stdio` (proces lokalny: `command` + `arguments`) oraz `http` (zdalny punkt końcowy: `endpoint`). Identyfikator serwera dopuszcza tylko małe litery, cyfry i znaki podkreślenia. Po dodaniu natychmiast łączy i synchronizuje ze wszystkimi Istotami Krzemowymi.
+
+### Włączenie/wyłączenie serwera
+
+**POST** `/api/mcp/toggle`
+
+Treść żądania: `{ "serverId": "filesystem", "enabled": true }`
+
+### Usunięcie serwera
+
+**POST** `/api/mcp/remove-server`
+
+Treść żądania: `{ "serverId": "filesystem" }`
+
+Usuwa konfigurację serwera i wyrejestrowuje jego narzędzia ze wszystkich Istot.
+
+### Ponowne połączenie z serwerem
+
+**POST** `/api/mcp/reconnect`
+
+Treść żądania: `{ "serverId": "filesystem" }`
+
+Wymusza rozłączenie i ponowne nawiązanie połączenia, odświeża listę narzędzi.
+
+### Testowe wywołanie narzędzia
+
+**POST** `/api/mcp/test-tool`
+
+Treść żądania:
+
+```json
+{
+  "serverId": "filesystem",
+  "toolName": "read_file",
+  "argumentsJson": "{ \"path\": \"/data/hello.txt\" }"
+}
+```
+
+Bezpośrednio wywołuje narzędzie serwera MCP (bez udziału AI), służy do weryfikacji łączności.
+
+---
+
+## Autoryzacja OAuth platformy IM
+
+### Inicjowanie autoryzacji
+
+**GET** `/im/{platform}/authorize`
+
+Parametr ścieżki: `platform` — identyfikator platformy IM (np. `feishu`)
+
+Generuje losowy `state` chroniący przed CSRF, rejestruje sesję autoryzacyjną ważną 5 minut, zwraca URL autoryzacji i automatycznie otwiera domyślną przeglądarkę systemu. Ponowne inicjowanie dla tej samej platformy nadpisuje poprzednią sesję.
+
+### Wywołanie zwrotne autoryzacji
+
+**GET** `/im/{platform}/callback?code={code}&state={state}`
+
+Wywoływane przez przekierowanie platformy IM. Po weryfikacji `state` wymienia kod autoryzacyjny na token dostępu, zapisuje `accessToken`, `refreshToken`, `tokenExpiresAt`, `authMode=oauth` w konfiguracji platformy i utrwala je, a następnie renderuje stronę wyniku autoryzacji (sukces/niepowodzenie).
+
+### Sprawdzenie statusu autoryzacji
+
+**GET** `/im/{platform}/status`
+
+Zwraca `{ platform, status, tokenExpiresAt }`. Wartości `status`: `pending` / `success` / `failed` / `timeout` / `none`. Frontend priorytetowo odbiera aktualizacje statusu przez zdarzenie SSE `im_auth_status`; ten punkt końcowy służy jako mechanizm rezerwowy do odpytywania.
+
+---
+
 ## System dokumentacji pomocy
 
 ### Strona pomocy
@@ -1370,6 +1626,20 @@ eventSource.onmessage = (event) => {
       break;
   }
 };
+```
+
+### Zdarzenia statusu autoryzacji IM
+
+Kreator autoryzacji OAuth platformy IM przesyła status przez współdzielone połączenie SSE (nazwa zdarzenia `im_auth_status`):
+
+```javascript
+eventSource.addEventListener('im_auth_status', (event) => {
+  const data = JSON.parse(event.data);
+  // data.platform — identyfikator platformy (feishu / wecom / dingtalk)
+  // data.status  — pending / success / failed / timeout
+  // data.message — dodatkowy opis
+  updateAuthStatus(data.platform, data.status);
+});
 ```
 
 ---

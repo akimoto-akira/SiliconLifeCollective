@@ -102,7 +102,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 {
   "action": "send_message",
   "target_id": "being-uuid-or-user-0",
-  "message": "你好，让我们协作吧！"
+  "message": "Hello, let's collaborate!"
 }
 ```
 
@@ -151,8 +151,8 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 ```json
 {
   "action": "create_being",
-  "name": "助手",
-  "soul": "你是一个有用的助手..."
+  "name": "Assistant",
+  "soul": "You are a helpful assistant..."
 }
 ```
 
@@ -279,7 +279,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 ```json
 {
   "action": "search",
-  "keyword": "权限"
+  "keyword": "permission"
 }
 ```
 
@@ -314,7 +314,33 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 
 ---
 
-### 11. Log Tool (LogTool)
+### 11. MCP Query Tool (McpTool)
+
+**Tool Name**: `mcp`
+
+**Description**: Query MCP (Model Context Protocol) integration status — connected external servers, their available tools, and how to call them. This is a read-only tool: server add/remove can only be done by users through the Web UI; AI cannot modify the server list.
+
+**Supported Operations**:
+- `status` — Global overview (enabled status, server count, tool count)
+- `list_servers` — List configured servers (with connection status and tool count)
+- `list_tools` — List available tools (with `mcp_{server}_{tool}` prefix name, description, and parameter schema; optional `server_id` to filter a single server)
+
+**Usage Example**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**MCP Wrapper Tools**: Each tool provided by a connected MCP server is dynamically registered as an independent tool for Silicon Beings, named in the format `mcp_{serverId}_{toolName}` (e.g., `mcp_filesystem_read_file`). AI can directly call them by prefix name like regular tools, without going through this query tool. Wrapper tools present a single `execute` action in the permission matrix and can be individually disabled.
+
+**Scenario**: All scenarios (`All`)
+
+---
+
+### 12. Log Tool (LogTool)
 
 **Tool Name**: `log`
 
@@ -338,7 +364,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 
 ---
 
-### 12. Memory Tool (MemoryTool)
+### 13. Memory Tool (MemoryTool)
 
 **Tool Name**: `memory`
 
@@ -367,7 +393,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 
 ---
 
-### 13. Network Tool (NetworkTool)
+### 14. Network Tool (NetworkTool)
 
 **Tool Name**: `network`
 
@@ -393,7 +419,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 
 ---
 
-### 14. Permission Tool (PermissionTool) 🔒
+### 15. Permission Tool (PermissionTool) 🔒
 
 **Tool Name**: `permission`
 
@@ -420,7 +446,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 
 ---
 
-### 15. Project Tool (ProjectTool) 🔒
+### 16. Project Tool (ProjectTool) 🔒
 
 **Tool Name**: `project`
 
@@ -450,13 +476,13 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 {
   "action": "create",
   "name": "My Project",
-  "description": "项目描述"
+  "description": "Project description"
 }
 ```
 
 ---
 
-### 16. Project Task Tool (ProjectTaskTool)
+### 17. Project Task Tool (ProjectTaskTool)
 
 **Tool Name**: `project_task`
 
@@ -483,14 +509,14 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 {
   "action": "create",
   "project_id": "project-uuid",
-  "description": "完成任务描述",
+  "description": "Complete task description",
   "priority": 5
 }
 ```
 
 ---
 
-### 17. Project Work Note Tool (ProjectWorkNoteTool)
+### 18. Project Work Note Tool (ProjectWorkNoteTool)
 
 **Tool Name**: `project_work_note`
 
@@ -512,15 +538,15 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 {
   "action": "create",
   "project_id": "project-uuid",
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token",
-  "keywords": "认证,JWT"
+  "summary": "Complete user authentication module",
+  "content": "## Implementation Details\n\n- Use JWT token",
+  "keywords": "authentication,JWT"
 }
 ```
 
 ---
 
-### 18. Project Work Tool (ProjectWorkTool) 🔒
+### 19. Project Work Tool (ProjectWorkTool) 🔒
 
 **Tool Name**: `project_work`
 
@@ -543,13 +569,61 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 {
   "action": "create-task",
   "project_id": "project-uuid",
-  "title": "实现用户认证"
+  "title": "Implement user authentication"
 }
 ```
 
 ---
 
-### 19. System Tool (SystemTool)
+### 20. Skill Tool (SkillTool)
+
+**Tool Name**: `skill`
+
+**Description**: Manage Silicon Being skills (reusable "tool orchestration + prompt template" capability units), supporting create, list, update, delete, import, and export. Missing metadata (id, description, parameter schema, etc.) is auto-completed by AI.
+
+**Supported Operations**:
+- `create` — Create a new skill (requires `id` and `system_prompt`; optional `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — List all available skills (with summaries)
+- `update` — Update an existing skill via parameters (requires `skill_id`)
+- `update_from_md` — Update skill from Markdown string (YAML frontmatter + prompt body)
+- `delete` — Delete a skill (requires `skill_id`)
+- `export` — Export skill as JSON (requires `skill_id`)
+- `export_md` — Export skill as Markdown (requires `skill_id`)
+- `import` — Import skill from JSON (requires `json`)
+- `import_md` — Import skill from Markdown (requires `markdown`)
+
+**Usage Example**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "Search today's tech news and generate a summary",
+  "system_prompt": "Please use the network tool to search for the latest news on {topic} and generate a 500-word summary.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "News topic" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**Modify Permissions**: Silicon Curator can modify all skills; regular beings can only modify skills with source `Being` or `User` (cannot modify built-in and plugin skills).
+
+**Quantity Limit**: The number of custom skills per being is limited by the `MaxCustomSkillsPerBeing` config (default 50).
+
+**Scenario**: All scenarios (`All`)
+
+> For complete documentation on the skill system (trigger modes, whitelist, hot reload, auto-scheduling, etc.), see [Silicon Being Guide](silicon-being-guide.md#skill-system).
+
+---
+
+### 21. System Tool (SystemTool)
 
 **Tool Name**: `system`
 
@@ -570,7 +644,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 
 ---
 
-### 20. Task Tool (TaskTool)
+### 22. Task Tool (TaskTool)
 
 **Tool Name**: `task`
 
@@ -588,14 +662,14 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 ```json
 {
   "action": "create",
-  "description": "审查代码",
+  "description": "Review code",
   "priority": 5
 }
 ```
 
 ---
 
-### 21. Timer Tool (TimerTool)
+### 23. Timer Tool (TimerTool)
 
 **Tool Name**: `timer`
 
@@ -615,13 +689,13 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
   "action": "create",
   "interval": 3600,
   "repeat": true,
-  "message": "每小时提醒"
+  "message": "Hourly reminder"
 }
 ```
 
 ---
 
-### 22. Token Audit Tool (TokenAuditTool) 🔒
+### 24. Token Audit Tool (TokenAuditTool) 🔒
 
 **Tool Name**: `token_audit`
 
@@ -651,7 +725,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 
 ---
 
-### 23. WebView Browser Tool (WebViewBrowserTool)
+### 25. WebView Browser Tool (WebViewBrowserTool)
 
 **Tool Name**: `webview_browser`
 
@@ -692,7 +766,7 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 
 ---
 
-### 24. Work Note Tool (WorkNoteTool)
+### 26. Work Note Tool (WorkNoteTool)
 
 **Tool Name**: `work_note`
 
@@ -711,9 +785,9 @@ Additionally, tools marked with the `[ChatOnly]` attribute are only available in
 ```json
 {
   "action": "create",
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
-  "keywords": "认证,JWT,OAuth2"
+  "summary": "Complete user authentication module",
+  "content": "## Implementation Details\n\n- Use JWT token\n- Support OAuth2",
+  "keywords": "authentication,JWT,OAuth2"
 }
 ```
 
@@ -761,7 +835,7 @@ public class MyCustomTool : ITool
 {
     public string Name => "my_tool";
     
-    public string Description => "工具描述";
+    public string Description => "Tool description";
     
     public ToolDefinition Definition => new ToolDefinition
     {
@@ -769,7 +843,7 @@ public class MyCustomTool : ITool
         Description = Description,
         Parameters = new Dictionary<string, object>
         {
-            ["param1"] = new { type = "string", description = "参数说明" }
+            ["param1"] = new { type = "string", description = "Parameter description" }
         }
     };
     
@@ -821,6 +895,13 @@ public class AdminOnlyTool : ITool
 }
 ```
 
+### Alternative: Skills and MCP Tools
+
+In addition to writing C# tool classes, there are two extension methods that don't require compilation:
+
+- **Skills**: Create "tool orchestration + prompt template" combinations through the Web UI or the `skill` tool, suitable for encapsulating common workflows into reusable capabilities. See [Silicon Being Guide — Skill System](silicon-being-guide.md#skill-system).
+- **MCP Servers**: After configuring external MCP servers in the Web UI, their tools are automatically injected in the `mcp_{serverId}_{toolName}` format, without writing any code. See [Web UI Guide — MCP Management](web-ui-guide.md).
+
 ## Best Practices
 
 ### 1. Always Validate Parameters
@@ -828,7 +909,7 @@ public class AdminOnlyTool : ITool
 ```csharp
 if (!call.Parameters.ContainsKey("required_param"))
 {
-    return ToolResult.Failure("缺少必需参数: required_param");
+    return ToolResult.Failure("Missing required parameter: required_param");
 }
 ```
 
@@ -837,11 +918,11 @@ if (!call.Parameters.ContainsKey("required_param"))
 ```csharp
 try
 {
-    // 执行操作
+    // Execute operation
 }
 catch (Exception ex)
 {
-    Logger.Error($"工具 {Name} 执行失败: {ex.Message}");
+    Logger.Error($"Tool {Name} execution failed: {ex.Message}");
     return ToolResult.Failure(ex.Message);
 }
 ```
@@ -864,8 +945,8 @@ Help the AI understand when and how to use the tool:
 
 ```csharp
 public string Description => 
-    "用于在不同日历系统之间转换日期。" +
-    "需要提供 'date'、'from_calendar' 和 'to_calendar' 参数。";
+    "Converts dates between different calendar systems. " +
+    "Requires 'date', 'from_calendar', and 'to_calendar' parameters.";
 ```
 
 ## Troubleshooting

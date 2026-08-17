@@ -136,6 +136,26 @@ Configura il backend AI:
 - SiliconFlow (cloud, lista dinamica modelli)
 - Client personalizzato
 
+### Piattaforme IM (Multi-Istanza)
+
+La configurazione delle piattaforme IM supporta un'architettura multi-istanza, consentendo di abilitare contemporaneamente più piattaforme:
+
+1. Fare clic su **Aggiungi Piattaforma** e selezionare il tipo di piattaforma:
+   - **Web UI** (integrata, abilitata per impostazione predefinita)
+   - **Feishu** (supporta configurazione manuale e autorizzazione OAuth con un clic)
+   - **WeChat Enterprise** (configurazione manuale)
+   - **DingTalk** (configurazione manuale, supporta modalità evento Stream / HTTP)
+2. Compilare i campi della piattaforma tramite il modulo dinamico (i campi obbligatori sono contrassegnati con asterisco, i campi delle chiavi sono caselle di password)
+3. Ogni istanza può essere abilitata/disabilitata ed eliminata indipendentemente
+
+**Variabili di ambiente per le chiavi**: i valori di configurazione supportano i placeholder `${ENV_VAR}` (es. `"${FEISHU_APP_SECRET}"`), risolti a runtime dalle variabili di ambiente; le chiavi in chiaro non vengono scritte nel config.json.
+
+**Procedura guidata OAuth** (Feishu): dopo aver salvato appId/appSecret, nella pagina di configurazione appare un'area di autorizzazione inline; fare clic sul pulsante **Autorizza** per aprire il browser di sistema e passare alla pagina di autorizzazione Feishu; dopo aver completato l'autorizzazione, il token viene riscritto automaticamente nella configurazione e la pagina mostra lo stato dell'autorizzazione in tempo reale tramite SSE (successo/fallimento/timeout), senza necessità di copia e incolla manuale.
+
+### Server MCP
+
+L'elenco dei server MCP è gestito centralmente nella pagina di configurazione (editor di array): un server per riga (ID, nome, modalità di trasporto stdio/http, comando o endpoint, stato di abilitazione), con **Aggiungi** ed **Elimina** in linea. Dopo il salvataggio, il server si connette immediatamente e i suoi strumenti vengono iniettati automaticamente nell'Essere di Silicio. Vedere la sezione [Gestione MCP](#gestione-mcp) di seguito per i dettagli.
+
 ### Impostazioni di Archiviazione
 
 - Versione Default: percorso base, indice temporale, criteri di pulizia
@@ -521,6 +541,104 @@ Note di lavoro personali degli Esseri di Silicio, simili a un diario:
   - `/api/worknotes/search?q=keyword` - Cerca nelle note
   - `/api/worknotes/directory` - Genera l'indice delle note
   - `/api/projects` - API di gestione dei progetti
+
+---
+
+## Gestione delle Competenze
+
+### Panoramica delle Funzionalità
+
+Le competenze (Skill) sono unità di capacità riutilizzabili costituite da "orchestrazione di strumenti + modello di prompt". La pagina di gestione delle competenze (`/skill?beingId={id}`) fornisce una gestione visiva delle competenze per ogni Essere di Silicio.
+
+### Layout della Pagina
+
+- **Elenco competenze a sinistra**: visualizzazione a schede (titolo, badge `versione · fonte · modalità trigger`, descrizione)
+- **Editor a destra**: editor Markdown (metadati YAML front-matter + corpo del prompt)
+- **Statistiche in alto**: numero totale di competenze / competenze personalizzate / limite di quota (es. `5 / 2 / 50`)
+
+### Operazioni della Barra degli Strumenti
+
+- **Nuovo**: carica un modello di competenza Markdown
+- **Importa .md / Importa .json**: importa competenze da file locali
+- **Aggiorna**: ricarica l'elenco delle competenze
+
+### Operazioni delle Schede Competenza
+
+Ogni scheda competenza offre 5 operazioni:
+
+| Operazione | Descrizione |
+|------|------|
+| Modifica | Apre il Markdown nell'editor a destra, con possibilità di salvare (upsert) |
+| Test | Inserisce i parametri JSON, esegue immediatamente la competenza e visualizza il risultato |
+| Esporta JSON | Scarica `{id}.json` |
+| Esporta Markdown | Scarica `{id}.md` |
+| Elimina | Elimina la competenza (inclusi i file persistenti) |
+
+### Scrittura di Competenze
+
+Le competenze sono scritte in Markdown, con i metadati YAML front-matter che dichiarano id, descrizione, schema dei parametri, whitelist degli strumenti, modalità trigger, ecc.; il corpo è il modello di prompt (supporta i placeholder `{param}`). È possibile scrivere solo il corpo (omettendo YAML) — al salvataggio l'AI completa automaticamente i metadati mancanti e i campi forniti dall'utente non vengono mai sovrascritti.
+
+```markdown
+---
+id: daily_news_digest
+description: Cerca le notizie tecnologiche di oggi e genera un riepilogo
+tool_whitelist: [network, work_note]
+trigger_mode: Auto
+metadata:
+  schedule: "0 9 * * *"
+---
+
+Utilizza lo strumento network per cercare le ultime notizie su {topic}, genera un riepilogo di 500 parole e salvalo nelle note di lavoro.
+```
+
+### Implementazione Tecnica
+
+- **Controller**: `SkillController` (pagina + 10 endpoint API)
+- **Core**: `SkillManager` (registrazione/esecuzione/hot-reload), `SkillMetadataCompleter` (completamento metadati AI)
+- **Hot-reload**: l'Essere rileva le modifiche alla directory `skills/` ogni 30 secondi, dopo il salvataggio dalla Web UI non è necessario riavviare
+- **Archiviazione versioni**: ogni aggiornamento viene archiviato automaticamente in `skills/archive/{id}/{version}.md`
+
+---
+
+## Gestione MCP
+
+### Panoramica delle Funzionalità
+
+La pagina di gestione MCP (Model Context Protocol, Protocollo di Contesto del Modello) (`/mcp`) è utilizzata per gestire le connessioni ai server MCP esterni. Dopo la connessione, gli strumenti forniti dal server vengono iniettati automaticamente in tutti gli Esseri di Silicio con il formato `mcp_{serverId}_{toolName}`.
+
+### Elenco dei Server
+
+Visualizza per ogni server: ID, nome, modalità di trasporto (stdio/http), stato di connessione (connected/disconnected/connecting/error), stato di abilitazione, numero di strumenti, errore più recente.
+
+### Operazioni di Gestione
+
+| Operazione | Descrizione |
+|------|------|
+| Aggiungi server | Compilare ID (lettere minuscole/cifre/sottolineatura), nome, modalità di trasporto; stdio richiede comando e parametri, http richiede URL endpoint |
+| Abilita/Disabilita | Interruttore in linea, dopo la disabilitazione gli strumenti vengono deregistrati da tutti gli Esseri |
+| Riconnetti | Disconnette e riconnette, aggiorna l'elenco degli strumenti |
+| Elimina | Rimuove la configurazione del server e tutti i suoi strumenti |
+| Visualizza strumenti | Espande il server, elenca i nomi degli strumenti (con prefisso), descrizione, schema dei parametri |
+| Testa strumento | Chiama direttamente uno strumento MCP per verificare la connettività (senza AI) |
+
+### Esempio di Aggiunta Server stdio
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "enabled": true
+}
+```
+
+### Meccanismo di Sicurezza
+
+- L'aggiunta/eliminazione/abilitazione/disabilitazione dei server può essere eseguita solo dall'utente tramite la Web UI; l'AI non può modificare l'elenco dei server (lo strumento `mcp` fornisce solo query in sola lettura)
+- Lo strumento wrapper MCP presenta una singola azione `execute` nella matrice dei permessi degli strumenti, può essere disabilitato singolarmente per Essere/progetto
+- L'interruttore globale `McpEnabled` può disattivare con un clic l'intera integrazione MCP
 
 ---
 

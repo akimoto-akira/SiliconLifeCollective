@@ -400,13 +400,13 @@ SiliconLifeCollective/
 │   ├── ja-JP/                       # Japonština
 │   ├── ko-KR/                       # Korejština
 │   └── cs-CZ/                       # Čeština
-├── 总文档/                           # Dokumentace požadavků a architektury (čínština)
+├── docs/                            # Dokumentace požadavků a architektury
 └── README.md                        # Popis projektu
 ```
 
 ## Potřebujete pomoc?
 
-- 📖 Prohlédněte [systém nápovědy](web-ui-guide.md#帮助文档系统新增) (vícejazyčná podpora)
+- 📖 Prohlédněte [systém nápovědy](web-ui-guide.md#systém-nápovědy) (vícejazyčná podpora)
 - 📚 Přečtěte [kompletní dokumentaci](docs/)
 - 🐛 Nahlaste problémy na [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
 - 💬 Zapojte se do komunitní diskuse

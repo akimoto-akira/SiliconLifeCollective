@@ -1,4 +1,4 @@
-﻿# 变更日志
+# 变更日志
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | **中文** | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -66,6 +66,55 @@
 
 ## [未发布]
 
+### 2026-08-17
+
+#### 新功能
+- `c7b575b` - 实现 MCP 集成——外部服务器工具接入、配置管理与帮助文档
+  - 新增 MCP 核心（SiliconLife.Core/Mcp/）：McpManager 服务器生命周期管理、stdio/http 双传输、McpClientConnection 连接封装、按服务器包装工具并以 `mcp_{serverId}_{toolName}` 命名注入所有硅基生命体
+  - 新增 Web 管理页面（/mcp）与 7 个 API 端点（list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool）
+  - 新增 McpTool 查询工具（status/list_servers/list_tools，只读）；服务器增删仅限用户通过 Web UI，AI 无法修改服务器列表
+  - 配置页支持 MCP 服务器数组编辑器（模态窗口内行内添加/删除）
+  - 注册 MCP 帮助主题（🔌），10 种语言实现完整帮助文档
+  - MCP 包装工具在权限矩阵中以 `execute` 动作呈现，支持按生命体/项目禁用
+  - 45 个文件变更
+
+### 2026-08-16
+
+#### 新功能
+- `5d76c5a` - 实现技能系统——工具编排与提示词模板的复用抽象层
+  - 新增 SkillDefinition（id/描述/参数 schema/系统提示词模板/工具白名单/动作限制/最大轮数/超时/完成动作/触发模式）
+  - 新增 SkillManager：技能注册中心 + 执行引擎（子 AIRequest 循环、递归防护、全局轮数与超时钳制）
+  - 双触发模式：Manual（AI 函数调用，技能以 ToolDefinition 注入、调度侧优先路由）+ Auto（schedule 调度，支持 `HH:mm` / `N s|m|h|d` / cron 子集）
+  - Markdown 优先存储（YAML 前置 + 提示词正文），纯 Markdown 由 AI 自动补全元数据（用户字段不被覆盖）
+  - 热重载（30 秒指纹检测）、版本归档（skills/archive/）、3 个内置技能（summarize_document/code_review/research_topic）
+  - 新增 skill 工具（create/list/update/update_from_md/delete/export/export_md/import/import_md）
+  - 新增技能管理页面（/skill）与 10 个 API 端点；配额 MaxCustomSkillsPerBeing（默认 50）
+  - 权限：技能级 `execute` 动作权限、技能内工具白名单与生命体权限取严格侧并集
+- `b60fc68` - 更新千帆模型列表与上下文窗口映射 - 新增 glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest 模型，1M/128K 分级上下文窗口与视觉能力映射
+
+### 2026-08-15
+
+#### 新功能
+- `eaa8417` - 实现 IM 平台 OAuth 授权向导与配置密钥环境变量解析
+  - 新增 ImOAuthController/ImOAuthService 支持飞书 OAuth 授权流程（authorize/callback/status），含 state 防 CSRF、5 分钟超时、SSE 状态推送
+  - 新增 IMProviderRegistry 统一管理 IM 平台元数据（配置字段 schema/OAuth 端点模板/Provider 工厂）
+  - 新增 ConfigSecretResolver 解析配置中的 `${ENV_VAR}` 占位符，深拷贝替换不写回原始配置
+  - 配置页集成 IM 授权向导 UI（行内授权区 + SSE 实时状态）
+  - 补全 13 个语言文件的 IM 授权状态/帮助文案翻译
+
+### 2026-07-26
+
+#### 重构
+- `ffc45c2` - 重构 IM 平台为多实例配置架构 - IMPlatforms 列表化（每平台独立启停）、AggregateIMProvider 聚合多平台消息收发与权限竞速、配置页多实例编辑器
+
+### 2026-07-19
+
+#### 新功能
+- `9bf2103` - Speedy.Manager 树形框集成多选删除与多选导出
+
+#### 修复
+- `0df0674` - 修复 Speedy.Manager 多选删除仅删除首项的问题
+
 ### 2026-07-16
 
 #### 新功能
@@ -73,6 +122,7 @@
   - 20 个文件变更
 
 #### 文档
+- `ce36036` - 根据 git 记录重写所有 13 个语言版本 changelog 的 2026-05-26 后内容
 - `d6608ea` - 在所有 13 个语言版本的 changelog 中添加 DuMate（百度千帆）的 AI IDE 工具介绍
   - 13 个文件变更
 

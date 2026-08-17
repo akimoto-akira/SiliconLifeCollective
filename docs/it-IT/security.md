@@ -383,3 +383,82 @@ Il sistema fornisce template di permessi predefiniti per garantire una baseline 
 - **Granularità delle operazioni** — Ogni operazione di ogni strumento è controllata indipendentemente (es. `network:get` consentito ma `network:post` negato)
 - **Gestione del Curatore** — I permessi degli strumenti possono essere configurati solo dal Curatore di Silicio
 - **Traccia di audit** — Le modifiche ai permessi degli strumenti sono registrate nel log di audit
+
+---
+
+## Sicurezza delle Competenze
+
+Il sistema delle competenze riutilizza il sistema dei permessi degli strumenti e fornisce multiple protezioni:
+
+### Permesso di Esecuzione
+
+- L'id della competenza funge da nome dello strumento, incluso nella matrice dei permessi `ToolActionPermissionConfig` con l'azione `execute`
+- Le competenze disabilitate non compaiono nelle definizioni degli strumenti visibili all'AI (doppia garanzia: filtro a livello Schema + verifica a runtime)
+- Il Curatore può sempre eseguire; gli Esseri ordinari richiedono `IsActionAllowed(skillId, "execute")`
+
+### Whitelist degli Strumenti e Unione dei Permessi
+
+- Durante l'esecuzione della competenza sono consentiti solo gli strumenti nella `ToolWhitelist` (lista vuota = eredita tutti gli strumenti dell'Essere)
+- Le restrizioni delle azioni della competenza e i permessi dell'Essere **prendono l'unione sul lato restrittivo** (`MergePermissions`): la competenza può solo restringere ulteriormente i permessi, mai ampliarli
+- Le chiamate a strumenti fuori dalla whitelist falliscono direttamente (`Tool not in whitelist`)
+
+### Guardrail di Consumo delle Risorse
+
+- **Interruttore globale**: `SkillEnabled` disabilita con un clic l'intero sistema di competenze
+- **Quota numerica**: il numero di competenze personalizzate per Essere è limitato da `MaxCustomSkillsPerBeing` (predefinito 50)
+- **Limitazione dei round**: `maxToolRound = Min(valore dichiarato competenza, GlobalMaxToolRound predefinito 10)`, previene loop fuori controllo
+- **Limitazione del timeout**: `timeout = Min(valore dichiarato competenza, GlobalSkillTimeoutSeconds predefinito 300s)`
+- **Protezione contro la ricorsione**: una competenza in esecuzione non può richiamare se stessa
+
+### Modifica dei Permessi
+
+- Il Curatore può modificare tutte le competenze; gli Esseri ordinari possono modificare solo le competenze con fonte `Being`/`User`
+- Il completamento automatico dei metadati riempie solo i campi mancanti, i campi forniti dall'utente non vengono mai sovrascritti dall'AI
+
+---
+
+## Sicurezza MCP
+
+L'integrazione MCP segue il principio "sovranità dell'utente + coerenza dei permessi":
+
+### Sovranità dell'Utente
+
+- L'aggiunta, l'eliminazione, l'abilitazione/disabilitazione e la riconnessione dei server MCP **possono essere eseguite solo dall'utente tramite la Web UI** (/mcp o pagina di configurazione)
+- Lo strumento `mcp` lato AI è una query in sola lettura (status/list_servers/list_tools), non può modificare l'elenco dei server
+- L'interruttore globale `McpEnabled` può tagliare con un clic tutti gli strumenti esterni
+
+### Isolamento degli Strumenti e Permessi
+
+- Gli strumenti wrapper sono denominati `mcp_{serverId}_{toolName}`, isolati dal namespace degli strumenti integrati/plugin
+- Ogni strumento wrapper dichiara automaticamente una singola azione `execute`, inclusa nella matrice dei permessi degli strumenti a due livelli, disabilitabile singolarmente per Essere/progetto
+- Dopo la disabilitazione del server, i suoi strumenti vengono immediatamente deregistrati da tutti gli Esseri
+
+### Confine di Trasporto e Processo
+
+- I server `stdio` vengono eseguiti come sottoprocessi, ereditando solo le variabili di ambiente esplicitamente configurate (campo `env`)
+- I server `http` comunicano tramite l'endpoint configurato, in caso di fallimento della connessione passano automaticamente allo stato error ed espongono `lastError`
+
+---
+
+## Sicurezza delle Chiavi IM
+
+### Placeholder delle Variabili di Ambiente
+
+I valori di configurazione della piattaforma IM supportano i placeholder `${ENV_VAR}` (es. `"${FEISHU_APP_SECRET}"`):
+
+- `ConfigSecretResolver` risolve i placeholder su una **copia profonda**, il `config.json` originale mantiene sempre i placeholder intatti
+- I successivi `SaveConfig` non riscrivono le chiavi in chiaro risolte sul disco
+- Supporta placeholder a valore intero e placeholder incorporati nel valore (es. `prefix-${VAR}`)
+
+### Sicurezza dell'Autorizzazione OAuth
+
+- **state anti-CSRF**: 16 byte di numero casuale crittografico, verificato rigorosamente al callback
+- **Timeout di 5 minuti**: la sessione di autorizzazione viene automaticamente annullata al timeout, le sessioni precedenti vengono annullate immediatamente quando sovrascritte
+- **Archiviazione token**: accessToken/refreshToken/tokenExpiresAt vengono riscritti nella configurazione della piattaforma e resi persistenti, `authMode` viene contrassegnato come `oauth`
+- L'URL di callback supporta la configurazione `redirectBaseUrl` (scenari di callback su rete pubblica)
+
+### Sicurezza dei Messaggi
+
+- Feishu: verifica della firma (`X-Lark-Signature`, SHA256) + decrittazione eventi AES-256-CBC + deduplicazione eventi (finestra di 10 minuti)
+- WeChat Enterprise: crittografia/decrittografia e verifica della firma WXBizMsgCrypt
+- DingTalk: la modalità Stream utilizza WebSocket crittografato; la modalità HTTP verifica il callback

@@ -188,7 +188,7 @@ dotnet build
   "AIClients": {
     "Ernie": {
       "ApiKey": "your-api-key-here",
-      "Model": "ernie-4.0-8k"
+      "Model": "ernie-5.1"
     }
   }
 }

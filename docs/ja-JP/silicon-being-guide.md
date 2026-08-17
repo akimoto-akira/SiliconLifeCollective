@@ -188,6 +188,78 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
+## スキルシステム
+
+スキル（Skill）はシリコンビーイングの再利用可能な能力ユニットです。「ツールオーケストレーション + プロンプトテンプレート」を宣言型、進化型、自動スケジュール可能な関数としてカプセル化し、AI は通常のツールと同じようにスキルを呼び出します。
+
+### スキル構造
+
+| 要素 | 説明 |
+|------|------|
+| `id` / `description` | 一意識別子と一文の説明（AI に表示され、AI がいつこのスキルを選択するかを決定） |
+| `parameter_schema` | パラメータ JSON Schema、プロンプトで使用される各 `{param}` プレースホルダーを宣言 |
+| `system_prompt_template` | システムプロンプトテンプレート、実行時にパラメータでプレースホルダーを充填 |
+| `tool_whitelist` | 実行中に許可されるツールリスト（空 = ビーイングの全ツールを継承） |
+| `max_tool_round` / `timeout` | ツールラウンド数とタイムアウト上限（グローバル上限によりクランプ） |
+| `on_complete` | 完了アクション：`none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual`（AI による自律呼び出し）または `Auto` + `schedule` スケジュール |
+
+### 4種類のソース
+
+- **Builtin** — フレームワーク内蔵（`summarize_document` ドキュメント要約、`code_review` コードレビュー、`research_topic` テーマ調査）
+- **Plugin** — プラグインが `ISkillProvider` を通じて登録
+- **Being** — ビーイングが実行時に `skill` ツールで自己作成
+- **User** — ユーザーが Web UI のスキル管理ページから作成
+
+### トリガー方式
+
+1. **手動（Manual）**：スキルは通常のツール定義として AI リクエストに注入され、AI がいつ呼び出すかを判断；スケジューラー側は同名呼び出しをスキルに優先ルーティング
+2. **自動（Auto + schedule）**：スケジュール式は `metadata.schedule` に格納、3種類のフォーマットをサポート：
+   - `"09:30"` — 毎日定時
+   - `"6h"` / `"30 m"` / `"2 d"` — 間隔周期
+   - `"0 9 * * *"` / `"*/15 * * * *"` — cron サブセット
+
+### Markdown での記述
+
+スキルは Markdown で保存（`skills/{id}.md`、YAML フロントマター + プロンプト本文）：
+
+```markdown
+---
+id: daily_news_digest
+description: 搜索今日科技新闻并生成摘要
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+请使用 network 工具搜索 {topic} 的最新新闻，生成 500 字摘要并保存到工作笔记。
+```
+
+本文のみを記述（YAML を省略）することも可能です。保存時に AI が id、description、パラメータスキーマなどのメタデータを自動補完します。ユーザーが既に入力したフィールドは上書きされません。
+
+### ビーイングの自己管理
+
+ビーイングは `skill` ツールを通じて自身のスキルライブラリを管理できます：
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### ホットリロードと進化
+
+- ビーイングは30秒ごとに `skills/` ディレクトリの変更を検出（フィンガープリント比較）。Web UI や他のビーイングによる変更は自動的に反映され、再起動は不要です
+- スキル更新のたびに履歴バージョンが `skills/archive/{id}/{version}.md` に自動アーカイブされ、スキルの進化履歴が形成されます
+- カスタムスキルの数はクォータで制限されます（`MaxCustomSkillsPerBeing`、デフォルト50）
+
+### 実行ガードレール
+
+- スキルレベルの `execute` アクションパーミッション（パーミッションマトリックスで無効化可能、無効化後は AI に不可視）
+- 実行パラメータはグローバル上限によりクランプ：ラウンド数 ≤ `GlobalMaxToolRound`（デフォルト10）、タイムアウト ≤ `GlobalSkillTimeoutSeconds`（デフォルト300秒）
+- スキルは自身を再帰的に呼び出せません
+- ホワイトリスト外のツール呼び出しは即座に失敗します
+
 ## メモリシステム
 
 ### メモリの種類

@@ -314,7 +314,33 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 11. Strumento Log (LogTool)
+### 11. Strumento Query MCP (McpTool)
+
+**Nome strumento**: `mcp`
+
+**Descrizione**: Query dello stato di integrazione MCP (Model Context Protocol) — server esterni connessi, strumenti forniti e come chiamarli. Strumento di sola lettura: l'aggiunta/rimozione dei server può essere effettuata solo dall'utente tramite Web UI, l'AI non può modificare l'elenco dei server.
+
+**Operazioni supportate**:
+- `status` — Panoramica globale (stato di abilitazione, numero di server, numero di strumenti)
+- `list_servers` — Elenca i server configurati (con stato di connessione e numero di strumenti)
+- `list_tools` — Elenca gli strumenti disponibili (con prefisso `mcp_{server}_{tool}`, descrizione e schema dei parametri; `server_id` opzionale per filtrare un singolo server)
+
+**Esempio di utilizzo**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**Strumento wrapper MCP**: Ogni strumento fornito da un server MCP connesso viene registrato dinamicamente come strumento indipendente negli Esseri di Silicio, con formato di naming `mcp_{serverId}_{toolName}` (es. `mcp_filesystem_read_file`). L'AI può chiamarli direttamente per nome come strumenti ordinari, senza passare attraverso questo strumento di query. Lo strumento wrapper presenta una singola azione `execute` nella matrice dei permessi e può essere disabilitato individualmente.
+
+**Scenario**: Tutti gli scenari (`All`)
+
+---
+
+### 12. Strumento Log (LogTool)
 
 **Nome strumento**: `log`
 
@@ -338,7 +364,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 12. Strumento Memoria (MemoryTool)
+### 13. Strumento Memoria (MemoryTool)
 
 **Nome strumento**: `memory`
 
@@ -367,7 +393,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 13. Strumento Rete (NetworkTool)
+### 14. Strumento Rete (NetworkTool)
 
 **Nome strumento**: `network`
 
@@ -393,7 +419,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 14. Strumento Permessi (PermissionTool) 🔒
+### 15. Strumento Permessi (PermissionTool) 🔒
 
 **Nome strumento**: `permission`
 
@@ -420,7 +446,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 15. Strumento Progetto (ProjectTool) 🔒
+### 16. Strumento Progetto (ProjectTool) 🔒
 
 **Nome strumento**: `project`
 
@@ -456,7 +482,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 16. Strumento Attività di Progetto (ProjectTaskTool)
+### 17. Strumento Attività di Progetto (ProjectTaskTool)
 
 **Nome strumento**: `project_task`
 
@@ -490,7 +516,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 17. Strumento Note di Lavoro di Progetto (ProjectWorkNoteTool)
+### 18. Strumento Note di Lavoro di Progetto (ProjectWorkNoteTool)
 
 **Nome strumento**: `project_work_note`
 
@@ -520,7 +546,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 18. Strumento Lavoro di Progetto (ProjectWorkTool) 🔒
+### 19. Strumento Lavoro di Progetto (ProjectWorkTool) 🔒
 
 **Nome strumento**: `project_work`
 
@@ -549,7 +575,55 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 19. Strumento Sistema (SystemTool)
+### 20. Strumento Competenza (SkillTool)
+
+**Nome strumento**: `skill`
+
+**Descrizione**: Gestione delle competenze degli Esseri di Silicio (unità di capacità riutilizzabile "orchestrazione di strumenti + modello di prompt"), supporta creazione, elenco, aggiornamento, eliminazione, importazione ed esportazione. I metadati mancanti (id, descrizione, schema dei parametri, ecc.) vengono completati automaticamente dall'AI.
+
+**Operazioni supportate**:
+- `create` — Crea una nuova competenza (richiede `id` e `system_prompt`; opzionali: `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — Elenca tutte le competenze disponibili (con riepilogo)
+- `update` — Aggiorna una competenza esistente tramite parametri (richiede `skill_id`)
+- `update_from_md` — Aggiorna una competenza da una stringa Markdown (metadati YAML frontmatter + corpo del prompt)
+- `delete` — Elimina una competenza (richiede `skill_id`)
+- `export` — Esporta una competenza in JSON (richiede `skill_id`)
+- `export_md` — Esporta una competenza in Markdown (richiede `skill_id`)
+- `import` — Importa una competenza da JSON (richiede `json`)
+- `import_md` — Importa una competenza da Markdown (richiede `markdown`)
+
+**Esempio di utilizzo**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "Cerca le notizie tecnologiche di oggi e genera un riepilogo",
+  "system_prompt": "Utilizza lo strumento network per cercare le ultime notizie su {topic} e genera un riepilogo di 500 parole.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "Argomento delle notizie" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**Permessi di modifica**: Il Curatore di Silicio può modificare tutte le competenze; gli Esseri ordinari possono modificare solo le competenze con origine `Being` o `User` (non possono modificare le competenze integrate e dei plugin).
+
+**Limite di quantità**: Il numero di competenze personalizzate per essere è limitato dalla configurazione `MaxCustomSkillsPerBeing` (predefinito 50).
+
+**Scenario**: Tutti gli scenari (`All`)
+
+> Per la documentazione completa del sistema di competenze (modalità di attivazione, whitelist, ricaricamento a caldo, pianificazione automatica, ecc.), consultare la [Guida all'Essere di Silicio](silicon-being-guide.md#sistema-di-competenze).
+
+---
+
+### 21. Strumento Sistema (SystemTool)
 
 **Nome strumento**: `system`
 
@@ -570,7 +644,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 20. Strumento Attività (TaskTool)
+### 22. Strumento Attività (TaskTool)
 
 **Nome strumento**: `task`
 
@@ -595,7 +669,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 21. Strumento Timer (TimerTool)
+### 23. Strumento Timer (TimerTool)
 
 **Nome strumento**: `timer`
 
@@ -621,7 +695,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 22. Strumento Audit Token (TokenAuditTool) 🔒
+### 24. Strumento Audit Token (TokenAuditTool) 🔒
 
 **Nome strumento**: `token_audit`
 
@@ -651,7 +725,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 23. Strumento Browser WebView (WebViewBrowserTool)
+### 25. Strumento Browser WebView (WebViewBrowserTool)
 
 **Nome strumento**: `webview_browser`
 
@@ -692,7 +766,7 @@ Inoltre, gli strumenti contrassegnati con l'attributo `[ChatOnly]` sono disponib
 
 ---
 
-### 24. Strumento Note di Lavoro (WorkNoteTool)
+### 26. Strumento Note di Lavoro (WorkNoteTool)
 
 **Nome strumento**: `work_note`
 
@@ -820,6 +894,13 @@ public class AdminOnlyTool : ITool
     // Accessibile solo al Curatore di Silicio
 }
 ```
+
+### Alternativa: Strumenti Competenza e MCP
+
+Oltre a scrivere classi di strumenti in C#, esistono due modalità di estensione senza compilazione:
+
+- **Competenza (Skill)**: Crea una combinazione "orchestrazione di strumenti + modello di prompt" tramite Web UI o lo strumento `skill`, adatta per consolidare flussi di lavoro frequenti in capacità riutilizzabili. Consultare la [Guida all'Essere di Silicio — Sistema di Competenze](silicon-being-guide.md#sistema-di-competenze).
+- **Server MCP**: Dopo aver configurato un server MCP esterno nella Web UI, i suoi strumenti vengono iniettati automaticamente nel formato `mcp_{serverId}_{toolName}`, senza scrivere alcun codice. Consultare la [Guida Web UI — Gestione MCP](web-ui-guide.md).
 
 ## Best Practices
 

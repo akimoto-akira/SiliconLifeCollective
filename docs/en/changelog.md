@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 **English** | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -66,6 +66,55 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ## [Unreleased]
 
+### 2026-08-17
+
+#### New Features
+- `c7b575b` - Implement MCP integration — external server tool access, configuration management, and help documentation
+  - New MCP core (SiliconLife.Core/Mcp/): McpManager server lifecycle management, stdio/http dual transport, McpClientConnection connection wrapper, per-server tool wrapping and injection into all Silicon Beings with `mcp_{serverId}_{toolName}` naming
+  - New web management page (/mcp) with 7 API endpoints (list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool)
+  - New McpTool query tool (status/list_servers/list_tools, read-only); server add/remove is restricted to user via Web UI, AI cannot modify server list
+  - Config page supports MCP server array editor (inline add/remove within modal window)
+  - Register MCP help topic (🔌), 10 languages with complete help documentation
+  - MCP wrapped tools appear as `execute` action in permission matrix, can be disabled per Silicon Being/project
+  - 45 files changed
+
+### 2026-08-16
+
+#### New Features
+- `5d76c5a` - Implement Skill system — reusable abstraction layer for tool orchestration and prompt templates
+  - New SkillDefinition (id/description/parameter schema/system prompt template/tool whitelist/action restrictions/max rounds/timeout/completion action/trigger mode)
+  - New SkillManager: skill registration center + execution engine (sub AIRequest loop, recursion guard, global round and timeout clamping)
+  - Dual trigger modes: Manual (AI function call, skill injected as ToolDefinition, scheduler-side priority routing) + Auto (schedule-based, supports `HH:mm` / `N s|m|h|d` / cron subset)
+  - Markdown-first storage (YAML frontmatter + prompt body), pure Markdown auto-completes metadata by AI (user fields not overwritten)
+  - Hot-reload (30-second fingerprint detection), version archiving (skills/archive/), 3 built-in skills (summarize_document/code_review/research_topic)
+  - New skill tool (create/list/update/update_from_md/delete/export/export_md/import/import_md)
+  - New skill management page (/skill) with 10 API endpoints; quota MaxCustomSkillsPerBeing (default 50)
+  - Permissions: skill-level `execute` action permission, skill-internal tool whitelist and Silicon Being permissions take strict-side union
+- `b60fc68` - Update Qianfan model list and context window mapping — add glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest models, 1M/128K tiered context window and vision capability mapping
+
+### 2026-08-15
+
+#### New Features
+- `eaa8417` - Implement IM platform OAuth authorization wizard and config secret environment variable resolution
+  - New ImOAuthController/ImOAuthService supporting Feishu OAuth authorization flow (authorize/callback/status), with state for CSRF prevention, 5-minute timeout, SSE status push
+  - New IMProviderRegistry for unified IM platform metadata management (config field schema/OAuth endpoint templates/Provider factory)
+  - New ConfigSecretResolver for resolving `${ENV_VAR}` placeholders in config, deep-copy replacement without writing back to original config
+  - Config page integrates IM authorization wizard UI (inline authorization area + SSE real-time status)
+  - Complete IM authorization status/help text translations for 13 language files
+
+### 2026-07-26
+
+#### Refactoring
+- `ffc45c2` - Refactor IM platform to multi-instance configuration architecture — IMPlatforms list-ified (each platform independently start/stop), AggregateIMProvider aggregates multi-platform message send/receive and permission racing, config page multi-instance editor
+
+### 2026-07-19
+
+#### New Features
+- `9bf2103` - Speedy.Manager tree view integrates multi-select delete and multi-select export
+
+#### Fixes
+- `0df0674` - Fix Speedy.Manager multi-select delete only deleting first item
+
 ### 2026-07-16
 
 #### New Features
@@ -73,6 +122,7 @@ Both versions share the same interfaces and functionality, differing only in sto
   - 20 files changed
 
 #### Documentation
+- `ce36036` - Rewrite all 13 language versions of changelog content after 2026-05-26 based on git records
 - `d6608ea` - Add DuMate (Baidu Qianfan) AI IDE tool introduction to all 13 language versions of changelog
   - 13 files changed
 

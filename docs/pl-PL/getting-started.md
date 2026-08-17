@@ -412,7 +412,7 @@ SiliconLifeCollective/
 
 ## Potrzebujesz pomocy?
 
-- 📖 Zobacz [system dokumentacji pomocy](web-ui-guide.md#帮助文档系统新增) (obsługa wielojęzyczna)
+- 📖 Zobacz [system dokumentacji pomocy](web-ui-guide.md#system-dokumentacji-pomocy-nowość) (obsługa wielojęzyczna)
 - 📚 Przeczytaj [pełną dokumentację](docs/)
 - 🐛 Zgłoś problemy na [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
 - 💬 Dołącz do dyskusji społeczności

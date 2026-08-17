@@ -855,6 +855,9 @@ Silicon Beings have the following activity states:
 | `GroupChat` | Engaged in group chat |
 | `Task` | Executing a task |
 | `Timer` | Executing a timer |
+| `Broadcast` | Processing broadcast messages |
+| `Project` | Executing project work |
+| `MemoryCompression` | Executing memory compression |
 | `Stopped` | Stopped due to consecutive errors or manual stop |
 
 **Stopped State Mechanism**:
@@ -868,6 +871,9 @@ Idle → SingleChat → Idle (chat completed)
 Idle → GroupChat → Idle (group chat completed)
 Idle → Task → Idle (task completed)
 Idle → Timer → Idle (timer completed)
+Idle → Broadcast → Idle (broadcast completed)
+Idle → Project → Idle (project work completed)
+Idle → MemoryCompression → Idle (memory compression completed)
 Any → Stopped (10 consecutive errors)
 Stopped → Idle (new chat message arrives or manual restart)
 ```
@@ -939,3 +945,110 @@ Project workspaces are a spatial management mechanism supporting multi-Silicon B
 | `ProjectTaskTool` | Project task management (create, assign, status update) |
 | `ProjectWorkNoteTool` | Project work notes (create, search, directory generation) |
 | `ProjectWorkTool` | Project work operations (create tasks, group chat, broadcast, complete project) |
+
+---
+
+## Skill System
+
+Skill is a reusable abstraction layer of "tool orchestration + prompt templates", encapsulating common workflows into declarative, evolvable, and schedulable capability units.
+
+### Layered Structure
+
+| Layer | Location | Responsibility |
+|------|------|------|
+| Core Layer | `SiliconLife.Core/Skills/` | SkillDefinition, SkillManager (registration + execution engine), SkillMarkdownParser, SkillFileManager, AutoSkillTickObject, SkillMetadataCompleter |
+| Common Layer | `SiliconLife.Common` | BuiltinSkills (3 built-in skills), SkillTool (the `skill` tool) |
+| Application Layer | `SiliconLife.App/Web/` | SkillController + SkillView (skill management page) |
+
+### Execution Flow
+
+```
+AI function call (skill id) or scheduler trigger
+        ↓
+SkillManager.ExecuteSkill
+  ├─ Global switch / permission / recursion guard check
+  ├─ Parameter clamping: maxToolRound = Min(skill value, GlobalMaxToolRound)
+  │            timeout = Min(skill value, GlobalSkillTimeoutSeconds)
+  ├─ MergePermissions: being permissions ∪ skill restrictions (strict side wins)
+  ├─ FillTemplate: {param} placeholder filling → sub AIRequest
+  └─ Sub-loop (up to maxToolRound rounds): AI ↔ tools (whitelist only)
+        ↓
+HandleCompletion (OnCompleteAction)
+  none / write_memory / notify_curator / broadcast
+```
+
+### Key Design
+
+- **Transparent Scheduling**: Skills are injected into `AIRequest.Tools` as `ToolDefinition`, transparent to AI; in `ContextManager.ExecuteToolCalls`, skill calls take priority over same-named tools
+- **Four Sources**: `Builtin` (framework) / `Plugin` (ISkillProvider) / `Being` (Silicon Being runtime) / `User` (Web UI); hot-reload preserves the first two categories and replaces the latter two
+- **Markdown First**: `skills/{id}.md` (YAML frontmatter + body) takes priority over `.json`; when saving pure Markdown, AI completes metadata (user fields are not overwritten)
+- **Auto Scheduling**: `AutoSkillTickObject` (30-second check interval) supports three scheduling expression formats: `HH:mm`, `N s|m|h|d`, and cron subset, with re-entrancy protection
+- **Multiple Guardrails**: Global switch, custom quota (`MaxCustomSkillsPerBeing`, default 50), global round/timeout limits, skill-level `execute` action permission, tool whitelist, recursion guard
+
+---
+
+## MCP Integration
+
+MCP (Model Context Protocol) integration allows Silicon Beings to call tools provided by external MCP servers, extending capability boundaries without writing code.
+
+### Architecture
+
+```
+User (Web UI /mcp) ──add/start-stop/delete──→ McpManager (singleton)
+                                           │
+                               ┌───────────┼───────────┐
+                               ↓           ↓           ↓
+                         McpClientConnection × N (stdio / http)
+                               │
+                               └→ ListTools → wrapped as SiliconLife.Collective.McpTool
+                                             named mcp_{serverId}_{toolName}
+                                                   │
+                           McpManager.SyncToolsForBeing(being) inject
+                                                   ↓
+                                     ToolManager (same treatment as built-in tools)
+```
+
+### Key Design
+
+- **Dual Transport**: `stdio` (local subprocess: command + arguments + env) and `http` (remote endpoint)
+- **Tool Naming Isolation**: `mcp_{serverId}_{toolName}` prefix avoids conflicts with built-in/plugin tools
+- **User Sovereignty**: Server add/remove/start/stop can only be done through Web UI; the AI-side `mcp` tool provides read-only queries only (status/list_servers/list_tools)
+- **Permission Consistency**: Wrapped tools automatically declare a single `execute` action, integrated into the tool action permission matrix, can be disabled per Silicon Being/project
+- **Configuration Persistence**: `McpServers` list stored in config.json, `McpEnabled` global switch
+
+---
+
+## IM Platform Multi-Instance Architecture
+
+The IM platform adopts a "multi-instance configuration + aggregate provider" architecture, allowing simultaneous connection to multiple chat platforms.
+
+### Core Components
+
+| Component | Responsibility |
+|------|------|
+| `IMPlatformConfig` | Single instance configuration (platform/enabled/config dictionary), `IMPlatforms` is a list, each instance can be independently started/stopped |
+| `IMProviderRegistry` | Platform metadata registry: config field schema, OAuth endpoint templates, Provider factory, help links |
+| `AggregateIMProvider` | Aggregates multiple platforms: message reception (any platform triggers), message sending (broadcast, single platform failure silently isolated), permission inquiry (first responder wins the race) |
+| `ImOAuthService` | OAuth authorization wizard (singleton): state for CSRF prevention, 5-minute timeout, token write-back to config, SSE status push |
+| `ConfigSecretResolver` | `${ENV_VAR}` placeholder resolution: deep-copy replacement, plaintext secrets not written back to config.json |
+| `IMManager` | Message routing: enqueue by ChannelId (serial processing) → ChatSystem → trigger Silicon Being thinking |
+
+### Supported Platforms
+
+| Platform | AuthModes | Event Access | Notes |
+|------|-----------|---------|------|
+| Web UI | manual | SSE (built-in) | Always available, auto-filled |
+| Feishu | manual / **oauth** | HTTP callback (signature verification + AES decryption) | Supports one-click OAuth authorization wizard |
+| WeChat Enterprise | manual | HTTP callback (WXBizMsgCrypt) | Requires public callback URL |
+| DingTalk | manual | Stream (WebSocket) / HTTP | Default Stream mode, no public network required |
+
+### Message Flow
+
+```
+Feishu/WeChat Enterprise/DingTalk/WebUI (inbound)
+  → IIMProvider.MessageReceived
+  → IMManager.OnMessageReceived (enqueue by ChannelId, serial)
+  → ChatSystem.AddMessage → Silicon Being AI thinking
+  → IMManager.SendMessageAsync / SendStreamChunkAsync (outbound)
+  → AggregateIMProvider broadcasts to all enabled platforms
+```

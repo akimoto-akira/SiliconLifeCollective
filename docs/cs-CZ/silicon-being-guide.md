@@ -125,6 +125,9 @@ Idle → SingleChat → Idle (chat dokončen)
 Idle → GroupChat → Idle (skupinový chat dokončen)
 Idle → Task → Idle (úkol dokončen)
 Idle → Timer → Idle (časovač dokončen)
+Idle → Broadcast → Idle (broadcast dokončen)
+Idle → Project → Idle (práce na projektu dokončena)
+Idle → MemoryCompression → Idle (komprese paměti dokončena)
 Jakýkoliv → Stopped (10 po sobě jdoucích chyb)
 Stopped → Idle (nová chatovací zpráva dorazila nebo ruční restart)
 ```
@@ -184,6 +187,78 @@ var timer = new BeingTimer
 
 await timerSystem.StartAsync(timer);
 ```
+
+## Systém dovedností
+
+Dovednost je opakovaně použitelná jednotka schopností Křemíkové Bytosti – zapouzdřuje "orchestraci nástrojů + šablonu promptu" do deklarovatelné, vyvíjející se a automaticky plánovatelné funkce, kterou AI volá stejně jako běžný nástroj.
+
+### Struktura dovednosti
+
+| Prvek | Popis |
+|------|------|
+| `id` / `description` | Jedinečný identifikátor a jednovětný popis (zobrazeno AI, určuje kdy AI vybere dovednost) |
+| `parameter_schema` | JSON Schema parametrů, deklaruje každý zástupný symbol `{param}` použitý v promptu |
+| `system_prompt_template` | Šablona systémového promptu, při spuštění se zástupné symboly vyplní parametry |
+| `tool_whitelist` | Seznam nástrojů povolených během provádění (prázdné = dědí všechny nástroje bytosti) |
+| `max_tool_round` / `timeout` | Omezení počtu kol nástrojů a časového limitu (omezováno globálními limity) |
+| `on_complete` | Akce po dokončení: `none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual` (autonomní volání AI) nebo `Auto` + plán `schedule` |
+
+### Čtyři zdroje
+
+- **Builtin** — vestavěné v rámci (`summarize_document` shrnutí dokumentu, `code_review` kontrola kódu, `research_topic` průzkum tématu)
+- **Plugin** — pluginy registrované přes `ISkillProvider`
+- **Being** — bytost vytváří za běhu pomocí nástroje `skill`
+- **User** — uživatel vytváří přes stránku správy dovedností ve Web UI
+
+### Způsoby spuštění
+
+1. **Manuální (Manual)**: Dovednost je vložena do požadavku AI jako definice běžného nástroje, AI rozhoduje kdy ji zavolat; plánovač upřednostňuje směrování volání se stejným názvem do dovednosti
+2. **Automatický (Auto + schedule)**: Plánovací výraz uložen v `metadata.schedule`, podporuje tři formáty:
+   - `"09:30"` — denní pevný čas
+   - `"6h"` / `"30 m"` / `"2 d"` — intervalové období
+   - `"0 9 * * *"` / `"*/15 * * * *"` — podmnožina cron
+
+### Psaní v Markdown
+
+Dovednosti jsou ukládány v Markdown (`skills/{id}.md`, YAML front matter + tělo promptu):
+
+```markdown
+---
+id: daily_news_digest
+description: Vyhledat dnešní technologické zprávy a vygenerovat shrnutí
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+Použijte nástroj network k vyhledání nejnovějších zpráv o {topic}, vygenerujte 500znakové shrnutí a uložte jej do pracovních poznámek.
+```
+
+Lze napsat pouze tělo (vynechat YAML): při uložení AI automaticky doplní id, description, schéma parametrů a další metadata – pole již vyplněná uživatelem nikdy nejsou přepsána.
+
+### Samospráva bytosti
+
+Bytost může spravovat svou knihovnu dovedností prostřednictvím nástroje `skill`:
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### Hot reload a evoluce
+
+- Bytost každých 30 sekund kontroluje změny v adresáři `skills/` (porovnáním otisku), úpravy z Web UI nebo jiných bytostí se automaticky projeví bez restartu
+- Při každé aktualizaci dovednosti se automaticky archivuje historická verze do `skills/archive/{id}/{version}.md`, čímž vzniká historie evoluce dovedností
+- Počet vlastních dovedností je omezen kvótou (`MaxCustomSkillsPerBeing`, výchozí 50)
+
+### Zábrany provádění
+
+- Oprávnění akce `execute` na úrovni dovednosti (může být zakázáno maticí oprávnění, při zákazu je pro AI neviditelné)
+- Parametry provádění jsou omezovány globálními limity: počet kol ≤ `GlobalMaxToolRound` (výchozí 10), časový limit ≤ `GlobalSkillTimeoutSeconds` (výchozí 300 sekund)
+- Dovednost nemůže rekurzivně volat sama sebe
+- Volání nástrojů mimo whitelist přímo selže
 
 ## Systém paměti
 

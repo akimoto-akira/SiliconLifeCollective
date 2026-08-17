@@ -368,6 +368,116 @@ Plugin load failed: Security check failed
 
 ---
 
+### Problémy s dovednostmi
+
+#### Problém: Dovednost se neobjevuje v seznamu dovedností nebo není pro AI viditelná
+
+**Příznaky**:
+- Stránka dovedností Web UI uloží úspěšně, ale seznam nezobrazuje / AI nevolá danou dovednost
+
+**Řešení**:
+1. Zkontrolujte, zda `id` a `description` dovednosti nejsou prázdné (koncepty nejsou AI vystaveny)
+2. Dovednosti s neúplnými metadaty (`NeedsCompletion`) nejsou injektovány do AI – doplňte YAML frontmatter metadata nebo nechte AI doplnit před uložením
+3. Zkontrolujte, zda matice oprávnění nezakazuje `{skillId}:execute` (zakázané dovednosti nejsou pro AI viditelné)
+4. Potvrďte, že globální přepínač `SkillEnabled` je true
+5. Hot-reload trvá maximálně 30 sekund, počkejte a obnovte nebo restartujte
+
+#### Problém: Spouštění dovednosti selhalo s "not in whitelist"
+
+**Příznaky**:
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**Řešení**:
+- Přidejte daný nástroj do `tool_whitelist` dovednosti, nebo vyprázdněte whitelist pro zdědění všech nástrojů Bytosti
+
+#### Problém: Dosažen limit počtu dovedností
+
+**Příznaky**:
+```
+Custom skill limit reached (50)
+```
+
+**Řešení**:
+1. Smažte nepoužívané vlastní dovednosti
+2. Nebo zvyšte konfiguraci `MaxCustomSkillsPerBeing`
+
+---
+
+### Problémy s MCP
+
+#### Problém: Připojení MCP serveru selhalo
+
+**Příznaky**:
+- Stav serveru ukazuje `error` nebo `disconnected`, `lastError` není prázdný
+
+**Řešení**:
+1. stdio server: potvrďte, že `command` je spustitelný (např. `npx` je v PATH), `arguments` jsou správné
+2. http server: zkontrolujte, že `endpoint` URL je dostupný (firewall, proxy)
+3. Na stránce /mcp klikněte na **Znovu připojit**
+4. Zkontrolujte detaily `lastError`, běžné příčiny: příkaz neexistuje, nekompatibilní verze, endpoint 404
+
+#### Problém: MCP nástroj není injektován do Bytosti
+
+**Příznaky**:
+- Server je připojen (`connected`), ale AI nemůže volat nástroj `mcp_xxx_yyy`
+
+**Řešení**:
+1. Potvrďte, že `enabled` serveru je true
+2. Potvrďte, že globální přepínač `McpEnabled` je true
+3. Zkontrolujte matici oprávnění: zda `mcp_{serverId}_{toolName}:execute` není zakázáno
+4. V konverzaci s Bytostí lze použít nástroj `mcp` (`list_tools`) pro ověření skutečně injektovaných názvů nástrojů
+
+#### Problém: Přidání serveru vrací chybu formátu ID
+
+**Příznaky**:
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**Řešení**:
+- ID serveru umožňuje pouze malá písmena, číslice a podtržítka (např. `filesystem`, `github_tools`)
+
+---
+
+### Problémy s IM platformou
+
+#### Problém: Zprávy Feishu nejsou přijímány
+
+**Řešení**:
+1. Zkontrolujte konfiguraci odběru událostí na Feishu Open Platform – adresu callback a port (`listenPort` + `callbackPath`)
+2. Potvrďte, že `Encrypt Key` / `Verification Token` odpovídá konfiguraci
+3. Pro lokální vývoj lze použít průvodce OAuth autorizací (jedno-klik autorizace na konfigurační stránce); event callback vyžaduje dostupnost z veřejné sítě nebo použití tunelu
+4. Zkontrolujte chyby ověření podpisu/dešifrování v protokolu
+
+#### Problém: Vypršení OAuth autorizace
+
+**Příznaky**:
+- Stránka autorizace ukazuje stav `timeout`
+
+**Řešení**:
+1. Platnost autorizační relace je 5 minut, po vypršení znovu klikněte na tlačítko autorizace
+2. Potvrďte, že callback adresa `/im/feishu/callback` je přístupná z Feishu (`redirectBaseUrl` je správně nakonfigurováno)
+3. Zobrazení stavu na frontendu závisí na SSE, pokud je SSE odpojeno, lze použít fallback dotazování na `/im/{platform}/status`
+
+#### Problém: Zástupný symbol `${ENV_VAR}` nebyl analyzován
+
+**Příznaky**:
+- Připojení IM platformy selhalo, konfigurační hodnota je stále text zástupného symbolu
+
+**Řešení**:
+1. Potvrďte, že proměnná prostředí byla nastavena před spuštěním procesu (restart aplikace pro uplatnění)
+2. Zkontrolujte překlep v názvu proměnné (podporováno pouze `[A-Za-z_][A-Za-z0-9_]*`)
+3. Poznámka: zachování zástupného symbolu v config.json je designové chování, analýza probíhá na kopii v paměti
+
+#### Problém: Pouze jedna z více IM platforem přijímá zprávy
+
+**Řešení**:
+- Odchozí zprávy se vysílají na všechny aktivní platformy, selhání odeslání na jedné platformě je tiše izolováno – zkontrolujte, zda token dané platformy nevypršel (znovu autorizujte nebo aktualizujte klíč)
+
+---
+
 ### Problémy s pracovními poznámkami
 
 #### Problém: Nelze vytvořit pracovní poznámku

@@ -113,7 +113,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **POST** `/api/chat/stop`
 
-停止目前正在進行的 AI 回應生成。
+停止目前正在進行的 AI 回應產生。
 
 **請求體**：
 ```json
@@ -160,13 +160,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **狀態值**：`idle` | `running` | `waiting_permission` | `stopped`
 
-### 取得生命體詳情
+### 取得生命體詳細資料
 
 **GET** `/api/beings/detail`
 
 查詢參數：`beingId` — 生命體 ID
 
-傳回指定生命體的詳細資訊。
+傳回指定生命體的詳細資料。
 
 ### 取得生命體活動狀態
 
@@ -233,23 +233,23 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 傳回聊天歷史主頁面。
 
-### 聊天歷史詳情頁面
+### 聊天歷史詳細資料頁面
 
 **GET** `/chat-history-detail`
 
-傳回指定會話的聊天歷史詳情頁面。
+傳回指定會話的聊天歷史詳細資料頁面。
 
-### 群聊歷史詳情頁面
+### 群聊歷史詳細資料頁面
 
 **GET** `/group-chat-history-detail`
 
-傳回群聊的歷史詳情頁面。
+傳回群聊的歷史詳細資料頁面。
 
-### 廣播歷史詳情頁面
+### 廣播歷史詳細資料頁面
 
 **GET** `/broadcast-history-detail`
 
-傳回廣播頻道的歷史詳情頁面。
+傳回廣播頻道的歷史詳細資料頁面。
 
 ### 取得歷史會話清單
 
@@ -281,11 +281,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 傳回所有定時器的清單。
 
-### 定時器週期詳情頁面
+### 定時器週期詳細資料頁面
 
 **GET** `/timer-cycles/{timerId}`
 
-傳回指定定時器的執行週期詳情頁面。
+傳回指定定時器的執行週期詳細資料頁面。
 
 ### 取得定時器週期清單
 
@@ -295,7 +295,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 傳回指定定時器的所有執行週期清單。
 
-### 單次執行週期詳情頁面
+### 單次執行週期詳細資料頁面
 
 **GET** `/timer-cycle/{cycleIndex}`
 
@@ -325,11 +325,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 傳回所有任務的清單。
 
-### 任務週期詳情頁面
+### 任務週期詳細資料頁面
 
 **GET** `/task-cycles/{taskId}`
 
-傳回指定任務的執行週期詳情頁面。
+傳回指定任務的執行週期詳細資料頁面。
 
 ### 取得任務週期清單
 
@@ -339,7 +339,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 傳回指定任務的所有執行週期清單。
 
-### 單次執行週期詳情頁面
+### 單次執行週期詳細資料頁面
 
 **GET** `/task-cycle/{cycleIndex}`
 
@@ -410,8 +410,8 @@ data: {"type": "complete", "sessionId": "uuid"}
 | `userId` | `Guid` | 請求權限的矽基生命體 ID |
 | `type` | `string` | 權限類型 |
 | `resource` | `string` | 請求的資源路徑 |
-| `allowCode` | `string` | 允許操作的代碼識別符 |
-| `denyCode` | `string` | 拒絕操作的代碼識別符 |
+| `allowCode` | `string` | 允許操作的程式碼識別 |
+| `denyCode` | `string` | 拒絕操作的程式碼識別 |
 
 ### 檢查待處理權限請求
 
@@ -460,7 +460,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/api/logs/list`
 
-查詢參數支援按等級、時間範圍篩選。
+查詢參數支援按層級、時間範圍過濾。
 
 **回應範例**：
 ```json
@@ -482,11 +482,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 按矽基生命體分組的日誌統計。
 
-### 取得可用日誌等級
+### 取得可用日誌層級
 
 **GET** `/api/logs/levels`
 
-傳回系統中可用的日誌等級清單。
+傳回系統中可用的日誌層級清單。
 
 ---
 
@@ -510,7 +510,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 查詢參數：`startDate`, `endDate`
 
-傳回指定時間段內的使用趨勢資料。
+傳回指定時間範圍內的使用趨勢資料。
 
 ### 匯出使用資料
 
@@ -520,31 +520,31 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## 審計追蹤
+## 稽核追蹤
 
-### 審計頁面
+### 稽核頁面
 
 **GET** `/audit`
 
-傳回審計追蹤介面頁面。
+傳回稽核追蹤介面頁面。
 
-### 取得審計清單
+### 取得稽核清單
 
 **GET** `/api/audit/list`
 
-傳回審計日誌條目清單。
+傳回稽核日誌條目清單。
 
-### 取得審計摘要
+### 取得稽核摘要
 
 **GET** `/api/audit/summary`
 
-傳回審計資料的彙總統計。
+傳回稽核資料的彙總統計。
 
-### 取得審計按生命體分組
+### 取得稽核按生命體分組
 
 **GET** `/api/audit/beings`
 
-按矽基生命體分組的審計統計。
+按矽基生命體分組的稽核統計。
 
 ---
 
@@ -622,15 +622,65 @@ data: {"type": "complete", "sessionId": "uuid"}
       "apiKey": "...",
       "model": "..."
     }
-  }
+  },
+  "imPlatforms": [
+    {
+      "platform": "webui",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "platform": "feishu",
+      "enabled": true,
+      "config": {
+        "appId": "cli_xxx",
+        "appSecret": "${FEISHU_APP_SECRET}",
+        "verificationToken": "..."
+      }
+    }
+  ]
 }
 ```
+
+`imPlatforms` 為多實例清單：每個條目代表一個 IM 平台實例，可同時啟用多個平台（各自獨立啟停）。`config` 中的 `${ENV_VAR}` 佔位符會在執行時從環境變數解析，明文密鑰不會寫回 config.json。
 
 ### 取得 AI 設定選項
 
 **GET** `/config/aioptions`
 
 傳回可用的 AI 用戶端類型及其動態選項（可用模型、區域等）。
+
+### 取得 IM 平台選項
+
+**GET** `/config/imoptions`
+
+傳回 IM 平台元資料（供設定精靈動態渲染表單）：
+
+```json
+{
+  "success": true,
+  "platforms": [
+    {
+      "value": "feishu",
+      "display": "飛書 (Feishu)",
+      "authModes": ["manual", "oauth"],
+      "needsPublicCallback": false,
+      "help": "...",
+      "helpUrl": "https://open.feishu.cn/app",
+      "fields": [
+        { "key": "appId", "label": "App ID", "type": "text", "required": true },
+        { "key": "appSecret", "label": "App Secret", "type": "password", "required": true, "isSecret": true }
+      ]
+    }
+  ]
+}
+```
+
+### 瀏覽設定
+
+**GET** `/config/browse`
+
+傳回設定項目的瀏覽資料（用於設定介面的分組展示）。
 
 ---
 
@@ -648,7 +698,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 傳回矽基生命體的記憶條目清單。
 
-### 取得記憶詳情
+### 取得記憶詳細資料
 
 **GET** `/api/memory/detail/{id}`
 
@@ -666,9 +716,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/api/memory/search`
 
-查詢參數：`keyword` — 搜尋關鍵詞
+查詢參數：`keyword` — 搜尋關鍵字
 
-搜尋匹配的記憶條目。
+搜尋相符的記憶條目。
 
 ### 取得記憶按生命體分組
 
@@ -724,9 +774,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/api/work-notes/search`
 
-查詢參數：`keyword` — 搜尋關鍵詞
+查詢參數：`keyword` — 搜尋關鍵字
 
-搜尋匹配的工作筆記。
+搜尋相符的工作筆記。
 
 ### 建立工作筆記
 
@@ -737,7 +787,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 {
   "title": "筆記標題",
   "content": "筆記內容",
-  "keywords": ["關鍵詞1", "關鍵詞2"]
+  "keywords": ["關鍵字1", "關鍵字2"]
 }
 ```
 
@@ -767,13 +817,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## 知識網絡
+## 知識網路
 
-### 知識網絡頁面
+### 知識網路頁面
 
 **GET** `/knowledge`
 
-傳回知識網絡管理介面頁面。
+傳回知識網路管理介面頁面。
 
 ### 取得知識圖譜
 
@@ -783,55 +833,55 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
-## 項目管理
+## 專案管理
 
-### 項目頁面
+### 專案頁面
 
 **GET** `/project`
 
-傳回項目管理介面頁面。
+傳回專案管理介面頁面。
 
-### 項目工作筆記頁面
+### 專案工作筆記頁面
 
 **GET** `/project/{id}/work-notes`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-傳回指定項目的工作筆記頁面。
+傳回指定專案的工作筆記頁面。
 
-### 項目任務頁面
+### 專案任務頁面
 
 **GET** `/project/{id}/tasks`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-傳回指定項目的任務管理頁面。
+傳回指定專案的任務管理頁面。
 
-### 項目工具權限頁面
+### 專案工具權限頁面
 
 **GET** `/project/{id}/tool-permissions`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-傳回指定項目的工具權限管理頁面。
+傳回指定專案的工具權限管理頁面。
 
-### 項目工作流頁面
+### 專案工作流程頁面
 
 **GET** `/project/{id}/workflow`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-傳回指定項目的工作流管理頁面。
+傳回指定專案的工作流程管理頁面。
 
-### 取得項目工作流詳情
+### 取得專案工作流程詳細資料
 
 **GET** `/api/projects/workflow-detail`
 
-查詢參數：`projectId` — 項目 ID
+查詢參數：`projectId` — 專案 ID
 
-傳回項目關聯的工作流詳情。
+傳回專案關聯的工作流程詳細資料。
 
-### 分配項目角色
+### 指派專案角色
 
 **POST** `/api/projects/assign-role`
 
@@ -844,7 +894,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 移除項目角色
+### 移除專案角色
 
 **POST** `/api/projects/remove-role`
 
@@ -857,19 +907,19 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 取得項目清單
+### 取得專案清單
 
 **GET** `/api/projects/list`
 
-傳回所有項目的清單。
+傳回所有專案的清單。
 
-### 取得項目工作流範本清單
+### 取得專案工作流程範本清單
 
 **GET** `/api/projects/list-workflow-templates`
 
-傳回可用的工作流範本清單。
+傳回可用的工作流程範本清單。
 
-### 建立項目
+### 建立專案
 
 **POST** `/api/projects/create`
 
@@ -881,39 +931,39 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 歸檔項目
+### 封存專案
 
 **POST** `/api/projects/{id}/archive`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-歸檔指定項目。
+封存指定專案。
 
-### 還原項目
+### 復原專案
 
 **POST** `/api/projects/{id}/restore`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-還原已歸檔的項目。
+復原已封存的專案。
 
-### 銷毀項目
+### 銷毀專案
 
 **POST** `/api/projects/{id}/destroy`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-永久刪除指定項目（不可還原）。
+永久刪除指定專案（不可復原）。
 
-### 取得項目詳情
+### 取得專案詳細資料
 
 **GET** `/api/projects/detail`
 
-查詢參數：`projectId` — 項目 ID
+查詢參數：`projectId` — 專案 ID
 
-傳回項目的詳細資訊。
+傳回專案的詳細資料。
 
-### 更新項目
+### 更新專案
 
 **POST** `/api/projects/update`
 
@@ -926,7 +976,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 分配成員到項目
+### 指派成員到專案
 
 **POST** `/api/projects/assign`
 
@@ -938,7 +988,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 從項目中移除成員
+### 從專案中移除成員
 
 **POST** `/api/projects/remove`
 
@@ -950,117 +1000,117 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 取得項目工作筆記清單
+### 取得專案工作筆記清單
 
 **GET** `/api/projects/{id}/work-notes/list`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-傳回指定項目的工作筆記清單。
+傳回指定專案的工作筆記清單。
 
-### 讀取項目工作筆記
+### 讀取專案工作筆記
 
 **GET** `/api/projects/{id}/work-notes/read`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-傳回指定項目的工作筆記內容。
+傳回指定專案的工作筆記內容。
 
-### 建立項目工作筆記
+### 建立專案工作筆記
 
 **POST** `/api/projects/{id}/work-notes/create`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-在指定項目中建立新的工作筆記。
+在指定專案中建立新的工作筆記。
 
-### 更新項目工作筆記
+### 更新專案工作筆記
 
 **POST** `/api/projects/{id}/work-notes/update`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-更新指定項目中的工作筆記。
+更新指定專案中的工作筆記。
 
-### 刪除項目工作筆記
+### 刪除專案工作筆記
 
 **POST** `/api/projects/{id}/work-notes/delete`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-刪除指定項目中的工作筆記。
+刪除指定專案中的工作筆記。
 
-### 取得項目任務清單
+### 取得專案任務清單
 
 **GET** `/api/projects/{id}/tasks/list`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-傳回指定項目的任務清單。
+傳回指定專案的任務清單。
 
-### 建立項目任務
+### 建立專案任務
 
 **POST** `/api/projects/{id}/tasks/create`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-在指定項目中建立新任務。
+在指定專案中建立新任務。
 
-### 更新項目任務
+### 更新專案任務
 
 **POST** `/api/projects/{id}/tasks/update`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-更新指定項目中的任務。
+更新指定專案中的任務。
 
-### 刪除項目任務
+### 刪除專案任務
 
 **POST** `/api/projects/{id}/tasks/delete`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-刪除指定項目中的任務。
+刪除指定專案中的任務。
 
-### 分配任務負責人
+### 指派任務負責人
 
 **POST** `/api/projects/{id}/tasks/assign`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-為項目任務分配負責人。
+為專案任務指派負責人。
 
 ### 移除任務負責人
 
 **POST** `/api/projects/{id}/tasks/remove-assignee`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-移除項目任務的負責人。
+移除專案任務的負責人。
 
 ### 標記任務完成
 
 **POST** `/api/projects/{id}/tasks/complete`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-標記項目任務為已完成。
+標記專案任務為已完成。
 
 ### 標記任務失敗
 
 **POST** `/api/projects/{id}/tasks/fail`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-標記項目任務為失敗。
+標記專案任務為失敗。
 
 ### 取消任務
 
 **POST** `/api/projects/{id}/tasks/cancel`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-取消項目任務。
+取消專案任務。
 
 ---
 
@@ -1108,19 +1158,19 @@ data: {"type": "complete", "sessionId": "uuid"}
 }
 ```
 
-### 取得項目工具權限
+### 取得專案工具權限
 
 **GET** `/api/projects/{id}/tool-permissions`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
-傳回指定項目的工具權限設定。
+傳回指定專案的工具權限設定。
 
-### 更新項目工具權限
+### 更新專案工具權限
 
 **PUT** `/api/projects/{id}/tool-permissions`
 
-路徑參數：`id` — 項目 ID
+路徑參數：`id` — 專案 ID
 
 **請求體**：
 ```json
@@ -1165,13 +1215,13 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 傳回支援的程式碼類型/語言清單。
 
-### 取得程式碼詳情
+### 取得程式碼詳細資料
 
 **GET** `/api/code/detail`
 
 查詢參數：`filePath`, `lineNumber`
 
-傳回指定檔案的程式碼詳情。
+傳回指定檔案的程式碼詳細資料。
 
 ---
 
@@ -1204,6 +1254,230 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
+## 技能管理
+
+### 技能管理頁面
+
+**GET** `/skill` 或 **GET** `/skill/index`
+
+查詢參數：`beingId` — 生命體 ID（必需）
+
+傳回指定矽基生命體的技能管理頁面（技能清單 + Markdown 編輯器）。
+
+### 取得技能清單
+
+**GET** `/api/skills/list`
+
+查詢參數：`beingId` — 生命體 ID（必需）
+
+傳回生命體的所有技能（id、description、version、tags、source、triggerMode、toolWhitelist、maxToolRound、timeoutSeconds、parameterCount），以及統計資訊（技能總數 / 自訂技能數 / 配額上限）。
+
+### 取得技能 Markdown
+
+**GET** `/api/skills/get-md`
+
+查詢參數：`beingId`、`skillId`
+
+傳回指定技能的 Markdown 文字（YAML 前置元資料 + 提示詞正文）。
+
+### 儲存技能 Markdown
+
+**POST** `/api/skills/update-md?beingId={beingId}`
+
+請求體（`application/json`）：
+
+```json
+{
+  "markdown": "---\nid: my_skill\n...\n---\n\n提示詞正文",
+  "skillId": "my_skill"
+}
+```
+
+以 Markdown 更新或新建技能（upsert 語義）。缺失的元資料由 AI 自動補全；透過 Web UI 儲存的技能 `Source` 標記為 `User`。受配額 `MaxCustomSkillsPerBeing` 限制。
+
+### 匯入技能（JSON）
+
+**POST** `/api/skills/import?beingId={beingId}`
+
+請求體：`{ "json": "<技能定義 JSON>" }`
+
+從 JSON 匯入技能，同樣受配額限制。
+
+### 匯入技能（Markdown）
+
+**POST** `/api/skills/import-md?beingId={beingId}`
+
+請求體：`{ "markdown": "<Markdown 文字>" }`
+
+從 Markdown 匯入新技能，缺失元資料由 AI 自動補全。
+
+### 刪除技能
+
+**POST** `/api/skills/delete?beingId={beingId}`
+
+請求體：`{ "skillId": "my_skill" }`
+
+刪除技能（同時刪除對應的 `.md` 與 `.json` 持久化檔案）。
+
+### 匯出技能（JSON）
+
+**GET** `/api/skills/export?beingId={beingId}&skillId={skillId}`
+
+以 JSON 附件形式下載技能定義（`{id}.json`）。
+
+### 匯出技能（Markdown）
+
+**GET** `/api/skills/export-md?beingId={beingId}&skillId={skillId}`
+
+以 Markdown 附件形式下載技能（`{id}.md`）。
+
+### 測試執行技能
+
+**POST** `/api/skills/test?beingId={beingId}`
+
+請求體：
+
+```json
+{
+  "skillId": "my_skill",
+  "parametersJson": "{ \"topic\": \"AI 新聞\" }"
+}
+```
+
+以給定參數執行一次技能並傳回 `ToolResult`（含 AI 執行輪數與最終輸出）。
+
+---
+
+## MCP 管理
+
+### MCP 管理頁面
+
+**GET** `/mcp`
+
+查詢參數：`beingId` — 生命體 ID（可選，用於顯示該生命體可見的 MCP 工具）
+
+傳回 MCP 伺服器管理頁面。
+
+### 取得伺服器清單
+
+**GET** `/api/mcp/list-servers`
+
+傳回所有已設定的 MCP 伺服器狀態：
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "state": "connected",
+      "enabled": true,
+      "toolCount": 8,
+      "endpoint": null,
+      "lastError": null
+    }
+  ],
+  "mcpEnabled": true,
+  "connected": 1,
+  "toolTotal": 8
+}
+```
+
+`state` 取值：`connected` / `disconnected` / `connecting` / `error`。
+
+### 取得伺服器工具清單
+
+**GET** `/api/mcp/list-tools?serverId={serverId}`
+
+傳回指定伺服器提供的工具（`name` 為帶前綴的完整名 `mcp_{serverId}_{toolName}`、`description`、`schema`）。伺服器未連線時傳回錯誤。
+
+### 新增伺服器
+
+**POST** `/api/mcp/add-server`
+
+請求體（`McpServerConfig`）：
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "env": {},
+  "endpoint": null,
+  "enabled": true
+}
+```
+
+`transport` 支援 `stdio`（本機處理程序：`command` + `arguments`）與 `http`（遠端端點：`endpoint`）。伺服器 ID 僅允許小寫字母、數字和底線。新增後立即連線並同步到所有矽基生命體。
+
+### 啟用/停用伺服器
+
+**POST** `/api/mcp/toggle`
+
+請求體：`{ "serverId": "filesystem", "enabled": true }`
+
+### 移除伺服器
+
+**POST** `/api/mcp/remove-server`
+
+請求體：`{ "serverId": "filesystem" }`
+
+刪除伺服器設定並從所有生命體註銷其工具。
+
+### 重新連線伺服器
+
+**POST** `/api/mcp/reconnect`
+
+請求體：`{ "serverId": "filesystem" }`
+
+強制斷線並重新建立連線，重新整理工具清單。
+
+### 測試工具呼叫
+
+**POST** `/api/mcp/test-tool`
+
+請求體：
+
+```json
+{
+  "serverId": "filesystem",
+  "toolName": "read_file",
+  "argumentsJson": "{ \"path\": \"/data/hello.txt\" }"
+}
+```
+
+直接呼叫 MCP 伺服器的工具（無需 AI 參與），用於驗證連通性。
+
+---
+
+## IM 平台 OAuth 授權
+
+### 發起授權
+
+**GET** `/im/{platform}/authorize`
+
+路徑參數：`platform` — IM 平台識別（如 `feishu`）
+
+產生防 CSRF 的隨機 `state`，登記 5 分鐘有效的授權會話，傳回授權 URL 並自動開啟系統預設瀏覽器。同一平台重複發起會覆蓋舊會話。
+
+### 授權回呼
+
+**GET** `/im/{platform}/callback?code={code}&state={state}`
+
+由 IM 平台重新導向呼叫。驗證 `state` 後用授權碼換取存取權杖，將 `accessToken`、`refreshToken`、`tokenExpiresAt`、`authMode=oauth` 寫回該平台的設定並持久化，最後渲染授權結果落地頁（成功/失敗）。
+
+### 查詢授權狀態
+
+**GET** `/im/{platform}/status`
+
+傳回 `{ platform, status, tokenExpiresAt }`。`status` 取值：`pending` / `success` / `failed` / `timeout` / `none`。前端優先透過 SSE 事件 `im_auth_status` 接收狀態推送，此介面作為輪詢兜底。
+
+---
+
 ## 說明文件系統
 
 ### 說明頁面
@@ -1216,7 +1490,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/help/{topic}`
 
-路徑參數：`topic` — 主題識別符
+路徑參數：`topic` — 主題識別碼
 
 傳回指定主題的說明文件頁面。
 
@@ -1224,9 +1498,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/api/help/search`
 
-查詢參數：`keyword` — 搜尋關鍵詞
+查詢參數：`keyword` — 搜尋關鍵字
 
-搜尋匹配的說明文件主題。
+搜尋相符的說明文件主題。
 
 ---
 
@@ -1250,11 +1524,11 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 開啟目錄瀏覽器以選擇資料儲存位置。
 
-### 取得 AI 設定中繼資料
+### 取得 AI 設定元資料
 
 **GET** `/init/ai-config-metadata`
 
-傳回可用的 AI 用戶端類型及其設定欄位中繼資料。
+傳回可用的 AI 用戶端類型及其設定欄位元資料。
 
 ---
 
@@ -1288,9 +1562,9 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 **GET** `/about`
 
-傳回關於頁面，包含系統資訊和已載入的插件清單。
+傳回關於頁面，包含系統資訊和已載入的外掛程式清單。
 
-**插件清單資料**：
+**外掛程式清單資料**：
 ```json
 {
   "plugins": {
@@ -1323,7 +1597,7 @@ data: {"type": "complete", "sessionId": "uuid"}
 ### 常見錯誤代碼
 
 | 代碼 | HTTP 狀態 | 描述 |
-|------|-------------|------|
+|------|-------------|-------------|
 | `PERMISSION_DENIED` | 403 | 權限不足 |
 | `NOT_FOUND` | 404 | 資源未找到 |
 | `VALIDATION_ERROR` | 400 | 請求參數無效 |
@@ -1343,7 +1617,7 @@ const eventSource = new EventSource('/api/chat/stream');
 
 eventSource.onmessage = (event) => {
   const data = JSON.parse(event.data);
-
+  
   switch(data.type) {
     case 'chunk':
       console.log('Streaming:', data.content);
@@ -1359,6 +1633,20 @@ eventSource.onmessage = (event) => {
       break;
   }
 };
+```
+
+### IM 授權狀態事件
+
+IM 平台 OAuth 授權精靈透過共享 SSE 連線推送狀態（事件名 `im_auth_status`）：
+
+```javascript
+eventSource.addEventListener('im_auth_status', (event) => {
+  const data = JSON.parse(event.data);
+  // data.platform — 平台識別（feishu / wecom / dingtalk）
+  // data.status  — pending / success / failed / timeout
+  // data.message — 附加說明
+  updateAuthStatus(data.platform, data.status);
+});
 ```
 
 ---
@@ -1377,7 +1665,7 @@ public interface IAIClient
     int? ContextWindowTokens { get; }
     bool? SupportsVision { get; }
     bool? SupportsAudio { get; }
-
+    
     AIResponse Chat(AIRequest request);
 }
 ```
@@ -1429,7 +1717,7 @@ public interface ITool
     string Name { get; }
     string Description { get; }
     ToolDefinition Definition { get; }
-
+    
     Task<ToolResult> ExecuteAsync(ToolCall call);
 }
 ```
@@ -1460,7 +1748,7 @@ public class ToolResult
 
 ## 下一步
 
-- 🚀 檢視[快速開始指南](getting-started.md)
+- 🚀 查看[快速開始指南](getting-started.md)
 - 🛠️ 閱讀[開發指南](development-guide.md)
-- 📚 檢視[架構文件](architecture.md)
+- 📚 查看[架構文件](architecture.md)
 - 🔒 了解[安全模型](security.md)

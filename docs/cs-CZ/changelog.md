@@ -1,4 +1,4 @@
-﻿# Seznam změn
+# Seznam změn
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | **Čeština** | [Русский](../ru-RU/changelog.md)
 
@@ -33,7 +33,7 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze v implementaci 
 - Postaveno na Code OSS (VS Code), podporuje nastavení VS Code a pluginy kompatibilní s Open VSX.
 - Nabízí specifikacemi řízený vývojový pracovní postup pro strukturované AI kódování.
 
-#### Comate AI IDE / 文心快码 (Baidu)
+#### Comate AI IDE / Comate (Baidu)
 - Občas používáno pro redakční a dokumentační práci.
 - Comate AI IDE je AI-nativní vývojové prostředí vydané Baidu Wenxin 23. června 2025.
 - První multimodální, multi-agentní kolaborativní AI IDE v oboru.
@@ -66,6 +66,55 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze v implementaci 
 
 ## [Nezveřejněno]
 
+### 2026-08-17
+
+#### Nové funkce
+- `c7b575b` - Implementace MCP integrace – připojení nástrojů externích serverů, správa konfigurace a dokumentace nápovědy
+  - Nový jádrový MCP (SiliconLife.Core/Mcp/): správa životního cyklu serverů McpManager, duální transport stdio/http, zapouzdření připojení McpClientConnection, balení nástrojů podle serveru a injektování do všech Křemíkových Bytostí s pojmenováním `mcp_{serverId}_{toolName}`
+  - Nová webová stránka správy (/mcp) s 7 API endpointy (list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool)
+  - Nový nástroj McpTool pro dotazy (status/list_servers/list_tools, pouze pro čtení); přidávání a odebírání serverů je dostupné pouze uživateli přes Web UI, AI nemůže měnit seznam serverů
+  - Konfigurační stránka podporuje editor polí MCP serverů (přidávání/odebírání řádků v modálním okně)
+  - Registrace tématu nápovědy MCP (🔌), kompletní dokumentace nápovědy v 10 jazycích
+  - Nástroje zabalené MCP se v matici oprávnění prezentují jako akce `execute`, podporují zakázání podle Bytosti/projektu
+  - 45 soubor(ů) změněno
+
+### 2026-08-16
+
+#### Nové funkce
+- `5d76c5a` - Implementace systému dovedností – abstrakční vrstva znovupoužitelnosti pro orchestraci nástrojů a šablony promptů
+  - Nový SkillDefinition (id/popis/schema parametrů/šablona systémového promptu/whitelist nástrojů/omezení akcí/maximální počet kol/timeout/akce při dokončení/režim spouštěče)
+  - Nový SkillManager: centrum registrace dovedností + exekuční engine (podřazený cyklus AIRequest, ochrana proti rekurzi, globální limit kol a timeoutu)
+  - Duální režim spouštěče: Manual (volání AI funkce, dovednost injektována jako ToolDefinition, upřednostněné směrování na straně dispatche) + Auto (plánování, podpora `HH:mm` / `N s|m|h|d` / cron podmnožiny)
+  - Markdown-prioritní ukládání (YAML frontmatter + tělo promptu), čistý Markdown je AI automaticky doplněn o metadata (uživatelská pole nejsou přepsána)
+  - Hot-reload (detekce otisku každých 30 sekund), archivace verzí (skills/archive/), 3 vestavěné dovednosti (summarize_document/code_review/research_topic)
+  - Nový nástroj skill (create/list/update/update_from_md/delete/export/export_md/import/import_md)
+  - Nová stránka správy dovedností (/skill) s 10 API endpointy; kvóta MaxCustomSkillsPerBeing (výchozí 50)
+  - Oprávnění: akce `execute` na úrovni dovednosti, whitelist nástrojů v dovednosti a oprávnění Bytosti s přísnější stranou jako vítězem sjednocení
+- `b60fc68` - Aktualizace seznamu modelů Qianfan a mapování kontextových oken – přidány modely glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest, mapování kontextových oken 1M/128K a vizuálních schopností
+
+### 2026-08-15
+
+#### Nové funkce
+- `eaa8417` - Implementace průvodce OAuth autorizací IM platformy a analýzy proměnných prostředí pro konfigurační tajemství
+  - Nový ImOAuthController/ImOAuthService podporující OAuth autorizační tok Feishu (authorize/callback/status), včetně ochrany state proti CSRF, 5minutový timeout, SSE push stavu
+  - Nový IMProviderRegistry pro sjednocenou správu metadat IM platforem (schema konfiguračních polí/šablony OAuth endpointů/Provider factory)
+  - Nový ConfigSecretResolver pro analýzu `${ENV_VAR}` zástupných symbolů v konfiguraci, hluboká kopie nahrazení bez zápisu zpět do původní konfigurace
+  - Konfigurační stránka integruje UI průvodce IM autorizací (inline autorizační zóna + SSE stav v reálném čase)
+  - Doplnění překladů stavu/textu nápovědy IM autorizace pro 13 jazykových souborů
+
+### 2026-07-26
+
+#### Refaktoring
+- `ffc45c2` - Refaktoring IM platformy na architekturu multi-instance konfigurace - IMPlatforms jako seznam (nezávislý start/stop každé platformy), AggregateIMProvider agregace zasílání a přijímání zpráv napříč platformami a závod oprávnění, editor multi-instance na konfigurační stránce
+
+### 2026-07-19
+
+#### Nové funkce
+- `9bf2103` - Speedy.Manager integrace stromového rámečku s vícenásobným výběrem pro mazání a export
+
+#### Opravy
+- `0df0674` - Oprava problému, kdy vícenásobné mazání ve Speedy.Manager mazalo pouze první položku
+
 ### 2026-07-16
 
 #### Nové funkce
@@ -73,6 +122,7 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze v implementaci 
   - 20 soubor(ů) změněno
 
 #### Dokumentace
+- `ce36036` - Přepsat obsah changelogu po 2026-05-26 pro všech 13 jazykových verzí podle git záznamů
 - `d6608ea` - Přidat představení AI IDE nástroje DuMate (Baidu Qianfan) do všech 13 jazykových verzí changelogu
   - 13 soubor(ů) změněno
 

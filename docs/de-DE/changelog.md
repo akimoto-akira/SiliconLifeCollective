@@ -1,4 +1,4 @@
-﻿# Änderungsprotokoll
+# Änderungsprotokoll
 
 [English](../en/changelog.md) | **Deutsch** | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -33,7 +33,7 @@ Beide Versionen teilen sich dieselben Schnittstellen und Funktionen und untersch
 - Basiert auf Code OSS (VS Code), unterstützt VS Code-Einstellungen und Open VSX-kompatible Erweiterungen.
 - Bietet einen spezifikationsgetriebenen Entwicklungs-Workflow für strukturierte KI-Codierung.
 
-#### Comate AI IDE / 文心快码 (Baidu)
+#### Comate AI IDE (Baidu)
 - Gelegentlich für Text- und Dokumentationsarbeiten verwendet.
 - Comate AI IDE ist ein KI-natives Entwicklungsumgebungstool, das von Baidu Wenxin am 23. Juni 2025 veröffentlicht wurde.
 - Branchenweit erste multimodale, Multi-Agenten-Kollaborations-KI-IDE.
@@ -54,7 +54,7 @@ Beide Versionen teilen sich dieselben Schnittstellen und Funktionen und untersch
 
 #### DuMate (Baidu Qianfan)
 - Seit Juli 2026 für Codeentwicklung, Lokalisierung und Dokumentation verwendet.
-- Ein universeller KI-Assistent auf der Qianfan-Desktop-Plattform mit Multi-Tool-Orchestrierung, Dateioperationen, Browser-Automatisierung und mehrstufiger Taskausführung.
+- Ein universeller KI-Assistent auf der Qianfan-Desktop-Plattform mit Multi-Werkzeug-Orchestrierung, Dateioperationen, Browser-Automatisierung und mehrstufiger Taskausführung.
 - Liest und schreibt lokale Dateien direkt, führt Shell-Befehle aus und führt Websuchen auf dem Windows-Desktop des Benutzers durch.
 
 ### Anforderungsdokumentation
@@ -66,6 +66,55 @@ Beide Versionen teilen sich dieselben Schnittstellen und Funktionen und untersch
 
 ## [Unveröffentlicht]
 
+### 2026-08-17
+
+#### Neue Funktionen
+- `c7b575b` - MCP-Integration implementiert — externe Server-Werkzeuganbindung, Konfigurationsverwaltung und Hilfedokumentation
+  - Neuer MCP-Kern (SiliconLife.Core/Mcp/): McpManager Server-Lebenszyklusverwaltung, stdio/http-Dualtransport, McpClientConnection Verbindungs-Kapselung, werkzeugverpackung pro Server mit `mcp_{serverId}_{toolName}`-Benennung, Injektion in alle Silicon Beings
+  - Neue Web-Verwaltungsseite (/mcp) mit 7 API-Endpunkten (list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool)
+  - Neues McpTool-Abfragewerkzeug (status/list_servers/list_tools, schreibgeschützt); Server hinzufügen/löschen nur durch Benutzer über Web UI, KI kann Serverliste nicht ändern
+  - Konfigurationsseite unterstützt MCP-Server-Array-Editor (Inline hinzufügen/löschen im Modal-Fenster)
+  - MCP-Hilfethema registriert, vollständige Hilfedokumentation in 10 Sprachen
+  - MCP-verpackte Werkzeuge erscheinen in der Berechtigungsmatrix mit `execute`-Aktion, unterstützen Deaktivierung pro Being/Projekt
+  - 45 Dateien geändert
+
+### 2026-08-16
+
+#### Neue Funktionen
+- `5d76c5a` - Fähigkeitssystem implementiert — Wiederverwendungsabstraktionsschicht für Werkzeugorchestrierung und Prompt-Vorlagen
+  - Neue SkillDefinition (id/Beschreibung/Parameter-Schema/System-Prompt-Vorlage/Werkzeug-Whitelist/Aktionsbeschränkung/Max-Runden/Timeout/Abschlussaktion/Auslösemodus)
+  - Neue SkillManager: Fähigkeitsregistrierungszentrale + Ausführungs-Engine (Unter-AIRequest-Schleife, Rekursionsschutz, globale Runden- und Timeout-Klammerung)
+  - Dualer Auslösemodus: Manual (KI-Funktionsaufruf, Fähigkeit als ToolDefinition injiziert, Planungsseite mit Vorrang-Routing) + Auto (Schedule-Planung, unterstützt `HH:mm` / `N s|m|h|d` / cron-Teilmenge)
+  - Markdown-Vorrang-Speicherung (YAML-Frontmatter + Prompt-Body), reines Markdown wird von KI automatisch mit Metadaten ergänzt (Benutzerfelder werden nicht überschrieben)
+  - Hot-Reload (30-Sekunden-Fingerabdruck-Erkennung), Versionsarchivierung (skills/archive/), 3 integrierte Fähigkeiten (summarize_document/code_review/research_topic)
+  - Neues skill-Werkzeug (create/list/update/update_from_md/delete/export/export_md/import/import_md)
+  - Neue Fähigkeitsverwaltungsseite (/skill) mit 10 API-Endpunkten; Kontingent MaxCustomSkillsPerBeing (Standard 50)
+  - Berechtigungen: Fähigkeits-Level `execute`-Aktionsberechtigung, Werkzeug-Whitelist innerhalb der Fähigkeit und Being-Berechtigungen nehmen strikte-Seite-Vereinigung
+- `b60fc68` - Qianfan-Modellliste und Kontextfenster-Mapping aktualisiert — neue Modelle glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest, gestaffelte 1M/128K-Kontextfenster und visuelle Fähigkeits-Mappings
+
+### 2026-08-15
+
+#### Neue Funktionen
+- `eaa8417` - IM-Plattform OAuth-Autorisierungsassistent und Konfigurations-Geheimnis-Umgebungsvariablen-Auflösung implementiert
+  - Neue ImOAuthController/ImOAuthService unterstützen Feishu OAuth-Autorisierungsablauf (authorize/callback/status), mit state für CSRF-Schutz, 5-Minuten-Timeout, SSE-Status-Push
+  - Neue IMProviderRegistry zur einheitlichen Verwaltung von IM-Plattform-Metadaten (Konfigurationsfeld-Schema/OAuth-Endpunkt-Vorlagen/Provider-Factory)
+  - Neue ConfigSecretResolver zur Auflösung von `${ENV_VAR}` Platzhaltern in Konfigurationen, Deep-Copy-Ersetzung ohne Zurückschreiben in Originalkonfiguration
+  - Konfigurationsseite integriert IM-Autorisierungsassistent-UI (Inline-Autorisierungsbereich + SSE-Echtzeitstatus)
+  - Vervollständigung von 13 Sprachdateien mit IM-Autorisierungsstatus/Hilfetext-Übersetzungen
+
+### 2026-07-26
+
+#### Refactoring
+- `ffc45c2` - IM-Plattform zu Multi-Instanz-Konfigurationsarchitektur refaktoriert — IMPlatforms als Liste (jede Plattform unabhängig startbar/stoppbar), AggregateIMProvider aggregiert Multi-Plattform-Nachrichtenempfang/-versand und Berechtigungsrennen, Konfigurationsseite mit Multi-Instanz-Editor
+
+### 2026-07-19
+
+#### Neue Funktionen
+- `9bf2103` - Speedy.Manager-Baumansicht mit Mehrfachauswahl-Löschen und Mehrfachauswahl-Export integriert
+
+#### Fehlerbehebungen
+- `0df0674` - Problem behoben, bei dem Speedy.Manager-Mehrfachauswahl-Löschen nur das erste Element löschte
+
 ### 2026-07-16
 
 #### Neue Funktionen
@@ -73,6 +122,7 @@ Beide Versionen teilen sich dieselben Schnittstellen und Funktionen und untersch
   - 20 Datei(en) geändert
 
 #### Dokumentation
+- `ce36036` - Alle 13 Sprachversionen des Änderungsprotokolls nach dem 2026-05-26-Inhalt gemäß Git-Verlauf neu schreiben
 - `d6608ea` - DuMate (Baidu Qianfan) AI-IDE-Werkzeugeinführung zu allen 13 Sprachversionen des Änderungsprotokolls hinzufügen
   - 13 Datei(en) geändert
 

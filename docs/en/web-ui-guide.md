@@ -17,13 +17,13 @@ Default URL: `http://localhost:8080`
 ### Main Sections
 
 1. **Dashboard** - System overview and metrics
-2. **Beings** - Manage Silicon Beings
+2. **Beings** - Manage Silicon Beings (including Skill management, AI configuration, soul files)
 3. **Chat** - Interact with beings (supports file upload, real-time SSE)
 4. **Chat History** - View chat history of Silicon Beings (conversation list, message details)
 5. **Tasks** - Task management (personal tasks)
 6. **Timers** - Timer configuration (create, pause, execution history)
-7. **Configuration** - System settings (AI clients, localization)
-8. **Permissions** - Access control (ACL management, permission queries)
+7. **Configuration** - System settings (AI clients, IM platform multi-instance, MCP servers, localization)
+8. **Permissions** - Access control (ACL management, permission queries, tool action permissions)
 9. **Logs** - System logs (filter by level, time range queries)
 10. **Audit** - Token usage and audit trail
 11. **Memory** - Being memory (timeline view, advanced filtering)
@@ -32,8 +32,9 @@ Default URL: `http://localhost:8080`
 14. **Code Editor** - Code editing with hover tooltips (Monaco Editor)
 15. **Projects** - Project management (workspaces, tasks, work notes)
 16. **Executors** - Executor management (disk, network, command line)
-17. **Help** - Help documentation system (multi-language support, topic search)
-18. **About** - System information and version
+17. **MCP** - MCP server management (add, start/stop, reconnect, test)
+18. **Help** - Help documentation system (multi-language support, topic search)
+19. **About** - System information and version
 
 ---
 
@@ -120,14 +121,42 @@ When the AI calls a tool:
 
 ### AI Clients
 
-Configure AI backends:
+Configure AI backends (13 clients):
 - Ollama (local)
-- Bailian (cloud)
-- Volcano Engine Ark (cloud)
-- Herdsman (local/cloud, no authentication)
+- Alibaba Cloud Bailian DashScope (cloud)
+- ByteDance Volcengine Ark (cloud)
+- Herdsman Inference Engine (local/cloud, no authentication)
 - Meituan LongCat (cloud)
 - Qiniu Cloud AI (cloud)
-- Custom clients
+- DeepSeek (cloud)
+- Zhipu GLM (cloud)
+- Moonshot Kimi (cloud)
+- SiliconFlow (cloud)
+- MiniMax (cloud)
+- Baidu Qianfan ERNIE (cloud)
+- Tencent Hunyuan (cloud)
+
+Each client's configuration form is dynamically provided by the respective client factory (API keys, endpoints, model dropdowns, etc.), with corresponding help documentation accessible directly from the configuration page.
+
+### IM Platforms (Multi-Instance)
+
+IM platform configuration supports a multi-instance architecture, allowing multiple platforms to be enabled simultaneously:
+
+1. Click **Add Platform** and select the platform type:
+   - **Web UI** (built-in, enabled by default)
+   - **Feishu** (supports manual configuration and OAuth one-click authorization)
+   - **WeChat Enterprise** (manual configuration)
+   - **DingTalk** (manual configuration, supports Stream / HTTP event modes)
+2. Fill in platform fields via the dynamic form (required fields are marked with asterisks, secret fields use password inputs)
+3. Each instance can be independently enabled/disabled or deleted
+
+**Secret Environment Variables**: Configuration values support `${ENV_VAR}` placeholders (e.g., `"${FEISHU_APP_SECRET}"`), resolved from environment variables at runtime. Plaintext secrets are never written to config.json.
+
+**OAuth Authorization Wizard** (Feishu): After saving appId/appSecret, an inline authorization section appears on the configuration page. Clicking the **Authorize** button opens the system browser to navigate to the Feishu authorization page. Upon successful authorization, the token is automatically written back to the configuration, and the page displays the authorization status in real time via SSE (success/failure/timeout), eliminating the need for manual copy-paste.
+
+### MCP Servers
+
+The MCP server list is centrally managed in the configuration page (array editor): one server per row (ID, name, transport stdio/http, command or endpoint, enabled status), with inline **Add** and **Delete** support. After saving, the server connects immediately and its tools are automatically injected into all Silicon Beings. See the [MCP Management](#mcp-management) section below for details.
 
 ### Storage Settings
 
@@ -514,6 +543,104 @@ Personal work notes for Silicon Beings, similar to a journal:
   - `/api/worknotes/search?q=keyword` - Search notes
   - `/api/worknotes/directory` - Generate note table of contents
   - `/api/projects` - Project management API
+
+---
+
+## Skill Management
+
+### Feature Overview
+
+A Skill is a reusable capability unit of "tool orchestration + prompt template." The Skill management page (`/skill?beingId={id}`) provides visual management of skills for each Silicon Being.
+
+### Page Layout
+
+- **Left skill list**: Card-style display (title, `version · source · trigger mode` badges, description)
+- **Right editor**: Markdown editor (YAML front matter + prompt body)
+- **Top statistics**: Total skills / custom skills / quota limit (e.g., `5 / 2 / 50`)
+
+### Toolbar Actions
+
+- **New**: Loads a Markdown skill template
+- **Import .md / Import .json**: Import skills from local files
+- **Refresh**: Reload the skill list
+
+### Skill Card Actions
+
+Each skill card provides 5 actions:
+
+| Action | Description |
+|------|------|
+| Edit | Open the Markdown in the right editor, with save support (upsert) |
+| Test | Input parameter JSON, execute the skill once immediately and view results |
+| Export JSON | Download `{id}.json` |
+| Export Markdown | Download `{id}.md` |
+| Delete | Delete the skill (including persisted files) |
+
+### Writing Skills
+
+Skills are written in Markdown. YAML front matter declares id, description, parameter schema, tool whitelist, trigger mode, etc.; the body is the prompt template (supports `{param}` placeholders). Writing only the body (omitting YAML) is also acceptable — when saving, AI automatically completes missing metadata, and user-provided fields are never overwritten.
+
+```markdown
+---
+id: daily_news_digest
+description: Search today's tech news and generate a summary
+tool_whitelist: [network, work_note]
+trigger_mode: Auto
+metadata:
+  schedule: "0 9 * * *"
+---
+
+Use the network tool to search for the latest news on {topic}, generate a 500-word summary, and save it to work notes.
+```
+
+### Technical Implementation
+
+- **Controller**: `SkillController` (page + 10 API endpoints)
+- **Core**: `SkillManager` (register/execute/hot reload), `SkillMetadataCompleter` (AI metadata completion)
+- **Hot reload**: Each being checks the `skills/` directory for changes every 30 seconds; no restart needed after Web UI saves
+- **Version archiving**: Each update is automatically archived to `skills/archive/{id}/{version}.md`
+
+---
+
+## MCP Management
+
+### Feature Overview
+
+The MCP (Model Context Protocol) management page (`/mcp`) is used to manage external MCP server connections. Once connected, the tools provided by the server are automatically injected into all Silicon Beings in the form `mcp_{serverId}_{toolName}`.
+
+### Server List
+
+Displays for each server: ID, name, transport (stdio/http), connection status (connected/disconnected/connecting/error), enabled status, tool count, and last error.
+
+### Management Actions
+
+| Action | Description |
+|------|------|
+| Add Server | Fill in ID (lowercase letters/digits/underscores), name, transport; stdio requires command and arguments, http requires endpoint URL |
+| Enable/Disable | Inline toggle; when disabled, tools are unregistered from all beings |
+| Reconnect | Disconnect and reconnect, refreshing the tool list |
+| Delete | Remove server configuration and all its tools |
+| View Tools | Expand the server to list tool names (with prefix), descriptions, and parameter schemas |
+| Test Tool | Directly invoke an MCP tool to verify connectivity (no AI involvement required) |
+
+### Add stdio Server Example
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "enabled": true
+}
+```
+
+### Security Mechanisms
+
+- Adding/deleting/starting/stopping servers can only be done by the user through the Web UI; AI cannot modify the server list (the `mcp` tool only provides read-only queries)
+- MCP wrapper tools appear as a single `execute` action in the tool permission matrix, and can be individually disabled per being/project
+- The global switch `McpEnabled` can disable the entire MCP integration with one click
 
 ---
 

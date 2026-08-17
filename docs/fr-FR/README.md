@@ -22,13 +22,30 @@
 - **Intégration d'outils** — Les plugins peuvent enregistrer des outils personnalisés via l'interface ITool, automatiquement intégrés dans la boucle d'appel d'outils
 
 ### Outils et exécution
-- **24 outils intégrés** — Couvrant le calendrier, le chat, la configuration, le disque, le réseau, la mémoire, les tâches, les minuteurs, la base de connaissances, les notes de travail, l'espace projet, le navigateur WebView, etc.
-- **Isolation des scénarios d'outils** — Chaque outil déclare ses scénarios disponibles via l'attribut `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project) ; l'attribut `ChatOnly` restreint l'outil au seul scénario de chat
-  - **Interface des capacités IAIClient** — Les clients IA déclarent les capacités de mode flux, appels d'outils, fenêtre de contexte, vision et audio, et le ContextManager adapte le comportement en conséquence
+- **26 outils intégrés** — Couvrant le calendrier, le chat, la configuration, le disque, le réseau, la mémoire, les tâches, les minuteurs, la base de connaissances, les notes de travail, l'espace projet, les tâches de projet, les notes de travail de projet, le travail de projet, le navigateur WebView, la compilation dynamique, l'exécution de code, la gestion des autorisations, l'audit de tokens, la consultation des journaux, la base de données, les informations système, l'aide, la gestion des compétences, la requête MCP, etc.
+- **Isolation des scénarios d'outils** — Chaque outil déclare ses scénarios disponibles via l'attribut `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project) ; l'attribut `ChatOnly` restreint l'outil au seul scénario de chat, l'attribut `SiliconManagerOnly` restreint l'outil au seul usage du Curateur
 - **Boucle d'appel d'outils** — L'IA retourne un appel d'outil → exécution de l'outil → résultat renvoyé à l'IA → boucle continue jusqu'à l'obtention d'une réponse en texte brut
 - **Sécurité Exécuteur-Autorisation** — Toutes les opérations d'E/S passent par des exécuteurs avec vérification stricte des autorisations
   - Chaîne de vérification des autorisations à 3 niveaux : UserFrequencyCache → IPermissionCallback → (IsCurator : IPermissionAskHandler | Non-curateur : GlobalACL → refus par défaut)
   - Journal d'audit complet enregistrant toutes les décisions d'autorisation
+
+### Système de Compétences
+- **Unité de capacité réutilisable** — Encapsuler "l'orchestration d'outils + le modèle de prompt" en une compétence déclarable, évolutif et planifiable ; l'IA appelle les compétences comme des outils
+- **Double mode de déclenchement** — Manual (l'IA décide de manière autonome via function calling) + Auto (planification : horaire fixe quotidien / intervalle périodique / sous-ensemble cron)
+- **Markdown en priorité** — Métadonnées YAML frontmatter + corps du prompt ; lors de la sauvegarde en Markdown pur, l'IA complète automatiquement les métadonnées manquantes (les champs utilisateur ne sont pas écrasés)
+- **Rechargement à chaud et archivage des versions** — Détection d'empreinte numérique toutes les 30 secondes avec effet automatique ; chaque mise à jour est archivée dans `skills/archive/{id}/{version}.md` formant un historique évolutif
+- **Multiples garde-fous** — Interrupteur global, limites de quota (par défaut 50/être), rounds globaux et délai d'attente, liste blanche des outils, protection récursive, autorisations d'action au niveau de la compétence
+
+### Intégration MCP
+- **Accès aux outils externes** — Connexion à des serveurs MCP (Model Context Protocol) externes ; leurs outils sont automatiquement injectés dans tous les Êtres de Silicium avec le nommage `mcp_{serverId}_{toolName}`, sans nécessiter de code
+- **Double transport** — stdio (sous-processus local) et http (endpoint distant)
+- **Souveraineté de l'utilisateur** — Ajout/suppression/démarrage/arrêt des serveurs uniquement via l'interface Web UI, l'outil `mcp` côté IA est en lecture seule
+- **Cohérence des autorisations** — Les outils wrapper MCP sont intégrés dans la matrice d'autorisations d'outils à deux niveaux, peuvent être désactivés par être/projet
+
+### Intégration de la Messagerie Instantanée
+- **Architecture multi-instance** — Possibilité de connecter simultanément plusieurs plateformes IM (Web UI / Feishu / WeChat Enterprise / DingTalk), chaque instance peut être démarrée/arrêtée indépendamment, routage agrégé des messages
+- **Assistant d'autorisation OAuth** — Autorisation Feishu en un clic (state anti-CSRF, push d'état en temps réel via SSE), jetons automatiquement écrits dans la configuration
+- **Sécurité des clés** — Les valeurs de configuration prennent en charge les espaces réservés `${ENV_VAR}` pour les variables d'environnement, les clés en clair ne sont pas stockées sur le disque
 
 ### IA et connaissances
 - **Support multi-backends IA**

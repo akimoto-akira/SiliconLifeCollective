@@ -1,4 +1,4 @@
-﻿# Journal des modifications
+# Journal des modifications
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -66,6 +66,55 @@ Les deux versions partagent les mêmes interfaces et fonctionnalités, ne diffé
 
 ## [Non publié]
 
+### 2026-08-17
+
+#### Nouvelles fonctionnalités
+- `c7b575b` - Mise en œuvre de l'intégration MCP — accès aux outils de serveurs externes, gestion de configuration et documentation d'aide
+  - Ajout du cœur MCP (`SiliconLife.Core/Mcp/`) : McpManager pour la gestion du cycle de vie des serveurs, double transport stdio/http, encapsulation de connexion McpClientConnection, encapsulation des outils par serveur avec nommage `mcp_{serverId}_{toolName}` et injection dans tous les Êtres de Silicium
+  - Ajout d'une page de gestion Web (`/mcp`) et de 7 points d'API (list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool)
+  - Ajout de l'outil de requête McpTool (status/list_servers/list_tools, en lecture seule) ; l'ajout et la suppression de serveurs sont réservés aux utilisateurs via l'UI Web, l'IA ne peut pas modifier la liste des serveurs
+  - La page de configuration prend en charge un éditeur de tableau de serveurs MCP (ajout/suppression en ligne dans une fenêtre modale)
+  - Enregistrement du thème d'aide MCP (🔌), documentation d'aide complète implémentée en 10 langues
+  - Les outils encapsulés MCP apparaissent avec l'action `execute` dans la matrice d'autorisations, avec prise en charge de la désactivation par Être de Silicium/projet
+  - 45 fichier(s) modifié(s)
+
+### 2026-08-16
+
+#### Nouvelles fonctionnalités
+- `5d76c5a` - Mise en œuvre du système de compétences — couche d'abstraction réutilisable pour l'orchestration d'outils et les modèles de prompts
+  - Ajout de SkillDefinition (id/description/schema de paramètres/modèle de prompt système/liste blanche d'outils/limites d'actions/nombre maximum de tours/délai d'expiration/action de complétion/mode de déclenchement)
+  - Ajout de SkillManager : centre d'enregistrement des compétences + moteur d'exécution (boucle sous-AIRequest, protection contre la récursion, limitation globale des tours et du délai d'expiration)
+  - Double mode de déclenchement : Manual (appel de fonction IA, compétence injectée en tant que ToolDefinition, routage prioritaire côté ordonnanceur) + Auto (ordonnancement schedule, prise en charge de `HH:mm` / `N s|m|h|d` / sous-ensemble cron)
+  - Stockage Markdown prioritaire (front-matter YAML + corps du prompt), Markdown pur avec métadonnées auto-complétées par l'IA (les champs utilisateur ne sont pas écrasés)
+  - Rechargement à chaud (détection d'empreinte toutes les 30 secondes), archivage des versions (`skills/archive/`), 3 compétences intégrées (summarize_document/code_review/research_topic)
+  - Ajout de l'outil `skill` (create/list/update/update_from_md/delete/export/export_md/import/import_md)
+  - Ajout d'une page de gestion des compétences (`/skill`) et de 10 points d'API ; quota `MaxCustomSkillsPerBeing` (50 par défaut)
+  - Autorisations : autorisation d'action `execute` au niveau compétence, liste blanche d'outils dans la compétence et autorisations de l'Être de Silicium avec union côté strict
+- `b60fc68` - Mise à jour de la liste des modèles Qianfan et du mappage des fenêtres de contexte - Ajout des modèles glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest, mappage des fenêtres de contexte à niveaux 1M/128K et des capacités visuelles
+
+### 2026-08-15
+
+#### Nouvelles fonctionnalités
+- `eaa8417` - Mise en œuvre de l'assistant d'autorisation OAuth de la plateforme IM et de l'analyse des variables d'environnement pour les clés de configuration
+  - Ajout de ImOAuthController/ImOAuthService prenant en charge le flux d'autorisation OAuth Feishu (authorize/callback/status), avec protection state anti-CSRF, délai d'expiration de 5 minutes, push d'état SSE
+  - Ajout de IMProviderRegistry gérant de manière unifiée les métadonnées des plateformes IM (schema des champs de configuration/modèles de points de terminaison OAuth/fabrique de Provider)
+  - Ajout de ConfigSecretResolver pour analyser les espaces réservés `${ENV_VAR}` dans la configuration, remplacement par copie profonde sans réécriture de la configuration originale
+  - Intégration de l'assistant d'autorisation IM dans la page de configuration (zone d'autorisation en ligne + état temps réel SSE)
+  - Complétion des traductions des textes d'état/aide d'autorisation IM dans 13 fichiers de langue
+
+### 2026-07-26
+
+#### Refactorisation
+- `ffc45c2` - Refactorisation de la plateforme IM en architecture de configuration multi-instance - IMPlatforms sous forme de liste (activation/désactivation indépendante par plateforme), AggregateIMProvider agrégeant l'envoi et la réception de messages multi-plateformes et la course d'autorisations, éditeur multi-instance sur la page de configuration
+
+### 2026-07-19
+
+#### Nouvelles fonctionnalités
+- `9bf2103` - Intégration de la suppression et de l'exportation multi-sélection dans l'arborescence de Speedy.Manager
+
+#### Corrections
+- `0df0674` - Correction du problème de suppression multi-sélection de Speedy.Manager qui ne supprimait que le premier élément
+
 ### 2026-07-16
 
 #### Nouvelles fonctionnalités
@@ -73,6 +122,7 @@ Les deux versions partagent les mêmes interfaces et fonctionnalités, ne diffé
   - 20 fichier(s) modifié(s)
 
 #### Documentation
+- `ce36036` - Réécrire le contenu postérieur au 2026-05-26 du journal des modifications pour les 13 versions linguistiques selon les enregistrements git
 - `d6608ea` - Ajouter l'introduction de l'outil AI IDE DuMate (Baidu Qianfan) aux 13 versions linguistiques du journal des modifications
   - 13 fichier(s) modifié(s)
 

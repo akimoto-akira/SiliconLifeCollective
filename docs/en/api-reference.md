@@ -67,8 +67,8 @@ Returns a list of all active Chat Sessions.
       "sessionId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
       "beingId": "being-uuid",
       "type": "single",
-      "displayName": "与小游聊天",
-      "lastMessage": "最后消息内容",
+      "displayName": "Chat with Assistant",
+      "lastMessage": "Last message content",
       "lastTime": "2026-05-20T10:30:00Z"
     }
   ]
@@ -97,7 +97,7 @@ Returns global chat history records.
 ```json
 {
   "channelId": "85ccff8e-7497-1991-7a38-ffa1b7d9c50d",
-  "content": "测试消息内容"
+  "content": "Test message content"
 }
 ```
 
@@ -639,6 +639,38 @@ Returns the system configuration interface page.
 
 Returns available AI client types and their dynamic options (available models, regions, etc.).
 
+### Get IM Platform Options
+
+**GET** `/config/imoptions`
+
+Returns IM platform metadata (for the configuration wizard to dynamically render forms):
+
+```json
+{
+  "success": true,
+  "platforms": [
+    {
+      "value": "feishu",
+      "display": "Feishu",
+      "authModes": ["manual", "oauth"],
+      "needsPublicCallback": false,
+      "help": "...",
+      "helpUrl": "https://open.feishu.cn/app",
+      "fields": [
+        { "key": "appId", "label": "App ID", "type": "text", "required": true },
+        { "key": "appSecret", "label": "App Secret", "type": "password", "required": true, "isSecret": true }
+      ]
+    }
+  ]
+}
+```
+
+### Browse Configuration
+
+**GET** `/config/browse`
+
+Returns browse data for configuration items (used for grouped display in the configuration interface).
+
 ---
 
 ## Memory System
@@ -742,9 +774,9 @@ Searches for matching work notes.
 **Request Body**:
 ```json
 {
-  "title": "笔记标题",
-  "content": "笔记内容",
-  "keywords": ["关键词1", "关键词2"]
+  "title": "Note title",
+  "content": "Note content",
+  "keywords": ["keyword1", "keyword2"]
 }
 ```
 
@@ -756,8 +788,8 @@ Searches for matching work notes.
 ```json
 {
   "noteId": "note-uuid",
-  "title": "更新后的标题",
-  "content": "更新后的内容"
+  "title": "Updated title",
+  "content": "Updated content"
 }
 ```
 
@@ -1211,6 +1243,230 @@ Unregisters a code position that no longer needs monitoring.
 
 ---
 
+## Skill Management
+
+### Skill Management Page
+
+**GET** `/skill` or **GET** `/skill/index`
+
+Query parameter: `beingId` — Silicon Being ID (required)
+
+Returns the Skill management page for the specified Silicon Being (skill list + Markdown editor).
+
+### Get Skill List
+
+**GET** `/api/skills/list`
+
+Query parameter: `beingId` — Silicon Being ID (required)
+
+Returns all skills for the Silicon Being (id, description, version, tags, source, triggerMode, toolWhitelist, maxToolRound, timeoutSeconds, parameterCount), along with statistics (total skills / custom skills / quota limit).
+
+### Get Skill Markdown
+
+**GET** `/api/skills/get-md`
+
+Query parameters: `beingId`, `skillId`
+
+Returns the Markdown text of the specified skill (YAML front matter + prompt body).
+
+### Save Skill Markdown
+
+**POST** `/api/skills/update-md?beingId={beingId}`
+
+Request body (`application/json`):
+
+```json
+{
+  "markdown": "---\nid: my_skill\n...\n---\n\nPrompt body",
+  "skillId": "my_skill"
+}
+```
+
+Updates or creates a skill via Markdown (upsert semantics). Missing metadata is automatically filled by AI; skills saved through the Web UI are marked with `Source` as `User`. Subject to the `MaxCustomSkillsPerBeing` quota.
+
+### Import Skill (JSON)
+
+**POST** `/api/skills/import?beingId={beingId}`
+
+Request body: `{ "json": "<skill definition JSON>" }`
+
+Imports a skill from JSON, also subject to the quota limit.
+
+### Import Skill (Markdown)
+
+**POST** `/api/skills/import-md?beingId={beingId}`
+
+Request body: `{ "markdown": "<Markdown text>" }`
+
+Imports a new skill from Markdown; missing metadata is automatically filled by AI.
+
+### Delete Skill
+
+**POST** `/api/skills/delete?beingId={beingId}`
+
+Request body: `{ "skillId": "my_skill" }`
+
+Deletes a skill (also deletes the corresponding `.md` and `.json` persistence files).
+
+### Export Skill (JSON)
+
+**GET** `/api/skills/export?beingId={beingId}&skillId={skillId}`
+
+Downloads the skill definition as a JSON attachment (`{id}.json`).
+
+### Export Skill (Markdown)
+
+**GET** `/api/skills/export-md?beingId={beingId}&skillId={skillId}`
+
+Downloads the skill as a Markdown attachment (`{id}.md`).
+
+### Test Execute Skill
+
+**POST** `/api/skills/test?beingId={beingId}`
+
+Request body:
+
+```json
+{
+  "skillId": "my_skill",
+  "parametersJson": "{ \"topic\": \"AI news\" }"
+}
+```
+
+Executes a skill once with the given parameters and returns a `ToolResult` (including AI execution rounds and final output).
+
+---
+
+## MCP Management
+
+### MCP Management Page
+
+**GET** `/mcp`
+
+Query parameter: `beingId` — Silicon Being ID (optional, used to display MCP tools visible to that Silicon Being)
+
+Returns the MCP server management page.
+
+### Get Server List
+
+**GET** `/api/mcp/list-servers`
+
+Returns the status of all configured MCP servers:
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "state": "connected",
+      "enabled": true,
+      "toolCount": 8,
+      "endpoint": null,
+      "lastError": null
+    }
+  ],
+  "mcpEnabled": true,
+  "connected": 1,
+  "toolTotal": 8
+}
+```
+
+`state` values: `connected` / `disconnected` / `connecting` / `error`.
+
+### Get Server Tool List
+
+**GET** `/api/mcp/list-tools?serverId={serverId}`
+
+Returns the tools provided by the specified server (`name` is the fully qualified name with prefix `mcp_{serverId}_{toolName}`, `description`, `schema`). Returns an error if the server is not connected.
+
+### Add Server
+
+**POST** `/api/mcp/add-server`
+
+Request body (`McpServerConfig`):
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "env": {},
+  "endpoint": null,
+  "enabled": true
+}
+```
+
+`transport` supports `stdio` (local process: `command` + `arguments`) and `http` (remote endpoint: `endpoint`). Server IDs only allow lowercase letters, numbers, and underscores. After adding, it immediately connects and syncs to all Silicon Beings.
+
+### Enable/Disable Server
+
+**POST** `/api/mcp/toggle`
+
+Request body: `{ "serverId": "filesystem", "enabled": true }`
+
+### Remove Server
+
+**POST** `/api/mcp/remove-server`
+
+Request body: `{ "serverId": "filesystem" }`
+
+Removes the server configuration and unregisters its tools from all Silicon Beings.
+
+### Reconnect Server
+
+**POST** `/api/mcp/reconnect`
+
+Request body: `{ "serverId": "filesystem" }`
+
+Forces a disconnect and re-establishes the connection, refreshing the tool list.
+
+### Test Tool Call
+
+**POST** `/api/mcp/test-tool`
+
+Request body:
+
+```json
+{
+  "serverId": "filesystem",
+  "toolName": "read_file",
+  "argumentsJson": "{ \"path\": \"/data/hello.txt\" }"
+}
+```
+
+Directly calls an MCP server tool (without AI involvement), used to verify connectivity.
+
+---
+
+## IM Platform OAuth Authorization
+
+### Initiate Authorization
+
+**GET** `/im/{platform}/authorize`
+
+Path parameter: `platform` — IM platform identifier (e.g., `feishu`)
+
+Generates a CSRF-protected random `state`, registers an authorization session valid for 5 minutes, returns the authorization URL, and automatically opens the system default browser. Repeated requests for the same platform will overwrite the previous session.
+
+### Authorization Callback
+
+**GET** `/im/{platform}/callback?code={code}&state={state}`
+
+Called by the IM platform redirect. After validating `state`, it exchanges the authorization code for an access token, writes `accessToken`, `refreshToken`, `tokenExpiresAt`, and `authMode=oauth` back to the platform's configuration and persists it, then renders the authorization result landing page (success/failure).
+
+### Query Authorization Status
+
+**GET** `/im/{platform}/status`
+
+Returns `{ platform, status, tokenExpiresAt }`. `status` values: `pending` / `success` / `failed` / `timeout` / `none`. The frontend primarily receives status updates via the SSE event `im_auth_status`; this endpoint serves as a polling fallback.
+
+---
+
 ## Help Documentation System
 
 ### Help Page
@@ -1366,6 +1622,20 @@ eventSource.onmessage = (event) => {
       break;
   }
 };
+```
+
+### IM Authorization Status Events
+
+The IM platform OAuth authorization wizard pushes status updates via a shared SSE connection (event name `im_auth_status`):
+
+```javascript
+eventSource.addEventListener('im_auth_status', (event) => {
+  const data = JSON.parse(event.data);
+  // data.platform — Platform identifier (feishu / wecom / dingtalk)
+  // data.status  — pending / success / failed / timeout
+  // data.message — Additional information
+  updateAuthStatus(data.platform, data.status);
+});
 ```
 
 ---

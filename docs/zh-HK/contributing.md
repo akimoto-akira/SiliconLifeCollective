@@ -124,7 +124,7 @@ refactor(web): simplify controller structure
    ```bash
    # 執行所有測試
    dotnet test
-
+   
    # 以發佈模式建置
    dotnet build --configuration Release
    ```
@@ -199,8 +199,8 @@ feat(localization): add Korean language support
 ### 1. Bug 修復
 
 **流程**：
-1. 檢查現有議題
-2. 如果不存在則建立議題
+1. 檢查現有問題
+2. 如果不存在則建立問題
 3. 修復 bug
 4. 新增測試個案
 5. 提交 PR
@@ -265,10 +265,10 @@ public void MyFeature_ShouldWork_AsExpected()
 {
     // 安排
     var service = new MyService();
-
+    
     // 執行
     var result = service.DoSomething();
-
+    
     // 斷言
     Assert.IsTrue(result.Success);
 }
@@ -385,14 +385,14 @@ git push --force-with-lease
 ### 資源
 
 - **文件**：[docs/](../)
-- **議題**：GitHub Issues
+- **問題**：GitHub Issues
 - **討論**：GitHub Discussions
 - **行為準則**：CODE_OF_CONDUCT.md
 
 ### 聯繫
 
 - 為 bug 建立 Issue
-- 為議題發起 Discussion
+- 為問題發起 Discussion
 - 為緊急事項標記維護者
 
 ---
@@ -415,7 +415,7 @@ git push --force-with-lease
 ## 下一步
 
 - 📚 閱讀[文件](../)
-- 🐛 檢視[開放議題](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
+- 🐛 檢視[開放問題](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
 - 💬 開始[討論](https://github.com/akimoto-akira/SiliconLifeCollective/discussions)
 - 🚀 Fork 並開始貢獻！
 

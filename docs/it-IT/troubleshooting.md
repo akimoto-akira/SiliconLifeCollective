@@ -383,6 +383,116 @@ Plugin load failed: Security check failed
 
 ---
 
+### Problemi con le Competenze
+
+#### Problema: La Competenza non appare nell'elenco o non è visibile all'IA
+
+**Sintomi**:
+- La pagina Competenze della Web UI salva con successo, ma l'elenco non visualizza / l'IA non richiama la Competenza
+
+**Soluzione**:
+1. Verifica che `id` e `description` della Competenza non siano vuoti (le bozze non sono esposte all'IA)
+2. Le Competenze con metadati incompleti (`NeedsCompletion`) non vengono iniettate nell'IA——completa i metadati del frontmatter YAML o lascia che l'IA li completi prima di salvare
+3. Controlla se la matrice dei permessi ha disabilitato `{skillId}:execute` (le Competenze disabilitate non sono visibili all'IA)
+4. Conferma che l'interruttore globale `SkillEnabled` sia true
+5. L'hot reload richiede fino a 30 secondi per avere effetto, attendere e aggiornare o riavviare
+
+#### Problema: Esecuzione della Competenza fallita con messaggio "not in whitelist"
+
+**Sintomi**:
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**Soluzione**:
+- Aggiungi lo strumento al `tool_whitelist` della Competenza, oppure svuota la whitelist per ereditare tutti gli strumenti dell'Essere
+
+#### Problema: Raggiunto il limite massimo di Competenze
+
+**Sintomi**:
+```
+Custom skill limit reached (50)
+```
+
+**Soluzione**:
+1. Elimina le Competenze personalizzate non più utilizzate
+2. Oppure aumenta la configurazione `MaxCustomSkillsPerBeing`
+
+---
+
+### Problemi MCP
+
+#### Problema: Connessione al server MCP fallita
+
+**Sintomi**:
+- Lo stato del server mostra `error` o `disconnected`, `lastError` non è vuoto
+
+**Soluzione**:
+1. Server stdio: conferma che `command` sia eseguibile (es. `npx` nel PATH), `arguments` corretti
+2. Server http: verifica che l'URL `endpoint` sia raggiungibile (firewall, proxy)
+3. Nella pagina /mcp clicca **Riconnetti**
+4. Consulta i dettagli di `lastError`, cause comuni: comando inesistente, versione incompatibile, endpoint 404
+
+#### Problema: Strumento MCP non iniettato nell'Essere
+
+**Sintomi**:
+- Il server è connesso (`connected`) ma l'IA non può richiamare lo strumento `mcp_xxx_yyy`
+
+**Soluzione**:
+1. Conferma che `enabled` del server sia true
+2. Conferma che l'interruttore globale `McpEnabled` sia true
+3. Controlla la matrice dei permessi: `mcp_{serverId}_{toolName}:execute` è disabilitato?
+4. Nella conversazione dell'Essere, utilizza lo strumento `mcp` (`list_tools`) per verificare i nomi degli strumenti effettivamente iniettati
+
+#### Problema: Aggiunta del server restituisce errore di formato ID
+
+**Sintomi**:
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**Soluzione**:
+- L'ID del server permette solo lettere minuscole, cifre e trattini bassi (es. `filesystem`, `github_tools`)
+
+---
+
+### Problemi con la piattaforma IM
+
+#### Problema: Messaggi Feishu non ricevuti
+
+**Soluzione**:
+1. Controlla l'indirizzo di callback e la porta configurati nell'abbonamento agli eventi della piattaforma aperta Feishu (`listenPort` + `callbackPath`)
+2. Conferma che `Encrypt Key` / `Verification Token` corrispondano alla configurazione
+3. Per lo sviluppo locale è disponibile la procedura guidata OAuth (autorizzazione con un clic dalla pagina di configurazione); il callback degli eventi richiede raggiungibilità da rete pubblica o tunnel intranet
+4. Consulta i log per errori di verifica della firma/decrittazione
+
+#### Problema: Timeout dell'autorizzazione OAuth
+
+**Sintomi**:
+- La pagina di autorizzazione mostra lo stato `timeout`
+
+**Soluzione**:
+1. La sessione di autorizzazione è valida 5 minuti, dopo il timeout clicca nuovamente il pulsante di autorizzazione
+2. Conferma che l'indirizzo di callback `/im/feishu/callback` sia accessibile da Feishu (`redirectBaseUrl` configurato correttamente)
+3. La visualizzazione dello stato frontend dipende da SSE; se SSE si disconnette, è possibile eseguire il polling di `/im/{platform}/status` come fallback
+
+#### Problema: Segnaposto `${ENV_VAR}` non risolto
+
+**Sintomi**:
+- La connessione alla piattaforma IM fallisce, il valore di configurazione è ancora testo segnaposto
+
+**Soluzione**:
+1. Conferma che la variabile d'ambiente sia stata impostata prima dell'avvio del processo (riavvia l'applicazione per renderla effettiva)
+2. Controlla l'ortografia del nome della variabile (supporta solo `[A-Za-z_][A-Za-z0-9_]*`)
+3. Nota: mantenere il segnaposto in config.json è un comportamento di design, la risoluzione avviene nella copia in memoria
+
+#### Problema: Solo una tra più piattaforme IM riceve i messaggi
+
+**Soluzione**:
+- I messaggi in uscita vengono trasmessi a tutte le piattaforme abilitate; il fallimento dell'invio su una singola piattaforma viene isolato silenziosamente——controlla se il token della piattaforma è scaduto (riautorizza o aggiorna la chiave)
+
+---
+
 ### Problemi delle Note di Lavoro
 
 #### Problema: Impossibile creare note di lavoro

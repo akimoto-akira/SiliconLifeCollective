@@ -314,7 +314,33 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 11. Narzędzie logów (LogTool)
+### 11. Narzędzie zapytań MCP (McpTool)
+
+**Nazwa narzędzia**: `mcp`
+
+**Opis funkcji**: Zapytanie o status integracji MCP (Model Context Protocol) — podłączone serwery zewnętrzne, narzędzia przez nie udostępniane i sposób ich wywoływania. Jest to narzędzie tylko do odczytu: dodawanie/usuwanie serwerów może być wykonywane wyłącznie przez użytkownika za pomocą Web UI, AI nie może modyfikować listy serwerów.
+
+**Obsługiwane operacje**:
+- `status` — globalny przegląd (status włączenia, liczba serwerów, liczba narzędzi)
+- `list_servers` — lista skonfigurowanych serwerów (z statusem połączenia i liczbą narzędzi)
+- `list_tools` — lista dostępnych narzędzi (z prefiksową nazwą `mcp_{server}_{tool}`, opisem i schematem parametrów; opcjonalny parametr `server_id` do filtrowania pojedynczego serwera)
+
+**Przykład użycia**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**Narzędzia opakowujące MCP**: Narzędzia udostępniane przez każdy podłączony serwer MCP są dynamicznie rejestrowane w Istocie Krzemowej jako niezależne narzędzia, w formacie nazewnictwa `mcp_{serverId}_{toolName}` (np. `mcp_filesystem_read_file`). AI może wywoływać je bezpośrednio po nazwie z prefiksem, tak jak zwykłe narzędzia, bez konieczności pośrednictwa przez to narzędzie zapytań. Narzędzia opakowujące są prezentowane w macierzy uprawnień jako pojedyncza akcja `execute` i mogą być indywidualnie wyłączane.
+
+**Scenariusz**: Wszystkie scenariusze (`All`)
+
+---
+
+### 12. Narzędzie logów (LogTool)
 
 **Nazwa narzędzia**: `log`
 
@@ -338,7 +364,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 12. Narzędzie pamięci (MemoryTool)
+### 13. Narzędzie pamięci (MemoryTool)
 
 **Nazwa narzędzia**: `memory`
 
@@ -367,7 +393,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 13. Narzędzie sieciowe (NetworkTool)
+### 14. Narzędzie sieciowe (NetworkTool)
 
 **Nazwa narzędzia**: `network`
 
@@ -393,7 +419,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 14. Narzędzie uprawnień (PermissionTool) 🔒
+### 15. Narzędzie uprawnień (PermissionTool) 🔒
 
 **Nazwa narzędzia**: `permission`
 
@@ -420,7 +446,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 15. Narzędzie projektowe (ProjectTool) 🔒
+### 16. Narzędzie projektowe (ProjectTool) 🔒
 
 **Nazwa narzędzia**: `project`
 
@@ -456,7 +482,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 16. Narzędzie zadań projektowych (ProjectTaskTool)
+### 17. Narzędzie zadań projektowych (ProjectTaskTool)
 
 **Nazwa narzędzia**: `project_task`
 
@@ -490,7 +516,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 17. Narzędzie notatek pracy projektu (ProjectWorkNoteTool)
+### 18. Narzędzie notatek pracy projektu (ProjectWorkNoteTool)
 
 **Nazwa narzędzia**: `project_work_note`
 
@@ -520,7 +546,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 18. Narzędzie pracy projektowej (ProjectWorkTool) 🔒
+### 19. Narzędzie pracy projektowej (ProjectWorkTool) 🔒
 
 **Nazwa narzędzia**: `project_work`
 
@@ -549,7 +575,55 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 19. Narzędzie systemowe (SystemTool)
+### 20. Narzędzie umiejętności (SkillTool)
+
+**Nazwa narzędzia**: `skill`
+
+**Opis funkcji**: Zarządzanie umiejętnościami Istoty Krzemowej (wielokrotnie użytkowanymi jednostkami zdolności typu "orchestracja narzędzi + szablon podpowiedzi"), obsługa tworzenia, listowania, aktualizacji, usuwania, importu i eksportu. Brakujące metadane (id, opis, schemat parametrów itp.) są automatycznie uzupełniane przez AI.
+
+**Obsługiwane operacje**:
+- `create` — utworzenie nowej umiejętności (wymaga `id` i `system_prompt`; opcjonalne: `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — lista wszystkich dostępnych umiejętności (z podsumowaniem)
+- `update` — aktualizacja istniejącej umiejętności poprzez parametry (wymaga `skill_id`)
+- `update_from_md` — aktualizacja umiejętności z ciągu Markdown (metadane frontmatter YAML + treść podpowiedzi)
+- `delete` — usunięcie umiejętności (wymaga `skill_id`)
+- `export` — eksport umiejętności jako JSON (wymaga `skill_id`)
+- `export_md` — eksport umiejętności jako Markdown (wymaga `skill_id`)
+- `import` — import umiejętności z JSON (wymaga `json`)
+- `import_md` — import umiejętności z Markdown (wymaga `markdown`)
+
+**Przykład użycia**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "Wyszukaj dzisiejsze wiadomości technologiczne i wygeneruj podsumowanie",
+  "system_prompt": "Proszę użyć narzędzia network do wyszukania najnowszych wiadomości o {topic} i wygenerowania podsumowania w 500 słowach.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "Temat wiadomości" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**Uprawnienia modyfikacji**: Kurator Krzemowy może modyfikować wszystkie umiejętności; zwykłe Istoty mogą modyfikować tylko umiejętności o źródle `Being` lub `User` (nie mogą modyfikować umiejętności wbudowanych i wtyczek).
+
+**Limit liczbowy**: Liczba niestandardowych umiejętności na Istotę jest ograniczona przez konfigurację `MaxCustomSkillsPerBeing` (domyślnie 50).
+
+**Scenariusz**: Wszystkie scenariusze (`All`)
+
+> Pełny opis systemu umiejętności (tryby wyzwalania, białe listy, gorące przeładowanie, automatyczne planowanie itp.) znajduje się w [Przewodniku Istoty Krzemowej](silicon-being-guide.md#system-umiejętności).
+
+---
+
+### 21. Narzędzie systemowe (SystemTool)
 
 **Nazwa narzędzia**: `system`
 
@@ -570,7 +644,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 20. Narzędzie zadań (TaskTool)
+### 22. Narzędzie zadań (TaskTool)
 
 **Nazwa narzędzia**: `task`
 
@@ -595,7 +669,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 21. Narzędzie czasomierzy (TimerTool)
+### 23. Narzędzie czasomierzy (TimerTool)
 
 **Nazwa narzędzia**: `timer`
 
@@ -621,7 +695,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 22. Narzędzie audytu tokenów (TokenAuditTool) 🔒
+### 24. Narzędzie audytu tokenów (TokenAuditTool) 🔒
 
 **Nazwa narzędzia**: `token_audit`
 
@@ -651,7 +725,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 23. Narzędzie przeglądarki WebView (WebViewBrowserTool)
+### 25. Narzędzie przeglądarki WebView (WebViewBrowserTool)
 
 **Nazwa narzędzia**: `webview_browser`
 
@@ -692,7 +766,7 @@ Dodatkowo, narzędzia oznaczone atrybutem `[ChatOnly]` są dostępne tylko w sce
 
 ---
 
-### 24. Narzędzie notatek pracy (WorkNoteTool)
+### 26. Narzędzie notatek pracy (WorkNoteTool)
 
 **Nazwa narzędzia**: `work_note`
 
@@ -820,6 +894,13 @@ public class AdminOnlyTool : ITool
     // Dostępne tylko dla Kuratora Krzemowego
 }
 ```
+
+### Alternatywy: Umiejętności i narzędzia MCP
+
+Oprócz pisania klas narzędzi w C#, istnieją dwa sposoby rozszerzenia bez konieczności kompilacji:
+
+- **Umiejętności (Skill)**: Tworzenie kombinacji "orchestracji narzędzi + szablonu podpowiedzi" za pomocą Web UI lub narzędzia `skill`, odpowiednie do hermetyzacji często używanych przepływów pracy w wielokrotnie użytkowane zdolności. Zobacz [Przewodnik Istoty Krzemowej — System umiejętności](silicon-being-guide.md#system-umiejętności).
+- **Serwer MCP**: Po skonfigurowaniu zewnętrznego serwera MCP w Web UI, jego narzędzia są automatycznie wstrzykiwane w formacie `mcp_{serverId}_{toolName}`, bez konieczności pisania jakiegokolwiek kodu. Zobacz [Przewodnik Web UI — Zarządzanie MCP](web-ui-guide.md).
 
 ## Najlepsze praktyki
 

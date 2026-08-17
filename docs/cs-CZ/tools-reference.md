@@ -314,7 +314,33 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 11. Protokolový nástroj (LogTool)
+### 11. MCP dotazovací nástroj (McpTool)
+
+**Název nástroje**: `mcp`
+
+**Popis funkce**: Dotazování stavu integrace MCP (Model Context Protocol) — připojené externí servery, nástroje, které poskytují, a jak je volat. Toto je nástroj pouze pro čtení: přidávání/odstraňování serverů může provádět pouze uživatel prostřednictvím Web UI, AI nemůže měnit seznam serverů.
+
+**Podporované operace**:
+- `status` — Globální přehled (stav povolení, počet serverů, počet nástrojů)
+- `list_servers` — Seznam nakonfigurovaných serverů (včetně stavu připojení a počtu nástrojů)
+- `list_tools` — Seznam dostupných nástrojů (s prefixem `mcp_{server}_{tool}`, popisem a schématem parametrů; volitelný filtr `server_id` pro jeden server)
+
+**Příklad použití**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**MCP obalové nástroje**: Každý nástroj poskytovaný připojeným MCP serverem je dynamicky registrován jako nezávislý nástroj pro Křemíkové Bytosti, s formátem názvu `mcp_{serverId}_{toolName}` (např. `mcp_filesystem_read_file`). AI je může volat přímo podle prefixu jako běžné nástroje, bez nutnosti procházet tímto dotazovacím nástrojem. Obalové nástroje se v matici oprávnění prezentují jako jediná akce `execute` a mohou být individuálně zakázány.
+
+**Scénář**: Všechny scénáře (`All`)
+
+---
+
+### 12. Protokolový nástroj (LogTool)
 
 **Název nástroje**: `log`
 
@@ -338,7 +364,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 12. Nástroj paměti (MemoryTool)
+### 13. Nástroj paměti (MemoryTool)
 
 **Název nástroje**: `memory`
 
@@ -367,7 +393,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 13. Síťový nástroj (NetworkTool)
+### 14. Síťový nástroj (NetworkTool)
 
 **Název nástroje**: `network`
 
@@ -393,7 +419,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 14. Nástroj oprávnění (PermissionTool) 🔒
+### 15. Nástroj oprávnění (PermissionTool) 🔒
 
 **Název nástroje**: `permission`
 
@@ -420,7 +446,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 15. Projektový nástroj (ProjectTool) 🔒
+### 16. Projektový nástroj (ProjectTool) 🔒
 
 **Název nástroje**: `project`
 
@@ -456,7 +482,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 16. Nástroj projektových úkolů (ProjectTaskTool)
+### 17. Nástroj projektových úkolů (ProjectTaskTool)
 
 **Název nástroje**: `project_task`
 
@@ -490,7 +516,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 17. Nástroj projektových pracovních poznámek (ProjectWorkNoteTool)
+### 18. Nástroj projektových pracovních poznámek (ProjectWorkNoteTool)
 
 **Název nástroje**: `project_work_note`
 
@@ -520,7 +546,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 18. Nástroj projektové práce (ProjectWorkTool) 🔒
+### 19. Nástroj projektové práce (ProjectWorkTool) 🔒
 
 **Název nástroje**: `project_work`
 
@@ -549,7 +575,55 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 19. Systémový nástroj (SystemTool)
+### 20. Nástroj dovedností (SkillTool)
+
+**Název nástroje**: `skill`
+
+**Popis funkce**: Správa dovedností Křemíkových Bytostí (znovupoužitelné jednotky schopností „orchestrace nástrojů + šablona výzev"), podpora vytváření, výpisu, aktualizace, odstranění, importu a exportu. Chybějící metadata (id, popis, schéma parametrů atd.) jsou automaticky doplněna AI.
+
+**Podporované operace**:
+- `create` — Vytvoření nové dovednosti (vyžaduje `id` a `system_prompt`, volitelně `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — Seznam všech dostupných dovedností (včetně shrnutí)
+- `update` — Aktualizace existující dovednosti pomocí parametrů (vyžaduje `skill_id`)
+- `update_from_md` — Aktualizace dovednosti z řetězce Markdown (YAML front matter + tělo výzvy)
+- `delete` — Odstranění dovednosti (vyžaduje `skill_id`)
+- `export` — Export dovednosti do JSON (vyžaduje `skill_id`)
+- `export_md` — Export dovednosti do Markdown (vyžaduje `skill_id`)
+- `import` — Import dovednosti z JSON (vyžaduje `json`)
+- `import_md` — Import dovednosti z Markdown (vyžaduje `markdown`)
+
+**Příklad použití**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "Vyhledat dnešní technologické zprávy a vygenerovat shrnutí",
+  "system_prompt": "Použijte nástroj network k vyhledání nejnovějších zpráv o {topic} a vygenerujte shrnutí o 500 slovech.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "Téma zpráv" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**Oprávnění úprav**: Kurátor Křemíku může upravovat všechny dovednosti; běžné bytosti mohou upravovat pouze dovednosti se zdrojem `Being` nebo `User` (nemohou upravovat vestavěné dovednosti a dovednosti zásuvných modulů).
+
+**Omezení počtu**: Počet vlastních dovedností každé bytosti je omezen konfigurací `MaxCustomSkillsPerBeing` (výchozí 50).
+
+**Scénář**: Všechny scénáře (`All`)
+
+> Úplný popis systému dovedností (spouštěcí režimy, whitelist, hot-reload, automatické plánování atd.) viz [Průvodce Křemíkovou Bytostí](silicon-being-guide.md#systém-dovedností).
+
+---
+
+### 21. Systémový nástroj (SystemTool)
 
 **Název nástroje**: `system`
 
@@ -570,7 +644,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 20. Nástroj úkolů (TaskTool)
+### 22. Nástroj úkolů (TaskTool)
 
 **Název nástroje**: `task`
 
@@ -595,7 +669,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 21. Nástroj časovačů (TimerTool)
+### 23. Nástroj časovačů (TimerTool)
 
 **Název nástroje**: `timer`
 
@@ -621,7 +695,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 22. Nástroj auditu Tokenů (TokenAuditTool) 🔒
+### 24. Nástroj auditu Tokenů (TokenAuditTool) 🔒 🔒
 
 **Název nástroje**: `token_audit`
 
@@ -651,7 +725,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 23. Nástroj WebView prohlížeče (WebViewBrowserTool)
+### 25. Nástroj WebView prohlížeče (WebViewBrowserTool)
 
 **Název nástroje**: `webview_browser`
 
@@ -692,7 +766,7 @@ Kromě toho nástroje označené atributem `[ChatOnly]` jsou dostupné pouze ve 
 
 ---
 
-### 24. Nástroj pracovních poznámek (WorkNoteTool)
+### 26. Nástroj pracovních poznámek (WorkNoteTool)
 
 **Název nástroje**: `work_note`
 
@@ -820,6 +894,13 @@ public class AdminOnlyTool : ITool
     // Přístupné pouze Kurátorem Křemíku
 }
 ```
+
+### Alternativa: Dovednosti a MCP nástroje
+
+Kromě psaní tříd nástrojů v C# existují dva způsoby rozšíření bez nutnosti kompilace:
+
+- **Dovednosti (Skill)**: Vytvořením kombinace „orchestrace nástrojů + šablona výzev" prostřednictvím Web UI nebo nástroje `skill`, vhodné pro zapouzdření častých pracovních postupů do znovupoužitelných schopností. Viz [Průvodce Křemíkovou Bytostí — Systém dovedností](silicon-being-guide.md#systém-dovedností).
+- **MCP servery**: Po konfiguraci externích MCP serverů v Web UI jsou jejich nástroje automaticky injektovány ve formátu `mcp_{serverId}_{toolName}`, bez nutnosti psát jakýkoliv kód. Viz [Průvodce Web UI — Správa MCP](web-ui-guide.md).
 
 ## Osvědčené postupy
 

@@ -121,6 +121,14 @@ Start with a single simple assistant. As you discover what's possible, create mo
 
 Extend functionality through plugins — community-built tools and capabilities can be easily added. Each plugin declares required capabilities via the `[PluginCapability]` attribute, ensuring system safety.
 
+### Assistant that Learns New Skills
+
+Your assistant can turn common workflows into **skills** — a natural language description plus tool orchestration, and they can repeatedly and reliably complete similar tasks. Skills can run on a schedule ("give me a tech news summary every morning at 9 AM"), and evolve into more proficient versions over time.
+
+### Connect to the External Tool World
+
+Supports MCP (Model Context Protocol) — connect to external tool servers like file systems, databases, and search engines. Your assistant instantly gains new capabilities without you writing a single line of code. All connections are under your control; the assistant can only use tools you explicitly enable.
+
 ### Dual Version Options
 
 - **Default Version**: Lightweight console application, suitable for development debugging and resource-constrained environments

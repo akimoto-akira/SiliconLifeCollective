@@ -191,6 +191,78 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
+## Sistema de Competências
+
+As Competências (Skills) são unidades de capacidade reutilizáveis dos Silicon Beings — encapsulam "orquestração de ferramentas + modelos de prompts" numa função declarativa, evolutiva e automaticamente escalonável, que a IA invoca como uma ferramenta comum.
+
+### Estrutura de Competências
+
+| Elemento | Descrição |
+|------|------|
+| `id` / `description` | Identificador único e descrição de uma frase (apresentada à IA, determina quando a IA selecciona a competência) |
+| `parameter_schema` | JSON Schema de parâmetros, declara cada marcador `{param}` usado no prompt |
+| `system_prompt_template` | Modelo de prompt de sistema, preenchido com parâmetros durante a execução |
+| `tool_whitelist` | Lista de ferramentas permitidas durante a execução (vazio = herda todas as ferramentas do Being) |
+| `max_tool_round` / `timeout` | Limites de rondas de ferramentas e tempo limite (sujeitos a limites globais) |
+| `on_complete` | Acção de conclusão: `none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual` (IA invoca autonomamente) ou `Auto` + `schedule` de escalonamento |
+
+### Quatro Fontes
+
+- **Builtin** — Integradas no framework (`summarize_document` resumo de documentos, `code_review` revisão de código, `research_topic` pesquisa de tópicos)
+- **Plugin** — Registadas por plugins através de `ISkillProvider`
+- **Being** — Criadas pelo Being em tempo de execução através da ferramenta `skill`
+- **User** — Criadas pelo utilizador através da página de gestão de competências da Web UI
+
+### Modos de Activação
+
+1. **Manual**: A competência é injectada no pedido da IA como uma definição de ferramenta comum; a IA determina quando invocar; o escalonador prioriza o encaminhamento de chamadas com o mesmo nome para a competência
+2. **Auto + schedule**: A expressão de escalonamento é armazenada em `metadata.schedule`, suportando três formatos:
+   - `"09:30"` — Horário fixo diário
+   - `"6h"` / `"30 m"` / `"2 d"` — Intervalo periódico
+   - `"0 9 * * *"` / `"*/15 * * * *"` — Subconjunto de cron
+
+### Escrita em Markdown
+
+As competências são armazenadas em Markdown (`skills/{id}.md`, frontmatter YAML + corpo do prompt):
+
+```markdown
+---
+id: daily_news_digest
+description: Pesquisar notícias de tecnologia de hoje e gerar um resumo
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+Utilize a ferramenta network para pesquisar as últimas notícias sobre {topic}, gere um resumo de 500 palavras e guarde-o nas notas de trabalho.
+```
+
+Também é possível escrever apenas o corpo (omitindo o YAML): ao guardar, a IA completa automaticamente os metadados como id, description, schema de parâmetros, etc. — os campos já preenchidos pelo utilizador nunca são sobrescritos.
+
+### Auto-gestão do Being
+
+O Being pode gerir o seu próprio repositório de competências através da ferramenta `skill`:
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### Recarga a Quente e Evolução
+
+- O Being detecta alterações no directório `skills/` a cada 30 segundos (comparação de impressão digital); as modificações feitas através da Web UI ou por outros Beings entram em vigor automaticamente, sem necessidade de reinício
+- Cada actualização de competência arquiva automaticamente a versão histórica em `skills/archive/{id}/{version}.md`, formando um histórico de evolução da competência
+- A quantidade de competências personalizadas é limitada por quota (`MaxCustomSkillsPerBeing`, predefinido 50)
+
+### Guardas de Execução
+
+- Permissão de acção `execute` ao nível da competência (pode ser desactivada pela matriz de permissões; quando desactivada, a competência não é visível para a IA)
+- Os parâmetros de execução são restringidos pelos limites globais: rondas ≤ `GlobalMaxToolRound` (predefinido 10), tempo limite ≤ `GlobalSkillTimeoutSeconds` (predefinido 300 segundos)
+- As competências não podem invocar-se recursivamente
+- Chamadas a ferramentas fora da lista de permissões falham imediatamente
+
 ## Sistema de Memória
 
 ### Tipos de Memória

@@ -314,7 +314,33 @@
 
 ---
 
-### 11. 로그 툴 (LogTool)
+### 11. MCP 조회 툴 (McpTool)
+
+**툴 이름**: `mcp`
+
+**기능 설명**: MCP(Model Context Protocol) 통합 상태 조회 — 연결된 외부 서버, 제공하는 도구 및 호출 방법. 읽기 전용 툴: 서버 추가/삭제는 사용자가 Web UI를 통해서만 수행 가능, AI는 서버 목록을 수정할 수 없음.
+
+**지원 작업**:
+- `status` — 전역 개요(활성화 상태, 서버 수, 도구 수)
+- `list_servers` — 구성된 서버 목록(연결 상태 및 도구 수 포함)
+- `list_tools` — 사용 가능한 도구 목록(`mcp_{server}_{tool}` 접두사 이름, 설명 및 매개변수 스키마 포함; 선택적 `server_id`로 단일 서버 필터링)
+
+**사용 예시**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**MCP 래핑 도구**: 연결된 각 MCP 서버가 제공하는 도구는 독립 도구로서 실리존 비잉에 동적 등록되며, 명명 형식은 `mcp_{serverId}_{toolName}`(예: `mcp_filesystem_read_file`). AI는 일반 도구처럼 접두사 이름으로 직접 호출할 수 있으며, 이 조회 툴을 경유할 필요 없음. 래핑 도구는 권한 매트릭스에서 단일 `execute` 액션으로 표시되며, 개별적으로 비활성화 가능.
+
+**시나리오**: 모든 시나리오(`All`)
+
+---
+
+### 12. 로그 툴 (LogTool)
 
 **툴 이름**: `log`
 
@@ -338,7 +364,7 @@
 
 ---
 
-### 12. 메모리 툴 (MemoryTool)
+### 13. 메모리 툴 (MemoryTool)
 
 **툴 이름**: `memory`
 
@@ -367,7 +393,7 @@
 
 ---
 
-### 13. 네트워크 툴 (NetworkTool)
+### 14. 네트워크 툴 (NetworkTool)
 
 **툴 이름**: `network`
 
@@ -393,7 +419,7 @@
 
 ---
 
-### 14. 퍼미션 툴 (PermissionTool) 🔒
+### 15. 퍼미션 툴 (PermissionTool) 🔒
 
 **툴 이름**: `permission`
 
@@ -420,7 +446,7 @@
 
 ---
 
-### 15. 프로젝트 툴 (ProjectTool) 🔒
+### 16. 프로젝트 툴 (ProjectTool) 🔒
 
 **툴 이름**: `project`
 
@@ -456,7 +482,7 @@
 
 ---
 
-### 16. 프로젝트 태스크 툴 (ProjectTaskTool)
+### 17. 프로젝트 태스크 툴 (ProjectTaskTool)
 
 **툴 이름**: `project_task`
 
@@ -490,7 +516,7 @@
 
 ---
 
-### 17. 프로젝트 워크 노트 툴 (ProjectWorkNoteTool)
+### 18. 프로젝트 워크 노트 툴 (ProjectWorkNoteTool)
 
 **툴 이름**: `project_work_note`
 
@@ -520,7 +546,7 @@
 
 ---
 
-### 18. 프로젝트 워크 툴 (ProjectWorkTool) 🔒
+### 19. 프로젝트 워크 툴 (ProjectWorkTool) 🔒
 
 **툴 이름**: `project_work`
 
@@ -549,7 +575,55 @@
 
 ---
 
-### 19. 시스템 툴 (SystemTool)
+### 20. 스킬 툴 (SkillTool)
+
+**툴 이름**: `skill`
+
+**기능 설명**: 실리존 비잉의 스킬(재사용 가능한 "도구 오케스트레이션 + 프롬프트 템플릿" 능력 단위) 관리, 생성, 목록 조회, 업데이트, 삭제, 가져오기/내보내기 지원. 누락된 메타데이터(id, 설명, 매개변수 스키마 등)는 AI가 자동으로 보완.
+
+**지원 작업**:
+- `create` — 새 스킬 생성(`id` 및 `system_prompt` 필요; 선택: `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — 사용 가능한 모든 스킬 목록(요약 포함)
+- `update` — 매개변수로 기존 스킬 업데이트(`skill_id` 필요)
+- `update_from_md` — Markdown 문자열에서 스킬 업데이트(YAML 프론트매터 메타데이터 + 프롬프트 본문)
+- `delete` — 스킬 삭제(`skill_id` 필요)
+- `export` — 스킬을 JSON으로 내보내기(`skill_id` 필요)
+- `export_md` — 스킬을 Markdown으로 내보내기(`skill_id` 필요)
+- `import` — JSON에서 스킬 가져오기(`json` 필요)
+- `import_md` — Markdown에서 스킬 가져오기(`markdown` 필요)
+
+**사용 예시**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "오늘의 기술 뉴스를 검색하고 요약을 생성",
+  "system_prompt": "network 도구를 사용하여 {topic}의 최신 뉴스를 검색하고 500자 요약을 생성해 주세요.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "뉴스 주제" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**수정 권한**: 실리콘 큐레이터는 모든 스킬을 수정할 수 있음; 일반 비잉은 출처가 `Being` 또는 `User`인 스킬만 수정 가능(내장 및 플러그인 스킬은 수정 불가).
+
+**수량 제한**: 비잉당 커스텀 스킬 수는 설정 `MaxCustomSkillsPerBeing`(기본 50)에 의해 제한.
+
+**시나리오**: 모든 시나리오(`All`)
+
+> 스킬 시스템(트리거 모드, 화이트리스트, 핫 리로드, 자동 스케줄링 등)의 전체 설명은 [실리존 비잉 가이드](silicon-being-guide.md#스킬-시스템)를 참조.
+
+---
+
+### 21. 시스템 툴 (SystemTool)
 
 **툴 이름**: `system`
 
@@ -570,7 +644,7 @@
 
 ---
 
-### 20. 태스크 툴 (TaskTool)
+### 22. 태스크 툴 (TaskTool)
 
 **툴 이름**: `task`
 
@@ -595,7 +669,7 @@
 
 ---
 
-### 21. 타이머 툴 (TimerTool)
+### 23. 타이머 툴 (TimerTool)
 
 **툴 이름**: `timer`
 
@@ -621,7 +695,7 @@
 
 ---
 
-### 22. 토큰 사용 감사 툴 (TokenAuditTool) 🔒
+### 24. 토큰 사용 감사 툴 (TokenAuditTool) 🔒
 
 **툴 이름**: `token_audit`
 
@@ -651,7 +725,7 @@
 
 ---
 
-### 23. WebView 브라우저 툴 (WebViewBrowserTool)
+### 25. WebView 브라우저 툴 (WebViewBrowserTool)
 
 **툴 이름**: `webview_browser`
 
@@ -692,7 +766,7 @@
 
 ---
 
-### 24. 워크 노트 툴 (WorkNoteTool)
+### 26. 워크 노트 툴 (WorkNoteTool)
 
 **툴 이름**: `work_note`
 
@@ -820,6 +894,13 @@ public class AdminOnlyTool : ITool
     // 실리콘 큐레이터만 접근 가능
 }
 ```
+
+### 대안: 스킬 및 MCP 도구
+
+C# 도구 클래스를 작성하는 것 외에, 컴파일 없이 확장할 수 있는 두 가지 방법이 있습니다:
+
+- **스킬(Skill)**: Web UI 또는 `skill` 도구를 통해 "도구 오케스트레이션 + 프롬프트 템플릿" 조합을 생성하여, 자주 사용하는 워크플로를 재사용 가능한 능력으로 캡슐화. [실리존 비잉 가이드 — 스킬 시스템](silicon-being-guide.md#스킬-시스템) 참조.
+- **MCP 서버**: Web UI에서 외부 MCP 서버를 구성하면, 해당 도구가 `mcp_{serverId}_{toolName}` 형식으로 자동 주입되며, 코드를 작성할 필요 없음. [Web UI 가이드 — MCP 관리](web-ui-guide.md) 참조.
 
 ## 모범 사례
 

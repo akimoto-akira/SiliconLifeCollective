@@ -118,7 +118,7 @@ Jeder Executor verwaltet eine Anfragewarteschlange:
 
 ### Thread-Sperrung für Berechtigungsvalidierung
 
-Wenn ein Tool Ressourcenzugriff initiiert:
+Wenn ein Werkzeug Ressourcenzugriff initiiert:
 
 1. Executor empfängt Anfrage und **sperrt seinen Thread**.
 2. Executor fragt den privaten Berechtigungsmanager des Beings ab.
@@ -160,7 +160,7 @@ Gemeinsame Regeltabelle persistent im Speicher, nur vom Silicon Curator verwalte
 ```
 
 - Regeln werden sequentiell bewertet; der erste Treffer gewinnt.
-- Nur der Silicon Curator kann die globale ACL modifizieren (durch sein dediziertes Tool).
+- Nur der Silicon Curator kann die globale ACL modifizieren (durch sein dediziertes Werkzeug).
 - Änderungen sind sofort wirksam.
 - Die globale ACL steht **nicht** in der oben genannten Abfrageprioritätskette — sie wird intern von der Callback-Funktion referenziert.
 
@@ -350,7 +350,7 @@ Der `PluginLoader` führt beim Laden Sicherheitsprüfungen durch und unterstütz
 - Typen und Assemblys zwischen Plugins stören sich nicht gegenseitig
 - Beim Entladen eines Plugins können zugehörige Ressourcen freigegeben werden
 
-### Tool-Berechtigungsbeschränkungen
+### Werkzeug-Berechtigungsbeschränkungen
 
 - Plugins, die Tools über die `ITool`-Schnittstelle registrieren, unterliegen demselben Berechtigungssystem
 - Plugin-Tools können die Berechtigungsvalidierungskette nicht umgehen
@@ -358,14 +358,14 @@ Der `PluginLoader` führt beim Laden Sicherheitsprüfungen durch und unterstütz
 
 ---
 
-## Tool-Berechtigungssicherheit
+## Werkzeug-Berechtigungssicherheit
 
-Das Tool-Berechtigungssystem bietet eine zusätzliche Sicherheitsschicht, die kontrolliert, welche Tool-Operationen Silicon Beings verwenden dürfen:
+Das Werkzeug-Berechtigungssystem bietet eine zusätzliche Sicherheitsschicht, die kontrolliert, welche Werkzeug-Operationen Silicon Beings verwenden dürfen:
 
 ### Zwei-Ebenen-Berechtigungsisolation
 
-1. **Silicon Being-Ebene** — Jedes Silicon Being hat eine unabhängige Tool-Berechtigungskonfiguration
-2. **Projektebene** — Tool-Berechtigungen innerhalb eines Projektbereichs sind unabhängig von der Being-Ebene, wodurch bereichsübergreifende Berechtigungsisolation erreicht wird
+1. **Silicon Being-Ebene** — Jedes Silicon Being hat eine unabhängige Werkzeug-Berechtigungskonfiguration
+2. **Projektebene** — Werkzeug-Berechtigungen innerhalb eines Projektbereichs sind unabhängig von der Being-Ebene, wodurch bereichsübergreifende Berechtigungsisolation erreicht wird
 
 ### Berechtigungsvorlagen
 
@@ -377,7 +377,86 @@ Das System bietet vordefinierte Berechtigungsvorlagen, die eine Sicherheitsbasel
 
 ### Sicherheitsmerkmale
 
-- **Standardmäßig verweigert** — Nicht explizit erlaubte Tool-Operationen werden standardmäßig verweigert
-- **Operationsgranularität** — Jede Operation jedes Tools wird unabhängig kontrolliert (z.B. `network:get` erlaubt, aber `network:post` verweigert)
-- **Curator-Verwaltung** — Tool-Berechtigungen können nur vom Silicon Curator konfiguriert werden
-- **Audit-Trail** — Tool-Berechtigungsänderungen werden im Audit-Protokoll erfasst
+- **Standardmäßig verweigert** — Nicht explizit erlaubte Werkzeug-Operationen werden standardmäßig verweigert
+- **Operationsgranularität** — Jede Operation jedes Werkzeugs wird unabhängig kontrolliert (z.B. `network:get` erlaubt, aber `network:post` verweigert)
+- **Curator-Verwaltung** — Werkzeug-Berechtigungen können nur vom Silicon Curator konfiguriert werden
+- **Audit-Trail** — Werkzeug-Berechtigungsänderungen werden im Audit-Protokoll erfasst
+
+---
+
+## Fähigkeitssicherheit
+
+Das Fähigkeitensystem nutzt das Werkzeugberechtigungssystem wieder und bietet mehrschichtige Leitplanken:
+
+### Ausführungsberechtigungen
+
+- Fähigkeits-ID als Werkzeugname, als `execute`-Aktion in die `ToolActionPermissionConfig`-Berechtigungsmatrix aufgenommen
+- Deaktivierte Fähigkeiten erscheinen nicht in den KI-sichtbaren Werkzeugdefinitionen (Schema-Ebene-Filter + Runtime-Überprüfung, doppelte Absicherung)
+- Der Curator kann immer ausführen; normale Beings benötigen `IsActionAllowed(skillId, "execute")`
+
+### Werkzeug-Whitelist und Berechtigungsvereinigung
+
+- Während der Fähigkeitsausführung sind nur Werkzeuge in `ToolWhitelist` erlaubt (leere Liste = alle Being-Werkzeuge erben)
+- Aktionsbeschränkungen der Fähigkeit und Being-Berechtigungen werden als **strikt-seitige Vereinigung** zusammengeführt (`MergePermissions`): Fähigkeiten können Berechtigungen nur weiter einschränken, niemals erweitern
+- Werkzeugaufrufe außerhalb der Whitelist schlagen direkt fehl (`Tool not in whitelist`)
+
+### Ressourcenverbrauch-Leitplanken
+
+- **Globaler Schalter**: `SkillEnabled` deaktiviert mit einem Klick das gesamte Fähigkeitensystem
+- **Mengenkontingent**: Die Anzahl benutzerdefinierter Fähigkeiten pro Being ist durch `MaxCustomSkillsPerBeing` (Standard 50) begrenzt
+- **Rundenbegrenzung**: `maxToolRound = Min(Fähigkeits-Deklarationswert, GlobalMaxToolRound Standard 10)`, verhindert unkontrollierte Schleifen
+- **Timeout-Begrenzung**: `timeout = Min(Fähigkeits-Deklarationswert, GlobalSkillTimeoutSeconds Standard 300s)`
+- **Rekursionsschutz**: Eine Fähigkeit kann sich während der Ausführung nicht selbst aufrufen
+
+### Änderungsberechtigungen
+
+- Der Curator kann alle Fähigkeiten ändern; normale Beings können nur Fähigkeiten mit der Quelle `Being`/`User` ändern
+- Die automatische Metadaten-Ergänzung füllt nur fehlende Felder, vom Benutzer bereitgestellte Felder werden niemals von der KI überschrieben
+
+---
+
+## MCP-Sicherheit
+
+Die MCP-Integration folgt dem Prinzip „Benutzersouveränität + Berechtigungskonsistenz":
+
+### Benutzersouveränität
+
+- Das Hinzufügen, Löschen, Aktivieren/Deaktivieren und Neuverbinden von MCP-Servern **kann nur vom Benutzer über die Web-UI** (/mcp oder Konfigurationsseite) erfolgen
+- Das `mcp`-Werkzeug auf KI-Seite ist eine Leseabfrage (status/list_servers/list_tools) und kann die Serverliste nicht verändern
+- Der globale Schalter `McpEnabled` kann mit einem Klick alle externen Werkzeuge trennen
+
+### Werkzeugisolation und Berechtigungen
+
+- Wrapper-Werkzeuge werden als `mcp_{serverId}_{toolName}` benannt, isoliert von der Namensgebung interner/Plugin-Werkzeuge
+- Jedes Wrapper-Werkzeug deklariert automatisch eine einzelne `execute`-Aktion, aufgenommen in die zweistufige Werkzeugberechtigungsmatrix, kann pro Being/Projekt einzeln deaktiviert werden
+- Nach Deaktivierung eines Servers werden dessen Werkzeuge sofort von allen Beings abgemeldet
+
+### Transport- und Prozessgrenzen
+
+- `stdio`-Server laufen als Unterprozess und erben nur explizit konfigurierte Umgebungsvariablen (`env`-Feld)
+- `http`-Server kommunizieren über den konfigurierten Endpunkt, bei Verbindungsfehler wird automatisch der error-Status angenommen und `lastError` verfügbar gemacht
+
+---
+
+## IM-Schlüsselsicherheit
+
+### Umgebungsvariablen-Platzhalter
+
+IM-Plattform-Konfigurationswerte unterstützen `${ENV_VAR}`-Platzhalter (z. B. `"${FEISHU_APP_SECRET}"`):
+
+- `ConfigSecretResolver` löst Platzhalter auf einer **Tiefkopie** auf, die ursprüngliche `config.json` behält die Platzhalter immer im Originalzustand
+- Ein nachfolgendes `SaveConfig` schreibt die aufgelösten Klartextschlüssel nicht zurück auf die Festplatte
+- Unterstützt Ganzwert-Platzhalter und in-Wert-eingebettete Platzhalter (z. B. `prefix-${VAR}`)
+
+### OAuth-Autorisierungssicherheit
+
+- **state gegen CSRF**: 16 Byte kryptografische Zufallszahl, strenge Validierung beim Callback
+- **5-Minuten-Timeout**: Autorisierungssitzung wird bei Timeout automatisch ungültig, beim Überschreiben alter Sitzungen sofort abgebrochen
+- **Token-Speicherung**: accessToken/refreshToken/tokenExpiresAt werden in die Plattformkonfiguration zurückgeschrieben und persistent gespeichert, `authMode` wird als `oauth` markiert
+- Callback-URL unterstützt `redirectBaseUrl`-Konfiguration (für öffentliche Callback-Szenarien)
+
+### Nachrichtensicherheit
+
+- Feishu: Signaturvalidierung (`X-Lark-Signature`, SHA256) + AES-256-CBC-Ereignisentschlüsselung + Ereignisdeduplizierung (10-Minuten-Fenster)
+- WeChat Enterprise: WXBizMsgCrypt Ver-/Entschlüsselung und Signaturvalidierung
+- DingTalk: Stream-Modus über verschlüsselte WebSocket; HTTP-Modus Callback-Validierung

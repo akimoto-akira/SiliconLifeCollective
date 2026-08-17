@@ -230,7 +230,7 @@ public class MyPluginTool : ITool
 {
     public string Name => "my_plugin_tool";
     public string Description => "A tool provided by my plugin";
-    
+
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
         return new ToolResult { Success = true, Output = "Done" };
@@ -238,7 +238,27 @@ public class MyPluginTool : ITool
 }
 ```
 
-3. 将编译后的 DLL 放入插件目录，`PluginLoader` 将自动加载。
+3. （可选）实现 `ISkillProvider` 接口以通过插件提供技能：
+
+```csharp
+public class MyPluginSkills : ISkillProvider
+{
+    public IEnumerable<SkillDefinition> GetSkills()
+    {
+        yield return new SkillDefinition
+        {
+            Id = "my_plugin_skill",
+            Description = "A skill provided by my plugin",
+            SystemPromptTemplate = "请执行任务：{task}",
+            // ... 其余元数据
+        };
+    }
+}
+```
+
+插件技能在生命体初始化时由 `SkillManager.ScanAllPluginAssemblies()` 自动注册（来源标记为 `Plugin`，热重载不会覆盖）。
+
+4. 将编译后的 DLL 放入插件目录，`PluginLoader` 将自动加载。
 
 > **安全限制**：插件默认不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空间。但插件可通过 `[PluginCapability]` 属性声明所需能力（Network、FileIO、Process、AI），加载器据此放宽对应命名空间的安全扫描规则。不可声明的能力（P/Invoke、Unsafe、反射发射等）始终被阻止。插件通过 `AssemblyLoadContext` 隔离加载。
 
@@ -286,7 +306,7 @@ SiliconLife.Common/
 ├── Localization/          # 本地化基类与 34 种语言变体实现
 ├── Security/              # 权限管理器
 ├── SiliconBeing/          # 默认硅基生命体实现
-├── Tools/                 # 共享的内置工具（23 个）
+├── Tools/                 # 共享的内置工具（25 个）
 ├── Web/                   # Web 基础设施
 └── WebView/               # Playwright WebView 实现
 
@@ -296,7 +316,7 @@ SiliconLife.App/          # Default 与 Fast 共享的应用层
 ├── Project/               # 项目系统（工作流引擎、项目角色）
 └── Web/                   # Web UI 实现
     ├── Component/         # 27 个 UI 组件
-    ├── Controllers/       # 24 个路由控制器
+    ├── Controllers/       # 27 个路由控制器
     ├── Models/            # 视图模型
     ├── Views/             # HTML 视图
     └── Skins/             # 7 个皮肤主题

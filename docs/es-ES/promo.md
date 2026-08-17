@@ -121,6 +121,14 @@ Comience con un asistente simple. A medida que descubra lo que es posible, cree 
 
 Amplíe las capacidades con plugins — herramientas y capacidades construidas por la comunidad que se pueden agregar fácilmente. Cada plugin se ejecuta en un sandbox seguro, garantizando la seguridad del sistema.
 
+### Asistentes que aprenden nuevas habilidades
+
+Sus asistentes pueden consolidar los flujos de trabajo frecuentes en **habilidades** — una descripción en lenguaje natural más una orquestación de herramientas, que les permite completar tareas similares de forma fiable y repetible. Las habilidades pueden ejecutarse automáticamente en horarios programados ("cada mañana a las 9, dame un resumen de las noticias tecnológicas") y evolucionan con el tiempo hacia versiones más competentes.
+
+### Conexión al mundo de herramientas externas
+
+Soporte para MCP (Model Context Protocol) — conecte servidores de herramientas externos como sistemas de archivos, bases de datos, motores de búsqueda, y su asistente obtiene inmediatamente nuevas capacidades sin escribir una sola línea de código. Todas las conexiones están bajo su control: el asistente solo puede usar las herramientas que usted haya activado explícitamente.
+
 ### Elección de doble versión
 
 - **Versión Default**: Aplicación de consola ligera, adecuada para depuración de desarrollo y entornos con recursos limitados

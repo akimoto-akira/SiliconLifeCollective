@@ -377,3 +377,82 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **操作粒度** — 每个工具的每个操作独立控制（如 `network:get` 允许但 `network:post` 拒绝）
 - **主理人管理** — 工具权限只能由硅基主理人配置
 - **审计追踪** — 工具权限变更记录在审计日志中
+
+---
+
+## 技能安全
+
+技能系统复用工具权限体系，并提供多层护栏：
+
+### 执行权限
+
+- 技能 id 作为工具名，以 `execute` 动作纳入 `ToolActionPermissionConfig` 权限矩阵
+- 被禁用的技能不会出现在 AI 可见的工具定义中（Schema 层过滤 + 运行时复核双重保障）
+- 主理人始终可执行；普通生命体需 `IsActionAllowed(skillId, "execute")`
+
+### 工具白名单与权限并集
+
+- 技能执行期间仅允许 `ToolWhitelist` 内的工具（空列表 = 继承生命体全部工具）
+- 技能的动作限制与生命体权限**取严格侧并集**（`MergePermissions`）：技能只能进一步收窄权限，永远不能放权
+- 白名单外的工具调用直接失败（`Tool not in whitelist`）
+
+### 资源消耗护栏
+
+- **全局开关**：`SkillEnabled` 一键禁用整个技能系统
+- **数量配额**：每个生命体自定义技能数受 `MaxCustomSkillsPerBeing`（默认 50）限制
+- **轮数钳制**：`maxToolRound = Min(技能声明值, GlobalMaxToolRound 默认 10)`，防止失控循环
+- **超时钳制**：`timeout = Min(技能声明值, GlobalSkillTimeoutSeconds 默认 300s)`
+- **递归防护**：技能执行中不能再调用自身
+
+### 修改权限
+
+- 主理人可修改所有技能；普通生命体仅能修改来源为 `Being`/`User` 的技能
+- 元数据自动补全只填充缺失字段，用户提供的字段永不被 AI 覆盖
+
+---
+
+## MCP 安全
+
+MCP 集成遵循"用户主权 + 权限一致"原则：
+
+### 用户主权
+
+- MCP 服务器的添加、删除、启停、重连**只能由用户通过 Web UI**（/mcp 或配置页）完成
+- AI 侧的 `mcp` 工具是只读查询（status/list_servers/list_tools），无法修改服务器列表
+- `McpEnabled` 全局开关可一键切断所有外部工具
+
+### 工具隔离与权限
+
+- 包装工具以 `mcp_{serverId}_{toolName}` 命名，与内置/插件工具命名空间隔离
+- 每个包装工具自动声明单一 `execute` 动作，纳入两级工具权限矩阵，可按生命体/项目逐个禁用
+- 禁用服务器后其工具立即从所有生命体注销
+
+### 传输与进程边界
+
+- `stdio` 服务器以子进程运行，仅继承显式配置的环境变量（`env` 字段）
+- `http` 服务器通过配置的端点通信，连接失败自动进入 error 状态并暴露 `lastError`
+
+---
+
+## IM 密钥安全
+
+### 环境变量占位符
+
+IM 平台配置值支持 `${ENV_VAR}` 占位符（如 `"${FEISHU_APP_SECRET}"`）：
+
+- `ConfigSecretResolver` 在**深拷贝副本**上解析占位符，原始 `config.json` 始终保持占位符原样
+- 后续 `SaveConfig` 不会把解析后的明文密钥写回磁盘
+- 支持整值占位符与值内嵌占位符（如 `prefix-${VAR}`）
+
+### OAuth 授权安全
+
+- **state 防 CSRF**：16 字节加密随机数，回调时严格校验
+- **5 分钟超时**：授权会话超时自动作废，旧会话被覆盖时立即取消
+- **令牌存储**：accessToken/refreshToken/tokenExpiresAt 写回平台配置并持久化，`authMode` 标记为 `oauth`
+- 回调 URL 支持 `redirectBaseUrl` 配置（公网回调场景）
+
+### 消息安全
+
+- 飞书：签名验证（`X-Lark-Signature`，SHA256）+ AES-256-CBC 事件解密 + 事件去重（10 分钟窗口）
+- 企业微信：WXBizMsgCrypt 加解密与签名验证
+- 钉钉：Stream 模式走加密 WebSocket；HTTP 模式回调校验

@@ -368,6 +368,116 @@ Plugin load failed: Security check failed
 
 ---
 
+### 技能问题
+
+#### 问题：技能不出现在技能列表或 AI 不可见
+
+**症状**：
+- Web UI 技能页保存成功，但列表不显示 / AI 不调用该技能
+
+**解决方案**：
+1. 检查技能 `id` 和 `description` 是否非空（草稿不暴露给 AI）
+2. 元数据不完整的技能（`NeedsCompletion`）不会注入 AI——补全 YAML 前置元数据或让 AI 补全后再保存
+3. 检查权限矩阵是否禁用了 `{skillId}:execute`（被禁用的技能对 AI 不可见）
+4. 确认全局开关 `SkillEnabled` 为 true
+5. 热重载最多 30 秒生效，稍候刷新或重启
+
+#### 问题：技能执行失败提示 "not in whitelist"
+
+**症状**：
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**解决方案**：
+- 把该工具加入技能的 `tool_whitelist`，或清空白名单以继承生命体全部工具
+
+#### 问题：达到技能数量上限
+
+**症状**：
+```
+Custom skill limit reached (50)
+```
+
+**解决方案**：
+1. 删除不再使用的自定义技能
+2. 或调大配置 `MaxCustomSkillsPerBeing`
+
+---
+
+### MCP 问题
+
+#### 问题：MCP 服务器连接失败
+
+**症状**：
+- 服务器状态显示 `error` 或 `disconnected`，`lastError` 非空
+
+**解决方案**：
+1. stdio 服务器：确认 `command` 可执行（如 `npx` 在 PATH 中）、`arguments` 正确
+2. http 服务器：检查 `endpoint` URL 可达（防火墙、代理）
+3. 在 /mcp 页面点击**重连**
+4. 查看 `lastError` 详情，常见为命令不存在、版本不兼容、端点 404
+
+#### 问题：MCP 工具未注入生命体
+
+**症状**：
+- 服务器已连接（`connected`）但 AI 无法调用 `mcp_xxx_yyy` 工具
+
+**解决方案**：
+1. 确认服务器 `enabled` 为 true
+2. 确认全局开关 `McpEnabled` 为 true
+3. 检查权限矩阵：`mcp_{serverId}_{toolName}:execute` 是否被禁用
+4. 生命体对话中可用 `mcp` 工具（`list_tools`）核对实际注入的工具名
+
+#### 问题：添加服务器返回 ID 格式错误
+
+**症状**：
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**解决方案**：
+- 服务器 ID 只允许小写字母、数字和下划线（如 `filesystem`、`github_tools`）
+
+---
+
+### IM 平台问题
+
+#### 问题：飞书消息收不到
+
+**解决方案**：
+1. 检查飞书开放平台事件订阅配置的回调地址与端口（`listenPort` + `callbackPath`）
+2. 确认 `Encrypt Key` / `Verification Token` 与配置一致
+3. 本地开发可用 OAuth 授权向导（配置页一键授权）；事件回调需公网可达或使用内网穿透
+4. 查看日志中的签名验证/解密错误
+
+#### 问题：OAuth 授权超时
+
+**症状**：
+- 授权页显示 `timeout` 状态
+
+**解决方案**：
+1. 授权会话有效期 5 分钟，超时后重新点击授权按钮
+2. 确认回调地址 `/im/feishu/callback` 可被飞书访问（`redirectBaseUrl` 配置正确）
+3. 前端状态显示依赖 SSE，若 SSE 断开可轮询 `/im/{platform}/status` 兜底
+
+#### 问题：`${ENV_VAR}` 占位符未解析
+
+**症状**：
+- IM 平台连接失败，配置值仍是占位符文本
+
+**解决方案**：
+1. 确认环境变量已在启动进程前设置（重启应用生效）
+2. 检查变量名拼写（仅支持 `[A-Za-z_][A-Za-z0-9_]*`）
+3. 注意：config.json 中保留占位符是设计行为，解析发生在内存副本
+
+#### 问题：多个 IM 平台只有一个收到消息
+
+**解决方案**：
+- 出站消息会广播到所有启用平台，单平台发送失败被静默隔离——检查该平台令牌是否过期（重新授权或更新密钥）
+
+---
+
 ### 工作笔记问题
 
 #### 问题：无法创建工作笔记

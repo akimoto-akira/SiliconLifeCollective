@@ -382,3 +382,82 @@ O sistema fornece modelos de permissões predefinidos, garantindo uma linha de b
 - **Granularidade por operação** — Cada operação de cada ferramenta é controlada independentemente (por exemplo `network:get` permitido mas `network:post` negado)
 - **Gestão pelo Curator** — As permissões de ferramentas só podem ser configuradas pelo Silicon Curator
 - **Rasto de auditoria** — As alterações de permissões de ferramentas são registadas no registo de auditoria
+
+---
+
+## Segurança de Competências
+
+O sistema de competências reutiliza o sistema de permissões de ferramentas e fornece múltiplas camadas de salvaguardas:
+
+### Permissões de Execução
+
+- O id da competência é usado como nome da ferramenta, incluído na matriz de permissões `ToolActionPermissionConfig` com a acção `execute`
+- Competências desactivadas não aparecem nas definições de ferramentas visíveis para a IA (filtragem ao nível de Schema + verificação em tempo de execução, dupla garantia)
+- O Curator pode sempre executar; Beings comuns necessitam de `IsActionAllowed(skillId, "execute")`
+
+### Lista de Permissões de Ferramentas e União de Permissões
+
+- Durante a execução da competência, apenas são permitidas as ferramentas na `ToolWhitelist` (lista vazia = herda todas as ferramentas do Being)
+- As restrições de acções da competência e as permissões do Being formam a **união do lado restritivo** (`MergePermissions`): a competência só pode restringir ainda mais as permissões, nunca alargar
+- Chamadas de ferramentas fora da lista de permissões falham directamente (`Tool not in whitelist`)
+
+### Salvaguardas de Consumo de Recursos
+
+- **Interruptor global**: `SkillEnabled` desactiva todo o sistema de competências com um clique
+- **Quota de quantidade**: O número de competências personalizadas por Being é limitado por `MaxCustomSkillsPerBeing` (predefinição 50)
+- **Limite de rondas**: `maxToolRound = Min(valor declarado pela competência, GlobalMaxToolRound predefinição 10)`, previne loops incontrolados
+- **Limite de timeout**: `timeout = Min(valor declarado pela competência, GlobalSkillTimeoutSeconds predefinição 300s)`
+- **Protecção contra recursão**: Uma competência em execução não pode chamar-se a si própria
+
+### Permissões de Modificação
+
+- O Curator pode modificar todas as competências; Beings comuns só podem modificar competências cuja fonte seja `Being`/`User`
+- A compleção automática de metadados apenas preenche campos em falta; os campos fornecidos pelo utilizador nunca são sobrescritos pela IA
+
+---
+
+## Segurança de MCP
+
+A integração MCP segue o princípio de "soberania do utilizador + permissões consistentes":
+
+### Soberania do Utilizador
+
+- A adição, remoção, activação, desactivação e re-ligação de servidores MCP **só pode ser feita pelo utilizador através da Web UI** (/mcp ou página de configuração)
+- A ferramenta `mcp` do lado da IA é uma consulta de leitura (status/list_servers/list_tools), incapaz de modificar a lista de servidores
+- O interruptor global `McpEnabled` pode cortar todas as ferramentas externas com um clique
+
+### Isolamento de Ferramentas e Permissões
+
+- As ferramentas de invólucro são nomeadas como `mcp_{serverId}_{toolName}`, isoladas do espaço de nomes das ferramentas incorporadas/plugins
+- Cada ferramenta de invólucro declara automaticamente uma única acção `execute`, incluída na matriz de permissões de ferramentas de dois níveis, podendo ser desactivada individualmente por Being/projecto
+- Após desactivar um servidor, as suas ferramentas são imediatamente removidas de todos os Beings
+
+### Fronteiras de Transporte e Processo
+
+- Os servidores `stdio` executam como subprocessos, herdando apenas as variáveis de ambiente explicitamente configuradas (campo `env`)
+- Os servidores `http` comunicam através do endpoint configurado; falhas de ligação entram automaticamente em estado de erro e expõem `lastError`
+
+---
+
+## Segurança de Segredos IM
+
+### Marcadores de Variáveis de Ambiente
+
+Os valores de configuração da plataforma IM suportam marcadores `${ENV_VAR}` (por exemplo `"${FEISHU_APP_SECRET}"`):
+
+- O `ConfigSecretResolver` resolve os marcadores numa **cópia profunda**, o `config.json` original mantém sempre os marcadores como estão
+- `SaveConfig` subsequente não escreve de volta os segredos em texto claro para o disco
+- Suporta marcadores de valor inteiro e marcadores embutidos no valor (por exemplo `prefix-${VAR}`)
+
+### Segurança da Autorização OAuth
+
+- **state anti-CSRF**: 16 bytes de número aleatório criptográfico, verificado rigorosamente no callback
+- **Timeout de 5 minutos**: A sessão de autorização expira automaticamente; sessões antigas são canceladas imediatamente quando sobrescritas
+- **Armazenamento de tokens**: accessToken/refreshToken/tokenExpiresAt são escritos de volta na configuração da plataforma e persistidos; `authMode` é marcado como `oauth`
+- O URL de callback suporta configuração `redirectBaseUrl` (cenários de callback público)
+
+### Segurança de Mensagens
+
+- Feishu: Verificação de assinatura (`X-Lark-Signature`, SHA256) + desencriptação de eventos AES-256-CBC + deduplicação de eventos (janela de 10 minutos)
+- WeChat Enterprise: Encriptação/desencriptação e verificação de assinatura WXBizMsgCrypt
+- DingTalk: O modo Stream usa WebSocket encriptado; o modo HTTP verifica o callback

@@ -30,6 +30,24 @@
   - 3-stufige Berechtigungsprüfungskette: Benutzerfrequenz-Cache → Berechtigungs-Callback-Schnittstelle → (IsCurator: Berechtigungsanfrage-Handler | Non-curator: Globale ACL → Standardablehnung)
   - Vollständiges Audit-Protokoll erfasst alle Berechtigungsentscheidungen
 
+### Fähigkeitssystem
+- **Wiederverwendbare Fähigkeitseinheiten** — "Werkzeugorchestrierung + Prompt-Vorlagen" als deklarierbare, evolutionäre, planbare Fähigkeiten kapseln; KI ruft Fähigkeiten auf wie Werkzeuge
+- **Dualer Trigger-Modus** — Manual (KI-Funktionsaufruf entscheidet autonom) + Auto (Schedule: tägliche feste Zeit / Intervallzyklus / Cron-Subset)
+- **Markdown-zuerst** — YAML-Frontmatter-Metadaten + Prompt-Text; bei reinem Markdown-Speichern ergänzt KI automatisch fehlende Metadaten (Benutzerfelder werden nie überschrieben)
+- **Heißes Neuladen und Versionsarchivierung** — 30-Sekunden-Fingerabdruckerkennung für automatische Wirksamkeit; jedes Update wird in `skills/archive/{id}/{version}.md` archiviert und bildet eine Evolutionsgeschichte
+- **Mehrfache Schutzmaßnahmen** — Globaler Schalter, Kontingentlimits (Standard 50/Being), globale Runden- und Timeout-Begrenzung, Werkzeug-Whitelist, Rekursionsschutz, Fähigkeitslevel-Aktionsberechtigungen
+
+### MCP-Integration
+- **Externe Werkzeuganbindung** — Externe MCP-Server (Model Context Protocol) verbinden; deren Werkzeuge werden mit `mcp_{serverId}_{toolName}`-Benennung in alle Silicon Beings automatisch injiziert, kein Code erforderlich
+- **Dualer Transport** — stdio (lokaler Unterprozess) und http (Remote-Endpunkt)
+- **Benutzersouveränität** — Server hinzufügen/entfernen/aktivieren/deaktivieren nur über Web UI; KI-seitiges `mcp`-Werkzeug ist Read-Only-Abfrage
+- **Konsistente Berechtigungen** — MCP-Wrapper-Werkzeuge sind in die zweistufige Werkzeugberechtigungsmatrix einbezogen, können pro Being/Projekt deaktiviert werden
+
+### IM-Integration
+- **Multi-Instanz-Architektur** — Gleichzeitige Verbindung zu mehreren IM-Plattformen (Web UI / Feishu / WeChat Enterprise / DingTalk), jede Instanz unabhängig startbar/stopbar, Nachrichten werden aggregiert und geroutet
+- **OAuth-Autorisierungsassistent** — Feishu Ein-Klick-Autorisierung (State für CSRF-Schutz, SSE-Echtzeit-Status-Push), Token automatisch in Konfiguration zurückgeschrieben
+- **Schlüsselsicherheit** — Konfigurationswerte unterstützen `${ENV_VAR}`-Umgebungsvariablen-Platzhalter, Klartextschlüssel werden nicht auf Festplatte gespeichert
+
 ### KI und Wissen
 - **Multi-KI-Backend-Unterstützung**
   - **Ollama** — Lokale Modellbereitstellung mit nativer HTTP-API
@@ -234,10 +252,10 @@ SiliconLifeCollective.sln
 │   ├── en/                                # Englisch
 │   └── ...                                # Andere Sprachen
 │
-└── 总文档/                                 # Anforderungs- und Architekturdokumentation
-    ├── 需求文档.md
-    ├── 架构大纲.md
-    └── 实现顺序.md
+└── docs/                                 # Anforderungs- und Architekturdokumentation
+    ├── Anforderungen.md
+    ├── Architekturgliederung.md
+    └── Implementierungsreihenfolge.md
 ```
 
 ## 🏗️ Architekturübersicht
@@ -366,7 +384,7 @@ dotnet publish src/SiliconLife.Fast -c Release -r osx-x64 --self-contained -p:Pu
 
 ### 🚧 Geplant
 - [ ] Phase 13: Externe IM-Integration (Feishu / WhatsApp / Telegram)
-- [ ] Phase 14: Skill-Ökosystem (Plugin-Marktplatz, Skill-Paket-Verteilung)
+- [ ] Phase 14: Fähigkeits-Ökosystem (Plugin-Marktplatz, Fähigkeits-Paket-Verteilung)
 
 ## 📚 Dokumentation
 
@@ -453,7 +471,7 @@ Dieses Projekt steht unter der Apache License 2.0 — siehe [LICENSE](../../LICE
 
 ## 👨‍💻 Autor
 
-**天源垦骥**
+**Akimoto Akira**
 
 - GitHub: [@akimoto-akira](https://github.com/akimoto-akira/SiliconLifeCollective)
 - Gitee: [hoshinokennji](https://gitee.com/hoshinokennji/SiliconLifeCollective)

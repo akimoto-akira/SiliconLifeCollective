@@ -391,6 +391,116 @@ Plugin load failed: Security check failed
 
 ---
 
+### Problemas con las Habilidades
+
+#### Problema: La habilidad no aparece en la lista de habilidades o no es visible para la IA
+
+**Síntomas**:
+- La página de habilidades de Web UI guarda correctamente, pero la lista no muestra / la IA no invoca la habilidad
+
+**Solución**:
+1. Comprobar que `id` y `description` de la habilidad no estén vacíos (los borradores no se exponen a la IA)
+2. Las habilidades con metadatos incompletos (`NeedsCompletion`) no se inyectan en la IA——completar los metadatos del front matter YAML o dejar que la IA los complete antes de guardar
+3. Comprobar si la matriz de permisos deshabilita `{skillId}:execute` (las habilidades deshabilitadas no son visibles para la IA)
+4. Confirmar que el interruptor global `SkillEnabled` es true
+5. La recarga en caliente tarda hasta 30 segundos en efectarse, esperar y refrescar o reiniciar
+
+#### Problema: La ejecución de la habilidad falla con "not in whitelist"
+
+**Síntomas**:
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**Solución**:
+- Añadir la herramienta al `tool_whitelist` de la habilidad, o vaciar la lista blanca para heredar todas las herramientas del Ser de Silicio
+
+#### Problema: Límite de cantidad de habilidades alcanzado
+
+**Síntomas**:
+```
+Custom skill limit reached (50)
+```
+
+**Solución**:
+1. Eliminar habilidades personalizadas que ya no se usan
+2. O aumentar la configuración `MaxCustomSkillsPerBeing`
+
+---
+
+### Problemas MCP
+
+#### Problema: Fallo de conexión del servidor MCP
+
+**Síntomas**:
+- El estado del servidor muestra `error` o `disconnected`, `lastError` no está vacío
+
+**Solución**:
+1. Servidor stdio: confirmar que `command` es ejecutable (ej. `npx` está en PATH), `arguments` correctos
+2. Servidor http: comprobar que la URL del `endpoint` es alcanzable (firewall, proxy)
+3. Hacer clic en **Reconectar** en la página /mcp
+4. Revisar los detalles de `lastError`, comúnmente comando inexistente, versión incompatible, endpoint 404
+
+#### Problema: Las herramientas MCP no se inyectan en el Ser de Silicio
+
+**Síntomas**:
+- El servidor está conectado (`connected`) pero la IA no puede llamar la herramienta `mcp_xxx_yyy`
+
+**Solución**:
+1. Confirmar que `enabled` del servidor es true
+2. Confirmar que el interruptor global `McpEnabled` es true
+3. Comprobar la matriz de permisos: si `mcp_{serverId}_{toolName}:execute` está deshabilitado
+4. En la conversación del Ser de Silicio se puede usar la herramienta `mcp` (`list_tools`) para verificar los nombres de herramientas inyectadas
+
+#### Problema: Añadir servidor devuelve error de formato de ID
+
+**Síntomas**:
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**Solución**:
+- El ID del servidor solo permite letras minúsculas, números y guiones bajos (ej. `filesystem`, `github_tools`)
+
+---
+
+### Problemas con la Plataforma IM
+
+#### Problema: No se reciben mensajes de Feishu
+
+**Solución**:
+1. Comprobar la dirección de callback y el puerto de la configuración de suscripción de eventos en la plataforma abierta de Feishu (`listenPort` + `callbackPath`)
+2. Confirmar que `Encrypt Key` / `Verification Token` coinciden con la configuración
+3. Para desarrollo local se puede usar el asistente de autorización OAuth (autorización de un clic en la página de configuración); el callback de eventos requiere red pública accesible o usar túnel de intranet
+4. Revisar errores de verificación de firma/descifrado en los registros
+
+#### Problema: Timeout de autorización OAuth
+
+**Síntomas**:
+- La página de autorización muestra estado `timeout`
+
+**Solución**:
+1. La sesión de autorización es válida por 5 minutos, tras el timeout hacer clic nuevamente en el botón de autorización
+2. Confirmar que la dirección de callback `/im/feishu/callback` es accesible por Feishu (`redirectBaseUrl` configurado correctamente)
+3. La visualización del estado frontend depende de SSE; si SSE se desconecta se puede consultar `/im/{platform}/status` como respaldo
+
+#### Problema: Marcador de posición `${ENV_VAR}` no resuelto
+
+**Síntomas**:
+- La conexión de la plataforma IM falla, el valor de configuración sigue siendo texto del marcador de posición
+
+**Solución**:
+1. Confirmar que la variable de entorno se estableció antes de iniciar el proceso (reiniciar la aplicación para que surta efecto)
+2. Comprobar la ortografía del nombre de la variable (solo soporta `[A-Za-z_][A-Za-z0-9_]*`)
+3. Nota: conservar el marcador de posición en config.json es el comportamiento esperado, la resolución ocurre en la copia en memoria
+
+#### Problema: Solo una de varias plataformas IM recibe mensajes
+
+**Solución**:
+- Los mensajes salientes se difunden a todas las plataformas activadas, el fallo de envío a una plataforma individual se aísla silenciosamente——comprobar si el token de esa plataforma ha expirado (reautorizar o actualizar la clave)
+
+---
+
 ### Problemas de Notas de Trabajo
 
 #### Problema: No se pueden crear notas de trabajo

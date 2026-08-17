@@ -379,3 +379,82 @@ The system provides predefined permission templates to ensure a security baselin
 - **Operation Granularity** — Each operation of each tool is independently controlled (e.g., `network:get` allowed but `network:post` denied)
 - **Curator Management** — Tool permissions can only be configured by the Silicon Curator
 - **Audit Trail** — Tool permission changes are recorded in the audit log
+
+---
+
+## Skill Security
+
+The Skill system reuses the tool permission framework and provides multiple layers of guardrails:
+
+### Execution Permissions
+
+- Skill id serves as the tool name, included in the `ToolActionPermissionConfig` permission matrix with the `execute` action
+- Disabled skills do not appear in AI-visible tool definitions (Schema-layer filtering + runtime re-check dual safeguard)
+- The Silicon Curator can always execute; normal beings require `IsActionAllowed(skillId, "execute")`
+
+### Tool Whitelist and Permission Union
+
+- During skill execution, only tools within the `ToolWhitelist` are allowed (empty list = inherit all being tools)
+- The skill's action restrictions and being permissions are merged on the **strict side** (`MergePermissions`): skills can only further narrow permissions, never widen them
+- Tool calls outside the whitelist fail directly (`Tool not in whitelist`)
+
+### Resource Consumption Guardrails
+
+- **Global switch**: `SkillEnabled` disables the entire Skill system with one click
+- **Quantity quota**: Custom skills per being are limited by `MaxCustomSkillsPerBeing` (default 50)
+- **Round clamping**: `maxToolRound = Min(skill declared value, GlobalMaxToolRound default 10)`, preventing runaway loops
+- **Timeout clamping**: `timeout = Min(skill declared value, GlobalSkillTimeoutSeconds default 300s)`
+- **Recursion protection**: A skill cannot invoke itself during execution
+
+### Modification Permissions
+
+- The Silicon Curator can modify all skills; normal beings can only modify skills with source `Being`/`User`
+- Automatic metadata completion only fills in missing fields; user-provided fields are never overwritten by AI
+
+---
+
+## MCP Security
+
+MCP integration follows the principle of "user sovereignty + permission consistency":
+
+### User Sovereignty
+
+- Adding, deleting, starting, stopping, and reconnecting MCP servers **can only be done by the user through the Web UI** (/mcp or configuration page)
+- The AI-side `mcp` tool is read-only query (status/list_servers/list_tools) and cannot modify the server list
+- The `McpEnabled` global switch can cut off all external tools with one click
+
+### Tool Isolation and Permissions
+
+- Wrapper tools are named `mcp_{serverId}_{toolName}`, isolated from the built-in/plugin tool namespace
+- Each wrapper tool automatically declares a single `execute` action, included in the two-level tool permission matrix, and can be individually disabled per being/project
+- When a server is disabled, its tools are immediately unregistered from all beings
+
+### Transport and Process Boundary
+
+- `stdio` servers run as subprocesses, inheriting only explicitly configured environment variables (`env` field)
+- `http` servers communicate via configured endpoints; connection failures automatically enter error status and expose `lastError`
+
+---
+
+## IM Key Security
+
+### Environment Variable Placeholders
+
+IM platform configuration values support `${ENV_VAR}` placeholders (e.g., `"${FEISHU_APP_SECRET}"`):
+
+- `ConfigSecretResolver` resolves placeholders on a **deep copy**, so the original `config.json` always retains placeholders as-is
+- Subsequent `SaveConfig` calls never write resolved plaintext secrets back to disk
+- Supports both whole-value placeholders and inline-embedded placeholders (e.g., `prefix-${VAR}`)
+
+### OAuth Authorization Security
+
+- **CSRF protection via state**: 16-byte cryptographic random number, strictly validated on callback
+- **5-minute timeout**: Authorization sessions are automatically invalidated on timeout; old sessions are immediately cancelled when overwritten
+- **Token storage**: accessToken/refreshToken/tokenExpiresAt are written back to the platform configuration and persisted, with `authMode` marked as `oauth`
+- Callback URL supports `redirectBaseUrl` configuration (for public callback scenarios)
+
+### Message Security
+
+- Feishu: Signature verification (`X-Lark-Signature`, SHA256) + AES-256-CBC event decryption + event deduplication (10-minute window)
+- WeChat Enterprise: WXBizMsgCrypt encryption/decryption and signature verification
+- DingTalk: Stream mode uses encrypted WebSocket; HTTP mode performs callback verification

@@ -290,7 +290,7 @@ IOException: Access denied
 - SpeedyStorage-Initialisierung schlägt fehl
 
 **Lösung**:
-1. `SiliconLife.Speedy.Manager`-Tool zum Prüfen und Reparieren von `.spk`-Dateien verwenden
+1. `SiliconLife.Speedy.Manager`-Werkzeug zum Prüfen und Reparieren von `.spk`-Dateien verwenden
 2. Prüfen, ob die `.spk.idx`-Indexdatei mit der `.spk`-Datei übereinstimmt
 3. Wenn die Indexdatei beschädigt ist, `.spk.idx`-Datei löschen — das System erstellt den Index automatisch neu
 4. `.spk`-Datei aus Backup wiederherstellen
@@ -305,13 +305,13 @@ IOException: Access denied
 1. Prüfen, ob `SpeedyPackAutoCompactor` ordnungsgemäß läuft
 2. Komprimierungsoperation manuell auslösen
 3. Komprimierungsschwellenwert-Konfiguration prüfen
-4. `SiliconLife.Speedy.Manager`-Tool für manuelle Komprimierung verwenden
+4. `SiliconLife.Speedy.Manager`-Werkzeug für manuelle Komprimierung verwenden
 
 ---
 
-### Tool-Ausführungsprobleme
+### Werkzeug-Ausführungsprobleme
 
-#### Problem: Tool nicht gefunden
+#### Problem: Werkzeug nicht gefunden
 
 **Symptome**:
 ```
@@ -319,12 +319,12 @@ Tool "xyz" not found
 ```
 
 **Lösung**:
-1. Tool-Namen auf Richtigkeit prüfen
-2. Tool im Tools-Verzeichnis prüfen
+1. Werkzeug-Namen auf Richtigkeit prüfen
+2. Werkzeug im Tools-Verzeichnis prüfen
 3. Projekt neu bauen
-4. Prüfen, ob das Tool korrekt implementiert ist
+4. Prüfen, ob das Werkzeug korrekt implementiert ist
 
-#### Problem: Tool gibt Fehler zurück
+#### Problem: Werkzeug gibt Fehler zurück
 
 **Symptome**:
 ```
@@ -332,9 +332,9 @@ Tool execution failed: ...
 ```
 
 **Lösung**:
-1. Tool-Logs prüfen
+1. Werkzeug-Logs prüfen
 2. Eingabeparameter verifizieren
-3. Tool unabhängig testen
+3. Werkzeug unabhängig testen
 4. Berechtigungen prüfen
 
 ---
@@ -358,13 +358,123 @@ Plugin load failed: Security check failed
 #### Problem: Plugin-Tools nicht registriert
 
 **Symptome**:
-- Plugin erfolgreich geladen, aber Tools erscheinen nicht in der Tool-Liste
+- Plugin erfolgreich geladen, aber Tools erscheinen nicht in der Werkzeug-Liste
 
 **Lösung**:
-1. Bestätigen, dass die Tool-Klasse im Plugin die `ITool`-Schnittstelle korrekt implementiert
-2. Prüfen, ob die Tool-Klasse public ist
+1. Bestätigen, dass die Werkzeug-Klasse im Plugin die `ITool`-Schnittstelle korrekt implementiert
+2. Prüfen, ob die Werkzeug-Klasse public ist
 3. Verifizieren, dass `ToolManager.ScanAllPluginAssemblies()` aufgerufen wurde
 4. Plugin neu bauen und Anwendung neu starten
+
+---
+
+### Fähigkeitsprobleme
+
+#### Problem: Fähigkeit erscheint nicht in der Fähigkeitsliste oder ist für die KI nicht sichtbar
+
+**Symptome**:
+- Web-UI-Fähigkeitsseite speichert erfolgreich, aber die Liste zeigt sie nicht / die KI ruft die Fähigkeit nicht auf
+
+**Lösung**:
+1. Prüfen, ob `id` und `description` der Fähigkeit nicht leer sind (Entwürfe werden der KI nicht offengelegt)
+2. Fähigkeiten mit unvollständigen Metadaten (`NeedsCompletion`) werden nicht in die KI injiziert — YAML-Frontmatter-Metadaten ergänzen oder von der KI ergänzen lassen vor dem Speichern
+3. Prüfen, ob die Berechtigungsmatrix `{skillId}:execute` deaktiviert hat (deaktivierte Fähigkeiten sind für die KI unsichtbar)
+4. Bestätigen, dass der globale Schalter `SkillEnabled` auf true gesetzt ist
+5. Hot-Reload dauert max. 30 Sekunden, kurz warten und aktualisieren oder neu starten
+
+#### Problem: Fähigkeitsausführung schlägt mit "not in whitelist" fehl
+
+**Symptome**:
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**Lösung**:
+- Das Werkzeug zur `tool_whitelist` der Fähigkeit hinzufügen oder die Whitelist leeren, um alle Being-Werkzeuge zu erben
+
+#### Problem: Limit für Fähigkeitsanzahl erreicht
+
+**Symptome**:
+```
+Custom skill limit reached (50)
+```
+
+**Lösung**:
+1. Nicht mehr verwendete benutzerdefinierte Fähigkeiten löschen
+2. Oder die Konfiguration `MaxCustomSkillsPerBeing` erhöhen
+
+---
+
+### MCP-Probleme
+
+#### Problem: MCP-Serververbindung fehlgeschlagen
+
+**Symptome**:
+- Serverstatus zeigt `error` oder `disconnected`, `lastError` ist nicht leer
+
+**Lösung**:
+1. stdio-Server: Bestätigen, dass `command` ausführbar ist (z.B. `npx` im PATH), `arguments` korrekt sind
+2. http-Server: `endpoint`-URL auf Erreichbarkeit prüfen (Firewall, Proxy)
+3. Auf der /mcp-Seite auf **Erneut verbinden** klicken
+4. `lastError`-Details prüfen, häufig: Befehl nicht vorhanden, Inkompatibilität, Endpunkt 404
+
+#### Problem: MCP-Werkzeuge nicht in Being injiziert
+
+**Symptome**:
+- Server ist verbunden (`connected`), aber die KI kann das Werkzeug `mcp_xxx_yyy` nicht aufrufen
+
+**Lösung**:
+1. Bestätigen, dass der Server `enabled` auf true gesetzt ist
+2. Bestätigen, dass der globale Schalter `McpEnabled` auf true gesetzt ist
+3. Berechtigungsmatrix prüfen: Ist `mcp_{serverId}_{toolName}:execute` deaktiviert?
+4. In der Being-Konversation das `mcp`-Werkzeug (`list_tools`) verwenden, um die tatsächlichen injizierten Werkzeugnamen zu überprüfen
+
+#### Problem: Server hinzufügen gibt ID-Formatfehler zurück
+
+**Symptome**:
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**Lösung**:
+- Server-ID darf nur Kleinbuchstaben, Ziffern und Unterstriche enthalten (z.B. `filesystem`, `github_tools`)
+
+---
+
+### IM-Plattform-Probleme
+
+#### Problem: Feishu-Nachrichten werden nicht empfangen
+
+**Lösung**:
+1. Callback-Adresse und Port der Feishu-Open-Plattform-Ereignisabonnementkonfiguration prüfen (`listenPort` + `callbackPath`)
+2. Bestätigen, dass `Encrypt Key` / `Verification Token` mit der Konfiguration übereinstimmen
+3. Für lokale Entwicklung kann der OAuth-Autorisierungsassistent verwendet werden (Ein-Klick-Autorisierung auf der Konfigurationsseite); Ereignis-Callback erfordert öffentlichen Zugang oder Intranet-Tunnel
+4. Signaturverifikations-/Entschlüsselungsfehler im Log prüfen
+
+#### Problem: OAuth-Autorisierungs-Timeout
+
+**Symptome**:
+- Autorisierungsseite zeigt `timeout`-Status
+
+**Lösung**:
+1. Die Autorisierungssitzung ist 5 Minuten gültig, nach Timeout erneut auf die Autorisierungsschaltfläche klicken
+2. Bestätigen, dass die Callback-Adresse `/im/feishu/callback` von Feishu erreichbar ist (`redirectBaseUrl` korrekt konfiguriert)
+3. Der Frontend-Status hängt von SSE ab; bei SSE-Abbruch kann `/im/{platform}/status` als Fallback abgefragt werden
+
+#### Problem: `${ENV_VAR}` Platzhalter nicht aufgelöst
+
+**Symptome**:
+- IM-Plattformverbindung schlägt fehl, Konfigurationswert ist noch Platzhaltertext
+
+**Lösung**:
+1. Bestätigen, dass die Umgebungsvariable vor dem Start des Prozesses gesetzt wurde (Anwendung neu starten)
+2. Variablennamen-Schreibweise prüfen (nur `[A-Za-z_][A-Za-z0-9_]*` wird unterstützt)
+3. Hinweis: Platzhalter in config.json zu behalten ist ein Entwurfsverhalten, die Auflösung erfolgt in der Speicherkopie
+
+#### Problem: Nur eine von mehreren IM-Plattformen empfängt Nachrichten
+
+**Lösung**:
+- Ausgehende Nachrichten werden an alle aktivierten Plattformen gesendet, Einzelplattform-Sendefehler werden still isoliert — prüfen, ob das Token der Plattform abgelaufen ist (neu autorisieren oder Schlüssel aktualisieren)
 
 ---
 
@@ -523,9 +633,9 @@ Failed to assign role
 
 ---
 
-### Tool-Berechtigungsprobleme
+### Werkzeug-Berechtigungsprobleme
 
-#### Problem: Tool-Operation verweigert
+#### Problem: Werkzeug-Operation verweigert
 
 **Symptome**:
 ```
@@ -533,12 +643,12 @@ Tool operation denied: network:post
 ```
 
 **Lösung**:
-1. Tool-Berechtigungskonfiguration des Silicon Beings prüfen:
+1. Werkzeug-Berechtigungskonfiguration des Silicon Beings prüfen:
 ```bash
 curl http://localhost:8080/api/beings/tool-permissions?beingId=<id>
 ```
 
-2. Tool-Berechtigungen aktualisieren:
+2. Werkzeug-Berechtigungen aktualisieren:
 ```bash
 curl -X PUT http://localhost:8080/api/beings/tool-permissions \
   -H "Content-Type: application/json" \
@@ -550,12 +660,12 @@ curl -X PUT http://localhost:8080/api/beings/tool-permissions \
   }'
 ```
 
-3. Oder Web-UI verwenden: Beings → Tool-Berechtigungen
+3. Oder Web-UI verwenden: Beings → Werkzeug-Berechtigungen
 
-#### Problem: Projekt-Tool-Berechtigungen werden nicht wirksam
+#### Problem: Projekt-Werkzeug-Berechtigungen werden nicht wirksam
 
 **Symptome**:
-- Tool-Berechtigungen auf Projektebene funktionieren nicht wie erwartet
+- Werkzeug-Berechtigungen auf Projektebene funktionieren nicht wie erwartet
 
 **Lösung**:
 1. Bestätigen, dass die Berechtigungen auf Projektebene korrekt konfiguriert sind
@@ -637,7 +747,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 **Lösung**:
 - Parallele Beings reduzieren
-- Tool-Code optimieren
+- Werkzeug-Code optimieren
 - Timer-Intervall anpassen
 
 ### Hohe Speichernutzung

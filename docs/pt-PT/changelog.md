@@ -1,4 +1,4 @@
-﻿# Registo de Alterações
+# Registo de Alterações
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -65,6 +65,55 @@ Ambas as versões partilham as mesmas interfaces e funcionalidades, diferindo ap
 ---
 
 ## [Não Publicado]
+
+### 2026-08-17
+
+#### Novas Funcionalidades
+- `c7b575b` - Implementar integração MCP — acesso a ferramentas de servidores externos, gestão de configuração e documentação de ajuda
+  - Novo núcleo MCP (SiliconLife.Core/Mcp/): McpManager para gestão do ciclo de vida do servidor, transporte duplo stdio/http, McpClientConnection para encapsulamento de ligações, ferramentas de embrulho por servidor injectadas em todos os Silicon Beings com nomeação `mcp_{serverId}_{toolName}`
+  - Nova página de gestão Web (/mcp) com 7 endpoints de API (list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool)
+  - Nova ferramenta de consulta McpTool (status/list_servers/list_tools, apenas leitura); adição e remoção de servidores limitadas ao utilizador através da Web UI; a IA não pode modificar a lista de servidores
+  - Página de configuração suporta editor de array de servidores MCP (adicionar/remover em linha dentro de janela modal)
+  - Registo de tópico de ajuda MCP (🔌), documentação de ajuda completa implementada em 10 idiomas
+  - Ferramentas de embrulho MCP apresentadas na matriz de permissões com a acção `execute`, suportando desactivação por being/projecto
+  - 45 ficheiros alterados
+
+### 2026-08-16
+
+#### Novas Funcionalidades
+- `5d76c5a` - Implementar sistema de competências — camada abstracta de reutilização para orquestração de ferramentas e modelos de prompts
+  - Novo SkillDefinition (id/descrição/schema de parâmetros/modelo de prompt do sistema/lista de permissões de ferramentas/limites de acções/número máximo de rondas/timeout/acção de conclusão/modo de acionamento)
+  - Novo SkillManager: centro de registo de competências + motor de execução (ciclo de sub-AIRequest, protecção contra recursão, limitação global de rondas e timeout)
+  - Modo de duplo acionamento: Manual (chamada de função pela IA, competências injectadas como ToolDefinition, encaminhamento prioritário do lado do despachante) + Auto (agenda programada, suporta `HH:mm` / `N s|m|h|d` / subconjunto cron)
+  - Armazenamento prioritário em Markdown (frontmatter YAML + corpo do prompt), Markdown puro com metadados auto-preenchidos pela IA (campos do utilizador não são sobrepostos)
+  - Hot reload (detecção de impressão digital em 30 segundos), arquivamento de versões (skills/archive/), 3 competências integradas (summarize_document/code_review/research_topic)
+  - Nova ferramenta skill (create/list/update/update_from_md/delete/export/export_md/import/import_md)
+  - Nova página de gestão de competências (/skill) com 10 endpoints de API; quota MaxCustomSkillsPerBeing (predefinição 50)
+  - Permissões: permissão de acção `execute` ao nível da competência, lista de permissões de ferramentas interna da competência e permissões do being com intersecção do lado restrito
+- `b60fc68` - Actualizar lista de modelos Qianfan e mapeamento de janela de contexto - novos modelos glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest, mapeamento de janela de contexto escalonado 1M/128K e capacidades visuais
+
+### 2026-08-15
+
+#### Novas Funcionalidades
+- `eaa8417` - Implementar assistente de autorização OAuth para plataformas IM e análise de variáveis de ambiente para segredos de configuração
+  - Novo ImOAuthController/ImOAuthService para suportar o fluxo de autorização OAuth do Feishu (authorize/callback/status), com state anti-CSRF, timeout de 5 minutos, push de estado via SSE
+  - Novo IMProviderRegistry para gestão unificada de metadados de plataformas IM (schema de campos de configuração/modelos de endpoint OAuth/fábrica de Provider)
+  - Novo ConfigSecretResolver para analisar marcadores `${ENV_VAR}` na configuração, substituição em cópia profunda sem reescrever a configuração original
+  - Página de configuração integra UI do assistente de autorização IM (área de autorização em linha + estado SSE em tempo real)
+  - Preenchimento das traduções de estado de autorização IM/texto de ajuda em 13 ficheiros de idioma
+
+### 2026-07-26
+
+#### Refactorização
+- `ffc45c2` - Refactorizar plataforma IM para arquitectura de configuração multi-instância - IMPlatforms em lista (cada plataforma com activação/desactivação independente), AggregateIMProvider agrega recepção e envio de mensagens multiplataforma com competição de permissões, editor multi-instância na página de configuração
+
+### 2026-07-19
+
+#### Novas Funcionalidades
+- `9bf2103` - Speedy.Manager integra selecção múltipla na vista em árvore para eliminação e exportação
+
+#### Correcções
+- `0df0674` - Corrigir problema de eliminação de selecção múltipla no Speedy.Manager que apenas eliminava o primeiro item
 
 ### 2026-07-16
 

@@ -378,3 +378,82 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **작업 세분성** — 각 툴의 각 작업을 독립적으로 제어 (예: `network:get`은 허용하지만 `network:post`는 거부)
 - **큐레이터 관리** — 툴 퍼미션은 실리콘 큐레이터만 구성 가능
 - **감사 추적** — 툴 퍼미션 변경이 감사 로그에 기록
+
+---
+
+## 스킬 보안
+
+스킬 시스템은 툴 퍼미션 체계를 재사용하며, 다중 가드레일을 제공합니다:
+
+### 실행 퍼미션
+
+- 스킬 id를 툴명으로 사용하여 `execute` 액션으로 `ToolActionPermissionConfig` 퍼미션 매트릭스에 포함
+- 비활성화된 스킬은 AI 가시 툴 정의에 나타나지 않음 (Schema 레이어 필터링 + 런타임 재검사 이중 보장)
+- 큐레이터는 항상 실행 가능; 일반 비잉은 `IsActionAllowed(skillId, "execute")` 필요
+
+### 툴 화이트리스트와 퍼미션 합집합
+
+- 스킬 실행 중에는 `ToolWhitelist` 내의 툴만 허용 (빈 목록 = 비잉의 전체 툴 상속)
+- 스킬의 액션 제한과 비잉 퍼미션의 **엄격한 측 합집합** (`MergePermissions`): 스킬은 퍼미션을 추가로 좁히기만 하며, 퍼미션을 확장할 수 없음
+- 화이트리스트 외의 툴 콜은 즉시 실패 (`Tool not in whitelist`)
+
+### 리소스 소모 가드레일
+
+- **글로벌 스위치**: `SkillEnabled`로 전체 스킬 시스템을 원클릭 비활성화
+- **수량 할당량**: 각 비잉의 커스텀 스킬 수는 `MaxCustomSkillsPerBeing` (기본 50) 제한
+- **라운드 제한**: `maxToolRound = Min(스킬 선언값, GlobalMaxToolRound 기본 10)`, 제어 불능 루프 방지
+- **타임아웃 제한**: `timeout = Min(스킬 선언값, GlobalSkillTimeoutSeconds 기본 300s)`
+- **재귀 방지**: 스킬 실행 중 자기 자신을 다시 호출할 수 없음
+
+### 수정 퍼미션
+
+- 큐레이터는 모든 스킬 수정 가능; 일반 비잉은 출처가 `Being`/`User`인 스킬만 수정 가능
+- 메타데이터 자동 보완은 누락된 필드만 채우며, 사용자가 제공한 필드는 AI에 의해 덮어쓰지 않음
+
+---
+
+## MCP 보안
+
+MCP 통합은 "사용자 주권 + 퍼미션 일관성" 원칙을 따릅니다:
+
+### 사용자 주권
+
+- MCP 서버의 추가, 삭제, 활성화/비활성화, 재연결은 **사용자가 Web UI** (/mcp 또는 설정 페이지)를 통해서만 수행
+- AI 측의 `mcp` 툴은 읽기 전용 쿼리 (status/list_servers/list_tools)이며, 서버 목록을 수정할 수 없음
+- `McpEnabled` 글로벌 스위치로 모든 외부 툴을 원클릭 차단 가능
+
+### 툴 격리와 퍼미션
+
+- 래핑 툴은 `mcp_{serverId}_{toolName}`으로 명명되며, 내장/플러그인 툴 네임스페이스와 격리
+- 각 래핑 툴은 자동으로 단일 `execute` 액션을 선언하여 2단계 툴 퍼미션 매트릭스에 포함, 비잉/프로젝트별로 개별 비활성화 가능
+- 서버 비활성화 시 해당 툴이 모든 비잉에서 즉시 등록 해제
+
+### 전송과 프로세스 경계
+
+- `stdio` 서버는 서브프로세스로 실행되며, 명시적으로 설정된 환경 변수 (`env` 필드)만 상속
+- `http` 서버는 설정된 엔드포인트를 통해 통신, 연결 실패 시 자동으로 error 상태로 전환되고 `lastError` 노출
+
+---
+
+## IM 시크릿 보안
+
+### 환경 변수 플레이스홀더
+
+IM 플랫폼 설정 값은 `${ENV_VAR}` 플레이스홀더를 지원합니다 (예: `"${FEISHU_APP_SECRET}"`):
+
+- `ConfigSecretResolver`는 **딥카피 복사본**에서 플레이스홀더를 해석하며, 원본 `config.json`은 항상 플레이스홀더 원형 유지
+- 후속 `SaveConfig`는 해석된 평문 시크릿을 디스크에 기록하지 않음
+- 정수 플레이스홀더와 값 내장 플레이스홀더 (예: `prefix-${VAR}`) 지원
+
+### OAuth 인증 보안
+
+- **state CSRF 방지**: 16바이트 암호화 난수, 콜백 시 엄격 검증
+- **5분 타임아웃**: 인증 세션 타임아웃 시 자동 무효화, 이전 세션이 덮어씌워질 때 즉시 취소
+- **토큰 저장**: accessToken/refreshToken/tokenExpiresAt을 플랫폼 설정에 기록하고 영속화, `authMode`를 `oauth`로 표시
+- 콜백 URL은 `redirectBaseUrl` 설정 지원 (공용 네트워크 콜백 시나리오)
+
+### 메시지 보안
+
+- Feishu: 서명 검증 (`X-Lark-Signature`, SHA256) + AES-256-CBC 이벤트 복호화 + 이벤트 중복 제거 (10분 윈도우)
+- WeChat Enterprise: WXBizMsgCrypt 암호화/복호화 및 서명 검증
+- DingTalk: Stream 모드는 암호화 WebSocket 사용; HTTP 모드는 콜백 검증

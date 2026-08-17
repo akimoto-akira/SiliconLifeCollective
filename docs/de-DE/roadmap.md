@@ -320,6 +320,19 @@ Jede Phase endet mit einem **funktionsfähigen, beobachtbaren** System. Keine Ph
 
 ---
 
+## Phase 11.5: Fähigkeitssystem und MCP-Integration
+
+**Ziel**: Wiederverwendbare Fähigkeitsabstraktionsschicht und externe Werkzeugökossystem-Integration.
+
+| # | Modul | Beschreibung |
+|---|--------|-------------|
+| 11.5.1 | ~~Fähigkeitssystem~~ ✅ Abgeschlossen | Werkzeugorchestrierung + Prompt-Vorlage wiederverwendbare Abstraktionsschicht (SkillManager, dualer Trigger-Modus, heißes Neuladen, Versionsarchivierung, KI-Metadaten-Vervollständigung) |
+| 11.5.2 | ~~MCP-Integration~~ ✅ Abgeschlossen | Externe MCP-Server-Werkzeuganbindung (stdio/http dualer Transport, `mcp_{serverId}_{toolName}`-Benennungsinjektion, Web-Verwaltungsseite, Berechtigungsmatrix-Integration) |
+
+**Liefergegenstände**: Fähigkeitsverwaltungsseite (/skill), MCP-Verwaltungsseite (/mcp), `skill` und `mcp` eingebaute Werkzeuge, Fähigkeits-/MCP-Hilfedokumentation.
+
+---
+
 ## Phase 12: Erweiterte Funktionen
 
 **Ziel**: Optionale erweiterte Funktionen für verbesserte Funktionalität.
@@ -328,4 +341,4 @@ Jede Phase endet mit einem **funktionsfähigen, beobachtbaren** System. Keine Ph
 |---|--------|-------------|
 | 12.1 | ~~Wissensnetzwerk~~ ✅ Abgeschlossen | Wissensgraph mit Triple-Struktur (Subjekt-Prädikat-Objekt), unterstützt CRUD, Pfadfindung, erweiterte Abfragen und Graph-Traversierung |
 | 12.2 | ~~Plugin-System~~ ✅ Abgeschlossen | Externes Plugin-Laden mit Sicherheitsprüfung und Sandbox (IPlugin-Schnittstelle, Plugin-Lader, AssemblyLoadContext-Isolation) |
-| 12.3 | Skill-Ökosystem | Wiederverwendbarer Skill-Marktplatz für Being-Fähigkeiten
+| 12.3 | Fähigkeits-Ökosystem | Wiederverwendbarer Fähigkeits-Marktplatz für Being-Fähigkeiten

@@ -2,7 +2,7 @@
 
 > **版本：v0.2.0-alpha**
 
-[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [简体中文](../zh-CN/troubleshooting.md) | **繁體中文** | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md)
+[English](../en/troubleshooting.md) | [Deutsch](../de-DE/troubleshooting.md) | [中文](../zh-CN/troubleshooting.md) | **繁體中文** | [Español](../es-ES/troubleshooting.md) | [日本語](../ja-JP/troubleshooting.md) | [한국어](../ko-KR/troubleshooting.md) | [Čeština](../cs-CZ/troubleshooting.md) | [Русский](../ru-RU/troubleshooting.md)
 
 ## 常見問題
 
@@ -137,7 +137,7 @@ lsof -ti:8080 | xargs kill -9
 **解決方案**：
 1. 檢查靈魂檔案存在且有效
 2. 驗證 AI 用戶端已設定
-3. 檢查日誌以獲取具體錯誤：
+3. 檢查日誌以取得具體錯誤：
 ```bash
 tail -f logs/*.log
 ```
@@ -183,7 +183,7 @@ Permission denied: FileAccess C:\Windows
 ```
 
 **解決方案**：
-1. 檢查當前權限：
+1. 檢查目前權限：
 ```bash
 curl http://localhost:8080/api/permissions/list
 ```
@@ -225,7 +225,7 @@ curl -X POST http://localhost:8080/api/permissions/save \
 1. 驗證伺服器正在運行
 2. 檢查正確 URL：`http://localhost:8080`
 3. 檢查防火牆設定
-4. 檢查日誌以獲取啟動錯誤
+4. 檢查日誌以取得啟動錯誤
 
 #### 問題：SSE 不工作
 
@@ -352,8 +352,8 @@ Plugin load failed: Security check failed
 1. 檢查外掛程式是否參照了未宣告的禁止命名空間（如 `System.Runtime.InteropServices`、`System.Reflection.Emit`、`Microsoft.CodeAnalysis`）
 2. 如果外掛程式需要 `System.IO` 或 `System.Net.Http`，確認外掛程式已透過 `[PluginCapability]` 宣告 `FileIO` 或 `Network` 能力
 3. 驗證外掛程式只參照了可信組件白名單中的組件
-4. 檢查外掛程式是否正確實作 `IPlugin` 介面
-5. 檢視日誌獲取詳細的安全檢查失敗原因
+3. 檢查外掛程式是否正確實作 `IPlugin` 介面
+4. 檢視日誌取得詳細的安全檢查失敗原因
 
 #### 問題：外掛程式工具未註冊
 
@@ -365,6 +365,116 @@ Plugin load failed: Security check failed
 2. 檢查工具類別是否為 public
 3. 驗證 `ToolManager.ScanAllPluginAssemblies()` 是否被呼叫
 4. 重新建構外掛程式並重啟應用
+
+---
+
+### 技能問題
+
+#### 問題：技能不出現在技能清單或 AI 不可見
+
+**症狀**：
+- Web UI 技能頁儲存成功，但清單不顯示 / AI 不呼叫該技能
+
+**解決方案**：
+1. 檢查技能 `id` 和 `description` 是否非空（草稿不暴露給 AI）
+2. 元資料不完整的技能（`NeedsCompletion`）不會注入 AI——補全 YAML 前置元資料或讓 AI 補全後再儲存
+3. 檢查權限矩陣是否停用了 `{skillId}:execute`（被停用的技能對 AI 不可見）
+4. 確認全域開關 `SkillEnabled` 為 true
+5. 熱重載最多 30 秒生效，稍候重新整理或重啟
+
+#### 問題：技能執行失敗提示 "not in whitelist"
+
+**症狀**：
+```
+Tool 'xxx' is not available in skill 'yyy' (not in whitelist)
+```
+
+**解決方案**：
+- 把該工具加入技能的 `tool_whitelist`，或清空白名單以繼承生命體全部工具
+
+#### 問題：達到技能數量上限
+
+**症狀**：
+```
+Custom skill limit reached (50)
+```
+
+**解決方案**：
+1. 刪除不再使用的自訂技能
+2. 或調大設定 `MaxCustomSkillsPerBeing`
+
+---
+
+### MCP 問題
+
+#### 問題：MCP 伺服器連接失敗
+
+**症狀**：
+- 伺服器狀態顯示 `error` 或 `disconnected`，`lastError` 非空
+
+**解決方案**：
+1. stdio 伺服器：確認 `command` 可執行（如 `npx` 在 PATH 中）、`arguments` 正確
+2. http 伺服器：檢查 `endpoint` URL 可達（防火牆、代理）
+3. 在 /mcp 頁面點擊**重連**
+4. 檢視 `lastError` 詳情，常見為命令不存在、版本不相容、端點 404
+
+#### 問題：MCP 工具未注入生命體
+
+**症狀**：
+- 伺服器已連接（`connected`）但 AI 無法呼叫 `mcp_xxx_yyy` 工具
+
+**解決方案**：
+1. 確認伺服器 `enabled` 為 true
+2. 確認全域開關 `McpEnabled` 為 true
+3. 檢查權限矩陣：`mcp_{serverId}_{toolName}:execute` 是否被停用
+4. 生命體對話中可用 `mcp` 工具（`list_tools`）核對實際注入的工具名
+
+#### 問題：新增伺服器回傳 ID 格式錯誤
+
+**症狀**：
+```
+Server id must contain only lowercase letters, digits and underscores
+```
+
+**解決方案**：
+- 伺服器 ID 只允許小寫字母、數字和底線（如 `filesystem`、`github_tools`）
+
+---
+
+### IM 平台問題
+
+#### 問題：飛書訊息收不到
+
+**解決方案**：
+1. 檢查飛書開放平台事件訂閱設定的回調地址與埠（`listenPort` + `callbackPath`）
+2. 確認 `Encrypt Key` / `Verification Token` 與設定一致
+3. 本地開發可用 OAuth 授權精靈（設定頁一鍵授權）；事件回調需公網可達或使用內網穿透
+4. 檢視日誌中的簽名驗證/解密錯誤
+
+#### 問題：OAuth 授權逾時
+
+**症狀**：
+- 授權頁顯示 `timeout` 狀態
+
+**解決方案**：
+1. 授權工作階段有效期 5 分鐘，逾時後重新點擊授權按鈕
+2. 確認回調地址 `/im/feishu/callback` 可被飛書存取（`redirectBaseUrl` 設定正確）
+3. 前端狀態顯示依賴 SSE，若 SSE 斷開可輪詢 `/im/{platform}/status` 作為備援
+
+#### 問題：`${ENV_VAR}` 佔位符未解析
+
+**症狀**：
+- IM 平台連接失敗，設定值仍是佔位符文字
+
+**解決方案**：
+1. 確認環境變數已在啟動處理程序前設定（重啟應用生效）
+2. 檢查變數名拼寫（僅支援 `[A-Za-z_][A-Za-z0-9_]*`）
+3. 注意：config.json 中保留佔位符是設計行為，解析發生在記憶體副本
+
+#### 問題：多個 IM 平台只有一個收到訊息
+
+**解決方案**：
+- 出站訊息會廣播到所有啟用平台，單平台傳送失敗被靜默隔離——檢查該平台權杖是否過期（重新授權或更新金鑰）
 
 ---
 
@@ -381,7 +491,7 @@ Failed to create work note
 1. 檢查生命體是否存在且處於運行狀態
 2. 驗證儲存路徑有寫入權限
 3. 檢查內容是否為空（內容必填）
-4. 檢視日誌獲取詳細錯誤資訊
+4. 檢視日誌取得詳細錯誤資訊
 
 #### 問題：筆記搜尋無結果
 
@@ -482,7 +592,7 @@ Failed to create project
 1. 檢查專案名稱是否為空（必填）
 2. 驗證專案名稱不重複
 3. 檢查儲存路徑有寫入權限
-4. 檢視日誌獲取詳細錯誤資訊
+4. 檢視日誌取得詳細錯誤資訊
 
 #### 問題：專案資料遺失
 
@@ -507,7 +617,7 @@ Failed to assign role
 1. 確認矽基生命體已加入專案
 2. 檢查角色名稱是否有效
 3. 驗證操作者是否為矽基主理人
-4. 檢視日誌獲取詳細錯誤資訊
+4. 檢視日誌取得詳細錯誤資訊
 
 #### 問題：工作流無法啟動
 
@@ -519,7 +629,7 @@ Failed to assign role
 1. 檢查工作流範本是否已定義
 2. 驗證初始狀態是否正確設定
 3. 確認專案已綁定工作流範本
-4. 檢查工作流日誌以獲取轉換錯誤
+4. 檢查工作流日誌以取得轉換錯誤
 
 ---
 
@@ -654,7 +764,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ---
 
-## 獲取幫助
+## 取得協助
 
 ### 檢視文件
 
@@ -665,7 +775,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ### 檢查日誌
 
-始終首先檢查日誌以獲取錯誤詳情。
+始終首先檢查日誌以取得錯誤詳情。
 
 ### 社群支援
 
@@ -679,7 +789,7 @@ dotnet run --project src/SiliconLife.Fast --configuration Debug
 
 ### 系統當機
 
-1. 檢查日誌以獲取原因
+1. 檢查日誌以取得原因
 2. 重啟應用程式：
 
 **SiliconLife.Default（預設實作）**：

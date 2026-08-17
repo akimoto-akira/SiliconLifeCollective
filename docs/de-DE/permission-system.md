@@ -317,6 +317,42 @@ Werkzeugberechtigungen über die Web-UI verwalten:
 | `/api/projects/{id}/tool-permissions` | GET | Projekt-Werkzeugberechtigungen abrufen |
 | `/api/projects/{id}/tool-permissions` | PUT | Projekt-Werkzeugberechtigungen aktualisieren |
 
+### Fähigkeits-Aktionsberechtigungen
+
+Fähigkeiten nutzen den Werkzeugaktionsberechtigungsmechanismus wieder: Die Fähigkeits-ID dient als Werkzeugname, mit `execute` als Aktion.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- Deaktivierte Fähigkeiten erscheinen nicht in den KI-sichtbaren Werkzeugdefinitionen (die KI kann sie gar nicht "sehen")
+- Die Fähigkeitsausführung hat Laufzeit-Neuprüfungen; auch veraltete Schemas können Berechtigungen nicht umgehen
+- Werkzeugberechtigungen innerhalb einer Fähigkeit = Being-Berechtigungen ∪ Fähigkeitseigene Einschränkungen (Strict-Side-Union, kann nur verengen, nie erweitern)
+
+### MCP-Wrapper-Werkzeug-Aktionsberechtigungen
+
+Jedes von einem MCP-Server injizierte Wrapper-Werkzeug (`mcp_{serverId}_{toolName}`) deklariert automatisch eine einzelne `execute`-Aktion:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- Präzise Kontrolle der externen Werkzeugverfügbarkeit pro Being oder Projekt
+- Wenn alle `execute`-Aktionen eines Servers deaktiviert sind, wird das Werkzeug vollständig aus dem KI-sichtbaren Schema entfernt
+- Deaktivieren/Löschen eines Servers (Web-UI-Operation) deregistriert sofort alle seine Werkzeuge
+
 ---
 
 ## Bewährte Verfahren

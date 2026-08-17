@@ -622,15 +622,65 @@ data: {"type": "complete", "sessionId": "uuid"}
       "apiKey": "...",
       "model": "..."
     }
-  }
+  },
+  "imPlatforms": [
+    {
+      "platform": "webui",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "platform": "feishu",
+      "enabled": true,
+      "config": {
+        "appId": "cli_xxx",
+        "appSecret": "${FEISHU_APP_SECRET}",
+        "verificationToken": "..."
+      }
+    }
+  ]
 }
 ```
+
+`imPlatforms` 为多实例列表：每个条目代表一个 IM 平台实例，可同时启用多个平台（各自独立启停）。`config` 中的 `${ENV_VAR}` 占位符会在运行时从环境变量解析，明文密钥不会写回 config.json。
 
 ### 获取 AI 配置选项
 
 **GET** `/config/aioptions`
 
 返回可用的 AI 客户端类型及其动态选项（可用模型、区域等）。
+
+### 获取 IM 平台选项
+
+**GET** `/config/imoptions`
+
+返回 IM 平台元数据（供配置向导动态渲染表单）：
+
+```json
+{
+  "success": true,
+  "platforms": [
+    {
+      "value": "feishu",
+      "display": "飞书 (Feishu)",
+      "authModes": ["manual", "oauth"],
+      "needsPublicCallback": false,
+      "help": "...",
+      "helpUrl": "https://open.feishu.cn/app",
+      "fields": [
+        { "key": "appId", "label": "App ID", "type": "text", "required": true },
+        { "key": "appSecret", "label": "App Secret", "type": "password", "required": true, "isSecret": true }
+      ]
+    }
+  ]
+}
+```
+
+### 浏览配置
+
+**GET** `/config/browse`
+
+返回配置项的浏览数据（用于配置界面的分组展示）。
 
 ---
 
@@ -1204,6 +1254,230 @@ data: {"type": "complete", "sessionId": "uuid"}
 
 ---
 
+## 技能管理
+
+### 技能管理页面
+
+**GET** `/skill` 或 **GET** `/skill/index`
+
+查询参数：`beingId` — 生命体 ID（必需）
+
+返回指定硅基生命体的技能管理页面（技能列表 + Markdown 编辑器）。
+
+### 获取技能列表
+
+**GET** `/api/skills/list`
+
+查询参数：`beingId` — 生命体 ID（必需）
+
+返回生命体的所有技能（id、description、version、tags、source、triggerMode、toolWhitelist、maxToolRound、timeoutSeconds、parameterCount），以及统计信息（技能总数 / 自定义技能数 / 配额上限）。
+
+### 获取技能 Markdown
+
+**GET** `/api/skills/get-md`
+
+查询参数：`beingId`、`skillId`
+
+返回指定技能的 Markdown 文本（YAML 前置元数据 + 提示词正文）。
+
+### 保存技能 Markdown
+
+**POST** `/api/skills/update-md?beingId={beingId}`
+
+请求体（`application/json`）：
+
+```json
+{
+  "markdown": "---\nid: my_skill\n...\n---\n\n提示词正文",
+  "skillId": "my_skill"
+}
+```
+
+以 Markdown 更新或新建技能（upsert 语义）。缺失的元数据由 AI 自动补全；通过 Web UI 保存的技能 `Source` 标记为 `User`。受配额 `MaxCustomSkillsPerBeing` 限制。
+
+### 导入技能（JSON）
+
+**POST** `/api/skills/import?beingId={beingId}`
+
+请求体：`{ "json": "<技能定义 JSON>" }`
+
+从 JSON 导入技能，同样受配额限制。
+
+### 导入技能（Markdown）
+
+**POST** `/api/skills/import-md?beingId={beingId}`
+
+请求体：`{ "markdown": "<Markdown 文本>" }`
+
+从 Markdown 导入新技能，缺失元数据由 AI 自动补全。
+
+### 删除技能
+
+**POST** `/api/skills/delete?beingId={beingId}`
+
+请求体：`{ "skillId": "my_skill" }`
+
+删除技能（同时删除对应的 `.md` 与 `.json` 持久化文件）。
+
+### 导出技能（JSON）
+
+**GET** `/api/skills/export?beingId={beingId}&skillId={skillId}`
+
+以 JSON 附件形式下载技能定义（`{id}.json`）。
+
+### 导出技能（Markdown）
+
+**GET** `/api/skills/export-md?beingId={beingId}&skillId={skillId}`
+
+以 Markdown 附件形式下载技能（`{id}.md`）。
+
+### 测试执行技能
+
+**POST** `/api/skills/test?beingId={beingId}`
+
+请求体：
+
+```json
+{
+  "skillId": "my_skill",
+  "parametersJson": "{ \"topic\": \"AI 新闻\" }"
+}
+```
+
+以给定参数执行一次技能并返回 `ToolResult`（含 AI 执行轮数与最终输出）。
+
+---
+
+## MCP 管理
+
+### MCP 管理页面
+
+**GET** `/mcp`
+
+查询参数：`beingId` — 生命体 ID（可选，用于显示该生命体可见的 MCP 工具）
+
+返回 MCP 服务器管理页面。
+
+### 获取服务器列表
+
+**GET** `/api/mcp/list-servers`
+
+返回所有已配置的 MCP 服务器状态：
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "state": "connected",
+      "enabled": true,
+      "toolCount": 8,
+      "endpoint": null,
+      "lastError": null
+    }
+  ],
+  "mcpEnabled": true,
+  "connected": 1,
+  "toolTotal": 8
+}
+```
+
+`state` 取值：`connected` / `disconnected` / `connecting` / `error`。
+
+### 获取服务器工具列表
+
+**GET** `/api/mcp/list-tools?serverId={serverId}`
+
+返回指定服务器提供的工具（`name` 为带前缀的完整名 `mcp_{serverId}_{toolName}`、`description`、`schema`）。服务器未连接时返回错误。
+
+### 添加服务器
+
+**POST** `/api/mcp/add-server`
+
+请求体（`McpServerConfig`）：
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "env": {},
+  "endpoint": null,
+  "enabled": true
+}
+```
+
+`transport` 支持 `stdio`（本地进程：`command` + `arguments`）与 `http`（远程端点：`endpoint`）。服务器 ID 仅允许小写字母、数字和下划线。添加后立即连接并同步到所有硅基生命体。
+
+### 启用/禁用服务器
+
+**POST** `/api/mcp/toggle`
+
+请求体：`{ "serverId": "filesystem", "enabled": true }`
+
+### 删除服务器
+
+**POST** `/api/mcp/remove-server`
+
+请求体：`{ "serverId": "filesystem" }`
+
+删除服务器配置并从所有生命体注销其工具。
+
+### 重连服务器
+
+**POST** `/api/mcp/reconnect`
+
+请求体：`{ "serverId": "filesystem" }`
+
+强制断开并重新建立连接，刷新工具列表。
+
+### 测试工具调用
+
+**POST** `/api/mcp/test-tool`
+
+请求体：
+
+```json
+{
+  "serverId": "filesystem",
+  "toolName": "read_file",
+  "argumentsJson": "{ \"path\": \"/data/hello.txt\" }"
+}
+```
+
+直接调用 MCP 服务器的工具（无需 AI 参与），用于验证连通性。
+
+---
+
+## IM 平台 OAuth 授权
+
+### 发起授权
+
+**GET** `/im/{platform}/authorize`
+
+路径参数：`platform` — IM 平台标识（如 `feishu`）
+
+生成防 CSRF 的随机 `state`，登记 5 分钟有效的授权会话，返回授权 URL 并自动打开系统默认浏览器。同一平台重复发起会覆盖旧会话。
+
+### 授权回调
+
+**GET** `/im/{platform}/callback?code={code}&state={state}`
+
+由 IM 平台重定向调用。校验 `state` 后用授权码换取访问令牌，将 `accessToken`、`refreshToken`、`tokenExpiresAt`、`authMode=oauth` 写回该平台的配置并持久化，最后渲染授权结果落地页（成功/失败）。
+
+### 查询授权状态
+
+**GET** `/im/{platform}/status`
+
+返回 `{ platform, status, tokenExpiresAt }`。`status` 取值：`pending` / `success` / `failed` / `timeout` / `none`。前端优先通过 SSE 事件 `im_auth_status` 接收状态推送，此接口作为轮询兜底。
+
+---
+
 ## 帮助文档系统
 
 ### 帮助页面
@@ -1359,6 +1633,20 @@ eventSource.onmessage = (event) => {
       break;
   }
 };
+```
+
+### IM 授权状态事件
+
+IM 平台 OAuth 授权向导通过共享 SSE 连接推送状态（事件名 `im_auth_status`）：
+
+```javascript
+eventSource.addEventListener('im_auth_status', (event) => {
+  const data = JSON.parse(event.data);
+  // data.platform — 平台标识（feishu / wecom / dingtalk）
+  // data.status  — pending / success / failed / timeout
+  // data.message — 附加说明
+  updateAuthStatus(data.platform, data.status);
+});
 ```
 
 ---

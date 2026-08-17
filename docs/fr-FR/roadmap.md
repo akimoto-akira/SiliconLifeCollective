@@ -320,6 +320,19 @@ Chaque phase se termine par un système **exécutable et observable**. Aucune ph
 
 ---
 
+## Phase 11.5 : Système de Compétences et Intégration MCP
+
+**Objectif** : Couche d'abstraction de capacité réutilisable et accès à l'écosystème d'outils externes.
+
+| # | Module | Description |
+|---|--------|-------------|
+| 11.5.1 | ~~Système de Compétences~~ ✅ Terminée | Couche d'abstraction réutilisable pour l'orchestration d'outils + modèle de prompt (SkillManager, double mode de déclenchement, rechargement à chaud, archivage des versions, complétion des métadonnées par l'IA) |
+| 11.5.2 | ~~Intégration MCP~~ ✅ Terminée | Accès aux outils de serveurs MCP externes (double transport stdio/http, injection avec nommage `mcp_{serverId}_{toolName}`, page de gestion Web, intégration de la matrice d'autorisations) |
+
+**Livrables** : Page de gestion des compétences (/skill), page de gestion MCP (/mcp), outils intégrés `skill` et `mcp`, documentation d'aide compétences/MCP.
+
+---
+
 ## Phase 12 : Fonctionnalités avancées
 
 **Objectif** : Fonctionnalités avancées optionnelles pour des capacités améliorées.

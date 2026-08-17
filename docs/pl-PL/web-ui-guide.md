@@ -32,8 +32,9 @@ Domyślny URL: `http://localhost:8080`
 14. **Edytor kodu** — edycja kodu z podpowiedziami (Monaco Editor)
 15. **Projekty** — zarządzanie projektami (obszar roboczy, zadania, notatki pracy)
 16. **Wykonawcy** — zarządzanie wykonawcami (dyskowy, sieciowy, wiersza poleceń)
-17. **Pomoc** — system dokumentacji pomocy (obsługa wielojęzyczna, wyszukiwanie tematów)
-18. **O projekcie** — informacje o systemie i wersji
+17. **MCP** — zarządzanie serwerami MCP (dodawanie, włączanie/wyłączanie, ponowne łączenie, testowanie)
+18. **Pomoc** — system dokumentacji pomocy (obsługa wielojęzyczna, wyszukiwanie tematów)
+19. **O projekcie** — informacje o systemie i wersji
 
 ---
 
@@ -135,6 +136,26 @@ Konfiguracja backendów AI:
 - Moonshot Kimi (chmurowa, tryb thinking)
 - SiliconFlow (chmurowa, agregator modeli)
 - Niestandardowi klienci
+
+### Platformy IM (wiele instancji)
+
+Konfiguracja platform IM obsługuje architekturę wieloinstancyjną, umożliwiając jednoczesne włączanie wielu platform:
+
+1. Kliknij **Dodaj platformę**, wybierz typ platformy:
+   - **Web UI** (wbudowana, domyślnie włączona)
+   - **Feishu** (obsługa ręcznej konfiguracji i autoryzacji OAuth jednym kliknięciem)
+   - **WeChat Enterprise** (konfiguracja ręczna)
+   - **DingTalk** (konfiguracja ręczna, obsługa trybu zdarzeń Stream / HTTP)
+2. Wypełnij pola platformy w dynamicznym formularzu (pola wymagane oznaczone gwiazdką, pola kluczy jako pola hasła)
+3. Każdą instancję można niezależnie włączyć/wyłączyć lub usunąć
+
+**Zmienne środowiskowe kluczy**: wartości konfiguracyjne obsługują placeholdery `${ENV_VAR}` (np. `"${FEISHU_APP_SECRET}"`), rozwiązywane w czasie wykonywania ze zmiennych środowiskowych, klucze w postaci jawnej nie są zapisywane w config.json.
+
+**Kreator autoryzacji OAuth** (Feishu): po zapisaniu appId/appSecret na stronie konfiguracji pojawia się wbudowany obszar autoryzacji; kliknięcie przycisku **Autoryzuj** otwiera systemową przeglądarkę i przechodzi do strony autoryzacji Feishu; po zakończeniu autoryzacji tokeny są automatycznie zapisywane w konfiguracji, a strona wyświetla w czasie rzeczywistym status autoryzacji przez SSE (sukces/błąd/limit czasu), bez konieczności ręcznego kopiowania i wklejania.
+
+### Serwery MCP
+
+Lista serwerów MCP jest zarządzana centralnie na stronie konfiguracji (edytor tablic): jeden serwer na wiersz (ID, nazwa, tryb transportu stdio/http, polecenie lub endpoint, status włączenia), z obsługą **dodawania** i **usuwania** w wierszu. Po zapisaniu serwer natychmiast się łączy, a jego narzędzia są automatycznie wstrzykiwane do Istot Krzemowych. Szczegóły w poniższym rozdziale [Zarządzanie MCP](#zarządzanie-mcp).
 
 ### Ustawienia przechowywania
 
@@ -521,6 +542,104 @@ Osobiste notatki pracy Istoty Krzemowej, podobne do dziennika:
   - `/api/worknotes/search?q=keyword` — wyszukiwanie notatek
   - `/api/worknotes/directory` — generowanie spisu treści notatek
   - `/api/projects` — API zarządzania projektami
+
+---
+
+## Zarządzanie umiejętnościami
+
+### Przegląd funkcji
+
+Umiejętności (Skill) to wielokrotnego użytku jednostki zdolności typu „orkiestracja narzędzi + szablony promptów". Strona zarządzania umiejętnościami (`/skill?beingId={id}`) zapewnia wizualne zarządzanie umiejętnościami dla każdej Istoty Krzemowej.
+
+### Układ strony
+
+- **Lista umiejętności po lewej**: widok kart (tytuł, plakietki `wersja · źródło · tryb wyzwalania`, opis)
+- **Edytor po prawej**: edytor Markdown (metadane YAML front matter + treść promptu)
+- **Statystyki u góry**: liczba umiejętności / liczba umiejętności niestandardowych / limit przydziału (np. `5 / 2 / 50`)
+
+### Operacje paska narzędzi
+
+- **Nowa**: wczytanie szablonu umiejętności Markdown
+- **Import .md / Import .json**: import umiejętności z pliku lokalnego
+- **Odśwież**: ponowne wczytanie listy umiejętności
+
+### Operacje na karcie umiejętności
+
+Każda karta umiejętności oferuje 5 operacji:
+
+| Operacja | Opis |
+|------|------|
+| Edytuj | Otwarcie Markdown w edytorze po prawej, z możliwością zapisu (upsert) |
+| Testuj | Wprowadzenie parametrów JSON, natychmiastowe jednorazowe wykonanie umiejętności i podgląd wyniku |
+| Eksport JSON | Pobranie `{id}.json` |
+| Eksport Markdown | Pobranie `{id}.md` |
+| Usuń | Usunięcie umiejętności (wraz z plikami utrwalonymi) |
+
+### Tworzenie umiejętności
+
+Umiejętności są pisane w Markdown, z metadanymi YAML front matter deklarującymi id, opis, schemat parametrów, białą listę narzędzi, tryb wyzwalania itp.; treść to szablon promptu (obsługa placeholderów `{param}`). Można napisać samą treść (pomijając YAML) — podczas zapisu AI automatycznie uzupełni brakujące metadane, a pola dostarczone przez użytkownika nigdy nie są nadpisywane.
+
+```markdown
+---
+id: daily_news_digest
+description: 搜索今日科技新闻并生成摘要
+tool_whitelist: [network, work_note]
+trigger_mode: Auto
+metadata:
+  schedule: "0 9 * * *"
+---
+
+请使用 network 工具搜索 {topic} 的最新新闻，生成 500 字摘要并保存到工作笔记。
+```
+
+### Implementacja techniczna
+
+- **Kontroler**: `SkillController` (strona + 10 endpointów API)
+- **Rdzeń**: `SkillManager` (rejestracja/wykonanie/hot-reload), `SkillMetadataCompleter` (uzupełnianie metadanych przez AI)
+- **Hot-reload**: istota co 30 sekund wykrywa zmiany w katalogu `skills/`, zapis z Web UI nie wymaga restartu
+- **Archiwizacja wersji**: każda aktualizacja jest automatycznie archiwizowana w `skills/archive/{id}/{version}.md`
+
+---
+
+## Zarządzanie MCP
+
+### Przegląd funkcji
+
+Strona zarządzania MCP (Model Context Protocol, protokół kontekstu modelu) (`/mcp`) służy do zarządzania połączeniami z zewnętrznymi serwerami MCP. Po połączeniu narzędzia udostępniane przez serwer są automatycznie wstrzykiwane do wszystkich Istot Krzemowych w formie `mcp_{serverId}_{toolName}`.
+
+### Lista serwerów
+
+Wyświetla dla każdego serwera: ID, nazwę, tryb transportu (stdio/http), status połączenia (connected/disconnected/connecting/error), status włączenia, liczbę narzędzi, ostatni błąd.
+
+### Operacje zarządzania
+
+| Operacja | Opis |
+|------|------|
+| Dodaj serwer | Wypełnij ID (małe litery/cyfry/podkreślenia), nazwę, tryb transportu; stdio wymaga polecenia i argumentów, http wymaga URL endpointu |
+| Włącz/Wyłącz | Przełącznik w wierszu, po wyłączeniu narzędzia są wyrejestrowywane ze wszystkich istot |
+| Połącz ponownie | Rozłączenie i ponowne połączenie, odświeżenie listy narzędzi |
+| Usuń | Usunięcie konfiguracji serwera i wszystkich jego narzędzi |
+| Zobacz narzędzia | Rozwinięcie serwera, lista nazw narzędzi (z prefiksem), opisów, schematów parametrów |
+| Testuj narzędzie | Bezpośrednie wywołanie narzędzia MCP w celu weryfikacji łączności (bez udziału AI) |
+
+### Przykład dodania serwera stdio
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "enabled": true
+}
+```
+
+### Mechanizmy bezpieczeństwa
+
+- Dodawanie/usuwanie/włączanie/wyłączanie serwerów może być wykonywane tylko przez użytkownika za pomocą Web UI, AI nie może modyfikować listy serwerów (narzędzie `mcp` zapewnia tylko zapytania tylko do odczytu)
+- Narzędzia opakowujące MCP są prezentowane w macierzy uprawnień narzędzi jako pojedyncza akcja `execute` i mogą być wyłączane indywidualnie dla każdej istoty/projektu
+- Globalny przełącznik `McpEnabled` pozwala jednym kliknięciem wyłączyć całą integrację MCP
 
 ---
 

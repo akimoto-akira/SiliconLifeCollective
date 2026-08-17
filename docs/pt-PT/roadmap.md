@@ -320,6 +320,19 @@ Cada fase termina com um sistema **executável e observável**. Nenhuma fase pro
 
 ---
 
+## Fase 11.5: Sistema de Competências e Integração MCP
+
+**Objectivo**: Camada de abstracção de capacidades reutilizáveis e integração com o ecossistema de ferramentas externas.
+
+| # | Módulo | Descrição |
+|---|--------|-------------|
+| 11.5.1 | ~~Sistema de Competências~~ ✅ Concluído | Camada de abstracção reutilizável de orquestração de ferramentas + modelo de prompt (SkillManager, modos de duplo acionamento, recarregamento a quente, arquivo de versões, preenchimento automático de metadados por IA) |
+| 11.5.2 | ~~Integração MCP~~ ✅ Concluído | Integração de ferramentas de servidores MCP externos (transporte duplo stdio/http, injecção de nomenclatura `mcp_{serverId}_{toolName}`, página de gestão Web, integração com matriz de permissões) |
+
+**Entregável**: Página de gestão de competências (/skill), página de gestão MCP (/mcp), ferramentas incorporadas `skill` e `mcp`, documentação de ajuda de competências/MCP.
+
+---
+
 ## Fase 12: Funcionalidades Avançadas
 
 **Objectivo**: Funcionalidades avançadas opcionais para melhorar as capacidades.

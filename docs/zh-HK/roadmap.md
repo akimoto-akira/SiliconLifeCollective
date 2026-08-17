@@ -311,12 +311,27 @@
 
 | # | 模組 | 描述 |
 |---|--------|-------------|
-| 11.1 | FeishuProvider | 飛書（Lark）機器人整合，支援卡片 |
-| 11.2 | WhatsAppProvider | WhatsApp Business API 整合 |
-| 11.3 | TelegramProvider | Telegram Bot API 整合，支援內聯鍵盤 |
-| 11.4 | IMManager 增強 | 多提供者路由、統一訊息格式、跨平台權限詢問處理 |
+| 11.1 | ~~FeishuProvider~~ ✅ 已完成 | 飛書機器人整合（HTTP 回呼、簽名驗證 + AES 解密、互動卡片、OAuth 授權嚮導） |
+| 11.2 | WeComProvider ✅ | 企業微信整合（WXBizMsgCrypt 加解密、範本卡片權限互動） |
+| 11.3 | DingTalkProvider ✅ | 釘釘整合（Stream WebSocket / HTTP 雙模式、互動卡片） |
+| 11.4 | ~~IMManager 增強~~ ✅ 已完成 | 多實例設定架構（IMPlatforms 列表、獨立啟停）、AggregateIMProvider 聚合路由、跨平台權限詢問競速 |
+| 11.5 | WhatsAppProvider | WhatsApp Business API 整合（計劃中） |
+| 11.6 | TelegramProvider | Telegram Bot API 整合，支援內聯鍵盤（計劃中） |
 
-**交付物**：使用者可以透過外部即時通訊平台與矽基生命體互動。
+**交付物**：使用者可以透過外部即時通訊平台（飛書 / 企業微信 / 釘釘）與矽基生命體互動，多平台可同時啟用。
+
+---
+
+## 階段 11.5：技能系統與 MCP 整合
+
+**目標**：可重用能力抽象層與外部工具生態接入。
+
+| # | 模組 | 描述 |
+|---|--------|-------------|
+| 11.5.1 | ~~技能系統~~ ✅ 已完成 | 工具編排 + 提示詞範本的複用抽象層（SkillManager、雙觸發模式、熱重載、版本歸檔、AI 元資料補全） |
+| 11.5.2 | ~~MCP 整合~~ ✅ 已完成 | 外部 MCP 伺服器工具接入（stdio/http 雙傳輸、`mcp_{serverId}_{toolName}` 命名注入、Web 管理頁面、權限矩陣整合） |
+
+**交付物**：技能管理頁面（/skill）、MCP 管理頁面（/mcp）、`skill` 與 `mcp` 內建工具、技能/MCP 幫助文件。
 
 ---
 
@@ -328,4 +343,4 @@
 |---|--------|-------------|
 | 12.1 | ~~知識網絡~~ ✅ 已完成 | 三元結構（主謂賓）的知識圖譜，支援增刪改查、路徑發現、進階查詢和圖譜遍歷 |
 | 12.2 | ~~外掛程式系統~~ ✅ 已完成 | 外部外掛程式載入，帶安全檢查和沙箱（IPlugin 介面、PluginLoader、AssemblyLoadContext 隔離） |
-| 12.3 | 技能生態系統 | 可重用技能市場，用於生命體能力
+| 12.3 | 技能生態系統 | 可重用技能市場，用於生命體能力（技能系統核心已實作，見階段 11.5；剩餘：外掛程式市場、技能包分發） |

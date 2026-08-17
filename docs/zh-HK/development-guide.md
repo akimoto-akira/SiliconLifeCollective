@@ -147,6 +147,7 @@ public class MyAIClient : IAIClient
 
     public AIResponse Chat(AIRequest request)
     {
+        // 呼叫您的 AI API
         var response = CallMyAPI(request);
 
         return new AIResponse
@@ -237,11 +238,31 @@ public class MyPluginTool : ITool
 }
 ```
 
-3. 將編譯後的 DLL 放入外掛程式目錄，`PluginLoader` 將自動載入。
+3. （可選）實作 `ISkillProvider` 介面以透過外掛程式提供技能：
+
+```csharp
+public class MyPluginSkills : ISkillProvider
+{
+    public IEnumerable<SkillDefinition> GetSkills()
+    {
+        yield return new SkillDefinition
+        {
+            Id = "my_plugin_skill",
+            Description = "A skill provided by my plugin",
+            SystemPromptTemplate = "請執行任務：{task}",
+            // ... 其餘中繼資料
+        };
+    }
+}
+```
+
+外掛程式技能在生命體初始化時由 `SkillManager.ScanAllPluginAssemblies()` 自動註冊（來源標記為 `Plugin`，熱重載不會覆寫）。
+
+4. 將編譯後的 DLL 放入外掛程式目錄，`PluginLoader` 將自動載入。
 
 > **安全限制**：外掛程式預設不能引用 `System.IO`、`System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`、`Microsoft.CodeAnalysis` 等命名空間。但外掛程式可透過 `[PluginCapability]` 屬性宣告所需能力（Network、FileIO、Process、AI），載入器據此放寬對應命名空間的安全掃描規則。不可宣告的能力（P/Invoke、Unsafe、反射發射等）始終被阻止。外掛程式透過 `AssemblyLoadContext` 隔離載入。
 
-### 新增新皮膚
+### 新增新佈景主題
 
 1. 在 `src/SiliconLife.App/Web/Skins/` 中實作 `ISkin`：
 
@@ -264,7 +285,7 @@ public class MyCustomSkin : ISkin
 }
 ```
 
-2. 皮膚由 `SkinManager` 自動發現。
+2. 佈景主題由 `SkinManager` 自動發現。
 
 ## 程式碼風格指南
 
@@ -285,7 +306,7 @@ SiliconLife.Common/
 ├── Localization/          # 在地化基底類別與 34 種語言變體實作
 ├── Security/              # 權限管理器
 ├── SiliconBeing/          # 預設矽基生命體實作
-├── Tools/                 # 共享的內建工具（23 個）
+├── Tools/                 # 共享的內建工具（25 個）
 ├── Web/                   # Web 基礎設施
 └── WebView/               # Playwright WebView 實作
 
@@ -295,10 +316,10 @@ SiliconLife.App/          # Default 與 Fast 共享的應用層
 ├── Project/               # 專案系統（工作流引擎、專案角色）
 └── Web/                   # Web UI 實作
     ├── Component/         # 27 個 UI 元件
-    ├── Controllers/       # 24 個路由控制器
+    ├── Controllers/       # 27 個路由控制器
     ├── Models/            # 檢視模型
     ├── Views/             # HTML 檢視
-    └── Skins/             # 7 個皮膚主題
+    └── Skins/             # 7 個佈景主題
 
 SiliconLife.Default/      # 版本特有目錄
 ├── Config/                # 預設設定資料
@@ -460,7 +481,7 @@ public class MyToolTests
         // 執行
         var result = await tool.ExecuteAsync(call);
 
-        // 判斷
+        // 斷言
         Assert.IsTrue(result.Success);
         Assert.IsNotNull(result.Output);
     }
@@ -509,10 +530,10 @@ if (!allowed)
 全域註冊和檢索服務：
 
 ```csharp
-// 初始化期间
+// 初始化期間
 ServiceLocator.Instance.Register<ICustomService>(myService);
 
-// 需要时
+// 需要時
 var service = ServiceLocator.Instance.Get<ICustomService>();
 ```
 

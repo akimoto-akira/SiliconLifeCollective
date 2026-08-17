@@ -320,6 +320,19 @@ Ogni fase si conclude con un sistema **eseguibile e osservabile**. Nessuna fase 
 
 ---
 
+## Fase 11.5: Sistema di Competenze e Integrazione MCP
+
+**Obiettivo**: Livello di astrazione per capacità riutilizzabili e accesso all'ecosistema di strumenti esterni.
+
+| # | Modulo | Descrizione |
+|---|--------|-------------|
+| 11.5.1 | ~~Sistema di Competenze~~ ✅ Completata | Livello di astrazione riutilizzabile per orchestrazione di strumenti + modello di prompt (SkillManager, doppia modalità di attivazione, ricaricamento a caldo, archiviazione versioni, completamento metadati AI) |
+| 11.5.2 | ~~Integrazione MCP~~ ✅ Completata | Accesso agli strumenti di server MCP esterni (doppio trasporto stdio/http, iniezione con naming `mcp_{serverId}_{toolName}`, pagina di gestione Web, integrazione matrice permessi) |
+
+**Consegna**: Pagina di gestione competenze (/skill), pagina di gestione MCP (/mcp), strumenti integrati `skill` e `mcp`, documentazione di aiuto competenze/MCP.
+
+---
+
 ## Fase 12: Funzionalità avanzate
 
 **Obiettivo**: Funzionalità avanzate opzionali per migliorare le capacità.

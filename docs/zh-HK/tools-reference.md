@@ -20,6 +20,7 @@
 - **實用工具** — 系統資訊、Token 審計、說明文件、知識網絡
 - **瀏覽器工具** — WebView 瀏覽器自動化
 - **專案工具** — 專案管理、專案任務、專案工作筆記、專案工作
+- **擴充工具** — MCP 外部伺服器工具、技能管理
 - **外掛程式工具** — 透過外掛程式系統註冊的第三方工具
 
 ### 工具場景系統
@@ -113,7 +114,7 @@
 
 **支援的操作**:
 - `get_all` — 取得所有設定項
-- `get_group` — 取得指定群組的設定項
+- `get_group` — 取得指定分組的設定項
 - `get_field` — 取得指定設定欄位
 - `get_enum_values` — 取得列舉類型的可選值（如可用模型、區域等）
 
@@ -136,13 +137,13 @@
 
 **可用場景**: Chat、Task、Timer
 
-**功能描述**: 矽基主理人專用的系統管理工具，用於管理矽基生命體的建立、檢視和重設。
+**功能描述**: 矽基主理人專用的系統管理工具，用於管理矽基生命體的建立、檢視和重置。
 
 **支援的操作**:
 - `list_beings` — 列出所有矽基生命體及其狀態
 - `create_being` — 建立新矽基生命體（需要 `name` 和 `soul` 參數）
 - `get_code` — 檢視矽基生命體的自訂原始碼
-- `reset` — 將矽基生命體重設為預設實作
+- `reset` — 將矽基生命體重置為預設實作
 
 **使用範例**:
 ```json
@@ -166,8 +167,8 @@
 - `insert` — 插入資料
 - `update` — 更新資料
 - `delete` — 刪除資料
-- `create_table` — 建立表
-- `list_tables` — 列出所有表
+- `create_table` — 建立資料表
+- `list_tables` — 列出所有資料表
 
 **使用範例**:
 ```json
@@ -227,7 +228,7 @@
 
 **安全機制**:
 - 編譯時引用控制（排除危險組件）
-- 執行時期靜態程式碼掃描
+- 執行時靜態程式碼掃描
 - AES-256 加密儲存
 
 **使用範例**:
@@ -249,7 +250,7 @@
 **功能描述**: 編譯並執行 C# 程式碼片段。
 
 **支援的操作**:
-- `run_script` — 執行程式碼指令碼
+- `run_script` — 執行程式碼腳本
 
 **使用範例**:
 ```json
@@ -314,44 +315,68 @@
 
 ---
 
-### 11. 日誌工具 (LogTool)
+### 11. MCP 查詢工具 (McpTool)
 
-**工具名稱**: `log`
+**工具名稱**: `mcp`
 
-**功能描述**: 查詢操作歷史和對話歷史。
+**功能描述**: 查詢 MCP（Model Context Protocol）整合狀態——已連線的外部伺服器、它們提供的工具以及如何呼叫。這是唯讀工具：伺服器的新增/刪除只能由使用者透過 Web UI 完成，AI 無法修改伺服器清單。
 
 **支援的操作**:
-- `query_logs` — 查詢系統日誌
-- `query_conversations` — 查詢對話歷史
-- `get_stats` — 取得日誌統計
+- `status` — 全域概覽（啟用狀態、伺服器數量、工具數量）
+- `list_servers` — 列出已設定的伺服器（含連線狀態和工具數量）
+- `list_tools` — 列出可用工具（帶 `mcp_{server}_{tool}` 前綴名、描述和參數 schema；可選 `server_id` 過濾單一伺服器）
 
 **使用範例**:
 ```json
 {
-  "action": "query_logs",
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**MCP 包裝工具**: 每個已連線 MCP 伺服器提供的工具會以獨立工具形式動態註冊到矽基生命體，命名格式為 `mcp_{serverId}_{toolName}`（如 `mcp_filesystem_read_file`）。AI 可以像呼叫普通工具一樣直接按前綴名呼叫它們，無需透過本查詢工具中轉。包裝工具在權限矩陣中以單一 `execute` 動作呈現，可被逐個停用。
+
+**場景**: 所有場景（`All`）
+
+---
+
+### 12. 日誌工具 (LogTool)
+
+**工具名稱**: `log`
+
+**功能描述**: 查詢操作歷史、工具呼叫歷史和對話歷史。
+
+**支援的操作**:
+- `query_operations` — 查詢操作歷史
+- `query_tool_calls` — 查詢工具呼叫歷史
+- `query_conversations` — 查詢對話歷史
+- `export` — 匯出日誌
+- `get_system_info` — 取得系統資訊
+
+**使用範例**:
+```json
+{
+  "action": "query_operations",
   "being_id": "being-uuid",
   "start_time": "2026-04-20T00:00:00Z",
-  "end_time": "2026-04-26T23:59:59Z",
-  "level": "info"
+  "end_time": "2026-04-26T23:59:59Z"
 }
 ```
 
 ---
 
-### 12. 記憶工具 (MemoryTool)
+### 13. 記憶工具 (MemoryTool)
 
 **工具名稱**: `memory`
 
 **功能描述**: 管理矽基生命體的長期和短期記憶。
 
 **支援的操作**:
-- `read` — 讀取記憶
-- `write` — 寫入記憶
-- `search` — 搜尋記憶
-- `delete` — 刪除記憶
-- `list` — 列出記憶
-- `get_stats` — 取得記憶統計
-- `compress` — 壓縮記憶
+- `add` — 新增記憶
+- `recent` — 取得最近的記憶
+- `query` — 搜尋記憶
+- `stats` — 取得記憶統計
 
 **使用範例**:
 ```json
@@ -367,7 +392,7 @@
 
 ---
 
-### 13. 網路工具 (NetworkTool)
+### 14. 網路工具 (NetworkTool)
 
 **工具名稱**: `network`
 
@@ -393,7 +418,7 @@
 
 ---
 
-### 14. 權限工具 (PermissionTool) 🔒
+### 15. 權限工具 (PermissionTool) 🔒
 
 **工具名稱**: `permission`
 
@@ -420,7 +445,7 @@
 
 ---
 
-### 15. 專案工具 (ProjectTool) 🔒
+### 16. 專案工具 (ProjectTool) 🔒
 
 **工具名稱**: `project`
 
@@ -432,15 +457,15 @@
 
 **支援的操作**:
 - `create` — 建立新專案空間
-- `archive` — 歸檔專案
-- `restore` — 還原已歸檔的專案
-- `destroy` — 銷毀專案並清理資料（不可還原）
+- `archive` — 封存專案
+- `restore` — 還原已封存的專案
+- `destroy` — 銷毀專案並清理資料（不可復原）
 - `list` — 列出所有專案
 - `get` — 取得專案詳情
 - `assign` — 將矽基生命體分配到專案
 - `remove` — 從專案中移除矽基生命體
 - `update` — 更新專案名稱/描述
-- `list-workflow-templates` — 列出可用的工作流範本
+- `list-workflow-templates` — 列出可用的工作流程範本
 - `assign_role` — 為矽基生命體分配專案角色
 - `remove_role` — 移除矽基生命體的專案角色
 - `list_roles` — 列出專案的角色分配
@@ -456,7 +481,7 @@
 
 ---
 
-### 16. 專案任務工具 (ProjectTaskTool)
+### 17. 專案任務工具 (ProjectTaskTool)
 
 **工具名稱**: `project_task`
 
@@ -490,7 +515,7 @@
 
 ---
 
-### 17. 專案工作筆記工具 (ProjectWorkNoteTool)
+### 18. 專案工作筆記工具 (ProjectWorkNoteTool)
 
 **工具名稱**: `project_work_note`
 
@@ -520,7 +545,7 @@
 
 ---
 
-### 18. 專案工作工具 (ProjectWorkTool) 🔒
+### 19. 專案工作工具 (ProjectWorkTool) 🔒
 
 **工具名稱**: `project_work`
 
@@ -528,7 +553,7 @@
 
 **可用場景**: Project（`[ToolScenario(ToolScenarioFlag.Project)]`，僅在專案場景可用）
 
-**功能描述**: 專案工作操作工具，用於主理人在 ThinkOnProject 場景中管理專案工作流。
+**功能描述**: 專案工作操作工具，用於主理人在 ThinkOnProject 場景中管理專案工作流程。
 
 **支援的操作**:
 - `create-task` — 建立專案任務
@@ -549,7 +574,55 @@
 
 ---
 
-### 19. 系統工具 (SystemTool)
+### 20. 技能工具 (SkillTool)
+
+**工具名稱**: `skill`
+
+**功能描述**: 管理矽基生命體的技能（可重複使用的「工具編排 + 提示詞範本」能力單元），支援建立、列出、更新、刪除、匯入匯出。缺失的中繼資料（id、描述、參數 schema 等）會由 AI 自動補全。
+
+**支援的操作**:
+- `create` — 建立新技能（需要 `id` 和 `system_prompt`，可選 `description`、`parameter_schema`、`tool_whitelist`、`tags`、`max_tool_round`、`timeout`、`on_complete`、`trigger_mode`、`auto_trigger_condition`）
+- `list` — 列出所有可用技能（含摘要）
+- `update` — 透過參數更新已有技能（需要 `skill_id`）
+- `update_from_md` — 從 Markdown 字串更新技能（YAML 前置中繼資料 + 提示詞內文）
+- `delete` — 刪除技能（需要 `skill_id`）
+- `export` — 匯出技能為 JSON（需要 `skill_id`）
+- `export_md` — 匯出技能為 Markdown（需要 `skill_id`）
+- `import` — 從 JSON 匯入技能（需要 `json`）
+- `import_md` — 從 Markdown 匯入技能（需要 `markdown`）
+
+**使用範例**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "搜尋今日科技新聞並產生摘要",
+  "system_prompt": "請使用 network 工具搜尋 {topic} 的最新新聞，並產生一份 500 字摘要。",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "新聞主題" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**修改權限**: 矽基主理人可修改所有技能；普通生命體只能修改來源為 `Being` 或 `User` 的技能（不能修改內建與外掛程式技能）。
+
+**數量限制**: 每個生命體的自訂技能數受設定 `MaxCustomSkillsPerBeing`（預設 50）限制。
+
+**場景**: 所有場景（`All`）
+
+> 關於技能系統（觸發模式、白名單、熱重載、自動排程等）的完整說明，參見 [矽基生命體指南](silicon-being-guide.md#技能系統)。
+
+---
+
+### 21. 系統工具 (SystemTool)
 
 **工具名稱**: `system`
 
@@ -558,7 +631,7 @@
 **支援的操作**:
 - `info` — 取得系統資訊
 - `resource_usage` — 取得資源使用情況
-- `find_process` — 查找處理程序
+- `find_process` — 尋找處理程序
 - `list_beings` — 列出矽基生命體
 
 **使用範例**:
@@ -570,7 +643,7 @@
 
 ---
 
-### 20. 任務工具 (TaskTool)
+### 22. 任務工具 (TaskTool)
 
 **工具名稱**: `task`
 
@@ -582,7 +655,7 @@
 - `update` — 更新任務
 - `complete` — 完成任務
 - `delete` — 刪除任務
-- `get_dependencies` — 取得依賴關係
+- `get_dependencies` — 取得相依關係
 
 **使用範例**:
 ```json
@@ -595,7 +668,7 @@
 
 ---
 
-### 21. 定時器工具 (TimerTool)
+### 23. 定時器工具 (TimerTool)
 
 **工具名稱**: `timer`
 
@@ -606,7 +679,7 @@
 - `list` — 列出定時器
 - `delete` — 刪除定時器
 - `pause` — 暫停定時器
-- `resume` — 還原定時器
+- `resume` — 恢復定時器
 - `get_execution_history` — 取得執行歷史
 
 **使用範例**:
@@ -621,7 +694,7 @@
 
 ---
 
-### 22. Token 審計工具 (TokenAuditTool) 🔒
+### 24. Token 審計工具 (TokenAuditTool) 🔒
 
 **工具名稱**: `token_audit`
 
@@ -651,24 +724,24 @@
 
 ---
 
-### 23. WebView 瀏覽器工具 (WebViewBrowserTool)
+### 25. WebView 瀏覽器工具 (WebViewBrowserTool)
 
 **工具名稱**: `webview_browser`
 
 **可用場景**: Chat、Task、Timer
 
-**功能描述**: 基於 Playwright 的瀏覽器自動化操作，提供完整的網頁導航、互動和資料提取能力。
+**功能描述**: 基於 Playwright 的瀏覽器自動化操作，提供完整的網頁導覽、互動和資料提取能力。
 
 **支援的操作**:
 - `open` — 開啟瀏覽器
 - `close` — 關閉瀏覽器
-- `navigate` — 導航到 URL
+- `navigate` — 導覽到 URL
 - `click` — 點擊元素
 - `input` — 輸入文字
 - `scroll` — 捲動頁面
 - `execute_script` — 執行 JavaScript
 - `get_page_text` — 取得頁面文字
-- `get_screenshot` — 取得截圖
+- `get_screenshot` — 取得螢幕截圖
 - `wait_for_element` — 等待元素出現
 - `get_element_info` — 取得元素資訊
 - `upload_file` — 上傳檔案
@@ -692,7 +765,7 @@
 
 ---
 
-### 24. 工作筆記工具 (WorkNoteTool)
+### 26. 工作筆記工具 (WorkNoteTool)
 
 **工具名稱**: `work_note`
 
@@ -723,7 +796,7 @@
 
 ```
 ┌──────────┐
-│   AI     │ 返回 tool_calls
+│   AI     │ 傳回 tool_calls
 └────┬─────┘
      ↓
 ┌──────────────┐
@@ -760,9 +833,9 @@
 public class MyCustomTool : ITool
 {
     public string Name => "my_tool";
-
+    
     public string Description => "工具描述";
-
+    
     public ToolDefinition Definition => new ToolDefinition
     {
         Name = Name,
@@ -772,14 +845,14 @@ public class MyCustomTool : ITool
             ["param1"] = new { type = "string", description = "參數說明" }
         }
     };
-
+    
     public async Task<ToolResult> ExecuteAsync(ToolCall call)
     {
         try
         {
             var param1 = call.Parameters["param1"]?.ToString();
             var result = await DoWork(param1);
-
+            
             return new ToolResult
             {
                 Success = true,
@@ -800,7 +873,7 @@ public class MyCustomTool : ITool
 
 ### 步驟 2: 新增到專案
 
-將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時透過反射自動發現並註冊。
+將工具檔案放置在 `src/SiliconLife.Common/Tools/` 目錄中（共享工具）或 `src/SiliconLife.Default/Tools/` / `src/SiliconLife.Fast/Tools/` 目錄中（版本特定工具）。`ToolManager` 會在啟動時透過反射自動發現和註冊。
 
 ### 步驟 2a: 透過外掛程式註冊工具
 
@@ -820,6 +893,13 @@ public class AdminOnlyTool : ITool
     // 僅矽基主理人可存取
 }
 ```
+
+### 替代方案：技能與 MCP 工具
+
+除撰寫 C# 工具類別外，還有兩種無需編譯的擴充方式：
+
+- **技能（Skill）**：透過 Web UI 或 `skill` 工具建立「工具編排 + 提示詞範本」組合，適合把常用工作流程封裝為可重複使用的能力。參見 [矽基生命體指南 — 技能系統](silicon-being-guide.md#技能系統)。
+- **MCP 伺服器**：在 Web UI 設定外部 MCP 伺服器後，其工具自動以 `mcp_{serverId}_{toolName}` 形式注入，無需撰寫任何程式碼。參見 [Web UI 指南 — MCP 管理](web-ui-guide.md)。
 
 ## 最佳實務
 
@@ -860,10 +940,10 @@ if (!allowed)
 
 ### 4. 提供清晰的工具描述
 
-幫助 AI 理解何時以及如何使用工具：
+協助 AI 理解何時以及如何使用工具：
 
 ```csharp
-public string Description =>
+public string Description => 
     "用於在不同日曆系統之間轉換日期。" +
     "需要提供 'date'、'from_calendar' 和 'to_calendar' 參數。";
 ```
@@ -877,7 +957,7 @@ public string Description =>
 **解決方案**:
 - 檢查工具名稱是否完全匹配
 - 驗證工具檔案在 `Tools/` 目錄中
-- 重新建構專案 (`dotnet build`)
+- 重新建置專案 (`dotnet build`)
 
 ### 權限被拒絕
 
@@ -904,4 +984,4 @@ public string Description =>
 - 📚 閱讀[架構指南](architecture.md)
 - 🛠️ 檢視[開發指南](development-guide.md)
 - 🔒 了解[權限系統](permission-system.md)
-- 🚀 檢視[快速開始指南](getting-started.md)
+- 🚀 檢視[快速入門指南](getting-started.md)

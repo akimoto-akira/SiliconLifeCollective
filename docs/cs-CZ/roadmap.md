@@ -323,7 +323,20 @@ Každá fáze končí **běžícím, pozorovatelným** systémem. Žádná fáze
 | 11.3 | TelegramProvider | Integrace Telegram Bot API, podpora inline klávesnic |
 | 11.4 | Vylepšení IMManager | Směrování více poskytovatelů, sjednocený formát zpráv, zpracování dotazů na oprávnění napříč platformami |
 
-**Výstup**: Uživatelé mohou interagovat s Křemíkovými Bytostmi přes externí platformy okamžitých zpráv.
+**Výstup**: Uživatelé mohou interagovat s Křemíkovými Bytostmi přes externí platformy okamžitých zpráv (Feishu / WeChat Enterprise / DingTalk), více platforem může být povoleno současně.
+
+---
+
+## Fáze 11.5: Systém dovedností a integrace MCP
+
+**Cíl**: Znovupoužitelná abstraktní vrstva schopností a přístup k ekosystému externích nástrojů.
+
+| # | Modul | Popis |
+|---|--------|-------------|
+| 11.5.1 | ~~Systém dovedností~~ ✅ Dokončeno | Znovupoužitelná abstraktní vrstva orchestrace nástrojů + šablon výzev (SkillManager, duální spouštěcí režim, hot-reload, verzování archivace, AI doplňování metadat) |
+| 11.5.2 | ~~Integrace MCP~~ ✅ Dokončeno | Přístup k nástrojům externích MCP serverů (duální transport stdio/http, injektáž názvů `mcp_{serverId}_{toolName}`, Webová stránka správy, integrace matice oprávnění) |
+
+**Výstup**: Stránka správy dovedností (/skill), stránka správy MCP (/mcp), vestavěné nástroje `skill` a `mcp`, dokumentace dovedností/MCP.
 
 ---
 
@@ -335,4 +348,4 @@ Každá fáze končí **běžícím, pozorovatelným** systémem. Žádná fáze
 |---|--------|-------------|
 | 12.1 | ~~Znalostní síť~~ ✅ Dokončeno | Znalostní graf založený na trojicové struktuře (subjekt-predikát-objekt), podpora CRUD, objevování cest, pokročilé dotazy a průchod grafem |
 | 12.2 | ~~Systém zásuvných modulů~~ ✅ Dokončeno | Načítání externích zásuvných modulů s bezpečnostními kontrolami a sandboxem (rozhraní IPlugin, PluginLoader, izolace AssemblyLoadContext) |
-| 12.3 | Ekosystém dovedností | Tržiště opakovaně použitelných dovedností pro schopnosti bytostí |
+| 12.3 | Ekosystém dovedností | Tržiště opakovaně použitelných dovedností pro schopnosti bytostí (jádro systému dovedností již implementováno, viz Fáze 11.5; zbývá: tržiště zásuvných modulů, distribuce balíčků dovedností) |

@@ -188,6 +188,78 @@ var timer = new BeingTimer
 await timerSystem.StartAsync(timer);
 ```
 
+## System Umiejętności
+
+Umiejętność (Skill) to jednostka zdolności wielokrotnego użytku Istoty Krzemowej — enkapsuluje „orkiestrację narzędzi + szablon podpowiedzi" w deklarowalną, ewoluującą, automatycznie planowalną funkcję, którą AI wywołuje jak zwykłe narzędzie.
+
+### Struktura Umiejętności
+
+| Element | Opis |
+|------|------|
+| `id` / `description` | Unikalny identyfikator i opis jednym zdaniem (wyświetlany AI, decyduje kiedy AI wybiera tę umiejętność) |
+| `parameter_schema` | Schemat JSON parametrów, deklarujący każdy placeholder `{param}` używany w podpowiedzi |
+| `system_prompt_template` | Szablon podpowiedzi systemowej, w czasie wykonania placeholdery są wypełniane parametrami |
+| `tool_whitelist` | Lista narzędzi dozwolonych podczas wykonania (puste = dziedziczenie wszystkich narzędzi istoty) |
+| `max_tool_round` / `timeout` | Limit rund narzędzi i timeout (ograniczane przez globalne limity) |
+| `on_complete` | Akcja zakończenia: `none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual` (autonomiczne wywołanie AI) lub `Auto` + planowanie `schedule` |
+
+### Cztery źródła
+
+- **Builtin** — wbudowane w framework (`summarize_document` podsumowanie dokumentu, `code_review` przegląd kodu, `research_topic` badanie tematu)
+- **Plugin** — wtyczki rejestrowane przez `ISkillProvider`
+- **Being** — istota tworzy w czasie działania przez narzędzie `skill`
+- **User** — użytkownik tworzy przez stronę zarządzania umiejętnościami Web UI
+
+### Sposoby wyzwalania
+
+1. **Ręczne (Manual)**: umiejętność jest wstrzykiwana jako zwykła definicja narzędzia do żądania AI, AI decyduje kiedy wywołać; strona planowania priorytetowo kieruje wywołania tej samej nazwy do umiejętności
+2. **Automatyczne (Auto + schedule)**: wyrażenie planowania przechowywane w `metadata.schedule`, obsługa trzech formatów:
+   - `"09:30"` — codziennie o stałej porze
+   - `"6h"` / `"30 m"` / `"2 d"` — okres interwału
+   - `"0 9 * * *"` / `"*/15 * * * *"` — podzbiór cron
+
+### Pisanie w Markdown
+
+Umiejętności są przechowywane w Markdown (`skills/{id}.md`, metadane YAML + treść podpowiedzi):
+
+```markdown
+---
+id: daily_news_digest
+description: Wyszukaj dzisiejsze wiadomości technologiczne i wygeneruj podsumowanie
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+Użyj narzędzia network do wyszukania najnowszych wiadomości na temat {topic}, wygeneruj 500-znakowe podsumowanie i zapisz je w notatkach pracy.
+```
+
+Można napisać tylko treść (pomijając YAML): przy zapisie AI automatycznie uzupełni metadane takie jak id, description, schemat parametrów itp. — pola wypełnione przez użytkownika nigdy nie są nadpisywane.
+
+### Samozarządzanie Istoty
+
+Istota może zarządzać własną biblioteką umiejętności przez narzędzie `skill`:
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### Gorące przeładowanie i ewolucja
+
+- Istota co 30 sekund sprawdza zmiany w katalogu `skills/` (porównanie odcisku palca), modyfikacje z Web UI lub innych istot wchodzą w życie automatycznie, bez restartu
+- Każda aktualizacja umiejętności automatycznie archiwizuje historyczną wersję do `skills/archive/{id}/{version}.md`, tworząc historię ewolucji umiejętności
+- Liczba niestandardowych umiejętności jest ograniczona limitem (`MaxCustomSkillsPerBeing`, domyślnie 50)
+
+### Zabezpieczenia wykonania
+
+- Uprawnienia akcji `execute` na poziomie umiejętności (można wyłączyć przez macierz uprawnień, po wyłączeniu umiejętność jest niewidoczna dla AI)
+- Parametry wykonania są ograniczane przez globalne limity: rundy ≤ `GlobalMaxToolRound` (domyślnie 10), timeout ≤ `GlobalSkillTimeoutSeconds` (domyślnie 300 sekund)
+- Umiejętności nie mogą rekurencyjnie wywoływać same siebie
+- Wywołania narzędzi spoza białej listy kończą się niepowodzeniem
+
 ## System pamięci
 
 ### Typy pamięci

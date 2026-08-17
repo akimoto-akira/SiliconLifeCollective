@@ -17,12 +17,12 @@ Standard-URL: `http://localhost:8080`
 ### Hauptbereiche
 
 1. **Dashboard** - Systemübersicht und Kennzahlen
-2. **Beings** - Silicon Beings verwalten
+2. **Beings** - Silicon Beings verwalten (inkl. Fähigkeitsverwaltung, KI-Konfiguration, Soul-Dateien)
 3. **Chat** - Mit Beings interagieren (Datei-Upload, Echtzeit-SSE unterstützt)
 4. **Chat-Historie** - Chat-Historie der Silicon Beings einsehen (Sitzungsliste, Nachrichtendetails)
 5. **Aufgaben** - Aufgabenverwaltung (persönliche Aufgaben)
 6. **Timer** - Timer-Konfiguration (erstellen, anhalten, Ausführungshistorie)
-7. **Konfiguration** - Systemeinstellungen (KI-Clients, Lokalisierung)
+7. **Konfiguration** - Systemeinstellungen (KI-Clients, IM-Plattformen Multi-Instanz, MCP-Server, Lokalisierung)
 8. **Berechtigungen** - Zugriffssteuerung (ACL-Verwaltung, Berechtigungsabfrage)
 9. **Protokolle** - Systemprotokolle (Filterung nach Stufe, Zeitbereichsabfrage)
 10. **Audit** - Token-Nutzung und Audit-Trail
@@ -32,8 +32,9 @@ Standard-URL: `http://localhost:8080`
 14. **Code-Editor** - Code-Bearbeitung mit Hover-Tooltips (Monaco Editor)
 15. **Projekte** - Projektverwaltung (Arbeitsbereiche, Aufgaben, Arbeitsnotizen)
 16. **Executoren** - Executor-Verwaltung (Disk, Netzwerk, Kommandozeile)
-17. **Hilfe** - Hilfedokumentationssystem (Mehrsprachigkeitsunterstützung, Themensuche)
-18. **Über** - Systeminformationen und Version
+17. **MCP** - MCP-Server-Verwaltung (hinzufügen, starten/stoppen, neu verbinden, testen)
+18. **Hilfe** - Hilfedokumentationssystem (Mehrsprachigkeitsunterstützung, Themensuche)
+19. **Über** - Systeminformationen und Version
 
 ---
 
@@ -135,6 +136,26 @@ KI-Backends konfigurieren:
 - Moonshot / Kimi (Cloud, Thinking, Vision, 262K Kontext)
 - SiliconFlow (Cloud, Modell-Aggregator, 100+ Modelle, 1M Kontext)
 - Benutzerdefinierter Client
+
+### IM-Plattformen (Multi-Instanz)
+
+Die IM-Plattformkonfiguration unterstützt eine Multi-Instanz-Architektur, mit der mehrere Plattformen gleichzeitig aktiviert werden können:
+
+1. Auf **Plattform hinzufügen** klicken und Plattformtyp auswählen:
+   - **Web UI** (integriert, standardmäßig aktiviert)
+   - **Feishu** (unterstützt manuelle Konfiguration und OAuth-Ein-Klick-Autorisierung)
+   - **WeChat Enterprise** (manuelle Konfiguration)
+   - **DingTalk** (manuelle Konfiguration, unterstützt Stream / HTTP-Ereignismodi)
+2. Plattformfelder gemäß dynamischem Formular ausfüllen (Pflichtfelder mit Sternchen, Schlüsselfelder als Passwortfelder)
+3. Jede Instanz kann unabhängig aktiviert/deaktiviert und gelöscht werden
+
+**Schlüssel-Umgebungsvariablen**: Konfigurationswerte unterstützen `${ENV_VAR}`-Platzhalter (z. B. `"${FEISHU_APP_SECRET}"`), die zur Laufzeit aus Umgebungsvariablen aufgelöst werden. Klartextschlüssel werden nicht in config.json geschrieben.
+
+**OAuth-Autorisierungsassistent** (Feishu): Nach dem Speichern von appId/appSecret erscheint ein Inline-Autorisierungsbereich auf der Konfigurationsseite. Klick auf **Autorisieren** öffnet den Systembrowser und leitet zur Feishu-Autorisierungsseite weiter. Nach Abschluss der Autorisierung wird das Token automatisch in die Konfiguration zurückgeschrieben, und die Seite zeigt den Autorisierungsstatus (Erfolg/Fehlschlag/Timeout) in Echtzeit über SSE an, ohne manuelles Kopieren und Einfügen.
+
+### MCP-Server
+
+Die MCP-Serverliste wird zentral auf der Konfigurationsseite verwaltet (Array-Editor): eine Zeile pro Server (ID, Name, Transport stdio/http, Befehl oder Endpunkt, Aktiviert), mit Inline-**Hinzufügen** und **Löschen**. Nach dem Speichern verbindet sich der Server sofort, und seine Werkzeuge werden automatisch in alle Silicon Beings injiziert. Siehe auch den Abschnitt [MCP-Verwaltung](#mcp-verwaltung) unten.
 
 ### Speichereinstellungen
 
@@ -521,6 +542,104 @@ Persönliche Arbeitsnotizen der Silicon Beings, ähnlich einem Tagebuch:
   - `/api/worknotes/search?q=keyword` - Notizen durchsuchen
   - `/api/worknotes/directory` - Notizverzeichnis generieren
   - `/api/projects` - Projektverwaltungs-API
+
+---
+
+## Fähigkeitsverwaltung
+
+### Funktionsübersicht
+
+Fähigkeiten (Skills) sind wiederverwendbare Fähigkeitseinheiten aus „Werkzeugorchestrierung + Prompt-Vorlagen". Die Fähigkeitsverwaltungsseite (`/skill?beingId={id}`) bietet für jedes Silicon Being eine visuelle Verwaltung von Fähigkeiten.
+
+### Seitenlayout
+
+- **Fähigkeitenliste links**: Kartenbasierte Darstellung (Titel, `Version · Quelle · Trigger-Modus`-Badges, Beschreibung)
+- **Editor rechts**: Markdown-Editor (YAML-Front-Matter + Prompt-Text)
+- **Statistik oben**: Fähigkeiten-Gesamtzahl / Benutzerdefinierte Fähigkeiten / Kontingentobergrenze (z. B. `5 / 2 / 50`)
+
+### Symbolleisten-Aktionen
+
+- **Neu**: Markdown-Fähigkeitsvorlage laden
+- **.md importieren / .json importieren**: Fähigkeit aus lokaler Datei importieren
+- **Aktualisieren**: Fähigkeitenliste neu laden
+
+### Fähigkeitenkarten-Aktionen
+
+Jede Fähigkeitenkarte bietet 5 Aktionen:
+
+| Aktion | Beschreibung |
+|------|------|
+| Bearbeiten | Markdown im rechten Editor öffnen, speichern (upsert) möglich |
+| Testen | Parameter-JSON eingeben, Fähigkeit einmal ausführen und Ergebnis anzeigen |
+| JSON exportieren | `{id}.json` herunterladen |
+| Markdown exportieren | `{id}.md` herunterladen |
+| Löschen | Fähigkeit löschen (inkl. persistenter Dateien) |
+
+### Fähigkeiten schreiben
+
+Fähigkeiten werden in Markdown geschrieben. YAML-Front-Matter deklariert id, Beschreibung, Parameter-Schema, Werkzeug-Whitelist, Trigger-Modus usw.; der Text ist die Prompt-Vorlage (unterstützt `{param}`-Platzhalter). Es reicht auch, nur den Text zu schreiben (YAML weglassen) — beim Speichern ergänzt die KI automatisch fehlende Metadaten, und vom Benutzer bereitgestellte Felder werden niemals überschrieben.
+
+```markdown
+---
+id: daily_news_digest
+description: Heutige Technologie-Nachrichten suchen und Zusammenfassung generieren
+tool_whitelist: [network, work_note]
+trigger_mode: Auto
+metadata:
+  schedule: "0 9 * * *"
+---
+
+Bitte verwenden Sie das network-Werkzeug, um die neuesten Nachrichten zu {topic} zu suchen, eine 500-Zeichen-Zusammenfassung zu generieren und in den Arbeitsnotizen zu speichern.
+```
+
+### Technische Implementierung
+
+- **Controller**: `SkillController` (Seite + 10 API-Endpunkte)
+- **Kern**: `SkillManager` (Registrierung/Ausführung/Hot-Reload), `SkillMetadataCompleter` (KI-Metadaten-Ergänzung)
+- **Hot-Reload**: Being prüft alle 30 Sekunden `skills/`-Verzeichnisänderungen, Web-UI-Speichern ohne Neustart
+- **Versionsarchivierung**: Jede Aktualisierung wird automatisch in `skills/archive/{id}/{version}.md` archiviert
+
+---
+
+## MCP-Verwaltung
+
+### Funktionsübersicht
+
+Die MCP (Model Context Protocol)-Verwaltungsseite (`/mcp`) verwaltet externe MCP-Serververbindungen. Nach dem Verbinden werden die vom Server bereitgestellten Werkzeuge automatisch in der Form `mcp_{ServerID}_{Werkzeugname}` in alle Silicon Beings injiziert.
+
+### Serverliste
+
+Zeigt für jeden Server: ID, Name, Transport (stdio/http), Verbindungsstatus (connected/disconnected/connecting/error), Aktivierungsstatus, Werkzeuganzahl, letzter Fehler.
+
+### Verwaltungsaktionen
+
+| Aktion | Beschreibung |
+|------|------|
+| Server hinzufügen | ID (Kleinbuchstaben/Zahlen/Unterstrich), Name, Transport ausfüllen; stdio erfordert Befehl und Argumente, http erfordert Endpunkt-URL |
+| Aktivieren/Deaktivieren | Inline-Schalter, nach Deaktivierung werden Werkzeuge von allen Beings abgemeldet |
+| Neu verbinden | Trennen und neu verbinden, Werkzeugliste aktualisieren |
+| Löschen | Serverkonfiguration und alle seine Werkzeuge entfernen |
+| Werkzeuge anzeigen | Server aufklappen, Werkzeugnamen (mit Präfix), Beschreibung, Parameter-Schema auflisten |
+| Werkzeug testen | Ein MCP-Werkzeug direkt aufrufen zur Verbindungsprüfung (ohne KI-Beteiligung) |
+
+### stdio-Server hinzufügen - Beispiel
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "enabled": true
+}
+```
+
+### Sicherheitsmechanismen
+
+- Hinzufügen/Löschen/Aktivieren/Deaktivieren von Servern kann nur vom Benutzer über die Web-UI erfolgen, die KI kann die Serverliste nicht verändern (das `mcp`-Werkzeug bietet nur Lesezugriff)
+- MCP-Wrapper-Werkzeuge erscheinen in der Werkzeugberechtigungsmatrix als einzelne `execute`-Aktion, können pro Being/Projekt einzeln deaktiviert werden
+- Der globale Schalter `McpEnabled` kann die gesamte MCP-Integration mit einem Klick deaktivieren
 
 ---
 

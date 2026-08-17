@@ -136,6 +136,26 @@ Configurar o backend de IA:
 - SiliconFlow (nuvem)
 - Clientes personalizados
 
+### Plataforma IM (Múltiplas Instâncias)
+
+A configuração da plataforma IM suporta uma arquitectura de múltiplas instâncias, permitindo activar várias plataformas em simultâneo:
+
+1. Clique em **Adicionar Plataforma** e seleccione o tipo de plataforma:
+   - **Web UI** (incorporado, activo por defeito)
+   - **Feishu** (suporta configuração manual e autorização OAuth num clique)
+   - **WeChat Enterprise** (configuração manual)
+   - **DingTalk** (configuração manual, suporta modos de eventos Stream / HTTP)
+2. Preencha os campos da plataforma no formulário dinâmico (campos obrigatórios marcados com asterisco, campos de segredo como caixa de palavra-passe)
+3. Cada instância pode ser activada/desactivada e eliminada independentemente
+
+**Variáveis de ambiente para segredos**: Os valores de configuração suportam marcadores `${ENV_VAR}` (por exemplo `"${FEISHU_APP_SECRET}"`), resolvidos a partir de variáveis de ambiente em tempo de execução; segredos em texto claro não são escritos no config.json.
+
+**Assistente de autorização OAuth** (Feishu): Após guardar appId/appSecret, a página de configuração mostra uma área de autorização inline; clicar no botão **Autorizar** abre o navegador do sistema e redirecciona para a página de autorização do Feishu; após a autorização ser concluída, o token é automaticamente escrito de volta na configuração, e a página mostra o estado da autorização em tempo real via SSE (sucesso/fracasso/timeout), sem necessidade de copiar e colar manualmente.
+
+### Servidores MCP
+
+A lista de servidores MCP é gerida centralmente na página de configuração (editor de array): um servidor por linha (ID, nome, modo de transporte stdio/http, comando ou endpoint, estado activo), com **Adicionar** e **Eliminar** inline. Após guardar, os servidores ligam-se imediatamente e as suas ferramentas são automaticamente injectadas nos Silicon Beings. Consulte a secção [Gestão de MCP](#gestão-de-mcp) abaixo.
+
 ### Definições de Armazenamento
 
 - Versão Default: Caminho base, índice temporal, política de limpeza
@@ -521,6 +541,104 @@ Notas de trabalho pessoais dos Silicon Beings, semelhantes a um diário:
   - `/api/worknotes/search?q=keyword` - Pesquisar notas
   - `/api/worknotes/directory` - Gerar directório de notas
   - `/api/projects` - API de gestão de projectos
+
+---
+
+## Gestão de Competências
+
+### Visão Geral das Funcionalidades
+
+Competências (Skills) são unidades de capacidade reutilizáveis de "orquestração de ferramentas + modelo de prompt". A página de gestão de competências (`/skill?beingId={id}`) fornece gestão visual de competências para cada Silicon Being.
+
+### Disposição da Página
+
+- **Lista de competências à esquerda**: Apresentação em cartões (título, emblemas de `versão · fonte · modo de acionamento`, descrição)
+- **Editor à direita**: Editor Markdown (metadados YAML frontmatter + corpo do prompt)
+- **Estatísticas no topo**: Total de competências / Competências personalizadas / Limite de quota (por exemplo `5 / 2 / 50`)
+
+### Operações da Barra de Ferramentas
+
+- **Novo**: Carrega o modelo de competência Markdown
+- **Importar .md / Importar .json**: Importa competências de ficheiros locais
+- **Actualizar**: Recarrega a lista de competências
+
+### Operações de Cartões de Competências
+
+Cada cartão de competência oferece 5 operações:
+
+| Operação | Descrição |
+|------|------|
+| Editar | Abre o Markdown no editor à direita, pode guardar (upsert) |
+| Testar | Introduz parâmetros JSON, executa a competência uma vez e mostra o resultado |
+| Exportar JSON | Descarrega `{id}.json` |
+| Exportar Markdown | Descarrega `{id}.md` |
+| Eliminar | Elimina a competência (incluindo ficheiros persistentes) |
+
+### Escrever Competências
+
+As competências são escritas em Markdown, com metadados YAML frontmatter a declarar id, descrição, schema de parâmetros, lista de permissões de ferramentas, modo de acionamento, etc.; o corpo é o modelo de prompt (suporta marcadores `{param}`). Escrever apenas o corpo (omitindo YAML) também é possível — ao guardar, a IA completa automaticamente os metadados em falta, e os campos fornecidos pelo utilizador nunca são sobrescritos.
+
+```markdown
+---
+id: daily_news_digest
+description: Procurar notícias de tecnologia de hoje e gerar um resumo
+tool_whitelist: [network, work_note]
+trigger_mode: Auto
+metadata:
+  schedule: "0 9 * * *"
+---
+
+Por favor, use a ferramenta network para procurar as últimas notícias sobre {topic}, gerar um resumo de 500 palavras e guardá-lo nas notas de trabalho.
+```
+
+### Implementação Técnica
+
+- **Controlador**: `SkillController` (página + 10 endpoints de API)
+- **Núcleo**: `SkillManager` (registo/execução/hot reload), `SkillMetadataCompleter` (compleção de metadados por IA)
+- **Hot reload**: Cada Being verifica alterações no directório `skills/` a cada 30 segundos, a gravação na Web UI não requer reinício
+- **Arquivo de versões**: Cada actualização é arquivada automaticamente em `skills/archive/{id}/{version}.md`
+
+---
+
+## Gestão de MCP
+
+### Visão Geral das Funcionalidades
+
+A página de gestão de MCP (`/mcp`) é utilizada para gerir ligações a servidores MCP externos. Após a ligação, as ferramentas fornecidas pelo servidor são automaticamente injectadas em todos os Silicon Beings na forma `mcp_{serverId}_{toolName}`.
+
+### Lista de Servidores
+
+Mostra para cada servidor: ID, nome, modo de transporte (stdio/http), estado de ligação (connected/disconnected/connecting/error), estado activo, número de ferramentas, último erro.
+
+### Operações de Gestão
+
+| Operação | Descrição |
+|------|------|
+| Adicionar servidor | Preencher ID (minúsculas/dígitos/sublinhado), nome, modo de transporte; stdio requer comando e argumentos, http requer URL de endpoint |
+| Activar/Desactivar | Interruptor inline, após desactivar as ferramentas são removidas de todos os Beings |
+| Re-ligar | Desliga e volta a ligar, actualiza a lista de ferramentas |
+| Eliminar | Remove a configuração do servidor e todas as suas ferramentas |
+| Ver ferramentas | Expande o servidor, lista os nomes das ferramentas (com prefixo), descrição, schema de parâmetros |
+| Testar ferramenta | Chama directamente uma ferramenta MCP para verificar a conectividade (sem envolvimento da IA) |
+
+### Exemplo de Adição de Servidor stdio
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "enabled": true
+}
+```
+
+### Mecanismos de Segurança
+
+- A adição/remoção/activação/desactivação de servidores só pode ser feita pelo utilizador através da Web UI; a IA não pode modificar a lista de servidores (a ferramenta `mcp` apenas fornece consultas de leitura)
+- As ferramentas de invólucro MCP aparecem na matriz de permissões de ferramentas com uma única acção `execute`, podendo ser desactivadas individualmente por Being/projecto
+- O interruptor global `McpEnabled` permite desactivar toda a integração MCP com um clique
 
 ---
 

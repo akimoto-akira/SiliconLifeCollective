@@ -173,7 +173,7 @@ await taskSystem.CreateAsync(task);
 ### Example
 
 ```csharp
-// 每小时执行
+// Execute every hour
 var timer = new BeingTimer
 {
     BeingId = being.Id,
@@ -184,6 +184,78 @@ var timer = new BeingTimer
 
 await timerSystem.StartAsync(timer);
 ```
+
+## Skill System
+
+Skills are reusable capability units for Silicon Beings—encapsulating "tool orchestration + prompt templates" into a declarable, evolvable, and auto-schedulable function. AI calls Skills just like calling ordinary tools.
+
+### Skill Structure
+
+| Element | Description |
+|------|------|
+| `id` / `description` | Unique identifier and one-line description (shown to AI, determines when AI selects this Skill) |
+| `parameter_schema` | Parameter JSON Schema, declaring each `{param}` placeholder used in the prompt |
+| `system_prompt_template` | System prompt template, filled with parameters at execution time |
+| `tool_whitelist` | List of tools allowed during execution (empty = inherit all being's tools) |
+| `max_tool_round` / `timeout` | Tool round and timeout limits (clamped by global limits) |
+| `on_complete` | Completion action: `none` / `write_memory` / `notify_curator` / `broadcast` |
+| `trigger_mode` | `Manual` (AI autonomous call) or `Auto` + `schedule` scheduling |
+
+### Four Sources
+
+- **Builtin** — Framework built-in (`summarize_document` document summarization, `code_review` code review, `research_topic` topic research)
+- **Plugin** — Registered by plugins via `ISkillProvider`
+- **Being** — Self-created by beings at runtime via the `skill` tool
+- **User** — Created by users through the Web UI Skill management page
+
+### Trigger Methods
+
+1. **Manual**: Skills are injected into AI requests as ordinary tool definitions; AI determines when to call them. The scheduling side prioritizes routing same-name calls to Skills
+2. **Auto + schedule**: The schedule expression is stored in `metadata.schedule`, supporting three formats:
+   - `"09:30"` — Daily fixed time
+   - `"6h"` / `"30 m"` / `"2 d"` — Interval period
+   - `"0 9 * * *"` / `"*/15 * * * *"` — Cron subset
+
+### Markdown Authoring
+
+Skills are stored in Markdown (`skills/{id}.md`, YAML front matter + prompt body):
+
+```markdown
+---
+id: daily_news_digest
+description: Search today's tech news and generate a summary
+tool_whitelist: [network, work_note]
+on_complete: write_memory
+---
+
+Please use the network tool to search for the latest news on {topic}, generate a 500-word summary, and save it to work notes.
+```
+
+Writing only the body (omitting YAML) is also acceptable: upon saving, AI will automatically populate metadata such as id, description, and parameter schema—fields already filled by the user are never overwritten.
+
+### Being Self-Management
+
+Beings can manage their own Skill library through the `skill` tool:
+
+```json
+{ "action": "list" }
+{ "action": "create", "id": "my_skill", "system_prompt": "...", "description": "..." }
+{ "action": "update_from_md", "skill_id": "my_skill", "markdown": "..." }
+{ "action": "delete", "skill_id": "my_skill" }
+```
+
+### Hot Reload and Evolution
+
+- Beings detect `skills/` directory changes every 30 seconds (fingerprint comparison); modifications from Web UI or other beings take effect automatically without restart
+- Each Skill update automatically archives historical versions to `skills/archive/{id}/{version}.md`, forming a Skill evolution history
+- The number of custom Skills is limited by quota (`MaxCustomSkillsPerBeing`, default 50)
+
+### Execution Guardrails
+
+- Skill-level `execute` action permission (can be disabled by the permission matrix; when disabled, invisible to AI)
+- Execution parameters are clamped by global limits: rounds ≤ `GlobalMaxToolRound` (default 10), timeout ≤ `GlobalSkillTimeoutSeconds` (default 300 seconds)
+- Skills cannot recursively call themselves
+- Tool calls outside the whitelist fail directly
 
 ## Memory System
 
@@ -249,7 +321,7 @@ Work notes are a personal diary system for Silicon Beings, using a page-based de
 2. **Learning Notes**
    ```
    Summary: Learn C# async programming best practices
-   Content: async/await usage注意事项, ConfigureAwait usage scenarios...
+   Content: async/await usage notes, ConfigureAwait usage scenarios...
    Keywords: C#,async,best practices
    ```
 
@@ -265,24 +337,24 @@ Work notes are a personal diary system for Silicon Beings, using a page-based de
 Beings can manage work notes through the `work_note` tool:
 
 ```json
-// 创建笔记
+// Create note
 {
   "action": "create",
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token\n- 支持 OAuth2",
-  "keywords": "认证,JWT,OAuth2"
+  "summary": "Complete user authentication module",
+  "content": "## Implementation Details\n\n- Use JWT token\n- Support OAuth2",
+  "keywords": "authentication,JWT,OAuth2"
 }
 
-// 读取笔记
+// Read note
 {
   "action": "read",
   "page_number": 1
 }
 
-// 搜索笔记
+// Search notes
 {
   "action": "search",
-  "keyword": "认证",
+  "keyword": "authentication",
   "max_results": 10
 }
 ```
@@ -498,7 +570,7 @@ Returns page text content for AI analysis and understanding.
 {
   "action": "input",
   "selector": "#search-input",
-  "text": "搜索关键词"
+  "text": "Search keyword"
 }
 ```
 
@@ -624,9 +696,9 @@ Work notes within a project space are public and accessible to all project membe
 {
   "action": "create",
   "project_id": "project-uuid",
-  "summary": "完成用户认证模块",
-  "content": "## 实现细节\n\n- 使用 JWT token",
-  "keywords": "认证,JWT"
+  "summary": "Complete user authentication module",
+  "content": "## Implementation Details\n\n- Use JWT token",
+  "keywords": "authentication,JWT"
 }
 ```
 
@@ -638,7 +710,7 @@ Tasks within a project space support full lifecycle management:
 {
   "action": "create",
   "project_id": "project-uuid",
-  "title": "实现用户认证",
+  "title": "Implement user authentication",
   "priority": 5
 }
 ```

@@ -1,4 +1,4 @@
-﻿# 變更日誌
+# 變更日誌
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | **繁體中文** | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -66,238 +66,288 @@
 
 ## [未發佈]
 
+### 2026-08-17
+
+#### 新功能
+- `c7b575b` - 實作 MCP 整合——外部伺服器工具接入、設定管理與說明文件
+  - 新增 MCP 核心（SiliconLife.Core/Mcp/）：McpManager 伺服器生命週期管理、stdio/http 雙傳輸、McpClientConnection 連線封裝、按伺服器包裝工具並以 `mcp_{serverId}_{toolName}` 命名注入所有矽基生命體
+  - 新增 Web 管理頁面（/mcp）與 7 個 API 端點（list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool）
+  - 新增 McpTool 查詢工具（status/list_servers/list_tools，唯讀）；伺服器增刪僅限使用者透過 Web UI，AI 無法修改伺服器清單
+  - 設定頁支援 MCP 伺服器陣列編輯器（強制回應視窗內行內新增/刪除）
+  - 註冊 MCP 說明主題（🔌），10 種語言實作完整說明文件
+  - MCP 包裝工具在權限矩陣中以 `execute` 動作呈現，支援按生命體/專案停用
+  - 45 個檔案變更
+
+### 2026-08-16
+
+#### 新功能
+- `5d76c5a` - 實作技能系統——工具編排與提示詞模板的重用抽象層
+  - 新增 SkillDefinition（id/描述/參數 schema/系統提示詞模板/工具白名單/動作限制/最大輪數/逾時/完成動作/觸發模式）
+  - 新增 SkillManager：技能註冊中心 + 執行引擎（子 AIRequest 迴圈、遞迴防護、全域輪數與逾時鉗制）
+  - 雙觸發模式：Manual（AI 函式呼叫，技能以 ToolDefinition 注入、排程側優先路由）+ Auto（schedule 排程，支援 `HH:mm` / `N s|m|h|d` / cron 子集）
+  - Markdown 優先儲存（YAML 前置 + 提示詞正文），純 Markdown 由 AI 自動補全中繼資料（使用者欄位不被覆蓋）
+  - 熱重載（30 秒指紋偵測）、版本歸檔（skills/archive/）、3 個內建技能（summarize_document/code_review/research_topic）
+  - 新增 skill 工具（create/list/update/update_from_md/delete/export/export_md/import/import_md）
+  - 新增技能管理頁面（/skill）與 10 個 API 端點；配額 MaxCustomSkillsPerBeing（預設 50）
+  - 權限：技能級 `execute` 動作權限、技能內工具白名單與生命體權限取嚴格側聯集
+- `b60fc68` - 更新千帆模型列表與上下文視窗映射 - 新增 glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest 模型，1M/128K 分級上下文視窗與視覺能力映射
+
+### 2026-08-15
+
+#### 新功能
+- `eaa8417` - 實作 IM 平台 OAuth 授權精靈與設定密鑰環境變數解析
+  - 新增 ImOAuthController/ImOAuthService 支援飛書 OAuth 授權流程（authorize/callback/status），含 state 防 CSRF、5 分鐘逾時、SSE 狀態推送
+  - 新增 IMProviderRegistry 統一管理 IM 平台中繼資料（設定欄位 schema/OAuth 端點模板/Provider 工廠）
+  - 新增 ConfigSecretResolver 解析設定中的 `${ENV_VAR}` 佔位符，深層複製替換不寫回原始設定
+  - 設定頁整合 IM 授權精靈 UI（行內授權區 + SSE 即時狀態）
+  - 補全 13 個語言檔案的 IM 授權狀態/說明文案翻譯
+
+### 2026-07-26
+
+#### 重構
+- `ffc45c2` - 重構 IM 平台為多實例設定架構 - IMPlatforms 清單化（每平台獨立啟停）、AggregateIMProvider 聚合多平台訊息收發與權限競速、設定頁多實例編輯器
+
+### 2026-07-19
+
+#### 新功能
+- `9bf2103` - Speedy.Manager 樹狀檢視整合多選刪除與多選匯出
+
+#### 修復
+- `0df0674` - 修復 Speedy.Manager 多選刪除僅刪除首項的問題
+
 ### 2026-07-16
 
 #### 新功能
-- `7431312` - 補全 13 個語言文件的 AI 用戶端配置翻譯 - CsCZ/PlPL 從 stub 改為完整字典實現，其餘 10 個文件補充 7 個新用戶端（DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan）的 ConfigDisplayNames/ConfigDescriptions/ConfigGroupNames 條目，同步更新 6 個 ClientFactory 的配置鍵元數據
-  - 20 個文件變更
+- `7431312` - 補全 13 個語言檔案的 AI 用戶端設定翻譯 - CsCZ/PlPL 從 stub 改為完整字典實作，其餘 10 個檔案補充 7 個新用戶端（DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan）的 ConfigDisplayNames/ConfigDescriptions/ConfigGroupNames 條目，同步更新 6 個 ClientFactory 的設定鍵中繼資料
+  - 20 個檔案變更
 
 #### 文件
-- `d6608ea` - 在所有 13 個語言版本的 changelog 中添加 DuMate（百度千帆）的 AI IDE 工具介紹
-  - 13 個文件變更
+- `ce36036` - 根據 git 記錄重寫所有 13 個語言版本 changelog 的 2026-05-26 後內容
+- `d6608ea` - 在所有 13 個語言版本的 changelog 中新增 DuMate（百度千帆）的 AI IDE 工具介紹
+  - 13 個檔案變更
 
 #### 協作框架
 - `c607c97` - 註冊 DuMate（百度千帆）為常駐 AI 協作者到 .ai-collab 註冊表
-  - 1 個文件變更
+  - 1 個檔案變更
 
 
 ### 2026-07-15
 
 #### 新功能
-- `c007263` - 補全 10 個 AI 用戶端的說明文件 - HelpTopics 註冊 10 個主題，HelpLocalizationBase 添加 30 個抽象屬性，12 個語言文件實現完整 Markdown 說明內容（平台簡介/註冊步驟/配置方法/可用模型/計費/常見問題），覆蓋 Herdsman/LongCat/QiniuAI/DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan
-  - 12 個文件變更
-- `4634e33` - 實現 7 個國內 AI 平台用戶端（DeepSeek/智譜GLM/月之暗面Kimi/矽基流動/MiniMax/百度文心/騰訊混元）- 14 個獨立類別文件，遵循 LongCatClient 風格，不使用繼承，全部 OpenAI 相容 + Bearer Token，支援 Tool Calling/串流/思考模式，在 DefaultSiliconBeing 和 DefaultSiliconBeingFactory 註冊
-  - 16 個文件變更
+- `c007263` - 補全 10 個 AI 用戶端的說明文件 - HelpTopics 註冊 10 個主題，HelpLocalizationBase 新增 30 個抽象屬性，12 個語言檔案實作完整 Markdown 說明內容（平台簡介/註冊步驟/設定方法/可用模型/計費/常見問題），覆蓋 Herdsman/LongCat/QiniuAI/DeepSeek/ZhipuGLM/MoonshotKimi/SiliconFlow/MiniMax/Ernie/Hunyuan
+  - 12 個檔案變更
+- `4634e33` - 實作 7 個國內 AI 平台用戶端（DeepSeek/智譜GLM/月之暗面Kimi/矽基流動/MiniMax/百度文心/騰訊混元）- 14 個獨立類別檔案，遵循 LongCatClient 風格，不使用繼承，全部 OpenAI 相容 + Bearer Token，支援 Tool Calling/串流/思考模式，在 DefaultSiliconBeing 和 DefaultSiliconBeingFactory 註冊
+  - 16 個檔案變更
 
 #### 文件
 - `108c4ea` - 更新全部 13 語言文件以反映 7 個新 AI 用戶端 - 狀態 📋→✅，01.AI 標記為已廢棄
-  - 94 個文件變更
+  - 94 個檔案變更
 
 
 ### 2026-07-14
 
 #### 文件
-- `344b429` - 全語種 architecture.md AI 平台狀態新增「已廢棄」狀態，標記零一萬物為已廢棄（停止新用戶註冊）
-  - 13 個文件變更
+- `344b429` - 全語種 architecture.md AI 平台狀態新增「已廢棄」狀態，標記零一萬物為已廢棄（停止新使用者註冊）
+  - 13 個檔案變更
 
 
 ### 2026-07-07
 
 #### 清理
-- `e06e6f2` - 移除 OsmStore 工具鏈和 TravelCodeWikiWithAI 插件 - 刪除 tools/OsmStore.* 三個項目，刪除 src/TravelCodeWikiWithAI/ 插件項目，清理 sln 參照，項目回歸獨立版 TCW 開發路線
-  - 45 個文件變更
+- `e06e6f2` - 移除 OsmStore 工具鏈和 TravelCodeWikiWithAI 外掛程式 - 刪除 tools/OsmStore.* 三個專案，刪除 src/TravelCodeWikiWithAI/ 外掛程式專案，清理 sln 參照，專案回歸獨立版 TCW 開發路線
+  - 45 個檔案變更
 
 
 ### 2026-07-06
 
 #### 修復
-- `1b15886` - OSM 數據模型標準化與元素類型安全修復
-  - 7 個文件變更
+- `1b15886` - OSM 資料模型標準化與元素類型安全修復
+  - 7 個檔案變更
 
 
 ### 2026-07-05
 
 #### 新功能
-- `be4320b` - TravelCodeWikiWithAI 新增 CLDR 數據提供模組
-  - 4 個文件變更
+- `be4320b` - TravelCodeWikiWithAI 新增 CLDR 資料提供模組
+  - 4 個檔案變更
 
 
 ### 2026-07-04
 
 #### 新功能
-- `dbcabf3` - 插件權限系統增強 - 重構網路/文件 IO 為 Executor 模式 + GeneratedCodeAttribute 白名單豁免
-  - 34 個文件變更
-- `e84bb63` - 修復編譯錯誤並新增 TravelCodeWikiWithAI 項目
-  - 53 個文件變更
+- `dbcabf3` - 外掛程式權限系統增強 - 重構網路/檔案 IO 為 Executor 模式 + GeneratedCodeAttribute 白名單豁免
+  - 34 個檔案變更
+- `e84bb63` - 修復編譯錯誤並新增 TravelCodeWikiWithAI 專案
+  - 53 個檔案變更
 
 #### 重構
-- `9e5a345` - TravelCodeWikiWithAI 全量遷移 PBF 至同步在線 OSM API
-  - 4 個文件變更
+- `9e5a345` - TravelCodeWikiWithAI 全量遷移 PBF 至同步線上 OSM API
+  - 4 個檔案變更
 
 
 ### 2026-05-31
 
 #### 新功能
-- `a5f37bd` - 更新項目思考、對話系統及儲存相關功能
-  - 13 個文件變更
+- `a5f37bd` - 更新專案思考、對話系統及儲存相關功能
+  - 13 個檔案變更
 
 
 ### 2026-05-30
 
 #### 新功能
 - `c3cf429` - 新增 QiniuAIClient AI 用戶端（七牛雲 AI 大模型推理服務） (ref task-409)
-  - 20 個文件變更
+  - 20 個檔案變更
 - `d04131f` - 新增 LongCatClient AI 用戶端（美團 LongCat 大模型） (ref task-408)
-  - 19 個文件變更
+  - 19 個檔案變更
 
 #### 協作框架
-- `e9564f5` - 更新所有修改的文件
-  - 140 個文件變更
+- `e9564f5` - 更新所有修改的檔案
+  - 140 個檔案變更
 - `9c8b42f` - 歸檔 2026-05-29 的 sessions 和 changes
-  - 20 個文件變更
+  - 20 個檔案變更
 
 
 ### 2026-05-29
 
 #### 新功能
-- `d548e48` - 項目思考詳情頁按輪次（Cycle）分組展示訊息並支援摺疊 (ref task-407)
-  - 23 個文件變更
+- `d548e48` - 專案思考詳情頁按輪次（Cycle）分組展示訊息並支援摺疊 (ref task-407)
+  - 23 個檔案變更
 - `28d893d` - IAIClient 增加多模態能力宣告介面 + ChatMessage 增加多模態欄位 (ref task-402)
-  - 13 個文件變更
-- `ebe6a49` - 項目思考詳情頁增加會話狀態、建立時間、完成時間展示 (ref task-406)
-  - 22 個文件變更
-- `9a53d55` - IAIClient 增加 ContextWindowTokens + Token 預算制 + 工廠配置化 (ref task-401, task-403)
-  - 26 個文件變更
+  - 13 個檔案變更
+- `ebe6a49` - 專案思考詳情頁增加會話狀態、建立時間、完成時間展示 (ref task-406)
+  - 22 個檔案變更
+- `9a53d55` - IAIClient 增加 ContextWindowTokens + Token 預算制 + 工廠設定化 (ref task-401, task-403)
+  - 26 個檔案變更
 - `202b99c` - 新增 HerdsmanClient AI 用戶端 + 修復初始化介面下拉選單不重新整理 (ref task-399, task-400)
-  - 20 個文件變更
-- `285ab2f` - 項目處理記錄前端展示 (ref task-397)
-  - 25 個文件變更
+  - 20 個檔案變更
+- `285ab2f` - 專案處理記錄前端展示 (ref task-397)
+  - 25 個檔案變更
 - `b4b633f` - ThinkOnProject 偽 Session 多輪對話機制 (ref task-395)
-  - 13 個文件變更
+  - 13 個檔案變更
 - `d3e543f` - ThinkOnProject 場景上下文增加可用矽基人資訊 (ref task-394)
-  - 21 個文件變更
-- `07eb628` - BuildRequest 動態注入矽基人項目歸屬資訊 (ref task-396)
-  - 21 個文件變更
-- `2089696` - Tool 添加 Project 場景支援 + PluginLoader 多目錄統一重構
-  - 12 個文件變更
+  - 21 個檔案變更
+- `07eb628` - BuildRequest 動態注入矽基人專案歸屬資訊 (ref task-396)
+  - 21 個檔案變更
+- `2089696` - Tool 新增 Project 場景支援 + PluginLoader 多目錄統一重構
+  - 12 個檔案變更
 
 #### 修復
-- `b80a33b` - 修復項目思考詳情頁載入提示文字硬編碼英文及缺少在地化 (ref task-405)
-  - 6 個文件變更
-- `90b60c5` - 修復工具調用輪次中 AI 正文 Content 和 Thinking 被隱藏的問題 (ref task-404)
-  - 8 個文件變更
-- `a7d9a97` - ThinkOnProject 多輪循環續接及項目提醒訊息遺失修復
-  - 6 個文件變更
+- `b80a33b` - 修復專案思考詳情頁載入提示文字硬編碼英文及缺少在地化 (ref task-405)
+  - 6 個檔案變更
+- `90b60c5` - 修復工具呼叫輪次中 AI 正文 Content 和 Thinking 被隱藏的問題 (ref task-404)
+  - 8 個檔案變更
+- `a7d9a97` - ThinkOnProject 多輪循環續接及專案提醒資訊遺失修復
+  - 6 個檔案變更
 - `c0838dd` - 修復 ProjectThinkSession 訊息未寫入 Cycle 及完成後歷史被刪除的問題 (ref task-398)
-  - 7 個文件變更
+  - 7 個檔案變更
 - `f3d1794` - 修復矽基人 Project/Broadcast/Stopped 狀態在地化缺失及展示異常 (ref task-393)
-  - 20 個文件變更
-- `3eaa90d` - 移除已刪除項目 TravelCodeWikiWithAI 的解決方案參照
-  - 1 個文件變更
+  - 20 個檔案變更
+- `3eaa90d` - 移除已刪除專案 TravelCodeWikiWithAI 的解決方案參照
+  - 1 個檔案變更
 
 #### 協作框架
 - `f3cbed7` - 註冊 task-394~396（ThinkOnProject 增強）
-  - 3 個文件變更
+  - 3 個檔案變更
 - `e1971f5` - 註冊 task-393（BeingActivity 在地化與展示修復）
-  - 1 個文件變更
+  - 1 個檔案變更
 - `e710fa4` - 更新 changes commitHash 和 state 會話結束
-  - 2 個文件變更
+  - 2 個檔案變更
 - `4cacc4a` - 歸檔 2026-05-28 的 sessions 和 changes
-  - 4 個文件變更
+  - 4 個檔案變更
 
 
 ### 2026-05-28
 
 #### 新功能
-- `ae8b673` - 插件目錄配置從單一路徑升級為多目錄列表 (ref task-391)
-  - 29 個文件變更
-- `aac46c1` - PluginLoader 增加 CS 原始碼模式，無 DLL 時編譯載入插件 (ref task-389)
-  - 6 個文件變更
+- `ae8b673` - 外掛程式目錄設定從單一路徑升級為多目錄清單 (ref task-391)
+  - 29 個檔案變更
+- `aac46c1` - PluginLoader 增加 CS 原始碼模式，無 DLL 時編譯載入外掛程式 (ref task-389)
+  - 6 個檔案變更
 
 #### 修復
-- `63047b0` - 註冊所有 PluginLoader 到 ServiceLocator，修復多目錄插件反射不全 (ref task-391)
-  - 3 個文件變更
+- `63047b0` - 註冊所有 PluginLoader 到 ServiceLocator，修復多目錄外掛程式反射不全 (ref task-391)
+  - 3 個檔案變更
 - `fcad655` - 修復 directoryList 瀏覽按鈕互動問題 (ref task-392)
-  - 9 個文件變更
+  - 9 個檔案變更
 
 #### 文件
-- `e6d3037` - PluginDemo-22 CS 原始碼編譯載入模式示例 (ref task-390)
-  - 21 個文件變更
+- `e6d3037` - PluginDemo-22 CS 原始碼編譯載入模式範例 (ref task-390)
+  - 21 個檔案變更
 
 #### 協作框架
 - `09d9e9c` - 歸檔 30 個已完成任務（task-362~task-391）
-  - 2 個文件變更
+  - 2 個檔案變更
 - `66204a1` - 歸檔 2026-05-28 的 sessions（8）和 changes（8）
-  - 18 個文件變更
+  - 18 個檔案變更
 - `308a8d0` - 更新 task-391 relatedCommit
-  - 1 個文件變更
+  - 1 個檔案變更
 - `6fc4e05` - 註冊 task-389（CS 原始碼模式）和 task-390（PluginDemo-22）
-  - 1 個文件變更
+  - 1 個檔案變更
 
 
 ### 2026-05-27
 
 #### 新功能
-- `e154a18` - 完成 PluginDemo-21 WorkflowTemplate 完整業務工作流示例 (ref task-388)
-  - 19 個文件變更
-- `aa771b3` - 實現 PluginCapability 宣告式權限系統 (ref task-379)
-  - 9 個文件變更
-- `5e5e9d1` - 添加 04-SafeSystemIO System.IO 白名單安全類型示例 (ref task-370)
-  - 20 個文件變更
+- `e154a18` - 完成 PluginDemo-21 WorkflowTemplate 完整業務工作流程範例 (ref task-388)
+  - 19 個檔案變更
+- `aa771b3` - 實作 PluginCapability 宣告式權限系統 (ref task-379)
+  - 9 個檔案變更
+- `5e5e9d1` - 新增 04-SafeSystemIO System.IO 白名單安全類型範例 (ref task-370)
+  - 20 個檔案變更
 
 #### 文件
 - `48f6702` - 對齊 19-TickObject 和 20-SpeedyPack 所有語言 README 翻譯至基準 (ref task-386, task-387)
-  - 119 個文件變更
+  - 119 個檔案變更
 - `5d570e5` - 完成 task-378 禁止的字串反射繞過反例 (ref task-378)
-  - 19 個文件變更
+  - 19 個檔案變更
 - `348c410` - PluginDemo-11 禁止的 P/Invoke 和 unsafe 程式碼反例 (ref task-377)
-  - 19 個文件變更
+  - 19 個檔案變更
 - `fc92a49` - PluginDemo-10 禁止的反射操作反例 (ref task-376)
-  - 19 個文件變更
-- `826ad2a` - 建立 PluginDemo-09 禁止行程操作反例插件 (ref task-375)
-  - 19 個文件變更
-- `7870b05` - 添加 PluginDemo-08 禁止網路操作反例 (ref task-374)
-  - 15 個文件變更
-- `8636e31` - PluginDemo-07 禁止文件 I/O 操作反例 (ref task-373)
-  - 19 個文件變更
-- `322312e` - 添加 PluginDemo-06 TrustedAssemblies 受信依賴示例 (ref task-372)
-  - 19 個文件變更
-- `6df98a0` - 添加 IWorkflowPlugin 工作流插件示例 (ref task-371)
-  - 20 個文件變更
-- `f3787ba` - PluginDemo-03 IObjectFactory 註冊與建立示例 (ref task-369)
-  - 20 個文件變更
-- `bb4324d` - PluginDemo-02 ITypeRegistry 註冊與查詢示例 (ref task-368)
-  - 20 個文件變更
-- `bbdfa3c` - PluginDemo-01 最簡 IPlugin 實現示例 (ref task-367)
-  - 19 個文件變更
+  - 19 個檔案變更
+- `826ad2a` - 建立 PluginDemo-09 禁止處理序操作反例外掛程式 (ref task-375)
+  - 19 個檔案變更
+- `7870b05` - 新增 PluginDemo-08 禁止網路操作反例 (ref task-374)
+  - 15 個檔案變更
+- `8636e31` - PluginDemo-07 禁止檔案 I/O 操作反例 (ref task-373)
+  - 19 個檔案變更
+- `322312e` - 新增 PluginDemo-06 TrustedAssemblies 受信相依範例 (ref task-372)
+  - 19 個檔案變更
+- `6df98a0` - 新增 IWorkflowPlugin 工作流程外掛程式範例 (ref task-371)
+  - 20 個檔案變更
+- `f3787ba` - PluginDemo-03 IObjectFactory 註冊與建立範例 (ref task-369)
+  - 20 個檔案變更
+- `bb4324d` - PluginDemo-02 ITypeRegistry 註冊與查詢範例 (ref task-368)
+  - 20 個檔案變更
+- `bbdfa3c` - PluginDemo-01 最簡 IPlugin 實作範例 (ref task-367)
+  - 19 個檔案變更
 
 #### 協作框架
 - `de44057` - 歸檔 5 月 25 日和 27 日的 sessions 和 changes
-  - 58 個文件變更
+  - 58 個檔案變更
 - `9e4a84c` - 更新 tasks.json lastCommitHash 為 48f6702
-  - 1 個文件變更
+  - 1 個檔案變更
 - `beb58b2` - 補充 taskIndex 索引（8 pending, 19 completed）
-  - 1 個文件變更
+  - 1 個檔案變更
 - `63f7bfc` - 更新 task-388 relatedCommit (ref task-388)
-  - 1 個文件變更
+  - 1 個檔案變更
 - `e61be6f` - 更新 task-378 relatedCommit (ref task-378)
-  - 1 個文件變更
-- `dde579b` - 發佈 WorkflowTemplate 完整使用示例任務（task-388）
-  - 1 個文件變更
-- `2294fa7` - 發佈 TickObject 和 SpeedyPack 示例任務（task-386~387）
-  - 1 個文件變更
-- `82b9f63` - 發佈 6 個 PluginCapability 示例任務（task-380~385）
-  - 1 個文件變更
+  - 1 個檔案變更
+- `dde579b` - 發佈 WorkflowTemplate 完整使用範例任務（task-388）
+  - 1 個檔案變更
+- `2294fa7` - 發佈 TickObject 和 SpeedyPack 範例任務（task-386~387）
+  - 1 個檔案變更
+- `82b9f63` - 發佈 6 個 PluginCapability 範例任務（task-380~385）
+  - 1 個檔案變更
 - `588539b` - 發佈 PluginCapability 宣告式權限系統任務（task-379）
-  - 1 個文件變更
-- `37f9c23` - 更新解決方案和項目文件參照
-  - 8 個文件變更
+  - 1 個檔案變更
+- `37f9c23` - 更新解決方案和專案檔案參照
+  - 8 個檔案變更
 - `e1f7892` - 發佈 12 個 PluginDemo 待領取任務（task-367~378）
-  - 3 個文件變更
-- `87ae858` - 建立 PluginDemo 插件正反例任務註冊（task-367）
-  - 2 個文件變更
+  - 3 個檔案變更
+- `87ae858` - 建立 PluginDemo 外掛程式正反例任務註冊（task-367）
+  - 2 個檔案變更
 - `f77a102` - 歸檔 2026-05-26 的 sessions 和 changes
-  - 7 個文件變更
+  - 7 個檔案變更
 
 ## [Alpha-0.2] - 2026-05-16
 
@@ -463,7 +513,7 @@
   - 控制器和檢視同步更新
   - 33 個檔案變更，667 行新增，435 行刪除
 
-- `bfd332d` - 將 Style 從字串遷移到 CssBuilder 內嵌樣式
+- `bfd332d` - 將 Style 從字串遷移到 CssBuilder 內聯樣式
   - 新增 CssBuilder 樣式建構器
   - ComponentBase 樣式系統從字串遷移到結構化 CssBuilder
   - LoadingComponent 大幅增強（103 行新增）
@@ -482,7 +532,7 @@
   - TimerSystem 提取 TimerExecution 邏輯（175 行移除）
   - SelectComponent 大幅增強（427 行改進）
   - TimerController 和定時器檢視增強
-  - ContextManager 內容管理器更新
+  - ContextManager 上下文管理器更新
   - 12 個檔案變更，458 行新增，267 行刪除
 
 #### 在地化
@@ -498,7 +548,7 @@
   - ProjectTaskSystem 專案任務系統大幅精簡（411 行重構）
   - TaskSystem 任務系統精簡（254 行重構）
   - TaskCenter 任務中心重構（188 行改進）
-  - ContextManager 內容管理器最佳化（347 行重構）
+  - ContextManager 上下文管理器最佳化（347 行重構）
   - DefaultSiliconBeing 矽基生命體增強
   - TimerSystem 定時器系統整合任務
   - IWorkNoteStorage 介面更新
@@ -520,7 +570,7 @@
   - 14 個檔案變更，1030 行新增，112 行刪除
 
 - `c9babce` - 改進聊天檢視中的工具呼叫渲染
-  - ChatView 工具呼叫區塊渲染增強
+  - ChatView 工具呼叫塊渲染增強
   - 1 個檔案變更，54 行新增，11 行刪除
 
 #### AI 工具場景系統
@@ -528,7 +578,7 @@
   - 新增 ToolScenarioAttribute 工具場景屬性（36 行）
   - 新增 ChatOnlyAttribute 僅聊天場景屬性（19 行）
   - ToolManager 工具管理器新增場景篩選功能（40 行）
-  - ContextManager 內容管理器適配場景篩選
+  - ContextManager 上下文管理器適配場景篩選
   - 4 個檔案變更，115 行新增，30 行刪除
 
 - `5709a33` - 為工具類別新增場景屬性
@@ -556,9 +606,9 @@
   - PermissionRequestController 控制器更新
   - 14 個檔案變更，496 行新增，1183 行刪除
 
-#### AI 內容最佳化
-- `4c8aaff` - 最佳化內容管理器並增強服務定位器
-  - ContextManager 內容管理器精簡最佳化
+#### AI 上下文最佳化
+- `4c8aaff` - 最佳化上下文管理器並增強服務定位器
+  - ContextManager 上下文管理器精簡最佳化
   - ServiceLocator 服務定位器增強（36 行新增）
   - ToolManager 工具管理器增強（34 行新增）
   - DashScopeClient 和 VolcengineArkClient 用戶端改進
@@ -680,7 +730,7 @@
   - 14 個檔案變更，160 行新增，1 行刪除
 
 #### AI 最佳化
-- `147f8f4` - 簡化內容記憶提示文字
+- `147f8f4` - 簡化上下文記憶提示文字
   - ContextManager 最佳化 AI 提示詞
   - 1 個檔案變更，1 行新增，1 行刪除
 
@@ -861,7 +911,7 @@
 
 #### SiliconLife.Fast 高效能版本
 - `54a0307` - 新增 SiliconLife.Fast 專案並完成編譯修復
-  - 完整的 Windows 表單應用程式入口點
+  - 完整的 Windows 表單應用程式進入點
   - 系統匣支援（NotifyIcon）
   - 移植全部 Web UI 控制器（20+ 個）
   - 移植全部 Web 檢視元件
@@ -1231,7 +1281,7 @@
 - `c933fd8` - 更新在地化、定時器系統、Web 檢視並新增工具
   - 更好的在地化管理器
   - 定時任務的排程系統
-  - AI 設定和內容管理
+  - AI 設定和上下文管理
   - 支援 32 種日曆類型的日曆工具
   - 用於日曆 API 的 Web 控制器
   - 任務管理工具
@@ -1317,7 +1367,7 @@
 ### 2026-04-10
 
 - `4962924` - 增強 WebSocket 處理常式、聊天檢視和信使互動
-  - 內容管理器改進
+  - 上下文管理器改進
   - 聊天系統增強
   - 信使提供者介面更新
   - WebUI 提供者重新設計
@@ -1331,7 +1381,7 @@
 - `f9302bf` - 增強信使提供者介面、聊天系統和 Web UI 互動
   - 信使提供者介面擴充
   - 聊天訊息和系統改進
-  - 內容管理器最佳化
+  - 上下文管理器最佳化
   - 預設矽基生命體增強
   - Web UI 聊天檢視改進
   - WebSocket 處理常式更新
@@ -1350,7 +1400,7 @@
 ### 2026-04-05
 
 - `41e97fb` - 更新多個核心模組和 Web 控制器
-  - 內容管理器改進
+  - 上下文管理器改進
   - 聊天系統和會話管理
   - 服務定位器重新設計
   - 矽基生命體基底類別和管理器更新

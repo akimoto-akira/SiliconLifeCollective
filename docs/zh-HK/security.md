@@ -33,7 +33,7 @@
 | 結果 | 行為 |
 |--------|----------|
 | **Allowed（允許）** | 操作立即進行 |
-| **Denied（拒絕）** | 操作被阻止，記錄審計日誌 |
+| **Denied（拒絕）** | 操作被阻止，記錄稽核日誌 |
 | **AskUser（詢問使用者）** | 操作暫停，需要使用者確認 |
 
 ### 特殊角色：矽基主理人
@@ -42,7 +42,7 @@
 
 ### 私有權限管理器
 
-每個矽基生命（物件）都有自己的**私有 PermissionManager** 實例。權限狀態不在生命體之間共享。
+每個矽基生命體都有自己的**私有 PermissionManager** 實例。權限狀態不在生命體之間共享。
 
 ---
 
@@ -110,7 +110,7 @@
 
 - 請求按類型路由到相應的執行器。
 - 支援優先級排隊。
-- 每個請求的超時控制。
+- 每個請求的逾時控制。
 
 ### 權限驗證的執行緒鎖定
 
@@ -121,11 +121,11 @@
 3. 如果回呼回傳詢問使用者，執行器執行緒**保持鎖定**等待使用者回應。
 4. 生命體只看到最終結果（成功或拒絕） —— 它永遠不會看到中間的「待處理」或「等待」狀態。
 5. 只有矽基主理人會觸發真正的使用者提示。普通生命體同步查詢全域 ACL 而不阻塞。
-6. 超時時，請求被視為拒絕，執行緒鎖被釋放。
+6. 逾時時，請求被視為拒絕，執行緒鎖被釋放。
 
 ### 執行器類型
 
-| 執行器 | 範圍 | 預設超時 |
+| 執行器 | 範圍 | 預設逾時 |
 |----------|-------|-----------------|
 | `DiskExecutor` | 檔案讀/寫、目錄操作 | 30 秒 |
 | `NetworkExecutor` | HTTP 請求、WebSocket 連線 | 60 秒 |
@@ -212,10 +212,10 @@ Web 前端立即顯示**互動式卡片**，顯示：
 3. 使用者必須回覆準確的允許代碼才能授權。任何其他回覆被視為拒絕。
 4. 代碼是單次使用的，以防止重放攻擊。
 
-### 超時
+### 逾時
 
-- 為所有詢問使用者請求設定超時。
-- 超時時，請求被視為**拒絕**，執行器執行緒鎖被釋放。
+- 為所有詢問使用者請求設定逾時。
+- 逾時時，請求被視為**拒絕**，執行器執行緒鎖被釋放。
 
 ---
 
@@ -225,7 +225,7 @@ Web 前端立即顯示**互動式卡片**，顯示：
 
 ### 第 1 層：編譯時引用控制（主要防禦）
 
-- 編譯器只獲得**允許的組件引用列表**。
+- 編譯器只取得**允許的組件引用列表**。
 - **允許**：`System.Runtime`、`System.Private.CoreLib`、專案組件（ITool 介面等）
 - **阻止**：`System.IO`、`System.Reflection`、`System.Runtime.InteropServices` 等
 - 如果程式碼引用了被阻止的組件，**編譯器本身拒絕**程式碼。
@@ -239,7 +239,7 @@ Web 前端立即顯示**互動式卡片**，顯示：
 
 ### 繼承約束
 
-所有自訂矽基生命（物件）類**必須**繼承 `SiliconBeingBase`。編譯器在類型級別強制執行此約束。
+所有自訂矽基生命體類**必須**繼承 `SiliconBeingBase`。編譯器在類型級別強制執行此約束。
 
 ### 加密儲存
 
@@ -253,7 +253,7 @@ Web 前端立即顯示**互動式卡片**，顯示：
 
 替換過程是原子的：
 
-1. 在記憶體中編譯新程式碼 → 獲取 `Type`。
+1. 在記憶體中編譯新程式碼 → 取得 `Type`。
 2. 從 `Type` 建立新實例。
 3. 從舊實例遷移狀態到新實例。
 4. 交換引用。
@@ -272,9 +272,9 @@ Web 前端立即顯示**互動式卡片**，顯示：
 - **預設**：指向內建預設權限函式。
 - **動態編譯後**：被生命體的自訂權限函式覆蓋。
 - **二選一**：任何時候只有一個回呼處於活動狀態。
-- **編譯失敗**：不影響當前回呼 —— 預設或上次成功的自訂函式保持有效。
+- **編譯失敗**：不影響目前回呼 —— 預設或上次成功的自訂函式保持有效。
 
-### 回呼簽名
+### 回呼簽章
 
 ```
 PermissionResult Callback(PermissionType type, string resourcePath, Guid callerId)
@@ -284,7 +284,7 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 
 ---
 
-## 審計日誌
+## 稽核日誌
 
 所有權限決策都被記錄：
 
@@ -299,14 +299,14 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 
 ---
 
-## Token 使用審計
+## Token 使用稽核
 
 `TokenUsageAuditManager` 提供與安全性相關的 AI token 消耗追蹤：
 
 - **每次請求記錄** —— 每次 AI 呼叫記錄生命體 ID、模型、提示詞 token、補全 token 和時間戳。
 - **異常檢測** —— 異常的 token 消耗模式可能表明提示詞注入或資源濫用。
 - **僅主理人存取** —— `TokenAuditTool`（標記為 `[SiliconManagerOnly]`）允許主理人查詢和彙總 token 使用。
-- ** Web 儀表板** —— `UsageController` 提供基於瀏覽器的儀表板，帶趨勢圖和資料匯出。
+- **Web 儀表板** —— `UsageController` 提供基於瀏覽器的儀表板，帶趨勢圖和資料匯出。
 - **持久化儲存** —— 記錄透過 `ITimeStorage` 儲存，用於時間序列查詢和長期分析。
 
 ---
@@ -322,7 +322,7 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 1. **可宣告能力** — 外掛程式透過 `[PluginCapability]` 屬性宣告所需能力：
    - `Network` — 網路存取（允許引用 `System.Net.Http`、`System.Net.WebSockets`、`System.Net.Sockets`）
    - `FileIO` — 檔案讀寫（允許引用 `System.IO`）
-   - `Process` — 行程管理
+   - `Process` — 處理程序管理
    - `AI` — AI 呼叫
 
 2. **不可宣告能力** — 以下能力始終被阻止：
@@ -356,12 +356,12 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 
 ## 工具權限安全
 
-工具權限系統提供了額外的安全層，控制矽基生命（物件）可以使用哪些工具操作：
+工具權限系統提供了額外的安全層，控制矽基生命體可以使用哪些工具操作：
 
 ### 兩級權限隔離
 
-1. **矽基生命（物件）級別** — 每個矽基生命（物件）有獨立的工具權限設定
-2. **專案級別** — 專案空間內的工具權限獨立於矽基生命（物件）級別，實現專案間的權限隔離
+1. **矽基生命體級別** — 每個矽基生命體有獨立的工具權限設定
+2. **專案級別** — 專案空間內的工具權限獨立於矽基生命體級別，實作專案間的權限隔離
 
 ### 權限模板
 
@@ -376,4 +376,83 @@ PermissionResult Callback(PermissionType type, string resourcePath, Guid callerI
 - **預設拒絕** — 未明確允許的工具操作預設被拒絕
 - **操作粒度** — 每個工具的每個操作獨立控制（如 `network:get` 允許但 `network:post` 拒絕）
 - **主理人管理** — 工具權限只能由矽基主理人設定
-- **審計追蹤** — 工具權限變更記錄在審計日誌中
+- **稽核追蹤** — 工具權限變更記錄在稽核日誌中
+
+---
+
+## 技能安全
+
+技能系統複用工具權限體系，並提供多層護欄：
+
+### 執行權限
+
+- 技能 id 作為工具名，以 `execute` 動作納入 `ToolActionPermissionConfig` 權限矩陣
+- 被停用的技能不會出現在 AI 可見的工具定義中（Schema 層過濾 + 執行時複核雙重保障）
+- 主理人始終可執行；普通生命體需 `IsActionAllowed(skillId, "execute")`
+
+### 工具白名單與權限聯集
+
+- 技能執行期間僅允許 `ToolWhitelist` 內的工具（空列表 = 繼承生命體全部工具）
+- 技能的動作限制與生命體權限**取嚴格側聯集**（`MergePermissions`）：技能只能進一步收窄權限，永遠不能放權
+- 白名單外的工具呼叫直接失敗（`Tool not in whitelist`）
+
+### 資源消耗護欄
+
+- **全域開關**：`SkillEnabled` 一鍵停用整個技能系統
+- **數量配額**：每個生命體自訂技能數受 `MaxCustomSkillsPerBeing`（預設 50）限制
+- **輪數鉗制**：`maxToolRound = Min(技能宣告值, GlobalMaxToolRound 預設 10)`，防止失控循環
+- **逾時鉗制**：`timeout = Min(技能宣告值, GlobalSkillTimeoutSeconds 預設 300s)`
+- **遞迴防護**：技能執行中不能再呼叫自身
+
+### 修改權限
+
+- 主理人可修改所有技能；普通生命體僅能修改來源為 `Being`/`User` 的技能
+- 元資料自動補全只填充缺失欄位，使用者提供的欄位永不被 AI 覆蓋
+
+---
+
+## MCP 安全
+
+MCP 整合遵循「使用者主權 + 權限一致」原則：
+
+### 使用者主權
+
+- MCP 伺服器的新增、刪除、啟停、重連**只能由使用者透過 Web UI**（/mcp 或設定頁）完成
+- AI 側的 `mcp` 工具是唯讀查詢（status/list_servers/list_tools），無法修改伺服器列表
+- `McpEnabled` 全域開關可一鍵切斷所有外部工具
+
+### 工具隔離與權限
+
+- 包裝工具以 `mcp_{serverId}_{toolName}` 命名，與內建/外掛程式工具命名空間隔離
+- 每個包裝工具自動宣告單一 `execute` 動作，納入兩級工具權限矩陣，可按生命體/專案逐個停用
+- 停用伺服器後其工具立即從所有生命體註銷
+
+### 傳輸與處理程序邊界
+
+- `stdio` 伺服器以子處理程序執行，僅繼承顯式設定的環境變數（`env` 欄位）
+- `http` 伺服器透過設定的端點通訊，連線失敗自動進入 error 狀態並暴露 `lastError`
+
+---
+
+## IM 金鑰安全
+
+### 環境變數佔位符
+
+IM 平台設定值支援 `${ENV_VAR}` 佔位符（如 `"${FEISHU_APP_SECRET}"`）：
+
+- `ConfigSecretResolver` 在**深拷貝副本**上解析佔位符，原始 `config.json` 始終保持佔位符原樣
+- 後續 `SaveConfig` 不會把解析後的明文金鑰寫回磁碟
+- 支援整值佔位符與值內嵌佔位符（如 `prefix-${VAR}`）
+
+### OAuth 授權安全
+
+- **state 防 CSRF**：16 位元組加密隨機數，回呼時嚴格校驗
+- **5 分鐘逾時**：授權工作階段逾時自動作廢，舊工作階段被覆蓋時立即取消
+- **權杖儲存**：accessToken/refreshToken/tokenExpiresAt 寫回平台設定並持久化，`authMode` 標記為 `oauth`
+- 回呼 URL 支援 `redirectBaseUrl` 設定（公網回呼場景）
+
+### 訊息安全
+
+- 飛書：簽章驗證（`X-Lark-Signature`，SHA256）+ AES-256-CBC 事件解密 + 事件去重（10 分鐘視窗）
+- 企業微信：WXBizMsgCrypt 加解密與簽章驗證
+- 釘釘：Stream 模式走加密 WebSocket；HTTP 模式回呼校驗

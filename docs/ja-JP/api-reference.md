@@ -637,6 +637,38 @@ AI 設定エディタインターフェースを返します。
 
 利用可能な AI クライアントタイプとその動的オプション（利用可能なモデル、リージョンなど）を返します。
 
+### IM プラットフォームオプションを取得
+
+**GET** `/config/imoptions`
+
+IM プラットフォームのメタデータを返します（設定ウィザードがフォームを動的にレンダリングするために使用）：
+
+```json
+{
+  "success": true,
+  "platforms": [
+    {
+      "value": "feishu",
+      "display": "Feishu",
+      "authModes": ["manual", "oauth"],
+      "needsPublicCallback": false,
+      "help": "...",
+      "helpUrl": "https://open.feishu.cn/app",
+      "fields": [
+        { "key": "appId", "label": "App ID", "type": "text", "required": true },
+        { "key": "appSecret", "label": "App Secret", "type": "password", "required": true, "isSecret": true }
+      ]
+    }
+  ]
+}
+```
+
+### 設定を参照
+
+**GET** `/config/browse`
+
+設定項目の参照データを返します（設定インターフェースのグループ表示に使用）。
+
 ---
 
 ## メモリシステム
@@ -1209,6 +1241,230 @@ AI 設定エディタインターフェースを返します。
 
 ---
 
+## スキル管理
+
+### スキル管理ページ
+
+**GET** `/skill` または **GET** `/skill/index`
+
+クエリパラメータ：`beingId` — ビーイング ID（必須）
+
+指定されたシリコンビーイングのスキル管理ページ（スキルリスト + Markdown エディタ）を返します。
+
+### スキルリストを取得
+
+**GET** `/api/skills/list`
+
+クエリパラメータ：`beingId` — ビーイング ID（必須）
+
+ビーイングのすべてのスキル（id、description、version、tags、source、triggerMode、toolWhitelist、maxToolRound、timeoutSeconds、parameterCount）、および統計情報（スキル総数 / カスタムスキル数 / クォータ上限）を返します。
+
+### スキル Markdown を取得
+
+**GET** `/api/skills/get-md`
+
+クエリパラメータ：`beingId`、`skillId`
+
+指定されたスキルの Markdown テキスト（YAML フロントメタデータ + プロンプト本文）を返します。
+
+### スキル Markdown を保存
+
+**POST** `/api/skills/update-md?beingId={beingId}`
+
+リクエストボディ（`application/json`）：
+
+```json
+{
+  "markdown": "---\nid: my_skill\n...\n---\n\n提示词正文",
+  "skillId": "my_skill"
+}
+```
+
+Markdown でスキルを更新または新規作成します（upsert セマンティクス）。欠落しているメタデータは AI によって自動補完されます。Web UI 経由で保存されたスキルの `Source` は `User` とマークされます。クォータ `MaxCustomSkillsPerBeing` の制限を受けます。
+
+### スキルをインポート（JSON）
+
+**POST** `/api/skills/import?beingId={beingId}`
+
+リクエストボディ：`{ "json": "<スキル定義 JSON>" }`
+
+JSON からスキルをインポートします。同じくクォータ制限を受けます。
+
+### スキルをインポート（Markdown）
+
+**POST** `/api/skills/import-md?beingId={beingId}`
+
+リクエストボディ：`{ "markdown": "<Markdown テキスト>" }`
+
+Markdown から新規スキルをインポートします。欠落しているメタデータは AI によって自動補完されます。
+
+### スキルを削除
+
+**POST** `/api/skills/delete?beingId={beingId}`
+
+リクエストボディ：`{ "skillId": "my_skill" }`
+
+スキルを削除します（対応する `.md` および `.json` 永続化ファイルも同時に削除されます）。
+
+### スキルをエクスポート（JSON）
+
+**GET** `/api/skills/export?beingId={beingId}&skillId={skillId}`
+
+スキル定義を JSON 添付ファイルとしてダウンロードします（`{id}.json`）。
+
+### スキルをエクスポート（Markdown）
+
+**GET** `/api/skills/export-md?beingId={beingId}&skillId={skillId}`
+
+スキルを Markdown 添付ファイルとしてダウンロードします（`{id}.md`）。
+
+### スキルのテスト実行
+
+**POST** `/api/skills/test?beingId={beingId}`
+
+リクエストボディ：
+
+```json
+{
+  "skillId": "my_skill",
+  "parametersJson": "{ \"topic\": \"AI 新闻\" }"
+}
+```
+
+指定されたパラメータでスキルを一度実行し、`ToolResult`（AI 実行ラウンド数と最終出力を含む）を返します。
+
+---
+
+## MCP 管理
+
+### MCP 管理ページ
+
+**GET** `/mcp`
+
+クエリパラメータ：`beingId` — ビーイング ID（省略可能、該当ビーイングが参照可能な MCP ツールを表示するために使用）
+
+MCP サーバー管理ページを返します。
+
+### サーバーリストを取得
+
+**GET** `/api/mcp/list-servers`
+
+設定済みのすべての MCP サーバーの状態を返します：
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "filesystem",
+      "name": "Filesystem",
+      "transport": "stdio",
+      "state": "connected",
+      "enabled": true,
+      "toolCount": 8,
+      "endpoint": null,
+      "lastError": null
+    }
+  ],
+  "mcpEnabled": true,
+  "connected": 1,
+  "toolTotal": 8
+}
+```
+
+`state` の値：`connected` / `disconnected` / `connecting` / `error`。
+
+### サーバーツールリストを取得
+
+**GET** `/api/mcp/list-tools?serverId={serverId}`
+
+指定されたサーバーが提供するツール（`name` はプレフィックス付きの完全名 `mcp_{serverId}_{toolName}`、`description`、`schema`）を返します。サーバーが未接続の場合はエラーを返します。
+
+### サーバーを追加
+
+**POST** `/api/mcp/add-server`
+
+リクエストボディ（`McpServerConfig`）：
+
+```json
+{
+  "id": "filesystem",
+  "name": "Filesystem",
+  "transport": "stdio",
+  "command": "npx",
+  "arguments": ["-y", "@modelcontextprotocol/server-filesystem", "/data"],
+  "env": {},
+  "endpoint": null,
+  "enabled": true
+}
+```
+
+`transport` は `stdio`（ローカルプロセス：`command` + `arguments`）と `http`（リモートエンドポイント：`endpoint`）をサポートします。サーバー ID には小文字、数字、アンダースコアのみ使用できます。追加後、すぐに接続し、すべてのシリコンビーイングに同期されます。
+
+### サーバーを有効化/無効化
+
+**POST** `/api/mcp/toggle`
+
+リクエストボディ：`{ "serverId": "filesystem", "enabled": true }`
+
+### サーバーを削除
+
+**POST** `/api/mcp/remove-server`
+
+リクエストボディ：`{ "serverId": "filesystem" }`
+
+サーバー設定を削除し、すべてのビーイングからそのツールを登録解除します。
+
+### サーバーを再接続
+
+**POST** `/api/mcp/reconnect`
+
+リクエストボディ：`{ "serverId": "filesystem" }`
+
+強制的に切断して再接続し、ツールリストを更新します。
+
+### ツール呼び出しをテスト
+
+**POST** `/api/mcp/test-tool`
+
+リクエストボディ：
+
+```json
+{
+  "serverId": "filesystem",
+  "toolName": "read_file",
+  "argumentsJson": "{ \"path\": \"/data/hello.txt\" }"
+}
+```
+
+MCP サーバーのツールを直接呼び出します（AI を介さず）、接続性を検証するために使用します。
+
+---
+
+## IM プラットフォーム OAuth 認証
+
+### 認証を開始
+
+**GET** `/im/{platform}/authorize`
+
+パスパラメータ：`platform` — IM プラットフォーム識別子（例：`feishu`）
+
+CSRF 対策のランダム `state` を生成し、5 分間有効な認証セッションを登録し、認証 URL を返してシステムのデフォルトブラウザを自動的に開きます。同じプラットフォームで重複して開始すると、古いセッションが上書きされます。
+
+### 認証コールバック
+
+**GET** `/im/{platform}/callback?code={code}&state={state}`
+
+IM プラットフォームからのリダイレクトによって呼び出されます。`state` を検証した後、認可コードをアクセストークンと交換し、`accessToken`、`refreshToken`、`tokenExpiresAt`、`authMode=oauth` を該当プラットフォームの設定に書き戻して永続化し、最後に認証結果のランディングページ（成功/失敗）をレンダリングします。
+
+### 認証状態を照会
+
+**GET** `/im/{platform}/status`
+
+`{ platform, status, tokenExpiresAt }` を返します。`status` の値：`pending` / `success` / `failed` / `timeout` / `none`。フロントエンドは主に SSE イベント `im_auth_status` でステータス通知を受信し、このインターフェースはポーリングのフォールバックとして使用されます。
+
+---
+
 ## ヘルプドキュメントシステム
 
 ### ヘルプページ
@@ -1364,6 +1620,20 @@ eventSource.onmessage = (event) => {
       break;
   }
 };
+```
+
+### IM 認証状態イベント
+
+IM プラットフォーム OAuth 認証ウィザードは、共有 SSE 接続を通じてステータスをプッシュします（イベント名 `im_auth_status`）：
+
+```javascript
+eventSource.addEventListener('im_auth_status', (event) => {
+  const data = JSON.parse(event.data);
+  // data.platform — プラットフォーム識別子（feishu / wecom / dingtalk）
+  // data.status  — pending / success / failed / timeout
+  // data.message — 追加説明
+  updateAuthStatus(data.platform, data.status);
+});
 ```
 
 ---

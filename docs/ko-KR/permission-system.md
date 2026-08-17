@@ -313,6 +313,42 @@ Web UI를 통해 툴 퍼미션 관리:
 | `/api/projects/{id}/tool-permissions` | GET | 프로젝트 툴 퍼미션 조회 |
 | `/api/projects/{id}/tool-permissions` | PUT | 프로젝트 툴 퍼미션 업데이트 |
 
+### 스킬 액션 권한
+
+스킬은 도구 액션 권한 메커니즘을 재사용: 스킬 id가 도구 이름으로 사용되고, 액션은 `execute`.
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "daily_news_digest:execute": "denied",
+    "code_review:execute": "allowed"
+  }
+}
+```
+
+- 비활성화된 스킬은 AI에게 보이는 도구 정의에 나타나지 않음(AI가 전혀 "볼 수" 없음)
+- 스킬 실행 시 런타임 재검증이 있으며, 오래된 스키마도 우회할 수 없음
+- 스킬 내부 도구 권한 = 비잉 권한 ∪ 스킬 자체 제한(제한 측의 교집합, 좁히기만 가능하고 확장 불가)
+
+### MCP 래핑 도구 액션 권한
+
+MCP 서버가 주입하는 각 래핑 도구(`mcp_{serverId}_{toolName}`)는 단일 `execute` 액션을 자동 선언:
+
+```json
+{
+  "beingId": "being-uuid",
+  "permissions": {
+    "mcp_filesystem_read_file:execute": "denied",
+    "mcp_github_create_issue:execute": "allowed"
+  }
+}
+```
+
+- 비잉 또는 프로젝트별로 외부 도구의 가용성을 정밀하게 제어 가능
+- 서버의 모든 `execute` 액션이 거부되면, 해당 도구는 AI에게 보이는 스키마에서 전체 제거
+- 서버 비활성화/삭제(Web UI 조작) 시 모든 도구가 즉시 등록 해제
+
 ---
 
 ## 모범 사례

@@ -121,6 +121,14 @@ Commencez avec un assistant simple. Au fur et à mesure que vous découvrez ce q
 
 Étendez les fonctionnalités avec des plugins — des outils et capacités construits par la communauté faciles à ajouter. Chaque plugin s'exécute dans un Sandbox de sécurité, garantissant la sécurité du système.
 
+### Assistants qui apprennent de nouvelles compétences
+
+Vos assistants peuvent consolider les flux de travail fréquents en **compétences** — une description en langage naturel plus une orchestration d'outils, qui leur permet d'accomplir des tâches similaires de manière fiable et répétable. Les compétences peuvent s'exécuter automatiquement à des horaires programmés ("chaque matin à 9h, donne-moi un résumé des actualités tech") et évoluent au fil du temps vers des versions plus performantes.
+
+### Connexion au monde des outils externes
+
+Prise en charge de MCP (Model Context Protocol) — connectez des serveurs d'outils externes tels que des systèmes de fichiers, des bases de données, des moteurs de recherche, et votre assistant acquiert immédiatement de nouvelles capacités sans écrire une seule ligne de code. Toutes les connexions sont sous votre contrôle : l'assistant ne peut utiliser que les outils que vous avez explicitement activés.
+
 ### Choix de double version
 
 - **Version Default** : Application console légère, adaptée au développement/debugging et aux environnements à ressources limitées

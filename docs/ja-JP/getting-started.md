@@ -31,18 +31,18 @@
 - **.NET 9 SDK** - [ダウンロード](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **Git** - [ダウンロード](https://git-scm.com/)
 - **Ollama**（オプション、ローカル AI 用） - [ダウンロード](https://ollama.com/)
-- **百炼 API キー**（オプション、クラウド AI 用） - [申請](https://bailian.console.aliyun.com/)
-- **火山引擎 Ark API キー**（オプション、クラウド AI 用） - [申請](https://console.volcengine.com/ark)
+- **Bailian API キー**（オプション、クラウド AI 用） - [申請](https://bailian.console.aliyun.com/)
+- **Volcengine Ark API キー**（オプション、クラウド AI 用） - [申請](https://console.volcengine.com/ark)
 - **Herdsman**（オプション、ローカル/クラウド推論エンジン） - 認証不要、OpenAI API 形式互換
 - **Meituan LongCat API キー**（オプション、クラウド AI 用） - API キー認証
 - **Qiniu Cloud AI API キー**（オプション、クラウド AI 用） - API キー認証
 - **DeepSeek API キー**（オプション、クラウド AI 用） - [申請](https://platform.deepseek.com/)
-- **智谱AI API キー**（オプション、クラウド AI 用） - [申請](https://open.bigmodel.cn/)
-- **百度千帆 API キー**（オプション、クラウド AI 用） - [申請](https://qianfan.baidubce.com/)
-- **騰訊混元 API キー**（オプション、クラウド AI 用） - [申請](https://cloud.tencent.com/product/hunyuan)
+- **Zhipu AI API キー**（オプション、クラウド AI 用） - [申請](https://open.bigmodel.cn/)
+- **Baidu Qianfan API キー**（オプション、クラウド AI 用） - [申請](https://qianfan.baidubce.com/)
+- **Tencent Hunyuan API キー**（オプション、クラウド AI 用） - [申請](https://cloud.tencent.com/product/hunyuan)
 - **MiniMax API キー**（オプション、クラウド AI 用） - [申請](https://platform.minimaxi.com/)
-- **月之暗面 API キー**（オプション、クラウド AI 用） - [申請](https://platform.moonshot.cn/)
-- **硅基流動 API キー**（オプション、クラウド AI 用） - [申請](https://cloud.siliconflow.cn/)
+- **Moonshot API キー**（オプション、クラウド AI 用） - [申請](https://platform.moonshot.cn/)
+- **SiliconFlow API キー**（オプション、クラウド AI 用） - [申請](https://cloud.siliconflow.cn/)
 
 ## クイックスタート
 
@@ -76,7 +76,7 @@ dotnet build
 }
 ```
 
-#### オプション B：百炼（クラウド）
+#### オプション B：Bailian（クラウド）
 
 ```json
 {
@@ -92,7 +92,7 @@ dotnet build
 
 > **利用可能なリージョン**：`beijing`（北京）、`virginia`（バージニア）、`singapore`（シンガポール）、`hongkong`（香港）、`frankfurt`（フランクフルト）
 
-#### オプション C：火山引擎 Ark（クラウド）
+#### オプション C：Volcengine Ark（クラウド）
 
 ```json
 {
@@ -106,7 +106,7 @@ dotnet build
 }
 ```
 
-> **注意**：火山引擎 Ark の Model パラメータには、モデル名ではなく推論エンドポイント ID（例：`ep-20241212123456-abcde`）を使用します。
+> **注意**：Volcengine Ark の Model パラメータには、モデル名ではなく推論エンドポイント ID（例：`ep-20241212123456-abcde`）を使用します。
 
 #### オプション D：Herdsman（ローカル/クラウド）
 
@@ -167,7 +167,7 @@ dotnet build
 
 > **特徴**：思考モード（thinking）対応、1M コンテキストウィンドウ。`deepseek-reasoner` モデルで推論コンテンツを出力可能。
 
-#### オプション H：智谱AI GLM（クラウド）
+#### オプション H：Zhipu AI GLM（クラウド）
 
 ```json
 {
@@ -183,7 +183,7 @@ dotnet build
 
 > **特徴**：思考モード対応、モデル別ビジョン対応、1M コンテキストウィンドウ。
 
-#### オプション I：百度千帆（クラウド）
+#### オプション I：Baidu Qianfan（クラウド）
 
 ```json
 {
@@ -199,7 +199,7 @@ dotnet build
 
 > **特徴**：131K コンテキストウィンドウ、モデル別ビジョン対応。
 
-#### オプション J：騰訊混元（クラウド）
+#### オプション J：Tencent Hunyuan（クラウド）
 
 ```json
 {
@@ -229,7 +229,7 @@ dotnet build
 
 > **特徴**：国内/国際エンドポイント自動選択（`endpoint` に `international` を指定で国際エンドポイント）、1M コンテキストウィンドウ。
 
-#### オプション L：月之暗面 Kimi（クラウド）
+#### オプション L：Moonshot Kimi（クラウド）
 
 ```json
 {
@@ -245,7 +245,7 @@ dotnet build
 
 > **特徴**：思考モード対応、262K コンテキストウィンドウ。
 
-#### オプション M：硅基流動 SiliconFlow（クラウド）
+#### オプション M：SiliconFlow（クラウド）
 
 ```json
 {
@@ -406,7 +406,7 @@ SiliconLifeCollective/
 
 ## サポートが必要ですか？
 
-- 📖 [ヘルプドキュメントシステム](web-ui-guide.md#帮助文档系统新增)（多言語サポート）を確認
+- 📖 [ヘルプドキュメントシステム](web-ui-guide.md#ヘルプドキュメントシステム新規)（多言語サポート）を確認
 - 📚 [完全なドキュメント](docs/)を読む
 - 🐛 [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues) で問題を報告
 - 💬 コミュニティディスカッションに参加

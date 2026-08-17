@@ -121,6 +121,14 @@ Beginnen Sie mit einem einfachen Assistenten. Wenn Sie entdecken, was möglich i
 
 Erweitern Sie die Funktionalität durch Plugins — von der Community erstellte Werkzeuge und Fähigkeiten, die einfach hinzugefügt werden können. Jedes Plugin läuft in einem sicheren Sandkasten und gewährleistet die Systemsicherheit.
 
+### Ein Assistent, der neue Fähigkeiten lernt
+
+Ihr Assistent kann häufige Workflows in **Fähigkeiten** verwandeln — eine natürlichsprachliche Beschreibung plus Werkzeugorchestrierung, und sie können ähnliche Aufgaben wiederholt und zuverlässig erledigen. Fähigkeiten können nach Zeitplan ausgeführt werden ("jeden Morgen um 9 Uhr eine Tech-News-Zusammenfassung"), und entwickeln sich im Laufe der Zeit zu geschickteren Versionen.
+
+### Verbinden Sie sich mit der externen Werkzeugwelt
+
+Unterstützt MCP (Model Context Protocol) — verbinden Sie sich mit externen Werkzeugservern wie Dateisystemen, Datenbanken und Suchmaschinen. Ihr Assistent erhält sofort neue Fähigkeiten, ohne dass Sie eine Zeile Code schreiben. Alle Verbindungen stehen unter Ihrer Kontrolle; der Assistent kann nur Werkzeuge verwenden, die Sie explizit aktivieren.
+
 ### Dual-Version-Auswahl
 
 - **Default-Version**: Leichte Konsolenanwendung, geeignet für Entwicklung, Debugging und ressourcenbeschränkte Umgebungen

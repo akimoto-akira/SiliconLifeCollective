@@ -121,6 +121,14 @@ Comece com um assistente simples. Quando descobrir o que é possível, crie comp
 
 Expanda as funcionalidades com plugins — ferramentas e capacidades construídas pela comunidade que podem ser adicionadas facilmente. Cada plugin corre numa sandbox segura, garantindo a segurança do sistema.
 
+### Assistente que Aprende Novas Competências
+
+O seu assistente pode consolidar fluxos de trabalho frequentes em **competências** — uma descrição em linguagem natural combinada com orquestração de ferramentas, permitindo-lhes executar tarefas semelhantes de forma repetida e fiável. As competências podem ser executadas automaticamente em horários definidos ("dá-me um resumo de notícias de tecnologia todos os dias às 9 da manhã") e evoluem para versões mais proficientes ao longo do tempo.
+
+### Ligar ao Mundo das Ferramentas Externas
+
+Suporta MCP (Protocolo de Contexto de Modelos) — ligue a servidores de ferramentas externas como sistemas de ficheiros, bases de dados, motores de busca, e o seu assistente ganha imediatamente novas capacidades sem escrever uma única linha de código. Todas as ligações são controladas por si; o assistente só pode usar as ferramentas que activou explicitamente.
+
 ### Escolha de Duas Versões
 
 - **Versão Default**: Aplicação de consola leve, adequada para depuração de desenvolvimento e ambientes com recursos limitados

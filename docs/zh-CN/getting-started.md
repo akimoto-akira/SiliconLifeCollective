@@ -188,13 +188,13 @@ dotnet build
   "AIClients": {
     "Ernie": {
       "ApiKey": "your-api-key-here",
-      "Model": "ernie-4.0-8k"
+      "Model": "ernie-5.1"
     }
   }
 }
 ```
 
-> **特点**：百度千帆平台，131,072 上下文窗口。
+> **特点**：百度千帆平台，支持 glm-5.2 / deepseek-v4 / kimi-k2.6 / ernie-5.1 等模型（1M 或 128K 上下文按模型分级）。
 
 #### 选项 J：腾讯混元（云端）
 

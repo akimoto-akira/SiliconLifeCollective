@@ -29,6 +29,24 @@
   - 3-poziomowy łańcuch weryfikacji uprawnień: Pamięć Podręczna Częstotliwości Użytkownika → Interfejs Wywołania Zwrotnego Uprawnień → (IsCurator: Obsługa Zapytań o Uprawnienia | Non-curator: Globalna ACL → domyślna odmowa)
   - Kompletny dziennik audytu rejestrujący wszystkie decyzje dotyczące uprawnień
 
+### System umiejętności
+- **Wielokrotnie użytkowane jednostki zdolności** — hermetyzacja "orchestracji narzędzi + szablonu podpowiedzi" jako deklarowane, ewoluujące, planowane umiejętności; AI wywołuje umiejętności tak jak narzędzia
+- **Podwójny tryb wyzwalania** — Manual (autonomiczna decyzja AI poprzez wywołanie funkcji) + Auto (planowanie schedule: stała pora dziennie / okresowy interwał / podzbiór cron)
+- **Priorytet Markdown** — metadane frontmatter YAML + treść podpowiedzi; przy zapisie czystego Markdown AI automatycznie uzupełnia brakujące metadane (pola użytkownika nie są nadpisywane)
+- **Gorące przeładowanie i archiwizacja wersji** — detekcja odcisku palca co 30 sekund z automatycznym wejściem w życie; każda aktualizacja jest archiwizowana w `skills/archive/{id}/{version}.md` tworząc historię ewolucji
+- **Wielokrotne zabezpieczenia** — globalny przełącznik, limity kwot (domyślnie 50/istotę), globalne limity rund i limitów czasu, biała lista narzędzi, ochrona przed rekurencją, uprawnienia akcji na poziomie umiejętności
+
+### Integracja MCP
+- **Dostęp do narzędzi zewnętrznych** — połączenie z zewnętrznymi serwerami MCP (Model Context Protocol), których narzędzia są automatycznie wstrzykiwane do wszystkich Istot Krzemowych z nazewnictwem `mcp_{serverId}_{toolName}`, bez konieczności pisania kodu
+- **Podwójny transport** — stdio (lokalny podproces) i http (zdalny punkt końcowy)
+- **Suwerenność użytkownika** — dodawanie/usuwanie/uruchamianie/zatrzymywanie serwerów wyłącznie przez Web UI, narzędzie `mcp` po stronie AI jest tylko do odczytu
+- **Spójne uprawnienia** — narzędzia opakowujące MCP są włączone do dwupoziomowej macierzy uprawnień narzędzi, można je wyłączyć per istota/projekt
+
+### Integracja komunikatorów
+- **Architektura wieloinstalacyjna** — można jednocześnie podłączyć wiele platform IM (Web UI / Feishu / WeChat Enterprise / DingTalk), każda instancja z niezależnym uruchamianiem/zatrzymywaniem, zagregowany routing wiadomości
+- **Kreator autoryzacji OAuth** — jednorazowa autoryzacja Feishu (state anti-CSRF, push statusu w czasie rzeczywistym via SSE), tokeny automatycznie zapisywane w konfiguracji
+- **Bezpieczeństwo kluczy** — wartości konfiguracyjne obsługują symbole zmiennych środowiskowych `${ENV_VAR}`, klucze w postaci jawnej nie są zapisywane na dysku
+
 ### AI i wiedza
 - **Obsługa wielu backendów AI**
   - **Ollama** — lokalne wdrażanie modeli, wykorzystujące natywne HTTP API

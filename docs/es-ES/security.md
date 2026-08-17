@@ -381,3 +381,82 @@ El sistema proporciona plantillas de permisos predefinidas para garantizar una l
 - **Granularidad de operaciones** — Cada operación de cada herramienta se controla independientemente (por ejemplo, `network:get` permitido pero `network:post` denegado)
 - **Gestión del Curador** — Los permisos de herramientas solo pueden ser configurados por el Curador de Silicio
 - **Pista de auditoría** — Los cambios en los permisos de herramientas se registran en el registro de auditoría
+
+---
+
+## Seguridad de las Habilidades
+
+El sistema de habilidades reutiliza el sistema de permisos de herramientas y proporciona múltiples capas de salvaguardas:
+
+### Permisos de Ejecución
+
+- El id de la habilidad se usa como nombre de herramienta, incluyéndose en la matriz de permisos `ToolActionPermissionConfig` con la acción `execute`
+- Las habilidades deshabilitadas no aparecen en las definiciones de herramientas visibles para la IA (doble garantía: filtrado a nivel de esquema + verificación en tiempo de ejecución)
+- El Curador siempre puede ejecutar; los seres ordinarios necesitan `IsActionAllowed(skillId, "execute")`
+
+### Lista Blanca de Herramientas y Unión de Permisos
+
+- Durante la ejecución de la habilidad, solo se permiten las herramientas dentro de `ToolWhitelist` (lista vacía = heredar todas las herramientas del ser)
+- Las restricciones de acciones de la habilidad y los permisos del ser **toman la unión del lado más estricto** (`MergePermissions`): la habilidad solo puede restringir aún más los permisos, nunca puede ampliarlos
+- Las llamadas a herramientas fuera de la lista blanca fallan directamente (`Tool not in whitelist`)
+
+### Salvaguardas de Consumo de Recursos
+
+- **Interruptor global**: `SkillEnabled` desactiva con un clic todo el sistema de habilidades
+- **Cuota de cantidad**: el número de habilidades personalizadas por ser está limitado por `MaxCustomSkillsPerBeing` (predeterminado 50)
+- **Limitación de rondas**: `maxToolRound = Min(valor declarado por la habilidad, GlobalMaxToolRound predeterminado 10)`, previene bucles descontrolados
+- **Limitación de tiempo de espera**: `timeout = Min(valor declarado por la habilidad, GlobalSkillTimeoutSeconds predeterminado 300s)`
+- **Protección contra recursión**: una habilidad no puede invocarse a sí misma durante su ejecución
+
+### Permisos de Modificación
+
+- El Curador puede modificar todas las habilidades; los seres ordinarios solo pueden modificar habilidades con origen `Being`/`User`
+- El completado automático de metadatos solo rellena los campos faltantes, los campos proporcionados por el usuario nunca son sobrescritos por la IA
+
+---
+
+## Seguridad MCP
+
+La integración MCP sigue el principio de "soberanía del usuario + permisos consistentes":
+
+### Soberanía del Usuario
+
+- La adición, eliminación, habilitación/deshabilitación y reconexión de servidores MCP **solo puede ser realizada por el usuario a través de la Web UI** (/mcp o página de configuración)
+- La herramienta `mcp` del lado de la IA es de solo lectura (status/list_servers/list_tools), no puede modificar la lista de servidores
+- El interruptor global `McpEnabled` puede cortar con un clic todas las herramientas externas
+
+### Aislamiento de Herramientas y Permisos
+
+- Las herramientas de envoltura se nombran como `mcp_{serverId}_{toolName}`, aisladas del espacio de nombres de las herramientas integradas/de plugins
+- Cada herramienta de envoltura declara automáticamente una única acción `execute`, incluida en la matriz de permisos de herramientas de dos niveles, que se puede deshabilitar individualmente por ser/proyecto
+- Al deshabilitar un servidor, sus herramientas se eliminan inmediatamente de todos los seres
+
+### Límites de Transporte y Proceso
+
+- Los servidores `stdio` se ejecutan como subprocesos, heredando solo las variables de entorno explícitamente configuradas (campo `env`)
+- Los servidores `http` se comunican a través del endpoint configurado; si la conexión falla, entran automáticamente en estado de error y exponen `lastError`
+
+---
+
+## Seguridad de las Claves IM
+
+### Marcadores de Posición de Variables de Entorno
+
+Los valores de configuración de las plataformas IM soportan marcadores de posición `${ENV_VAR}` (por ejemplo, `"${FEISHU_APP_SECRET}"`):
+
+- `ConfigSecretResolver` resuelve los marcadores de posición en una **copia profunda**, el `config.json` original siempre mantiene los marcadores de posición sin modificar
+- Las posteriores llamadas a `SaveConfig` no escriben las claves en texto plano resueltas de vuelta al disco
+- Soporta marcadores de posición de valor completo y marcadores de posición incrustados en el valor (como `prefix-${VAR}`)
+
+### Seguridad de Autorización OAuth
+
+- **state anti-CSRF**: número aleatorio criptográfico de 16 bytes, verificación estricta en la devolución de llamada
+- **Tiempo de espera de 5 minutos**: la sesión de autorización expira automáticamente al superar el tiempo de espera; las sesiones antiguas se cancelan inmediatamente al ser sobrescritas
+- **Almacenamiento de tokens**: accessToken/refreshToken/tokenExpiresAt se escriben en la configuración de la plataforma y se persisten, `authMode` se marca como `oauth`
+- La URL de devolución de llamada soporta la configuración `redirectBaseUrl` (escenarios de devolución de llamada pública)
+
+### Seguridad de Mensajes
+
+- Feishu: verificación de firma (`X-Lark-Signature`, SHA256) + descifrado de eventos AES-256-CBC + deduplicación de eventos (ventana de 10 minutos)
+- WeChat Enterprise: cifrado/descifrado y verificación de firma con WXBizMsgCrypt
+- DingTalk: el modo Stream usa WebSocket cifrado; el modo HTTP verifica la devolución de llamada

@@ -30,21 +30,39 @@
   - 3レベルパーミッション検証チェーン：UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: グローバルACL → デフォルト拒否)
   - すべてのパーミッション決定を記録する完全な監査ログ
 
+### スキルシステム
+- **再利用可能な能力ユニット** — 「ツールオーケストレーション + プロンプトテンプレート」を宣言可能、進化可能、スケジュール可能なスキルとしてカプセル化。AI はツールを呼び出すようにスキルを呼び出します
+- **デュアルトリガーモード** — Manual（AI 関数呼び出しで自律判断）+ Auto（schedule スケジュール：毎日定時 / 間隔周期 / cron サブセット）
+- **Markdown 優先** — YAML フロントメタデータ + プロンプト本文。純 Markdown 保存時に AI が欠落メタデータを自動補完（ユーザーフィールドは上書きされません）
+- **ホットリロードとバージョンアーカイブ** — 30 秒フィンガープリント検出で自動反映。更新のたびに `skills/archive/{id}/{version}.md` にアーカイブし進化履歴を形成
+- **多層ガードレール** — グローバルスイッチ、クォータ制限（デフォルト 50/ビーイング）、グローバルラウンド数とタイムアウト制限、ツールホワイトリスト、再帰防护、スキルレベルのアクションパーミッション
+
+### MCP 統合
+- **外部ツールアクセス** — 外部 MCP（Model Context Protocol）サーバーに接続。そのツールは `mcp_{serverId}_{toolName}` という名前で全シリコンビーイングに自動注入され、コード記述不要
+- **デュアルトランスポート** — stdio（ローカルサブプロセス）と http（リモートエンドポイント）
+- **ユーザー主権** — サーバーの追加/削除/起動/停止は Web UI のみ。AI 側の `mcp` ツールは読み取り専用
+- **パーミッション一貫性** — MCP ラップツールは 2 レベルツールパーミッションマトリクスに組み込まれ、ビーイング/プロジェクト単位で無効化可能
+
+### インスタントメッセージング統合
+- **マルチインスタンスアーキテクチャ** — 複数の IM プラットフォーム（Web UI / Feishu / WeChat Enterprise / DingTalk）を同時接続可能。各インスタンスは独立して起動/停止可能、メッセージは集約ルーティング
+- **OAuth 認証ウィザード** — Feishu ワンクリック認証（state による CSRF 防止、SSE によるリアルタイム状態プッシュ）、トークンは自動的に設定に書き戻し
+- **シークレットセキュリティ** — 設定値は `${ENV_VAR}` 環境変数プレースホルダーをサポート。平文シークレットはディスクに保存されません
+
 ### AI とナレッジ
 - **マルチ AI バックエンドサポート**
   - **Ollama** — ローカルモデルデプロイ、ネイティブ HTTP API 使用
-  - **阿里雲百炼（DashScope）** — クラウド AI サービス、OpenAI API 互換、13以上のモデルをサポート、マルチリージョンデプロイ
-  - **火山エンジン Ark（VolcengineArk）** — ByteDance クラウド AI サービス、ストリーミング/非ストリーミングモード対応、内蔵レート制御
+  - **Alibaba Cloud Bailian（DashScope）** — クラウド AI サービス、OpenAI API 互換、13以上のモデルをサポート、マルチリージョンデプロイ
+  - **Volcengine Ark** — ByteDance クラウド AI サービス、ストリーミング/非ストリーミングモード対応、内蔵レート制御
   - **Herdsman** — 認証不要の推論エンジン、OpenAI API 形式互換
   - **Meituan LongCat** — 美団独自開発大規模モデル、OpenAI API 形式互換、API キー認証
   - **Qiniu Cloud AI** — 七牛クラウド大規模モデル推論サービス、OpenAI API 形式互換、API キー認証
   - **DeepSeek** — 思考モード対応、1M コンテキスト、OpenAI API 互換
-  - **智谱AI（GLM）** — 思考モード対応、モデル別ビジョン、1M コンテキスト、OpenAI API 互換
-  - **百度千帆（Ernie）** — 131K コンテキスト、モデル別ビジョン、OpenAI API 互換
-  - **騰訊混元（Hunyuan）** — TokenHub + レガシーデュアルエンドポイント、262K コンテキスト
+  - **Zhipu AI（GLM）** — 思考モード対応、モデル別ビジョン、1M コンテキスト、OpenAI API 互換
+  - **Baidu Qianfan（ERNIE）** — 131K コンテキスト、モデル別ビジョン、OpenAI API 互換
+  - **Tencent Hunyuan** — TokenHub + レガシーデュアルエンドポイント、262K コンテキスト
   - **MiniMax** — 国内/国際エンドポイント、1M コンテキスト、OpenAI API 互換
-  - **月之暗面（Kimi/Moonshot）** — 思考モード対応、262K コンテキスト、OpenAI API 互換
-  - **硅基流動（SiliconFlow）** — 動的モデルリスト、1M コンテキスト、OpenAI API 互換
+  - **月の暗面（Kimi/Moonshot）** — 思考モード対応、262K コンテキスト、OpenAI API 互換
+  - **SiliconFlow** — 動的モデルリスト、1M コンテキスト、OpenAI API 互換
 - **32種類のカレンダーシステム** — グレゴリオ暦、農暦、イスラム暦、ヘブライ暦、日本暦、ペルシャ暦、マヤ暦、中国歴史暦法など、世界の主要暦法を網羅
 - **ナレッジネットワークシステム** — 三つ組（主体・関係・客体）ベースのナレッジグラフ、保存・検索・パス発見をサポート
 - **プロジェクトワークスペース** — プロジェクトスペース管理、プロジェクトの作成/アーカイブ/破棄、ロール割り当て、ワークノート、タスク追跡、ツールパーミッション分離をサポート
@@ -102,7 +120,7 @@
   - 7種類のスキンテーマ、自動検出と切り替えをサポート
   - ホットリロードツールによるオンライン更新と再起動をサポート → Linux で自動的にブラウザを開き Web UI にアクセス、`--no-tray` パラメータをサポート
 - **パフォーマンス向上**：ストレージ読み取りレイテンシ1000分の1、書き込みレイテンシ15000分の1、同時処理能力50倍向上
-- **ロール説明**：深く最適化された本番級実装、長期運用と実際の本番環境の首选
+- **ロール説明**：深く最適化された本番級実装、長期運用と実際の本番環境の推奨
 - **起動コマンド**：`dotnet run --project src/SiliconLife.Fast`
 
 ### バージョン比較
@@ -129,7 +147,7 @@
 | ランタイム | .NET 9 | .NET 9（Windows/macOS/Linux） |
 | プログラミング言語 | C# | C# |
 | アプリケーションタイプ | コンソールアプリケーション | デスクトップアプリケーション（Windows/macOS システムトレイ / Linux ステータスウィンドウ） |
-| AI 統合 | Ollama、阿里雲百炼、火山エンジンArk、Herdsman、LongCat、QiniuAI、DeepSeek、智谱AI、百度千帆、騰訊混元、MiniMax、月之暗面、硅基流動 | Ollama、阿里雲百炼、火山エンジンArk、Herdsman、LongCat、QiniuAI、DeepSeek、智谱AI、百度千帆、騰訊混元、MiniMax、月之暗面、硅基流動 |
+| AI 統合 | Ollama、Alibaba Cloud Bailian、Volcengine Ark、Herdsman、LongCat、QiniuAI、DeepSeek、Zhipu AI、Baidu Qianfan、Tencent Hunyuan、MiniMax、Moonshot、SiliconFlow | Ollama、Alibaba Cloud Bailian、Volcengine Ark、Herdsman、LongCat、QiniuAI、DeepSeek、Zhipu AI、Baidu Qianfan、Tencent Hunyuan、MiniMax、Moonshot、SiliconFlow |
 | データストレージ | ファイルシステム（JSON + 時間インデックスディレクトリ） | SpeedyPack（.spk フォーマット、メモリマップ + 非同期永続化） |
 | Web サーバー | HttpListener（.NET 内蔵） | HttpListener（.NET 内蔵） |
 | 動的コンパイル | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） | Roslyn（Microsoft.CodeAnalysis.CSharp 4.13.0） |
@@ -268,15 +286,15 @@ SiliconLifeCollective.sln
 - **.NET 9 SDK** — [ダウンロードリンク](https://dotnet.microsoft.com/download/dotnet/9.0)
 - **AI バックエンド**（いずれかを選択）：
   - **Ollama**：[Ollama をインストール](https://ollama.com)してモデルをプル（例：`ollama pull llama3`）
-  - **阿里雲百炼**：[百炼コンソール](https://bailian.console.aliyun.com/)から API キーを取得
-  - **火山エンジン Ark**：[火山エンジンコンソール](https://console.volcengine.com/ark)から API キーを取得
+  - **Alibaba Cloud Bailian**：[Bailian コンソール](https://bailian.console.aliyun.com/)から API キーを取得
+  - **Volcengine Ark**：[Volcengine コンソール](https://console.volcengine.com/ark)から API キーを取得
   - **DeepSeek**：[DeepSeek プラットフォーム](https://platform.deepseek.com/)から API キーを取得
-  - **智谱AI**：[智谱AI オープンプラットフォーム](https://open.bigmodel.cn/)から API キーを取得
-  - **百度千帆**：[百度千帆コンソール](https://qianfan.baidubce.com/)から API キーを取得
-  - **騰訊混元**：[騰訊混元コンソール](https://cloud.tencent.com/product/hunyuan)から API キーを取得
+  - **Zhipu AI**：[Zhipu AI オープンプラットフォーム](https://open.bigmodel.cn/)から API キーを取得
+  - **Baidu Qianfan**：[Baidu Qianfan コンソール](https://qianfan.baidubce.com/)から API キーを取得
+  - **Tencent Hunyuan**：[Tencent Hunyuan コンソール](https://cloud.tencent.com/product/hunyuan)から API キーを取得
   - **MiniMax**：[MiniMax プラットフォーム](https://platform.minimaxi.com/)から API キーを取得
-  - **月之暗面**：[月之暗面プラットフォーム](https://platform.moonshot.cn/)から API キーを取得
-  - **硅基流動**：[硅基流動クラウド](https://cloud.siliconflow.cn/)から API キーを取得
+  - **Moonshot**：[Moonshot プラットフォーム](https://platform.moonshot.cn/)から API キーを取得
+  - **SiliconFlow**：[SiliconFlow クラウド](https://cloud.siliconflow.cn/)から API キーを取得
 
 ### プロジェクトのビルド
 

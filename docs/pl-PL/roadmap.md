@@ -320,6 +320,19 @@ Każdy etap kończy się **działającym, obserwowalnym** systemem. Żaden etap 
 
 ---
 
+## Etap 11.5: System umiejętności i integracja MCP
+
+**Cel**: Warstwa abstrakcji wielokrotnie użytkowanych zdolności i integracja z ekosystemem narzędzi zewnętrznych.
+
+| # | Moduł | Opis |
+|---|--------|-------------|
+| 11.5.1 | ~~System umiejętności~~ ✅ Ukończono | Warstwa abstrakcji wielokrotnie użytkowanej orchestracji narzędzi + szablonu podpowiedzi (SkillManager, podwójny tryb wyzwalania, gorące przeładowanie, archiwizacja wersji, automatyczne uzupełnianie metadanych przez AI) |
+| 11.5.2 | ~~Integracja MCP~~ ✅ Ukończono | Integracja narzędzi zewnętrznych serwerów MCP (podwójny transport stdio/http, wstrzykiwanie nazewnictwa `mcp_{serverId}_{toolName}`, strona zarządzania Web, integracja z macierzą uprawnień) |
+
+**Dostarczane**: Strona zarządzania umiejętnościami (/skill), strona zarządzania MCP (/mcp), wbudowane narzędzia `skill` i `mcp`, dokumentacja pomocy umiejętności/MCP.
+
+---
+
 ## Etap 12: Funkcje zaawansowane
 
 **Cel**: opcjonalne funkcje zaawansowane dla rozszerzonych możliwości.

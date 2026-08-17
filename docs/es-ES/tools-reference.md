@@ -314,7 +314,33 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 11. Herramienta de Registros (LogTool)
+### 11. Herramienta de Consulta MCP (McpTool)
+
+**Nombre de la herramienta**: `mcp`
+
+**Descripción**: Consulta del estado de integración MCP (Model Context Protocol) — servidores externos conectados, las herramientas que proporcionan y cómo llamarlas. Herramienta de solo lectura: la adición/eliminación de servidores solo puede ser realizada por el usuario a través de la Web UI, la IA no puede modificar la lista de servidores.
+
+**Operaciones soportadas**:
+- `status` — Vista general global (estado de activación, número de servidores, número de herramientas)
+- `list_servers` — Listar los servidores configurados (con estado de conexión y número de herramientas)
+- `list_tools` — Listar las herramientas disponibles (con prefijo `mcp_{server}_{tool}`, descripción y esquema de parámetros; `server_id` opcional para filtrar un solo servidor)
+
+**Ejemplo de uso**:
+```json
+{
+  "action": "list_tools",
+  "server_id": "filesystem",
+  "include_schema": true
+}
+```
+
+**Herramienta wrapper MCP**: Cada herramienta proporcionada por un servidor MCP conectado se registra dinámicamente como una herramienta independiente en los Seres de Silicio, con el formato de nombrado `mcp_{serverId}_{toolName}` (ej. `mcp_filesystem_read_file`). La IA puede llamarlas directamente por nombre como herramientas ordinarias, sin pasar por esta herramienta de consulta. La herramienta wrapper presenta una única acción `execute` en la matriz de permisos y puede ser deshabilitada individualmente.
+
+**Escenario**: Todos los escenarios (`All`)
+
+---
+
+### 12. Herramienta de Registros (LogTool)
 
 **Nombre de herramienta**: `log`
 
@@ -338,7 +364,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 12. Herramienta de Memoria (MemoryTool)
+### 13. Herramienta de Memoria (MemoryTool)
 
 **Nombre de herramienta**: `memory`
 
@@ -367,7 +393,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 13. Herramienta de Red (NetworkTool)
+### 14. Herramienta de Red (NetworkTool)
 
 **Nombre de herramienta**: `network`
 
@@ -393,7 +419,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 14. Herramienta de Permisos (PermissionTool) 🔒
+### 15. Herramienta de Permisos (PermissionTool) 🔒
 
 **Nombre de herramienta**: `permission`
 
@@ -420,7 +446,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 15. Herramienta de Proyecto (ProjectTool) 🔒
+### 16. Herramienta de Proyecto (ProjectTool) 🔒
 
 **Nombre de herramienta**: `project`
 
@@ -456,7 +482,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 16. Herramienta de Tareas de Proyecto (ProjectTaskTool)
+### 17. Herramienta de Tareas de Proyecto (ProjectTaskTool)
 
 **Nombre de herramienta**: `project_task`
 
@@ -490,7 +516,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 17. Herramienta de Notas de Trabajo de Proyecto (ProjectWorkNoteTool)
+### 18. Herramienta de Notas de Trabajo de Proyecto (ProjectWorkNoteTool)
 
 **Nombre de herramienta**: `project_work_note`
 
@@ -520,7 +546,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 18. Herramienta de Trabajo de Proyecto (ProjectWorkTool) 🔒
+### 19. Herramienta de Trabajo de Proyecto (ProjectWorkTool) 🔒
 
 **Nombre de herramienta**: `project_work`
 
@@ -549,7 +575,55 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 19. Herramienta del Sistema (SystemTool)
+### 20. Herramienta de Habilidades (SkillTool)
+
+**Nombre de la herramienta**: `skill`
+
+**Descripción**: Gestión de las habilidades de los Seres de Silicio (unidad de capacidad reutilizable "orquestación de herramientas + plantilla de prompt"), soporta creación, listado, actualización, eliminación, importación y exportación. Los metadatos faltantes (id, descripción, esquema de parámetros, etc.) son completados automáticamente por la IA.
+
+**Operaciones soportadas**:
+- `create` — Crear una nueva habilidad (requiere `id` y `system_prompt`; opcionales: `description`, `parameter_schema`, `tool_whitelist`, `tags`, `max_tool_round`, `timeout`, `on_complete`, `trigger_mode`, `auto_trigger_condition`)
+- `list` — Listar todas las habilidades disponibles (con resumen)
+- `update` — Actualizar una habilidad existente mediante parámetros (requiere `skill_id`)
+- `update_from_md` — Actualizar una habilidad desde una cadena Markdown (metadatos YAML frontmatter + cuerpo del prompt)
+- `delete` — Eliminar una habilidad (requiere `skill_id`)
+- `export` — Exportar una habilidad en JSON (requiere `skill_id`)
+- `export_md` — Exportar una habilidad en Markdown (requiere `skill_id`)
+- `import` — Importar una habilidad desde JSON (requiere `json`)
+- `import_md` — Importar una habilidad desde Markdown (requiere `markdown`)
+
+**Ejemplo de uso**:
+```json
+{
+  "action": "create",
+  "id": "daily_news_digest",
+  "description": "Buscar las noticias tecnológicas de hoy y generar un resumen",
+  "system_prompt": "Utilice la herramienta network para buscar las últimas noticias sobre {topic} y genere un resumen de 500 palabras.",
+  "parameter_schema": {
+    "type": "object",
+    "properties": {
+      "topic": { "type": "string", "description": "Tema de las noticias" }
+    },
+    "required": ["topic"]
+  },
+  "tool_whitelist": ["network", "work_note"],
+  "trigger_mode": "Auto",
+  "auto_trigger_condition": "schedule",
+  "metadata": { "schedule": "0 9 * * *" }
+}
+```
+
+**Permisos de modificación**: El Curador de Silicio puede modificar todas las habilidades; los Seres ordinarios solo pueden modificar las habilidades cuyo origen es `Being` o `User` (no las habilidades integradas y de plugins).
+
+**Límite de cantidad**: El número de habilidades personalizadas por ser está limitado por la configuración `MaxCustomSkillsPerBeing` (predeterminado 50).
+
+**Escenario**: Todos los escenarios (`All`)
+
+> Para la documentación completa del sistema de habilidades (modos de activación, lista blanca, recarga en caliente, programación automática, etc.), consulte la [Guía del Ser de Silicio](silicon-being-guide.md#sistema-de-habilidades).
+
+---
+
+### 21. Herramienta del Sistema (SystemTool)
 
 **Nombre de herramienta**: `system`
 
@@ -570,7 +644,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 20. Herramienta de Tareas (TaskTool)
+### 22. Herramienta de Tareas (TaskTool)
 
 **Nombre de herramienta**: `task`
 
@@ -595,7 +669,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 21. Herramienta de Temporizadores (TimerTool)
+### 23. Herramienta de Temporizadores (TimerTool)
 
 **Nombre de herramienta**: `timer`
 
@@ -621,7 +695,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 22. Herramienta de Auditoría de Tokens (TokenAuditTool) 🔒
+### 24. Herramienta de Auditoría de Tokens (TokenAuditTool) 🔒
 
 **Nombre de herramienta**: `token_audit`
 
@@ -651,7 +725,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 23. Herramienta de Navegador WebView (WebViewBrowserTool)
+### 25. Herramienta de Navegador WebView (WebViewBrowserTool)
 
 **Nombre de herramienta**: `webview_browser`
 
@@ -692,7 +766,7 @@ Además, las herramientas marcadas con el atributo `[ChatOnly]` solo están disp
 
 ---
 
-### 24. Herramienta de Notas de Trabajo (WorkNoteTool)
+### 26. Herramienta de Notas de Trabajo (WorkNoteTool)
 
 **Nombre de herramienta**: `work_note`
 
@@ -820,6 +894,13 @@ public class AdminOnlyTool : ITool
     // Solo accesible por el Curador de Silicio
 }
 ```
+
+### Alternativa: Herramientas de Habilidad y MCP
+
+Además de escribir clases de herramientas en C#, existen dos modos de extensión sin compilación:
+
+- **Habilidad (Skill)**: Crear una combinación "orquestación de herramientas + plantilla de prompt" mediante la Web UI o la herramienta `skill`, adecuada para consolidar flujos de trabajo frecuentes en capacidades reutilizables. Consulte la [Guía del Ser de Silicio — Sistema de Habilidades](silicon-being-guide.md#sistema-de-habilidades).
+- **Servidor MCP**: Tras configurar un servidor MCP externo en la Web UI, sus herramientas se inyectan automáticamente con el formato `mcp_{serverId}_{toolName}`, sin escribir código. Consulte la [Guía Web UI — Gestión MCP](web-ui-guide.md).
 
 ## Mejores Prácticas
 

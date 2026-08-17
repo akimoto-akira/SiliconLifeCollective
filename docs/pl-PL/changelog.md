@@ -1,4 +1,4 @@
-﻿# Dziennik zmian
+# Dziennik zmian
 
 [English](../en/changelog.md) | [Deutsch](../de-DE/changelog.md) | [中文](../zh-CN/changelog.md) | [繁體中文](../zh-HK/changelog.md) | [Español](../es-ES/changelog.md) | [日本語](../ja-JP/changelog.md) | [한국어](../ko-KR/changelog.md) | [Čeština](../cs-CZ/changelog.md) | [Русский](../ru-RU/changelog.md)
 
@@ -65,6 +65,55 @@ Obie wersje współdzielą te same interfejsy i funkcjonalności, różnią się
 ---
 
 ## [Nieopublikowane]
+
+### 2026-08-17
+
+#### Nowe funkcje
+- `c7b575b` - Implementacja integracji MCP — podłączanie narzędzi zewnętrznych serwerów, zarządzanie konfiguracją i dokumentacja pomocy
+  - Dodano rdzeń MCP (SiliconLife.Core/Mcp/): McpManager zarządzanie cyklem życia serwerów, podwójny transport stdio/http, McpClientConnection hermetyzacja połączeń, pakowanie narzędzi według serwera i wstrzykiwanie do wszystkich Istot Krzemowych z nazewnictwem `mcp_{serverId}_{toolName}`
+  - Dodano stronę zarządzania Web (/mcp) i 7 endpointów API (list-servers/list-tools/add-server/toggle/remove-server/reconnect/test-tool)
+  - Dodano narzędzie zapytań McpTool (status/list_servers/list_tools, tylko do odczytu); dodawanie/usuwanie serwerów jest dostępne wyłącznie dla użytkownika przez Web UI, AI nie może modyfikować listy serwerów
+  - Strona konfiguracji obsługuje edytor tablicy serwerów MCP (dodawanie/usuwanie w wierszu w oknie modalnym)
+  - Zarejestrowano temat pomocy MCP (🔌), pełna dokumentacja pomocy w 10 językach
+  - Narzędzia opakowujące MCP są prezentowane w macierzy uprawnień jako akcja `execute`, z obsługą wyłączania według Istoty/projektu
+  - 45 plik(ów) zmienionych
+
+### 2026-08-16
+
+#### Nowe funkcje
+- `5d76c5a` - Implementacja systemu umiejętności — warstwa abstrakcji wielokrotnego użytku do orkiestracji narzędzi i szablonów podpowiedzi
+  - Dodano SkillDefinition (id/opis/schemat parametrów/szablon podpowiedzi systemowej/biała lista narzędzi/ograniczenia akcji/maksymalna liczba rund/limit czasu/akcja zakończenia/tryb wyzwalania)
+  - Dodano SkillManager: centrum rejestracji umiejętności + silnik wykonywania (pętla podrzędna AIRequest, ochrona przed rekurencją, globalne ograniczenie rund i limitu czasu)
+  - Podwójny tryb wyzwalania: Manual (wywołanie funkcji AI, umiejętność wstrzykiwana jako ToolDefinition, priorytetowy routing po stronie harmonogramu) + Auto (harmonogram schedule, obsługa `HH:mm` / `N s|m|h|d` / podzbiór cron)
+  - Przechowywanie z priorytetem Markdown (nagłówek YAML + treść podpowiedzi), czysty Markdown z automatycznym uzupełnianiem metadanych przez AI (pola użytkownika nie są nadpisywane)
+  - Gorące przeładowanie (wykrywanie odcisku palca co 30 s), archiwizacja wersji (skills/archive/), 3 wbudowane umiejętności (summarize_document/code_review/research_topic)
+  - Dodano narzędzie skill (create/list/update/update_from_md/delete/export/export_md/import/import_md)
+  - Dodano stronę zarządzania umiejętnościami (/skill) i 10 endpointów API; limit MaxCustomSkillsPerBeing (domyślnie 50)
+  - Uprawnienia: uprawnienie akcji `execute` na poziomie umiejętności, biała lista narzędzi w umiejętności i uprawnienia Istoty połączone stroną restrykcyjną
+- `b60fc68` - Aktualizacja listy modeli Qianfan i mapowania okna kontekstowego - dodano modele glm-5.2/glm-5.1/deepseek-v4-pro/deepseek-v4-flash/kimi-k2.6/ernie-5.1/qianfan-code-latest, mapowanie okna kontekstowego 1M/128K i możliwości wizyjnych
+
+### 2026-08-15
+
+#### Nowe funkcje
+- `eaa8417` - Implementacja kreatora autoryzacji OAuth platformy IM i analizy zmiennych środowiskowych kluczy konfiguracji
+  - Dodano ImOAuthController/ImOAuthService obsługujące proces autoryzacji OAuth Feishu (authorize/callback/status), z ochroną state przed CSRF, 5-minutowym limitem czasu, przesyłaniem stanu SSE
+  - Dodano IMProviderRegistry do ujednoliconego zarządzania metadanymi platformy IM (schemat pól konfiguracji/szablony endpointów OAuth/fabryka Provider)
+  - Dodano ConfigSecretResolver analizujący symbole zastępcze `${ENV_VAR}` w konfiguracji, zastępowanie z głęboką kopią bez zapisywania do oryginalnej konfiguracji
+  - Strona konfiguracji zintegrowana z kreatorem autoryzacji IM UI (obszar autoryzacji w wierszu + stan SSE w czasie rzeczywistym)
+  - Uzupełniono tłumaczenia stanu autoryzacji IM/tekstów pomocy dla 13 plików językowych
+
+### 2026-07-26
+
+#### Refaktoryzacja
+- `ffc45c2` - Refaktoryzacja platformy IM na architekturę konfiguracji wieloinstancyjnej - IMPlatforms jako lista (niezależne włączanie/wyłączanie każdej platformy), AggregateIMProvider agregujący odbiór/nadawanie wiadomości wieloplatformowych i wyścig uprawnień, edytor wieloinstancyjny na stronie konfiguracji
+
+### 2026-07-19
+
+#### Nowe funkcje
+- `9bf2103` - Speedy.Manager integracja widoku drzewa z usuwaniem wielokrotnym i eksportem wielokrotnym
+
+#### Poprawki
+- `0df0674` - Naprawiono problem z usuwaniem wielokrotnym w Speedy.Manager, gdzie usuwany był tylko pierwszy element
 
 ### 2026-07-16
 

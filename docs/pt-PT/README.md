@@ -29,6 +29,24 @@
   - Cadeia de verificação de permissões de 3 níveis: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → negação por defeito)
   - Registo de auditoria completo de todas as decisões de permissões
 
+### Sistema de Competências
+- **Unidades de capacidade reutilizáveis** — Encapsular "orquestração de ferramentas + modelo de prompt" em competências declaráveis, evolutivas e agendáveis; a IA chama competências como ferramentas normais
+- **Modo de duplo acionamento** — Manual (decisão autónoma da IA via chamada de função) + Auto (agendamento schedule: hora fixa diária / intervalo periódico / subconjunto cron)
+- **Markdown em primeiro lugar** — Metadados YAML front matter + texto do prompt; ao guardar Markdown puro, a IA completa automaticamente os metadados em falta (campos do utilizador não são sobrescritos)
+- **Recarregamento a quente e arquivo de versões** — Detecção de impressão digital a cada 30 segundos com entrada em vigor automática; cada atualização é arquivada em `skills/archive/{id}/{version}.md` formando um histórico de evolução
+- **Múltiplas barreiras de proteção** — Interruptor global, limite de quota (predefinição 50/ser), limites globais de rondas e timeout, lista branca de ferramentas, proteção contra recursão, permissões de ação ao nível de competência
+
+### Integração MCP
+- **Acesso a ferramentas externas** — Ligação a servidores MCP (Model Context Protocol) externos; as suas ferramentas são injetadas automaticamente em todos os Seres de Silício com o nome `mcp_{serverId}_{toolName}`, sem necessidade de escrever código
+- **Transporte duplo** — stdio (subprocesso local) e http (endpoint remoto)
+- **Soberania do utilizador** — Adição, remoção, arranque e paragem de servidores apenas via Web UI; a ferramenta `mcp` do lado da IA é apenas de leitura
+- **Permissões consistentes** — Ferramentas MCP embrulhadas são integradas na matriz de permissões de ferramentas de dois níveis, podendo ser desativadas por ser/projeto
+
+### Integração de Mensagens Instantâneas
+- **Arquitetura multi-instância** — Permitem ligar simultaneamente múltiplas plataformas de MI (Web UI / Feishu / WeCom / DingTalk), cada instância com arranque/paragem independente, encaminhamento agregado de mensagens
+- **Assistente de autorização OAuth** — Autorização com um clique do Feishu (state anti-CSRF, push de estado em tempo real via SSE), tokens escritos automaticamente na configuração
+- **Segurança de chaves** — Valores de configuração suportam marcadores `${ENV_VAR}` de variáveis de ambiente, chaves em texto claro não são persistidas em disco
+
 ### IA e Conhecimento
 - **Suporte para múltiplos backends de IA**
   - **Ollama** — Implantação de modelos locais, utilizando a API HTTP nativa

@@ -402,13 +402,13 @@ SiliconLifeCollective/
 │   ├── ja-JP/                       # Japanisch
 │   ├── ko-KR/                       # Koreanisch
 │   └── cs-CZ/                       # Tschechisch
-├── 总文档/                           # Anforderungen und Architekturdokumentation (Chinesisch)
+├── docs/                           # Anforderungen und Architekturdokumentation
 └── README.md                        # Projektbeschreibung
 ```
 
 ## Brauchen Sie Hilfe?
 
-- 📖 Sehen Sie das [Hilfedokumentationssystem](web-ui-guide.md#帮助文档系统新增) (mit Mehrsprachunterstützung)
+- 📖 Sehen Sie das [Hilfedokumentationssystem](web-ui-guide.md#hilfedokumentationssystem) (mit Mehrsprachunterstützung)
 - 📚 Lesen Sie die [vollständige Dokumentation](docs/)
 - 🐛 Melden Sie Probleme auf [GitHub](https://github.com/akimoto-akira/SiliconLifeCollective/issues)
 - 💬 Beteiligen Sie sich an Community-Diskussionen

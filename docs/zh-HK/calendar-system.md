@@ -113,13 +113,13 @@ SiliconLifeCollective 支援 32 種不同的日曆系統，用於日期轉換和
 public abstract class CalendarBase
 {
     public abstract string Name { get; }
-
+    
     public abstract CalendarDate ConvertFromGregorian(GregorianDate date);
-
+    
     public abstract GregorianDate ConvertToGregorian(CalendarDate date);
-
+    
     public virtual bool IsLeapYear(int year) => false;
-
+    
     public virtual int GetDaysInMonth(int year, int month) => 30;
 }
 ```
@@ -130,13 +130,13 @@ public abstract class CalendarBase
 public class MyCustomCalendar : CalendarBase
 {
     public override string Name => "MyCalendar";
-
+    
     public override CalendarDate ConvertFromGregorian(GregorianDate date)
     {
         // 轉換邏輯
         return new CalendarDate(year, month, day);
     }
-
+    
     public override GregorianDate ConvertToGregorian(CalendarDate date)
     {
         // 反向轉換

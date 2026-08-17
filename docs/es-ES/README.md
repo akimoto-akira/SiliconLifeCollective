@@ -22,13 +22,30 @@
 - **Integración de herramientas** — Los plugins pueden registrar herramientas personalizadas mediante la interfaz ITool, integrándose automáticamente en el ciclo de llamadas a herramientas
 
 ### Herramientas y Ejecución
-- **24 herramientas integradas** — Cubren calendario, chat, configuración, disco, red, memoria, tareas, temporizador, base de conocimiento, notas de trabajo, espacio de trabajo de proyectos, WebView, etc.
-- **Aislamiento de escenarios de herramientas** — Cada herramienta declara los escenarios disponibles mediante el atributo `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project); el atributo `ChatOnly` restringe las herramientas solo al escenario de chat
-- **Interfaz de capacidades IAIClient** — Los clientes de IA declaran las capacidades de modo streaming, llamadas a herramientas, ventana de contexto, visión y audio, y el ContextManager adapta su comportamiento en consecuencia
+- **26 herramientas integradas** — Cubren calendario, chat, configuración, disco, red, memoria, tareas, temporizadores, base de conocimiento, notas de trabajo, espacio de trabajo de proyectos, tareas de proyecto, notas de trabajo de proyecto, trabajo de proyecto, navegador WebView, compilación dinámica, ejecución de código, gestión de permisos, auditoría de tokens, consulta de registros, base de datos, información del sistema, ayuda, gestión de habilidades, consulta MCP, etc.
+- **Aislamiento de escenarios de herramientas** — Cada herramienta declara los escenarios disponibles mediante el atributo `ToolScenario` (Chat, Task, Timer, MemoryCompression, Project); el atributo `ChatOnly` restringe las herramientas solo al escenario de chat, el atributo `SiliconManagerOnly` restringe las herramientas solo al uso del Curador
 - **Ciclo de llamadas a herramientas** — La IA devuelve una llamada a herramienta → se ejecuta la herramienta → el resultado se retroalimenta a la IA → el ciclo continúa hasta que se devuelve una respuesta de texto puro
 - **Seguridad de Ejecutor-Permiso** — Todas las operaciones de E/S pasan por verificación estricta de permisos a través de ejecutores
   - Cadena de verificación de permisos de 3 niveles: UserFrequencyCache → IPermissionCallback → (IsCurator: IPermissionAskHandler | Non-curator: GlobalACL → denegación por defecto)
   - Registro de auditoría completo de todas las decisiones de permisos
+
+### Sistema de Habilidades
+- **Unidad de capacidad reutilizable** — Encapsular "orquestación de herramientas + plantilla de prompt" como una habilidad declarable, evolucionable y programable; la IA llama a las habilidades como herramientas
+- **Doble modo de activación** — Manual (la IA decide de forma autónoma mediante function calling) + Auto (programación: horario fijo diario / intervalo periódico / subconjunto cron)
+- **Markdown prioritario** — Metadatos YAML frontmatter + cuerpo del prompt; al guardar en Markdown puro, la IA completa automáticamente los metadatos faltantes (los campos de usuario no se sobrescriben)
+- **Recarga en caliente y archivado de versiones** — Detección de huella digital cada 30 segundos con efecto automático; cada actualización se archiva en `skills/archive/{id}/{version}.md` formando un historial evolutivo
+- **Múltiples salvaguardas** — Interruptor global, límites de cuota (predeterminado 50/ser), rondas globales y tiempo de espera, lista blanca de herramientas, protección recursiva, permisos de acción a nivel de habilidad
+
+### Integración MCP
+- **Acceso a herramientas externas** — Conexión a servidores MCP (Model Context Protocol) externos; sus herramientas se inyectan automáticamente en todos los Seres de Silicio con el nombrado `mcp_{serverId}_{toolName}`, sin necesidad de escribir código
+- **Doble transporte** — stdio (subproceso local) y http (endpoint remoto)
+- **Soberanía del usuario** — Adición/eliminación/inicio/parada de servidores solo mediante la interfaz Web UI, la herramienta `mcp` del lado de la IA es de solo lectura
+- **Coherencia de permisos** — Las herramientas wrapper MCP se integran en la matriz de permisos de herramientas de dos niveles, pueden deshabilitarse por ser/proyecto
+
+### Integración de Mensajería Instantánea
+- **Arquitectura multi-instancia** — Posibilidad de conectar simultáneamente múltiples plataformas IM (Web UI / Feishu / WeChat Enterprise / DingTalk), cada instancia puede iniciarse/detenerse de forma independiente, enrutamiento agregado de mensajes
+- **Asistente de autorización OAuth** — Autorización Feishu con un clic (state anti-CSRF, push de estado en tiempo real vía SSE), tokens escritos automáticamente en la configuración
+- **Seguridad de claves** — Los valores de configuración admiten marcadores de posición `${ENV_VAR}` para variables de entorno, las claves en texto plano no se almacenan en disco
 
 ### IA y Conocimiento
 - **Soporte para múltiples backends de IA**
