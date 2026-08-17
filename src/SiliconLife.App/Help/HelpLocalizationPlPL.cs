@@ -54,6 +54,8 @@ public class HelpLocalizationPlPL : HelpLocalizationBase
   public override string Logging_Title => "System Logowania";
   public override string Skills_Title => "Umiejętności";
 
+  public override string Mcp_Title => "Serwery MCP";
+
   public override string[] GettingStarted_Tags => new[]
   {
     "instalacja", "uruchomienie", "zaczynamy", "szybki start", "pierwsze użycie", "inicjalizacja", "proces",
@@ -160,6 +162,7 @@ public class HelpLocalizationPlPL : HelpLocalizationBase
     "plik"
   };
   public override string[] Skills_Tags => new[] { "umiejętności", "skill", "orkiestracja", "prompt", "automatyzacja", "plugin", "niestandardowe" };
+  public override string[] Mcp_Tags => new[] { "MCP", "Model Context Protocol", "zewnętrzne narzędzia", "serwer", "stdio", "http", "integracja narzędzi", "rozszerzenie" };
   public override string GettingStarted => @"
 # Szybki start
 
@@ -4767,6 +4770,134 @@ O: Uzyj `export` lub `export_md`, aby wyeksportowac jako JSON/Markdown, zapisz w
 
 **P: Czy umiejetnosc moze wywolywac sama siebie rekurencyjnie?**
 O: Nie. Dzialajace umiejetnosci sa blokowane przed wywolaniami rekurencyjnymi, aby zapobiec nieskonczonym petlom.
+";
+
+  public override string Mcp => @"
+# Serwery MCP
+
+## Czym jest MCP?
+
+MCP (Model Context Protocol) to otwarty protokół umożliwiający aplikacjom AI łączenie się z zewnętrznymi serwerami narzędzi. Dzięki integracji MCP byty krzemowe mogą wywoływać narzędzia udostępniane przez zewnętrzne serwery MCP (systemy plików, bazy danych, wyszukiwanie itd.), co znacznie rozszerza ich możliwości.
+
+**Podstawowe pojęcia:**
+
+- **Serwer MCP**: niezależnie działający proces lub usługa HTTP udostępniająca zestaw narzędzi
+- **Transport**: `stdio` (lokalny podproces) lub `http` (Streamable HTTP)
+- **Narzędzie**: atomowa operacja udostępniona przez serwer; przy rejestracji u bytów krzemowych automatycznie dodawany jest prefiks gwarantujący globalną unikalność
+
+## Włączanie MCP
+
+Integracja MCP jest domyślnie wyłączona. Włączenie:
+
+1. Otwórz stronę ""Konfiguracja"" w interfejsie webowym
+2. Znajdź grupę ""Mcp""
+3. Włącz ""Włącz MCP""
+
+## Konfiguracja globalna
+
+| Ustawienie | Domyślnie | Opis |
+|------------|-----------|------|
+| Włącz MCP (McpEnabled) | Wyłączone | Główny przełącznik integracji MCP |
+| Limit czasu narzędzi MCP (McpToolTimeoutSeconds) | 60 | Limit czasu jednego wywołania w sekundach |
+| Maks. narzędzi MCP na byt (MaxMcpToolsPerBeing) | 40 | Zapobiega rozdęciu kontekstu |
+| Maks. długość wyników MCP (McpMaxResponseLength) | 32768 | Dłuższe wyniki są ucinane |
+
+## Dodawanie serwera MCP
+
+### Opcja 1: strona konfiguracji (zalecane)
+
+1. Otwórz ""Konfiguracja"" → grupę ""Mcp""
+2. Kliknij przycisk edycji przy ""Serwery MCP"" (McpServers)
+3. W oknie edycji kliknij ""Dodaj serwer"" i wypełnij dane
+4. Każdy serwer to karta; możesz w dowolnym momencie dodawać lub usuwać
+5. Kliknij ""Zapisz""
+
+### Opcja 2: strona zarządzania MCP
+
+Otwórz stronę ""Serwery MCP"" w interfejsie webowym i kliknij ""Dodaj serwer""; postępuj zgodnie z instrukcjami.
+
+### Pola konfiguracji serwera
+
+| Pole | Wymagane | Opis |
+|------|----------|------|
+| Id | Tak | Identyfikator serwera; tylko małe litery/cyfry/podkreślenia (używany jako prefiks narzędzi) |
+| Name | Nie | Nazwa wyświetlana (gdy pusta, używa Id) |
+| Transport | Tak | `stdio` (lokalne polecenie) lub `http` (endpoint HTTP) |
+| Command | stdio | Wykonywalne polecenie, np. `npx` |
+| Args | Nie | Argumenty rozdzielone spacjami, np. `-y @modelcontextprotocol/server-filesystem D:\data` |
+| Url | http | Endpoint serwera, np. `http://localhost:3000/mcp` |
+| Enabled | - | Domyślnie wyłączone; włączenie natychmiast łączy |
+
+**Pola zaawansowane (bezpośrednia edycja JSON):**
+
+- `Environment`: słownik zmiennych środowiskowych dla stdio
+- `Headers`: dodatkowe nagłówki HTTP (np. Authorization)
+- `AllowedTools`: biała lista oryginalnych nazw narzędzi (pusta = wszystkie narzędzia serwera)
+- `AllowedBeingIds`: lista id bytów uprawnionych do korzystania z serwera (pusta = wszystkie)
+
+## Nazewnictwo narzędzi i uprawnienia
+
+Każde narzędzie MCP rejestrowane jest z prefiksem:
+
+```
+mcp_{serverId}_{oryginalnaNazwa}
+```
+
+Przykład: przy id serwera `fs` narzędzie `read_file` rejestrowane jest jako `mcp_fs_read_file`.
+
+**Dwa poziomy uprawnień:**
+
+| Klucz uprawnienia | Efekt |
+|-------------------|-------|
+| `mcp_{serverId}` | Poziom serwera: po wyłączeniu byt nie widzi żadnych narzędzi tego serwera |
+| `mcp_{serverId}_{toolName}` | Poziom narzędzia: wyłącza tylko jedno narzędzie |
+
+Oba używają akcji `execute` i konfiguruje się je w ""Uprawnieniach"" w akcjach narzędzi.
+
+## Strona zarządzania MCP
+
+Strona ""Serwery MCP"" w interfejsie webowym oferuje:
+
+- **Lista serwerów**: stan połączenia (połączony / błąd / oczekujący / wyłączony), liczba połączonych, łączna liczba narzędzi
+- **Podgląd narzędzi**: rozwiń serwer, aby zobaczyć nazwy, opisy i schematy parametrów
+- **Test narzędzia**: wywołaj narzędzie online i sprawdź wynik (wpisz argumenty JSON; `{}` = brak)
+- **Włącz/Wyłącz**: przełącz stan serwera (wyłączenie natychmiast rozłącza)
+- **Połącz ponownie**: ręczne ponowienie po niepowodzeniu połączenia
+- **Usuń**: usuwa konfigurację serwera i wyrejestrowuje wszystkie jego narzędzia
+
+## Mechanizmy bezpieczeństwa
+
+- **Domyślnie wyłączone**: integrację MCP trzeba włączyć jawnie, a każdy serwer jest domyślnie wyłączony — podwójna ochrona
+- **Leniwe łączenie**: serwery łączą się na żądanie dopiero po włączeniu; wyłączenie rozłącza
+- **Ucinanie wyników**: wyniki narzędzi przekraczające maksymalną długość są ucinane ze znacznikiem
+- **Limit narzędzi**: liczba narzędzi MCP widocznych dla każdego bytu jest ograniczona (domyślnie 40), co zapobiega rozdęciu kontekstu
+- **Ochrona czasowa**: pojedyncze wywołanie jest przerywane po limicie czasu (domyślnie 60 sekund)
+
+## HTTP API
+
+| Endpoint | Metoda | Opis |
+|----------|--------|------|
+| `/api/mcp/list-servers` | GET | Pobierz listę stanów serwerów |
+| `/api/mcp/list-tools?serverId=` | GET | Pobierz listę narzędzi serwera |
+| `/api/mcp/add-server` | POST | Dodaj serwer |
+| `/api/mcp/toggle` | POST | Włącz/wyłącz serwer |
+| `/api/mcp/remove-server` | POST | Usuń serwer |
+| `/api/mcp/reconnect` | POST | Połącz serwer ponownie |
+| `/api/mcp/test-tool` | POST | Przetestuj wywołanie narzędzia |
+
+## Częste pytania
+
+**P: Po dodaniu serwera narzędzia się nie pojawiają?**
+O: Sprawdź kolejno trzy rzeczy: ① globalny przełącznik ""Włącz MCP"" jest włączony; ② serwer jest włączony (domyślnie wyłączony); ③ stan połączenia to ""połączony"" — w razie błędu kliknij ""Połącz ponownie"" i sprawdź komunikat.
+
+**P: Serwer stdio nie może się połączyć?**
+O: Upewnij się, że polecenie istnieje i jest wykonywalne (np. `npx` wymaga Node.js w PATH) oraz że argumenty są poprawne. Przetestuj polecenie ręcznie w terminalu.
+
+**P: Wywołania narzędzi są odrzucane?**
+O: Sprawdź akcje narzędzi bytu: kluczowi serwera `mcp_{id}` lub narzędzia może być wyłączona akcja `execute`.
+
+**P: Jak udostępnić serwer tylko wybranym bytom?**
+O: Wypisz dozwolone id bytów w `AllowedBeingIds` serwera; pozostaw puste, aby udostępnić wszystkim.
 ";
 
 #endregion

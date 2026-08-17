@@ -135,6 +135,40 @@ public abstract class ConfigDataBase
     public virtual int MaxCustomSkillsPerBeing { get; set; } = 50;
 
     /// <summary>
+    /// Gets or sets whether the MCP (Model Context Protocol) integration is
+    /// enabled (default false — external MCP servers must be enabled explicitly).
+    /// </summary>
+    [ConfigGroup("Mcp", Order = 0, DisplayNameKey = "McpEnabled", DescriptionKey = "McpEnabled")]
+    public virtual bool McpEnabled { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the timeout in seconds for a single MCP tool call (default 60).
+    /// </summary>
+    [ConfigGroup("Mcp", Order = 1, DisplayNameKey = "McpToolTimeoutSeconds", DescriptionKey = "McpToolTimeoutSeconds")]
+    public virtual int McpToolTimeoutSeconds { get; set; } = 60;
+
+    /// <summary>
+    /// Gets or sets the maximum number of MCP tools visible to one being
+    /// (prevents context bloat, default 40).
+    /// </summary>
+    [ConfigGroup("Mcp", Order = 2, DisplayNameKey = "MaxMcpToolsPerBeing", DescriptionKey = "MaxMcpToolsPerBeing")]
+    public virtual int MaxMcpToolsPerBeing { get; set; } = 40;
+
+    /// <summary>
+    /// Gets or sets the maximum MCP tool result length in characters;
+    /// longer results are truncated (default 32768).
+    /// </summary>
+    [ConfigGroup("Mcp", Order = 3, DisplayNameKey = "McpMaxResponseLength", DescriptionKey = "McpMaxResponseLength")]
+    public virtual int McpMaxResponseLength { get; set; } = 32768;
+
+    /// <summary>
+    /// Gets or sets the list of external MCP server configurations.
+    /// Only servers listed here can be connected; each entry defaults to
+    /// disabled and must be enabled explicitly.
+    /// </summary>
+    public virtual List<McpServerConfig> McpServers { get; set; } = new();
+
+    /// <summary>
     /// Gets the configuration file path
     /// </summary>
     /// <returns>The full path to the configuration file</returns>

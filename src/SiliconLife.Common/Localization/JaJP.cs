@@ -460,6 +460,39 @@ _ => permissionType.ToString()
     public override string SkillLoadFailedFormat => "読み込み失敗：{0}";
     public override string SkillRequestFailed => "リクエスト失敗";
 
+    // ===== MCP Page Localization =====
+    public override string PageTitleMcp => "MCP Servers";
+    public override string McpPageHeader => "MCP Servers";
+    public override string McpPageSubtitle => "Connect external MCP servers to extend the tools available to silicon beings";
+    public override string McpsStatFormat => "Servers: {0} · Connected: {1} · Tools: {2}";
+    public override string McpsEmptyState => "No MCP servers configured";
+    public override string McpsBackToBeings => "← Back to beings";
+    public override string McpBtnAddServer => "Add Server";
+    public override string McpBtnRefresh => "Refresh";
+    public override string McpBtnToggleOn => "Enable";
+    public override string McpBtnToggleOff => "Disable";
+    public override string McpBtnReconnect => "Reconnect";
+    public override string McpBtnRemove => "Remove";
+    public override string McpBtnTest => "Test";
+    public override string McpBtnViewSchema => "Schema";
+    public override string McpBtnViewTools => "Tools";
+    public override string McpStatusConnected => "connected";
+    public override string McpStatusFailed => "failed";
+    public override string McpStatusPending => "pending";
+    public override string McpStatusDisabled => "disabled";
+    public override string McpConfirmRemoveFormat => "Remove MCP server {0}?";
+    public override string McpPromptServerId => "Server id (lowercase letters, digits, underscores; used as tool prefix mcp_{id}_...)";
+    public override string McpPromptName => "Display name (optional)";
+    public override string McpPromptTransport => "Transport: enter stdio or http";
+    public override string McpPromptCommand => "stdio command, e.g. npx";
+    public override string McpPromptArgs => "stdio arguments separated by spaces, e.g. -y @modelcontextprotocol/server-filesystem D:\\data";
+    public override string McpPromptUrl => "HTTP url, e.g. http://localhost:3000/mcp";
+    public override string McpPromptTestParams => "Enter tool arguments JSON ({} = no arguments)";
+    public override string McpTestResultPrefix => "Result: ";
+    public override string McpLoadFailedFormat => "Load failed: {0}";
+    public override string McpRequestFailed => "Request failed";
+    public override string McpPromptEnableNow => "Enable this server now?";
+
     // ===== Tasks Page Localization =====
 
     public override string TasksPageHeader => "タスク管理";

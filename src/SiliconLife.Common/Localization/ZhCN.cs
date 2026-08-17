@@ -460,6 +460,39 @@ _ => permissionType.ToString()
     public override string SkillLoadFailedFormat => "加载失败：{0}";
     public override string SkillRequestFailed => "请求失败";
 
+    // ===== MCP Page Localization =====
+    public override string PageTitleMcp => "MCP 服务";
+    public override string McpPageHeader => "MCP 服务";
+    public override string McpPageSubtitle => "接入外部 MCP server，为硅基生命体扩展工具能力";
+    public override string McpsStatFormat => "共 {0} 个服务 · 已连接 {1} · 工具 {2} 个";
+    public override string McpsEmptyState => "暂无 MCP 服务";
+    public override string McpsBackToBeings => "← 返回生命体列表";
+    public override string McpBtnAddServer => "添加服务";
+    public override string McpBtnRefresh => "刷新";
+    public override string McpBtnToggleOn => "启用";
+    public override string McpBtnToggleOff => "禁用";
+    public override string McpBtnReconnect => "重连";
+    public override string McpBtnRemove => "删除";
+    public override string McpBtnTest => "测试";
+    public override string McpBtnViewSchema => "Schema";
+    public override string McpBtnViewTools => "工具";
+    public override string McpStatusConnected => "已连接";
+    public override string McpStatusFailed => "连接失败";
+    public override string McpStatusPending => "待连接";
+    public override string McpStatusDisabled => "已禁用";
+    public override string McpConfirmRemoveFormat => "确定删除 MCP 服务 {0}？";
+    public override string McpPromptServerId => "输入服务 ID（小写字母/数字/下划线，用作工具名前缀 mcp_{id}_...）";
+    public override string McpPromptName => "显示名称（可选）";
+    public override string McpPromptTransport => "传输类型：输入 stdio 或 http";
+    public override string McpPromptCommand => "stdio 命令，例如 npx";
+    public override string McpPromptArgs => "stdio 参数（空格分隔），例如 -y @modelcontextprotocol/server-filesystem D:\\data";
+    public override string McpPromptUrl => "HTTP 地址，例如 http://localhost:3000/mcp";
+    public override string McpPromptTestParams => "输入工具参数 JSON（{} 表示无参数）";
+    public override string McpTestResultPrefix => "执行结果：";
+    public override string McpLoadFailedFormat => "加载失败：{0}";
+    public override string McpRequestFailed => "请求失败";
+    public override string McpPromptEnableNow => "是否立即启用该服务？";
+
     // ===== Tasks Page Localization =====
 
     public override string TasksPageHeader => "任务管理";
@@ -892,7 +925,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["Web"] = "Web 配置",
         ["User"] = "用户配置",
         ["IM"] = "IM 配置",
-        ["Skill"] = "技能配置"
+        ["Skill"] = "技能配置",
+        ["Mcp"] = "MCP 配置"
     };
 
     private static readonly Dictionary<string, string> ConfigDisplayNames = new()
@@ -1060,7 +1094,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["SkillEnabled"] = "启用技能",
         ["GlobalMaxToolRound"] = "全局最大工具轮数",
         ["GlobalSkillTimeoutSeconds"] = "全局技能超时（秒）",
-        ["MaxCustomSkillsPerBeing"] = "每个生命体最大自定义技能数"
+        ["MaxCustomSkillsPerBeing"] = "每个生命体最大自定义技能数",
+        ["McpEnabled"] = "启用 MCP",
+        ["McpToolTimeoutSeconds"] = "MCP 工具超时（秒）",
+        ["MaxMcpToolsPerBeing"] = "每个生命体最大 MCP 工具数",
+        ["McpMaxResponseLength"] = "MCP 结果最大长度（字符）"
     };
 
     private static readonly Dictionary<string, string> ConfigDescriptions = new()
@@ -1127,7 +1165,11 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["SkillEnabled"] = "启用技能系统（技能注册、AI 调度与自动触发）",
         ["GlobalMaxToolRound"] = "单次技能执行中工具调用轮数的上限",
         ["GlobalSkillTimeoutSeconds"] = "技能执行时长上限（秒）",
-        ["MaxCustomSkillsPerBeing"] = "每个硅基生命可持有的自定义（非内置）技能数量上限"
+        ["MaxCustomSkillsPerBeing"] = "每个硅基生命可持有的自定义（非内置）技能数量上限",
+        ["McpEnabled"] = "启用 MCP 集成：连接外部 MCP server 并将其工具注册给硅基生命（默认关闭）",
+        ["McpToolTimeoutSeconds"] = "单次 MCP 工具调用的超时（秒）",
+        ["MaxMcpToolsPerBeing"] = "每个硅基生命可见的 MCP 工具数量上限（防止上下文膨胀）",
+        ["McpMaxResponseLength"] = "MCP 工具结果的最大字符数，超出部分被截断"
     };
 
     public override string GetConfigGroupName(string groupKey) =>
@@ -1202,7 +1244,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["project_task"] = "项目任务",
         ["project_work_note"] = "项目工作笔记",
         ["webview_browser"] = "WebView浏览器",
-        ["skill"] = "技能"
+        ["skill"] = "技能",
+        ["mcp"] = "MCP"
     };
 
     public override string GetToolDisplayName(string toolName) =>

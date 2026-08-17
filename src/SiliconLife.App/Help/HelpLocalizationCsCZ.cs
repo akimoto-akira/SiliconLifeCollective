@@ -54,6 +54,8 @@ public class HelpLocalizationCsCZ : HelpLocalizationBase
   public override string Logging_Title => "Systém Protokolování";
   public override string Skills_Title => "Dovednosti";
 
+  public override string Mcp_Title => "MCP servery";
+
   public override string[] GettingStarted_Tags => new[]
   {
     "instalace", "spuštění", "začínáme", "rychlý start", "první použití", "inicializace", "provoz",
@@ -160,6 +162,7 @@ public class HelpLocalizationCsCZ : HelpLocalizationBase
     "soubor"
   };
   public override string[] Skills_Tags => new[] { "dovednosti", "skill", "orchestrace", "prompt", "automatizace", "plugin", "uživatelské" };
+  public override string[] Mcp_Tags => new[] { "MCP", "Model Context Protocol", "externí nástroje", "server", "stdio", "http", "integrace nástrojů", "rozšíření" };
   public override string GettingStarted => @"
 # Rychlý start
 
@@ -5206,6 +5209,134 @@ A: Pouzijte `export` nebo `export_md` pro export jako JSON/Markdown, ulozte na b
 
 **Q: Muze dovednost rekurzivne volat sama sebe?**
 A: Ne. Prave vykonavane dovednosti jsou blokovany proti rekurzivnim volanim, aby se zabranilo nekonecnym smyckam.
+";
+
+  public override string Mcp => @"
+# MCP servery
+
+## Co je MCP?
+
+MCP (Model Context Protocol) je otevřený protokol, který umožňuje AI aplikacím připojovat se k externím serverům nástrojů. Díky integraci MCP mohou křemíkové bytosti volat nástroje poskytované externími MCP servery (souborové systémy, databáze, vyhledávání apod.) a výrazně tak rozšiřují své schopnosti.
+
+**Základní pojmy:**
+
+- **MCP server**: nezávisle běžící proces nebo HTTP služba, která poskytuje sadu nástrojů
+- **Transport**: `stdio` (místní podproces) nebo `http` (Streamable HTTP)
+- **Nástroj**: atomická operace vystavená serverem; při registraci u křemíkových bytostí dostane automaticky předponu zaručující globální jednoznačnost
+
+## Povolení MCP
+
+Integrace MCP je ve výchozím nastavení vypnutá. Povolení:
+
+1. Otevřete stránku ""Nastavení"" ve webovém rozhraní
+2. Najděte skupinu ""Mcp""
+3. Zapněte ""Povolit MCP""
+
+## Globální konfigurace
+
+| Nastavení | Výchozí | Popis |
+|-----------|---------|-------|
+| Povolit MCP (McpEnabled) | Vypnuto | Hlavní vypínač integrace MCP |
+| Časový limit nástrojů MCP (McpToolTimeoutSeconds) | 60 | Časový limit jednoho volání v sekundách |
+| Max. nástrojů MCP na bytost (MaxMcpToolsPerBeing) | 40 | Zabraňuje nafouknutí kontextu |
+| Max. délka výsledků MCP (McpMaxResponseLength) | 32768 | Delší výsledky se zkrátí |
+
+## Přidání MCP serveru
+
+### Varianta 1: stránka nastavení (doporučeno)
+
+1. Otevřete ""Nastavení"" → skupinu ""Mcp""
+2. Klikněte na tlačítko úprav u ""MCP servery"" (McpServers)
+3. V modálním editoru klikněte na ""Přidat server"" a vyplňte údaje
+4. Každý server je karta; kdykoli můžete přidávat nebo mazat
+5. Klikněte na ""Uložit""
+
+### Varianta 2: stránka správy MCP
+
+Otevřete stránku ""MCP servery"" ve webovém rozhraní a klikněte na ""Přidat server""; postupujte podle pokynů.
+
+### Pole konfigurace serveru
+
+| Pole | Povinné | Popis |
+|------|---------|-------|
+| Id | Ano | Identifikátor serveru; pouze malá písmena/číslice/podtržítka (slouží jako předpona nástrojů) |
+| Name | Ne | Zobrazovaný název (při prázdném se použije Id) |
+| Transport | Ano | `stdio` (místní příkaz) nebo `http` (HTTP adresa) |
+| Command | stdio | Spustitelný příkaz, např. `npx` |
+| Args | Ne | Argumenty oddělené mezerami, např. `-y @modelcontextprotocol/server-filesystem D:\data` |
+| Url | http | Adresa serveru, např. `http://localhost:3000/mcp` |
+| Enabled | - | Ve výchozím stavu vypnuto; povolením se okamžitě připojí |
+
+**Pokročilá pole (přímo upravit JSON):**
+
+- `Environment`: slovník proměnných prostředí pro stdio
+- `Headers`: dodatečné HTTP hlavičky (např. Authorization)
+- `AllowedTools`: whitelist původních názvů nástrojů (prázdné = všechny nástroje serveru)
+- `AllowedBeingIds`: seznam id bytostí oprávněných server používat (prázdné = všechny)
+
+## Pojmenování nástrojů a oprávnění
+
+Každý nástroj MCP se registruje s předponou:
+
+```
+mcp_{serverId}_{původníNázevNástroje}
+```
+
+Například u serveru s id `fs` se nástroj `read_file` registruje jako `mcp_fs_read_file`.
+
+**Dvě úrovně oprávnění:**
+
+| Klíč oprávnění | Účinek |
+|----------------|--------|
+| `mcp_{serverId}` | Úroveň serveru: při zakázání bytost nevidí žádné nástroje tohoto serveru |
+| `mcp_{serverId}_{toolName}` | Úroveň nástroje: zakáže pouze jeden nástroj |
+
+Obě používají akci `execute` a konfigurují se v ""Oprávněních"" v akcích nástrojů.
+
+## Stránka správy MCP
+
+Stránka ""MCP servery"" ve webovém rozhraní nabízí:
+
+- **Seznam serverů**: stav připojení (připojeno / selhalo / čeká / zakázáno), počet připojených, celkový počet nástrojů
+- **Zobrazení nástrojů**: rozbalením serveru uvidíte názvy, popisy a schémata parametrů
+- **Test nástroje**: zavolejte nástroj online a prozkoumejte výsledek (zadejte JSON argumenty; `{}` = žádné)
+- **Povolit/Zakázat**: přepnutí stavu serveru (zakázáním se okamžitě odpojí)
+- **Znovu připojit**: ruční opakování po selhání připojení
+- **Odebrat**: smaže konfiguraci serveru a zruší registraci všech jeho nástrojů
+
+## Bezpečnostní mechanismy
+
+- **Ve výchozím stavu vypnuto**: integraci MCP je nutné explicitně povolit a každý server je ve výchozím stavu zakázán — dvojitá ochrana
+- **Líné připojování**: servery se připojují na vyžádání až po povolení; zakázáním se odpojí
+- **Zkracování výsledků**: výsledky přesahující maximální délku se zkrátí se značkou
+- **Strop nástrojů**: počet nástrojů MCP viditelných pro každou bytost je omezen (výchozí 40), aby se zabránilo nafouknutí kontextu
+- **Ochrana časovým limitem**: volání se po časovém limitu (výchozí 60 sekund) přeruší
+
+## HTTP API
+
+| Endpoint | Metoda | Popis |
+|----------|--------|-------|
+| `/api/mcp/list-servers` | GET | Získat seznam stavů serverů |
+| `/api/mcp/list-tools?serverId=` | GET | Získat seznam nástrojů serveru |
+| `/api/mcp/add-server` | POST | Přidat server |
+| `/api/mcp/toggle` | POST | Povolit/zakázat server |
+| `/api/mcp/remove-server` | POST | Odebrat server |
+| `/api/mcp/reconnect` | POST | Znovu připojit server |
+| `/api/mcp/test-tool` | POST | Otestovat volání nástroje |
+
+## Časté dotazy
+
+**Q: Po přidání serveru se nástroje neobjevují?**
+A: Postupně zkontrolujte tři věci: ① globální přepínač ""Povolit MCP"" je zapnutý; ② server je povolen (ve výchozím stavu zakázán); ③ stav připojení je ""připojeno"" — při selhání klikněte na ""Znovu připojit"" a prozkoumejte chybu.
+
+**Q: Server stdio se nepřipojí?**
+A: Ověřte, že příkaz existuje a lze jej spustit (např. `npx` vyžaduje Node.js v PATH) a že argumenty jsou správné. Příkaz si nejprve ověřte ručně v terminálu.
+
+**Q: Volání nástrojů jsou odmítnuta?**
+A: Zkontrolujte akce nástrojů bytosti: klíči serveru `mcp_{id}` nebo nástroje může být zakázaná akce `execute`.
+
+**Q: Jak zpřístupním server jen vybraným bytostem?**
+A: Vypíšte povolená id bytostí v `AllowedBeingIds` serveru; ponechte prázdné pro zpřístupnění všem.
 ";
 
 #endregion

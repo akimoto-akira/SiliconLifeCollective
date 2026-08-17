@@ -229,13 +229,13 @@ public class JsTernary : JsSyntax
 public class JsIndex : JsSyntax
 {
     public Func<JsSyntax> Target { get; }
-    public new Func<JsSyntax> Index { get; }
+    public Func<JsSyntax> IndexValue { get; }
     public JsIndex(Func<JsSyntax> target, Func<JsSyntax> index)
     {
         Target = target;
-        Index = index;
+        IndexValue = index;
     }
-    public override string Build() => $"{Target().Build()}[{Index().Build()}]";
+    public override string Build() => $"{Target().Build()}[{IndexValue().Build()}]";
 }
 
 public class JsPropAccess : JsSyntax

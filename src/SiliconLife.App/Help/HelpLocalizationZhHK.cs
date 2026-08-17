@@ -56,6 +56,8 @@ public class HelpLocalizationZhHK : HelpLocalizationBase
     public override string Logging_Title => "日誌系統";
     public override string Skills_Title => "技能系統";
 
+    public override string Mcp_Title => "MCP 服務";
+
     public override string[] GettingStarted_Tags => new[] { "安裝", "啟動", "入門", "快速入門", "開始使用", "初始化", "運行", "配置環境" };
     public override string[] BeingManagement_Tags => new[] { "硅基人", "創建", "配置", "硅基人管理", "生命體", "檔案", "設定", "管理" };
     public override string[] ChatSystem_Tags => new[] { "聊天", "對話", "訊息", "聊天功能", "交流", "通訊", "交談", "討論" };
@@ -115,6 +117,8 @@ public class HelpLocalizationZhHK : HelpLocalizationBase
     public override string[] Projects_Tags => new[] { "項目管理", "項目", "協作", "任務", "成員", "歸檔", "團隊", "工作空間", "進度" };
     public override string[] Logging_Tags => new[] { "日誌系統", "日誌", "記錄", "調試", "錯誤", "警告", "監控", "追蹤", "控制台", "文件" };
     public override string[] Skills_Tags => new[] { "技能", "Skill", "工具編排", "提示詞模板", "自動化", "自定義技能", "插件" };
+
+    public override string[] Mcp_Tags => new[] { "MCP", "模型上下文協議", "Model Context Protocol", "外部工具", "伺服器", "stdio", "http", "工具整合", "擴充" };
 
     public override string GettingStarted => @"
 # 快速入門
@@ -4635,6 +4639,134 @@ A: 使用 export 或 export_md 導出為 JSON/Markdown，保存到安全位置�
 
 **Q: 技能能否遞歸調用自身？**
 A: 不可以。技能執行期間不允許遞歸調用，防止死循環。
+";
+
+    public override string Mcp => @"
+# MCP 服務
+
+## 什麼是 MCP？
+
+MCP（Model Context Protocol，模型上下文協議）是一種開放協議，允許 AI 應用連接外部工具伺服器。透過 MCP 整合，硅基人可以呼叫外部 MCP 伺服器提供的工具（如檔案系統、資料庫、搜尋等），大幅擴充能力範圍。
+
+**核心概念：**
+
+- **MCP 伺服器（Server）**：獨立運行的程序或 HTTP 服務，對外提供一組工具
+- **傳輸方式（Transport）**：`stdio`（本地子程序）或 `http`（Streamable HTTP）
+- **工具（Tool）**：伺服器暴露的原子操作，註冊到硅基人時自動加前綴保證全域唯一
+
+## 啟用 MCP
+
+MCP 整合預設關閉，啟用步驟：
+
+1. 進入 Web 界面的""配置""頁面
+2. 找到 ""MCP"" 分組
+3. 將""啟用 MCP""設為開啟
+
+## 全域配置項
+
+| 配置項 | 預設值 | 說明 |
+|--------|--------|------|
+| 啟用 MCP（McpEnabled） | 關閉 | MCP 整合總開關 |
+| MCP 工具超時（McpToolTimeoutSeconds） | 60 | 單次工具呼叫超時（秒） |
+| 每個生命體最大 MCP 工具數（MaxMcpToolsPerBeing） | 40 | 防止上下文膨脹 |
+| MCP 結果最大長度（McpMaxResponseLength） | 32768 | 超出部分自動截斷 |
+
+## 新增 MCP 伺服器
+
+### 方式一：配置頁面（推薦）
+
+1. 進入""配置""頁面 → ""MCP"" 分組
+2. 點擊""MCP 伺服器（McpServers）""的編輯按鈕
+3. 在彈出的編輯視窗中點擊""新增服務""，填寫伺服器資訊
+4. 每個伺服器一張卡片，可隨時新增或刪除
+5. 點擊""儲存""提交
+
+### 方式二：MCP 管理頁面
+
+進入 Web 界面的""MCP 服務""頁面，點擊""新增服務""按鈕，按提示逐步輸入資訊。
+
+### 伺服器配置欄位
+
+| 欄位 | 必填 | 說明 |
+|------|------|------|
+| Id | 是 | 伺服器標識，僅允許小寫字母/數字/底線（用作工具名前綴） |
+| Name | 否 | 顯示名稱（留空時使用 Id） |
+| Transport | 是 | `stdio`（本地命令）或 `http`（HTTP 位址） |
+| Command | stdio 必填 | 可執行命令，如 `npx` |
+| Args | 否 | 命令參數（空格分隔），如 `-y @modelcontextprotocol/server-filesystem D:\data` |
+| Url | http 必填 | 伺服器位址，如 `http://localhost:3000/mcp` |
+| Enabled | - | 啟用狀態，預設關閉；啟用後立即連線 |
+
+**進階欄位（需直接編輯 JSON 配置）：**
+
+- `Environment`：stdio 傳輸的環境變數字典
+- `Headers`：HTTP 傳輸的附加請求頭（如 Authorization）
+- `AllowedTools`：原始工具名白名單（空 = 該伺服器全部工具）
+- `AllowedBeingIds`：允許使用的生命體 ID 清單（空 = 所有生命體）
+
+## 工具命名與權限
+
+每個 MCP 工具註冊到硅基人時自動加前綴：
+
+```
+mcp_{伺服器Id}_{原始工具名}
+```
+
+例如伺服器 Id 為 `fs`，其 `read_file` 工具註冊為 `mcp_fs_read_file`。
+
+**權限控制分兩級：**
+
+| 權限鍵 | 作用 |
+|--------|------|
+| `mcp_{伺服器Id}` | 伺服器級：停用後該生命體看不到此伺服器的全部工具 |
+| `mcp_{伺服器Id}_{工具名}` | 工具級：只停用單一工具 |
+
+兩者均使用動作 `execute`，在""權限管理""頁面的工具動作權限中配置。
+
+## MCP 管理頁面
+
+Web 界面的""MCP 服務""頁面提供：
+
+- **伺服器列表**：顯示連線狀態（已連線/連線失敗/待連線/已停用）、已連線數、工具總數
+- **工具檢視**：展開伺服器檢視全部工具的名稱、描述和參數 Schema
+- **測試工具**：線上呼叫工具並檢視回傳結果（輸入 JSON 格式參數，`{}` 表示無參數）
+- **啟用/停用**：切換伺服器狀態（停用會立即斷開連線）
+- **重連**：連線失敗後手動重試
+- **刪除**：移除伺服器配置並註銷其全部工具
+
+## 安全機制
+
+- **預設關閉**：必須明確啟用 MCP 整合，且每個伺服器預設停用，雙重保護
+- **懶連線**：伺服器僅在啟用後按需連線，停用即斷開
+- **結果截斷**：工具結果超過最大長度自動截斷並附加截斷標記
+- **數量上限**：每個生命體可見的 MCP 工具數有上限（預設 40），防止上下文膨脹
+- **超時保護**：單次呼叫超時（預設 60 秒）自動終止
+
+## HTTP API
+
+| 介面 | 方法 | 說明 |
+|------|------|------|
+| `/api/mcp/list-servers` | GET | 取得伺服器狀態列表 |
+| `/api/mcp/list-tools?serverId=` | GET | 取得指定伺服器的工具列表 |
+| `/api/mcp/add-server` | POST | 新增伺服器 |
+| `/api/mcp/toggle` | POST | 啟用/停用伺服器 |
+| `/api/mcp/remove-server` | POST | 刪除伺服器 |
+| `/api/mcp/reconnect` | POST | 重連伺服器 |
+| `/api/mcp/test-tool` | POST | 測試工具呼叫 |
+
+## 常見問題
+
+**Q: 新增伺服器後工具沒有出現？**
+A: 依次檢查三點：① 全域""啟用 MCP""是否已開啟；② 伺服器是否已啟用（預設停用）；③ 連線狀態是否為""已連線""——失敗時點擊""重連""並檢視錯誤資訊。
+
+**Q: stdio 伺服器連線失敗？**
+A: 確認命令存在且可執行（如 `npx` 需已安裝 Node.js 並在 PATH 中），參數格式正確。可先在終端機手動執行該命令驗證。
+
+**Q: 工具呼叫被拒絕？**
+A: 檢查生命體的工具動作權限：伺服器級 `mcp_{id}` 或工具級權限鍵可能被停用了 `execute` 動作。
+
+**Q: 如何讓某個伺服器只對特定生命體可見？**
+A: 在伺服器配置的 `AllowedBeingIds` 中列出允許的生命體 ID，留空表示對所有生命體可見。
 ";
 
     #endregion

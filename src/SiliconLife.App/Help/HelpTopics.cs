@@ -262,6 +262,14 @@ public static class HelpTopics
         },
         new()
         {
+            Id = "mcp",
+            PropertyName = nameof(HelpLocalizationBase.Mcp),
+            TitlePropertyName = nameof(HelpLocalizationBase.Mcp_Title),
+            TagsPropertyName = nameof(HelpLocalizationBase.Mcp_Tags),
+            Icon = "🔌"
+        },
+        new()
+        {
             Id = "logging",
             PropertyName = nameof(HelpLocalizationBase.Logging),
             TitlePropertyName = nameof(HelpLocalizationBase.Logging_Title),

@@ -56,6 +56,8 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
     public override string Logging_Title => "로깅 시스템";
     public override string Skills_Title => "스킬";
 
+    public override string Mcp_Title => "MCP 서버";
+
     public override string[] GettingStarted_Tags => new[] { "설치", "시작", "입문", "빠른 시작", "시작하기", "초기화", "실행", "환경 구성" };
 
     public override string[] BeingManagement_Tags =>
@@ -127,6 +129,7 @@ public class HelpLocalizationKoKR : HelpLocalizationBase
 
     public override string[] Logging_Tags => new[] { "로깅 시스템", "로그", "기록", "디버그", "오류", "경고", "모니터", "추적", "콘솔", "파일" };
     public override string[] Skills_Tags => new[] { "스킬", "Skill", "툻 오케스트레이션", "프롬프트 템플릿", "자동화", "커스텀 스킬", "플러그인" };
+    public override string[] Mcp_Tags => new[] { "MCP", "모델 컨텍스트 프로토콜", "Model Context Protocol", "외부 도구", "서버", "stdio", "http", "도구 통합", "확장" };
     public override string GettingStarted => @"
 # 빠른 시작
 
@@ -4622,6 +4625,134 @@ A: `export` 또는 `export_md`를 사용하여 JSON/Markdown으로 내보내고,
 
 **Q: 스킬이 재귀적으로 자신을 호출할 수 있습니까?**
 A: 아니요. 실행 중인 스킬은 재귀 호출이 차단되어 무한 루프를 방지합니다.
+";
+
+    public override string Mcp => @"
+# MCP 서버
+
+## MCP란?
+
+MCP(Model Context Protocol, 모델 컨텍스트 프로토콜)은 AI 애플리케이션이 외부 도구 서버에 연결할 수 있게 하는 개방형 프로토콜입니다. MCP 통합을 통해 규소인은 외부 MCP 서버가 제공하는 도구(파일 시스템, 데이터베이스, 검색 등)를 호출할 수 있어 능력 범위가 크게 확장됩니다.
+
+**핵심 개념:**
+
+- **MCP 서버**: 독립적으로 실행되는 프로세스 또는 HTTP 서비스로, 도구 집합을 제공
+- **전송 방식**: `stdio`(로컬 하위 프로세스) 또는 `http`(Streamable HTTP)
+- **도구**: 서버가 노출하는 원자적 연산. 규소인에 등록될 때 접두사가 자동으로 붙어 전역 고유성 보장
+
+## MCP 활성화
+
+MCP 통합은 기본적으로 비활성화되어 있습니다. 활성화 절차:
+
+1. 웹 UI의 ""설정"" 페이지를 엽니다
+2. ""Mcp"" 그룹을 찾습니다
+3. ""MCP 사용""을 켭니다
+
+## 전역 설정
+
+| 설정 항목 | 기본값 | 설명 |
+|-----------|--------|------|
+| MCP 사용(McpEnabled) | 끔 | MCP 통합 마스터 스위치 |
+| MCP 도구 시간 초과(McpToolTimeoutSeconds) | 60 | 도구 호출 1회의 시간 초과(초) |
+| 개체당 최대 MCP 도구 수(MaxMcpToolsPerBeing) | 40 | 컨텍스트 팽창 방지 |
+| MCP 결과 최대 길이(McpMaxResponseLength) | 32768 | 초과분은 자동 잘림 |
+
+## MCP 서버 추가
+
+### 방법 1: 설정 페이지(권장)
+
+1. ""설정"" 페이지 → ""Mcp"" 그룹을 엽니다
+2. ""MCP 서버""(McpServers)의 편집 버튼을 클릭합니다
+3. 편집 창에서 ""서버 추가""를 클릭하고 서버 정보를 입력합니다
+4. 각 서버는 카드 형태이며 언제든 추가/삭제 가능합니다
+5. ""저장""을 클릭하여 제출합니다
+
+### 방법 2: MCP 관리 페이지
+
+웹 UI의 ""MCP 서버"" 페이지를 열고 ""서버 추가"" 버튼을 클릭한 후 안내에 따라 입력합니다.
+
+### 서버 구성 필드
+
+| 필드 | 필수 | 설명 |
+|------|------|------|
+| Id | 예 | 서버 식별자. 소문자/숫자/밑줄만 허용(도구 이름 접두사로 사용) |
+| Name | 아니요 | 표시 이름(비어 있으면 Id 사용) |
+| Transport | 예 | `stdio`(로컬 명령) 또는 `http`(HTTP 주소) |
+| Command | stdio만 | 실행 명령. 예: `npx` |
+| Args | 아니요 | 명령 인수(공백 구분). 예: `-y @modelcontextprotocol/server-filesystem D:\data` |
+| Url | http만 | 서버 주소. 예: `http://localhost:3000/mcp` |
+| Enabled | - | 활성 상태. 기본값은 끔. 켜면 즉시 연결 |
+
+**고급 필드(JSON 구성 직접 편집):**
+
+- `Environment`: stdio 전송용 환경 변수 사전
+- `Headers`: HTTP 전송용 추가 요청 헤더(예: Authorization)
+- `AllowedTools`: 원본 도구 이름 화이트리스트(비어 있으면 서버의 전체 도구)
+- `AllowedBeingIds`: 사용을 허용할 개체 ID 목록(비어 있으면 전체 개체)
+
+## 도구 명명과 권한
+
+각 MCP 도구는 접두사와 함께 규소인에 등록됩니다:
+
+```
+mcp_{서버Id}_{원본도구명}
+```
+
+예: 서버 Id가 `fs`이면 `read_file` 도구는 `mcp_fs_read_file`로 등록됩니다.
+
+**권한 제어는 두 수준:**
+
+| 권한 키 | 효과 |
+|---------|------|
+| `mcp_{서버Id}` | 서버 수준: 비활성화하면 이 서버의 전체 도구가 보이지 않음 |
+| `mcp_{서버Id}_{도구명}` | 도구 수준: 단일 도구만 비활성화 |
+
+둘 다 동작 `execute`를 사용하며 ""권한 관리"" 페이지의 도구 동작 권한에서 설정합니다.
+
+## MCP 관리 페이지
+
+웹 UI의 ""MCP 서버"" 페이지 기능:
+
+- **서버 목록**: 연결 상태(연결됨/실패/대기 중/비활성), 연결 수, 도구 총수 표시
+- **도구 보기**: 서버를 펼쳐 전체 도구의 이름·설명·매개변수 스키마 확인
+- **도구 테스트**: 도구를 온라인으로 호출하고 결과 확인(JSON 인수 입력, `{}`는 인수 없음)
+- **활성화/비활성화**: 서버 상태 전환(비활성화하면 즉시 연결 해제)
+- **재연결**: 연결 실패 후 수동 재시도
+- **삭제**: 서버 구성을 제거하고 전체 도구 등록 해제
+
+## 보안 메커니즘
+
+- **기본 비활성**: MCP 통합을 명시적으로 활성화해야 하며 각 서버도 기본 비활성 — 이중 보호
+- **지연 연결**: 서버는 활성화된 후 필요할 때만 연결. 비활성화하면 즉시 연결 해제
+- **결과 잘림**: 최대 길이를 초과하는 도구 결과는 마커와 함께 잘림
+- **도구 수 상한**: 각 개체가 볼 수 있는 MCP 도구 수에 상한(기본 40)이 있어 컨텍스트 팽창 방지
+- **시간 초과 보호**: 단일 호출은 시간 초과(기본 60초) 후 자동 중단
+
+## HTTP API
+
+| 엔드포인트 | 메서드 | 설명 |
+|------------|--------|------|
+| `/api/mcp/list-servers` | GET | 서버 상태 목록 조회 |
+| `/api/mcp/list-tools?serverId=` | GET | 지정 서버의 도구 목록 조회 |
+| `/api/mcp/add-server` | POST | 서버 추가 |
+| `/api/mcp/toggle` | POST | 서버 활성화/비활성화 |
+| `/api/mcp/remove-server` | POST | 서버 삭제 |
+| `/api/mcp/reconnect` | POST | 서버 재연결 |
+| `/api/mcp/test-tool` | POST | 도구 호출 테스트 |
+
+## 자주 묻는 질문
+
+**Q: 서버 추가 후 도구가 나타나지 않나요?**
+A: 순서대로 세 가지를 확인하세요: ① 전역 ""MCP 사용"" 스위치가 켜져 있는지. ② 서버가 활성화되어 있는지(기본 비활성). ③ 연결 상태가 ""연결됨""인지 — 실패 시 ""재연결""을 클릭해 오류 메시지를 확인하세요.
+
+**Q: stdio 서버 연결에 실패하나요?**
+A: 명령이 존재하고 실행 가능한지(예: `npx`는 Node.js 설치 및 PATH 등록 필요), 인수 형식이 올바른지 확인하세요. 터미널에서 직접 실행해 검증할 수 있습니다.
+
+**Q: 도구 호출이 거부되나요?**
+A: 개체의 도구 동작 권한을 확인하세요: 서버 수준 `mcp_{id}` 또는 도구 수준 권한 키의 `execute` 동작이 비활성화되어 있을 수 있습니다.
+
+**Q: 특정 개체만 서버를 보게 하려면?**
+A: 서버 구성의 `AllowedBeingIds`에 허용할 개체 ID를 나열하세요. 비워 두면 전체 개체에 공개됩니다.
 ";
 
 #endregion

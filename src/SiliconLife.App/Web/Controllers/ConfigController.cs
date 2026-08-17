@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) 2026 Hoshino Kennji
+﻿// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -210,6 +210,24 @@ public class ConfigController : Controller
                 try
                 {
                     var list = System.Text.Json.JsonSerializer.Deserialize<List<IMPlatformConfig>>(data.value);
+                    if (list == null)
+                    {
+                        RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });
+                        return;
+                    }
+                    value = list;
+                }
+                catch (Exception ex)
+                {
+                    RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorSaveFailed, $"JSON parse error: {ex.Message}") });
+                    return;
+                }
+            }
+            else if (propType == typeof(List<McpServerConfig>))
+            {
+                try
+                {
+                    var list = System.Text.Json.JsonSerializer.Deserialize<List<McpServerConfig>>(data.value);
                     if (list == null)
                     {
                         RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });
@@ -630,6 +648,7 @@ public class ConfigController : Controller
         if (type == typeof(System.IO.DirectoryInfo)) return "directory";
         if (type == typeof(List<string>)) return "directoryList";
         if (type == typeof(List<IMPlatformConfig>)) return "imPlatformList";
+        if (type == typeof(List<McpServerConfig>)) return "mcpServerList";
         if (type.IsEnum) return "enum";
         
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))

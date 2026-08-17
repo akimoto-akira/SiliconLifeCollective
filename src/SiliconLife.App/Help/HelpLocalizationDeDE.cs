@@ -55,6 +55,8 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
   public override string Logging_Title => "Protokollierungssystem";
   public override string Skills_Title => "Fähigkeiten";
 
+  public override string Mcp_Title => "MCP-Server";
+
   public override string[] GettingStarted_Tags => new[]
   {
     "Installation", "Start", "Einrichtung", "Schnellstart", "Erste Schritte", "Beginnen", "Initialisierung", "Umgebung"
@@ -167,6 +169,7 @@ public class HelpLocalizationDeDE : HelpLocalizationBase
     "Konsole", "Datei"
   };
   public override string[] Skills_Tags => new[] { "Fähigkeiten", "Skill", "Orchestrierung", "Prompt", "Automatisierung", "Plugin", "anpassbar" };
+  public override string[] Mcp_Tags => new[] { "MCP", "Model Context Protocol", "externe Werkzeuge", "Server", "stdio", "http", "Werkzeugintegration", "Erweiterung" };
   public override string GettingStarted => @"
 # Schnellstart
 
@@ -5086,6 +5089,134 @@ A: Verwenden Sie `export` oder `export_md`, um sie als JSON/Markdown zu exportie
 
 **F: Kann eine Faehigkeit sich selbst rekursiv aufrufen?**
 A: Nein. Laufende Faehigkeiten werden gegen rekursive Aufrufe blockiert, um Endlosschleifen zu verhindern.
+";
+
+  public override string Mcp => @"
+# MCP-Server
+
+## Was ist MCP?
+
+MCP (Model Context Protocol) ist ein offenes Protokoll, das es KI-Anwendungen ermöglicht, sich mit externen Werkzeugservern zu verbinden. Mit der MCP-Integration können Siliziumwesen Werkzeuge externer MCP-Server aufrufen (Dateisysteme, Datenbanken, Suche usw.) und damit ihre Fähigkeiten erheblich erweitern.
+
+**Grundkonzepte:**
+
+- **MCP-Server**: ein unabhängig laufender Prozess oder HTTP-Dienst, der eine Reihe von Werkzeugen bereitstellt
+- **Transport**: `stdio` (lokaler Unterprozess) oder `http` (Streamable HTTP)
+- **Werkzeug**: eine vom Server bereitgestellte atomare Operation; bei der Registrierung bei Siliziumwesen wird automatisch ein Präfix hinzugefügt, das globale Eindeutigkeit garantiert
+
+## MCP aktivieren
+
+Die MCP-Integration ist standardmäßig deaktiviert. Aktivierung:
+
+1. Öffnen Sie im Web-UI die Seite ""Konfiguration""
+2. Suchen Sie die Gruppe ""Mcp""
+3. Schalten Sie ""MCP aktivieren"" ein
+
+## Globale Konfiguration
+
+| Einstellung | Standard | Beschreibung |
+|-------------|----------|--------------|
+| MCP aktivieren (McpEnabled) | Aus | Hauptschalter der MCP-Integration |
+| MCP-Werkzeug-Timeout (McpToolTimeoutSeconds) | 60 | Timeout pro Werkzeugaufruf in Sekunden |
+| Max. MCP-Werkzeuge pro Wesen (MaxMcpToolsPerBeing) | 40 | Verhindert Kontextaufblähung |
+| Max. Länge der MCP-Ergebnisse (McpMaxResponseLength) | 32768 | Längere Ergebnisse werden gekürzt |
+
+## MCP-Server hinzufügen
+
+### Option 1: Konfigurationsseite (empfohlen)
+
+1. Öffnen Sie ""Konfiguration"" → Gruppe ""Mcp""
+2. Klicken Sie auf die Schaltfläche ""Bearbeiten"" von ""MCP-Server"" (McpServers)
+3. Klicken Sie im Dialog auf ""Server hinzufügen"" und füllen Sie die Daten aus
+4. Jeder Server ist eine Karte; jederzeit hinzufügen oder löschen
+5. Klicken Sie auf ""Speichern""
+
+### Option 2: MCP-Verwaltungsseite
+
+Öffnen Sie im Web-UI die Seite ""MCP-Server"" und klicken Sie auf ""Server hinzufügen""; folgen Sie den Anweisungen Schritt für Schritt.
+
+### Serverkonfigurationsfelder
+
+| Feld | Pflicht | Beschreibung |
+|------|---------|--------------|
+| Id | Ja | Server-ID; nur Kleinbuchstaben/Ziffern/Unterstriche (dient als Werkzeugpräfix) |
+| Name | Nein | Anzeigename (fällt auf die Id zurück, wenn leer) |
+| Transport | Ja | `stdio` (lokaler Befehl) oder `http` (HTTP-Endpunkt) |
+| Command | stdio | Ausführbarer Befehl, z. B. `npx` |
+| Args | Nein | Durch Leerzeichen getrennte Argumente, z. B. `-y @modelcontextprotocol/server-filesystem D:\data` |
+| Url | http | Server-Endpunkt, z. B. `http://localhost:3000/mcp` |
+| Enabled | - | Standardmäßig deaktiviert; beim Aktivieren wird sofort verbunden |
+
+**Erweiterte Felder (JSON-Konfiguration direkt bearbeiten):**
+
+- `Environment`: Umgebungsvariablen-Wörterbuch für stdio
+- `Headers`: zusätzliche HTTP-Anforderungsheader (z. B. Authorization)
+- `AllowedTools`: Whitelist der ursprünglichen Werkzeugnamen (leer = alle Werkzeuge des Servers)
+- `AllowedBeingIds`: Liste der Wesen-IDs, die den Server nutzen dürfen (leer = alle Wesen)
+
+## Werkzeugbenennung und Berechtigungen
+
+Jedes MCP-Werkzeug wird mit einem Präfix registriert:
+
+```
+mcp_{serverId}_{ursprünglicherWerkzeugname}
+```
+
+Beispiel: Bei der Server-ID `fs` wird das Werkzeug `read_file` als `mcp_fs_read_file` registriert.
+
+**Zwei Berechtigungsstufen:**
+
+| Berechtigungsschlüssel | Wirkung |
+|------------------------|---------|
+| `mcp_{serverId}` | Serverstufe: deaktiviert sieht das Wesen keines der Werkzeuge dieses Servers |
+| `mcp_{serverId}_{toolName}` | Werkzeugstufe: deaktiviert nur ein einzelnes Werkzeug |
+
+Beide verwenden die Aktion `execute` und werden unter ""Berechtigungen"" bei den Werkzeugaktions-Berechtigungen konfiguriert.
+
+## MCP-Verwaltungsseite
+
+Die Seite ""MCP-Server"" im Web-UI bietet:
+
+- **Serverliste**: Verbindungsstatus (verbunden / fehlgeschlagen / ausstehend / deaktiviert), Anzahl verbunden, Werkzeuggesamtzahl
+- **Werkzeugansicht**: Server aufklappen, um Namen, Beschreibungen und Parameterschemas zu sehen
+- **Werkzeugtest**: Werkzeug online aufrufen und Ergebnis prüfen (JSON-Argumente eingeben; `{}` = keine)
+- **Aktivieren/Deaktivieren**: Serverstatus umschalten (Deaktivieren trennt sofort)
+- **Neu verbinden**: manueller Wiederholungsversuch nach Verbindungsfehler
+- **Entfernen**: Serverkonfiguration löschen und alle Werkzeuge abmelden
+
+## Sicherheitsmechanismen
+
+- **Standardmäßig deaktiviert**: Die MCP-Integration muss explizit aktiviert werden, und jeder Server ist standardmäßig deaktiviert — doppelter Schutz
+- **Lazy-Verbindung**: Server verbinden sich erst nach Aktivierung bei Bedarf; Deaktivieren trennt
+- **Ergebniskürzung**: Werkzeugergebnisse über der Maximallänge werden mit Markierung gekürzt
+- **Werkzeugobergrenze**: Die Anzahl der für jedes Wesen sichtbaren MCP-Werkzeuge ist begrenzt (Standard 40), um Kontextaufblähung zu verhindern
+- **Timeout-Schutz**: Ein Aufruf wird nach dem Timeout (Standard 60 Sekunden) abgebrochen
+
+## HTTP-API
+
+| Endpunkt | Methode | Beschreibung |
+|----------|---------|--------------|
+| `/api/mcp/list-servers` | GET | Serverstatusliste abrufen |
+| `/api/mcp/list-tools?serverId=` | GET | Werkzeugliste eines Servers abrufen |
+| `/api/mcp/add-server` | POST | Server hinzufügen |
+| `/api/mcp/toggle` | POST | Server aktivieren/deaktivieren |
+| `/api/mcp/remove-server` | POST | Server entfernen |
+| `/api/mcp/reconnect` | POST | Server neu verbinden |
+| `/api/mcp/test-tool` | POST | Werkzeugaufruf testen |
+
+## Häufige Fragen
+
+**F: Nach dem Hinzufügen eines Servers erscheinen keine Werkzeuge?**
+A: Prüfen Sie der Reihe nach drei Punkte: ① der globale Schalter ""MCP aktivieren"" ist eingeschaltet; ② der Server ist aktiviert (standardmäßig deaktiviert); ③ der Verbindungsstatus ist ""verbunden"" — klicken Sie bei einem Fehler auf ""Neu verbinden"" und prüfen Sie die Fehlermeldung.
+
+**F: Ein stdio-Server verbindet sich nicht?**
+A: Stellen Sie sicher, dass der Befehl existiert und ausführbar ist (z. B. erfordert `npx` Node.js im PATH) und die Argumente korrekt sind. Testen Sie den Befehl zunächst manuell im Terminal.
+
+**F: Werkzeugaufrufe werden abgelehnt?**
+A: Prüfen Sie die Werkzeugaktions-Berechtigungen des Wesens: Für den Serverschlüssel `mcp_{id}` oder den Werkzeugschlüssel könnte die Aktion `execute` deaktiviert sein.
+
+**F: Wie mache ich einen Server nur für bestimmte Wesen sichtbar?**
+A: Listen Sie die erlaubten Wesen-IDs in `AllowedBeingIds` des Servers auf; leer lassen, um ihn für alle sichtbar zu machen.
 ";
 
 #endregion

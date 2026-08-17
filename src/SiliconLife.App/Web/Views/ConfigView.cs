@@ -166,6 +166,13 @@ public class ConfigView : ViewBase
                             ).Class("dict-actions")
                         ).Class("form-group").Id("inputIMPlatformList").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
+                            H.Label(loc.GetConfigDisplayName("McpServers", out _)),
+                            H.Div().Id("mcpServerListContainer").Class("im-platform-list-editor"),
+                            H.Div(
+                                H.Button(loc.McpBtnAddServer).Class("btn btn-add").Id("btnAddMcpServerRow")
+                            ).Class("dict-actions")
+                        ).Class("form-group").Id("inputMcpServerList").Style(new CssBuilder().InlineProperty("display", "none")),
+                        H.Div(
                             H.Button(loc.ConfigSaveButton).Class("btn btn-primary").Id("btnSave"),
                             H.Button(loc.ConfigCancelButton).Class("btn btn-secondary").Id("btnCancel")
                         ).Class("form-actions")
@@ -695,7 +702,8 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputEnum")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDictionary")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputDirectoryList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputIMPlatformList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")));
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputIMPlatformList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputMcpServerList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")));
         js.Add(() => Js.Func(() => "hideAllInputs", () => new List<string> { }, () => hideAllInputsBlock));
 
         // Dictionary editor functions
@@ -1486,6 +1494,183 @@ public class ConfigView : ViewBase
         
         js.Add(() => Js.Func(() => "getIMPlatformListJson", () => new List<string> { }, () => getIMPlatformListJsonBlock));
 
+        // ===== MCP server list editor (inside editModal, no extra popups) =====
+        var locMcpRemove = loc.McpBtnRemove;
+        var locMcpEmpty = loc.McpsEmptyState;
+        var locMcpEnabled = loc.McpBtnToggleOn;
+        var locMcpPromptName = loc.McpPromptName;
+        var locMcpPromptCommand = loc.McpPromptCommand;
+        var locMcpPromptArgs = loc.McpPromptArgs;
+        var locMcpPromptUrl = loc.McpPromptUrl;
+
+        // 生成一个字段行（label + input/select），追加到 fields 容器；tag 保证 JS 变量名唯一
+        static List<Func<JsSyntax>> McpFieldRow(string tag, string rowClass, string labelText, string inputClass,
+            string? placeholder, Func<string, Func<JsSyntax>>? valueSetter, bool isSelect)
+        {
+            string rowV = $"frow{tag}", labV = $"flab{tag}", inpV = $"finp{tag}";
+            var stmts = new List<Func<JsSyntax>>
+            {
+                () => Js.Const(() => rowV, () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))),
+                () => Js.Id(() => rowV).Prop(() => "className").Assign(() => Js.Str(() => rowClass)),
+                () => Js.Const(() => labV, () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))),
+                () => Js.Id(() => labV).Prop(() => "textContent").Assign(() => Js.Str(() => labelText)),
+                () => Js.Id(() => rowV).Call(() => "appendChild", () => Js.Id(() => labV))
+            };
+            if (isSelect)
+            {
+                stmts.Add(() => Js.Const(() => inpV, () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "select"))));
+                stmts.Add(() => Js.Id(() => inpV).Call(() => "insertAdjacentHTML", () => Js.Str(() => "beforeend"), () => Js.Str(() => "<option value=\"stdio\">stdio</option><option value=\"http\">http</option>")).Stmt());
+            }
+            else
+            {
+                stmts.Add(() => Js.Const(() => inpV, () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))));
+                stmts.Add(() => Js.Id(() => inpV).Prop(() => "type").Assign(() => Js.Str(() => "text")));
+                if (placeholder != null)
+                    stmts.Add(() => Js.Id(() => inpV).Prop(() => "placeholder").Assign(() => Js.Str(() => placeholder)));
+            }
+            stmts.Add(() => Js.Id(() => inpV).Prop(() => "className").Assign(() => Js.Str(() => inputClass)));
+            if (valueSetter != null)
+                stmts.Add(valueSetter(inpV));
+            stmts.Add(() => Js.Id(() => rowV).Call(() => "appendChild", () => Js.Id(() => inpV)));
+            stmts.Add(() => Js.Id(() => "fields").Call(() => "appendChild", () => Js.Id(() => rowV)));
+            return stmts;
+        }
+
+        var addMcpServerRowBlock = Js.Block()
+            .Add(() => Js.Const(() => "src", () => Js.Id(() => "cfg").Op(() => "||", () => Js.Obj())))
+            .Add(() => Js.Const(() => "container", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mcpServerListContainer"))))
+            .Add(() => Js.Const(() => "emptyEl", () => Js.Id(() => "container").Call(() => "querySelector", () => Js.Str(() => ".im-platform-empty"))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "emptyEl"), new List<JsSyntax> { Js.Id(() => "emptyEl").Prop(() => "remove").Invoke().Stmt() }) }
+            }))
+            .Add(() => Js.Const(() => "row", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "row").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-item mcp-server-item")))
+            // header: Id + Enabled + Delete
+            .Add(() => Js.Const(() => "header", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "header").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-item-header")))
+            .Add(() => Js.Const(() => "idLabel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
+            .Add(() => Js.Id(() => "idLabel").Prop(() => "textContent").Assign(() => Js.Str(() => "Id")))
+            .Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "idLabel")))
+            .Add(() => Js.Const(() => "idInput", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
+            .Add(() => Js.Id(() => "idInput").Prop(() => "type").Assign(() => Js.Str(() => "text")))
+            .Add(() => Js.Id(() => "idInput").Prop(() => "className").Assign(() => Js.Str(() => "mcp-server-id")))
+            .Add(() => Js.Id(() => "idInput").Prop(() => "style").Prop(() => "flex").Assign(() => Js.Str(() => "1")))
+            .Add(() => Js.Id(() => "idInput").Prop(() => "value").Assign(() => Js.Id(() => "src").Prop(() => "Id").Op(() => "||", () => Js.Str(() => ""))))
+            .Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "idInput")))
+            .Add(() => Js.Const(() => "enabledDiv", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "enabledDiv").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-enabled")))
+            .Add(() => Js.Const(() => "enabledCheckbox", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "input"))))
+            .Add(() => Js.Id(() => "enabledCheckbox").Prop(() => "type").Assign(() => Js.Str(() => "checkbox")))
+            .Add(() => Js.Id(() => "enabledCheckbox").Prop(() => "className").Assign(() => Js.Str(() => "mcp-server-enabled")))
+            .Add(() => Js.Id(() => "enabledCheckbox").Prop(() => "checked").Assign(() => Js.Id(() => "src").Prop(() => "Enabled").Op(() => "===", () => Js.Bool(() => true))))
+            .Add(() => Js.Const(() => "enabledLabel", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "label"))))
+            .Add(() => Js.Id(() => "enabledLabel").Prop(() => "textContent").Assign(() => Js.Str(() => locMcpEnabled)))
+            .Add(() => Js.Id(() => "enabledDiv").Call(() => "appendChild", () => Js.Id(() => "enabledCheckbox")))
+            .Add(() => Js.Id(() => "enabledDiv").Call(() => "appendChild", () => Js.Id(() => "enabledLabel")))
+            .Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "enabledDiv")))
+            .Add(() => Js.Const(() => "deleteBtn", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "button"))))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "textContent").Assign(() => Js.Str(() => locMcpRemove)))
+            .Add(() => Js.Id(() => "deleteBtn").Prop(() => "className").Assign(() => Js.Str(() => "btn-im-platform-delete")))
+            .Add(() => Js.Id(() => "deleteBtn").Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "row").Prop(() => "remove").Invoke().Stmt())))
+            .Add(() => Js.Id(() => "header").Call(() => "appendChild", () => Js.Id(() => "deleteBtn")))
+            .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "header")))
+            // fields: Name / Transport / Command / Args / URL
+            .Add(() => Js.Const(() => "fields", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "fields").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-config-fields")));
+
+        foreach (var stmt in McpFieldRow("Name", "im-platform-field-row", "Name", "mcp-server-name", locMcpPromptName,
+            v => () => Js.Id(() => v).Prop(() => "value").Assign(() => Js.Id(() => "src").Prop(() => "Name").Op(() => "||", () => Js.Str(() => ""))), false))
+            addMcpServerRowBlock.Add(stmt);
+
+        foreach (var stmt in McpFieldRow("Transport", "im-platform-field-row", "Transport", "mcp-server-transport", null,
+            v => () => Js.Id(() => v).Prop(() => "value").Assign(() => Js.Ternary(
+                () => Js.Id(() => "src").Prop(() => "Transport").Op(() => "===", () => Js.Num(() => "1")).Op(() => "||", () => (JsSyntax)Js.Id(() => "src").Prop(() => "Transport").Op(() => "===", () => Js.Str(() => "Http"))).Op(() => "||", () => (JsSyntax)Js.Id(() => "src").Prop(() => "Transport").Op(() => "===", () => Js.Str(() => "http"))),
+                () => Js.Str(() => "http"), () => Js.Str(() => "stdio"))), true))
+            addMcpServerRowBlock.Add(stmt);
+
+        foreach (var stmt in McpFieldRow("Command", "im-platform-field-row mcp-stdio-only", "Command", "mcp-server-command", locMcpPromptCommand,
+            v => () => Js.Id(() => v).Prop(() => "value").Assign(() => Js.Id(() => "src").Prop(() => "Command").Op(() => "||", () => Js.Str(() => ""))), false))
+            addMcpServerRowBlock.Add(stmt);
+
+        foreach (var stmt in McpFieldRow("Args", "im-platform-field-row mcp-stdio-only", "Args", "mcp-server-args", locMcpPromptArgs,
+            v => () => Js.Id(() => v).Prop(() => "value").Assign(() => Js.Id(() => "src").Prop(() => "Args").Op(() => "||", () => Js.Array()).Call(() => "join", () => Js.Str(() => " "))), false))
+            addMcpServerRowBlock.Add(stmt);
+
+        foreach (var stmt in McpFieldRow("Url", "im-platform-field-row mcp-http-only", "URL", "mcp-server-url", locMcpPromptUrl,
+            v => () => Js.Id(() => v).Prop(() => "value").Assign(() => Js.Id(() => "src").Prop(() => "Url").Op(() => "||", () => Js.Str(() => ""))), false))
+            addMcpServerRowBlock.Add(stmt);
+
+        addMcpServerRowBlock
+            .Add(() => Js.Id(() => "row").Call(() => "appendChild", () => Js.Id(() => "fields")))
+            .Add(() => Js.Id(() => "row").Prop(() => "dataset").Prop(() => "mcpOrig").Assign(() => Js.Ternary(() => Js.Id(() => "cfg"), () => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "cfg")), () => Js.Str(() => "{}"))))
+            .Add(() => Js.Id(() => "container").Call(() => "appendChild", () => Js.Id(() => "row")))
+            .Add(() => Js.Id(() => "applyMcpTransport").Invoke(() => Js.Id(() => "row")).Stmt())
+            .Add(() => Js.Id(() => "row").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-transport")).Call(() => "addEventListener", () => Js.Str(() => "change"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "applyMcpTransport").Invoke(() => Js.Id(() => "row")))).Stmt());
+        js.Add(() => Js.Func(() => "addMcpServerRow", () => new List<string> { "cfg" }, () => addMcpServerRowBlock));
+
+        // applyMcpTransport(row) — 按 transport 显隐 stdio / http 字段
+        var applyMcpTransportForEachBlock = Js.Block()
+            .Add(() => Js.Id(() => "el").Prop(() => "style").Prop(() => "display").Assign(() => Js.Ternary(() => Js.Id(() => "t").Op(() => "===", () => Js.Str(() => "stdio")), () => Js.Str(() => ""), () => Js.Str(() => "none"))));
+        var applyMcpTransportForEachBlock2 = Js.Block()
+            .Add(() => Js.Id(() => "el").Prop(() => "style").Prop(() => "display").Assign(() => Js.Ternary(() => Js.Id(() => "t").Op(() => "===", () => Js.Str(() => "http")), () => Js.Str(() => ""), () => Js.Str(() => "none"))));
+        var applyMcpTransportBlock = Js.Block()
+            .Add(() => Js.Const(() => "t", () => Js.Id(() => "row").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-transport")).Prop(() => "value")))
+            .Add(() => Js.Id(() => "row").Call(() => "querySelectorAll", () => Js.Str(() => ".mcp-stdio-only")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "el" }, () => applyMcpTransportForEachBlock)))
+            .Add(() => Js.Id(() => "row").Call(() => "querySelectorAll", () => Js.Str(() => ".mcp-http-only")).Call(() => "forEach", () => Js.Arrow(() => new List<string> { "el" }, () => applyMcpTransportForEachBlock2)));
+        js.Add(() => Js.Func(() => "applyMcpTransport", () => new List<string> { "row" }, () => applyMcpTransportBlock));
+
+        // initMcpServerListEditor(jsonStr)
+        var initMcpServerListEditorBlock = Js.Block()
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mcpServerListContainer")).Prop(() => "innerHTML").Assign(() => Js.Str(() => "")))
+            .Add(() => Js.Let(() => "servers", () => Js.Ternary(() => Js.Id(() => "jsonStr"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "jsonStr")), () => Js.Array())));
+        var mcpForEachBlock = Js.Block()
+            .Add(() => Js.Id(() => "addMcpServerRow").Invoke(() => Js.Id(() => "s")).Stmt());
+        var mcpEmptyBlock = Js.Block()
+            .Add(() => Js.Const(() => "emptyRow", () => Js.Id(() => "document").Call(() => "createElement", () => Js.Str(() => "div"))))
+            .Add(() => Js.Id(() => "emptyRow").Prop(() => "className").Assign(() => Js.Str(() => "im-platform-empty")))
+            .Add(() => Js.Id(() => "emptyRow").Prop(() => "textContent").Assign(() => Js.Str(() => locMcpEmpty)))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mcpServerListContainer")).Call(() => "appendChild", () => Js.Id(() => "emptyRow")));
+        initMcpServerListEditorBlock.Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+        {
+            { (Js.Id(() => "servers").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0")), new List<JsSyntax>
+                {
+                    Js.Id(() => "servers").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "s" }, () => mcpForEachBlock))
+                })
+            },
+            { (null, new List<JsSyntax> { mcpEmptyBlock }) }
+        }));
+        js.Add(() => Js.Func(() => "initMcpServerListEditor", () => new List<string> { "jsonStr" }, () => initMcpServerListEditorBlock));
+
+        // getMcpServerListJson() — 收集所有行（保留未展示字段），输出 PascalCase JSON
+        var collectMcpItemBlock = Js.Block()
+            .Add(() => Js.Const(() => "cfg", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "item").Prop(() => "dataset").Prop(() => "mcpOrig").Op(() => "||", () => Js.Str(() => "{}")))))
+            .Add(() => Js.Assign(() => Js.Id(() => "cfg").Prop(() => "Id"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-id")).Prop(() => "value").Call(() => "trim")))
+            .Add(() => Js.Assign(() => Js.Id(() => "cfg").Prop(() => "Name"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-name")).Prop(() => "value").Call(() => "trim")))
+            .Add(() => Js.Assign(() => Js.Id(() => "cfg").Prop(() => "Transport"), () => Js.Ternary(() => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-transport")).Prop(() => "value").Op(() => "===", () => Js.Str(() => "http")), () => Js.Str(() => "Http"), () => Js.Str(() => "Stdio"))))
+            .Add(() => Js.Assign(() => Js.Id(() => "cfg").Prop(() => "Enabled"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-enabled")).Prop(() => "checked")))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "cfg").Prop(() => "Transport").Op(() => "===", () => Js.Str(() => "Stdio")), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "cfg").Prop(() => "Command"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-command")).Prop(() => "value").Call(() => "trim")).Stmt(),
+                        Js.Assign(() => Js.Id(() => "cfg").Prop(() => "Args"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-args")).Prop(() => "value").Call(() => "split", () => Js.Regex(() => "\\s+", () => "")).Call(() => "filter", () => Js.Arrow(() => new List<string> { "a" }, () => (JsSyntax)Js.Id(() => "a").Prop(() => "length").Op(() => ">", () => Js.Num(() => "0"))))).Stmt()
+                    })
+                },
+                { (null, new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "cfg").Prop(() => "Url"), () => Js.Id(() => "item").Call(() => "querySelector", () => Js.Str(() => ".mcp-server-url")).Prop(() => "value").Call(() => "trim")).Stmt()
+                    })
+                }
+            }))
+            .Add(() => Js.Id(() => "servers").Call(() => "push", () => Js.Id(() => "cfg")));
+        var getMcpServerListJsonBlock = Js.Block()
+            .Add(() => Js.Const(() => "items", () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "mcpServerListContainer")).Call(() => "querySelectorAll", () => Js.Str(() => ".mcp-server-item"))))
+            .Add(() => Js.Const(() => "servers", () => Js.Array()))
+            .Add(() => Js.Id(() => "items").Call(() => "forEach", () => Js.Arrow(() => new List<string> { "item" }, () => collectMcpItemBlock)))
+            .Add(() => Js.Return(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "servers"))));
+        js.Add(() => Js.Func(() => "getMcpServerListJson", () => new List<string> { }, () => getMcpServerListJsonBlock));
+
         var openModalBlock = Js.Block()
             .Add(() => Js.Id(() => "hideAllInputs").Invoke().Stmt())
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editKey")).Prop(() => "value").Assign(() => Js.Id(() => "key")))
@@ -1592,6 +1777,13 @@ public class ConfigView : ViewBase
                         Js.Break()
                     })
                 },
+                { (Js.Str(() => "mcpServerList"), new List<JsSyntax>
+                    {
+                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputMcpServerList")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
+                        Js.Id(() => "initMcpServerListEditor").Invoke(() => Js.Id(() => "value")),
+                        Js.Break()
+                    })
+                },
                 { (Js.Str(() => "guid"), new List<JsSyntax>
                     {
                         Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputString")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
@@ -1693,6 +1885,12 @@ public class ConfigView : ViewBase
                         Js.Break()
                     })
                 },
+                { (Js.Str(() => "mcpServerList"), new List<JsSyntax>
+                    {
+                        Js.Assign(() => Js.Id(() => "value"), () => Js.Id(() => "getMcpServerListJson").Invoke()),
+                        Js.Break()
+                    })
+                },
                 { (Js.Str(() => "guid"), new List<JsSyntax>
                     {
                         Js.Assign(() => Js.Id(() => "value"), () => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValue")).Prop(() => "value").Call(() => "trim")),
@@ -1767,7 +1965,8 @@ public class ConfigView : ViewBase
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnCancel")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "closeModal").Invoke().Stmt())))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDictRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDictRow").Invoke(() => Js.Str(() => ""), () => Js.Str(() => "")).Stmt())))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDirListRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDirListRow").Invoke(() => Js.Str(() => "")).Stmt())))
-            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddIMPlatformRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addIMPlatformRow").Invoke().Stmt())));
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddIMPlatformRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "addIMPlatformRow").Invoke().Stmt())))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddMcpServerRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string>(), () => Js.Id(() => "addMcpServerRow").Invoke().Stmt())));
         
         var modalClickBlock = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>

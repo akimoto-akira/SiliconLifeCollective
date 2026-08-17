@@ -56,6 +56,8 @@ public class HelpLocalizationEsES : HelpLocalizationBase
   public override string Logging_Title => "Sistema de Registro de Eventos";
   public override string Skills_Title => "Habilidades";
 
+  public override string Mcp_Title => "Servidores MCP";
+
   public override string[] GettingStarted_Tags => new[]
   {
     "instalación", "inicio", "introducción", "inicio rápido", "empezar", "inicialización", "ejecutar",
@@ -183,6 +185,7 @@ public class HelpLocalizationEsES : HelpLocalizationBase
     "archivo"
   };
   public override string[] Skills_Tags => new[] { "habilidades", "skill", "orquestación", "prompt", "automatización", "plugin", "personalizado" };
+  public override string[] Mcp_Tags => new[] { "MCP", "protocolo de contexto de modelo", "Model Context Protocol", "herramientas externas", "servidor", "stdio", "http", "integración de herramientas", "extensión" };
   public override string GettingStarted => @"
 # Inicio Rápido
 
@@ -5230,6 +5233,134 @@ R: Use `export` o `export_md` para exportarla como JSON/Markdown, guárdela en u
 
 **P: ¿Puede una habilidad llamarse a sí misma recursivamente?**
 R: No. Las habilidades en ejecución están bloqueadas contra llamadas recursivas para evitar bucles infinitos.
+";
+
+  public override string Mcp => @"
+# Servidores MCP
+
+## ¿Qué es MCP?
+
+MCP (Model Context Protocol) es un protocolo abierto que permite a las aplicaciones de IA conectarse a servidores de herramientas externos. Con la integración MCP, los seres de silicio pueden llamar a herramientas proporcionadas por servidores MCP externos (sistemas de archivos, bases de datos, búsqueda, etc.), ampliando enormemente sus capacidades.
+
+**Conceptos básicos:**
+
+- **Servidor MCP**: un proceso independiente o servicio HTTP que expone un conjunto de herramientas
+- **Transporte**: `stdio` (subproceso local) o `http` (HTTP fluido)
+- **Herramienta**: una operación atómica expuesta por el servidor; al registrarse en los seres de silicio se añade un prefijo automático que garantiza unicidad global
+
+## Habilitar MCP
+
+La integración MCP está deshabilitada por defecto. Para habilitarla:
+
+1. Abra la página ""Configuración"" en la interfaz web
+2. Busque el grupo ""Mcp""
+3. Active ""Habilitar MCP""
+
+## Configuración global
+
+| Ajuste | Predeterminado | Descripción |
+|--------|----------------|-------------|
+| Habilitar MCP (McpEnabled) | Desactivado | Interruptor maestro de la integración MCP |
+| Tiempo de espera de herramientas MCP (McpToolTimeoutSeconds) | 60 | Tiempo de espera por llamada en segundos |
+| Máx. herramientas MCP por ser (MaxMcpToolsPerBeing) | 40 | Evita la inflación del contexto |
+| Longitud máx. de resultados MCP (McpMaxResponseLength) | 32768 | Los resultados más largos se truncan |
+
+## Añadir un servidor MCP
+
+### Opción 1: página de configuración (recomendado)
+
+1. Abra ""Configuración"" → grupo ""Mcp""
+2. Haga clic en el botón de editar de ""Servidores MCP"" (McpServers)
+3. En el editor modal haga clic en ""Añadir servidor"" y complete los datos
+4. Cada servidor es una tarjeta; puede añadir o eliminar en cualquier momento
+5. Haga clic en ""Guardar"" para enviar
+
+### Opción 2: página de gestión de MCP
+
+Abra la página ""Servidores MCP"" en la interfaz web y haga clic en ""Añadir servidor""; siga las indicaciones paso a paso.
+
+### Campos de configuración del servidor
+
+| Campo | Obligatorio | Descripción |
+|-------|-------------|-------------|
+| Id | Sí | Identificador del servidor; solo minúsculas/dígitos/guiones bajos (se usa como prefijo de herramientas) |
+| Name | No | Nombre para mostrar (si está vacío se usa el Id) |
+| Transport | Sí | `stdio` (comando local) o `http` (endpoint HTTP) |
+| Command | stdio | Comando ejecutable, p. ej. `npx` |
+| Args | No | Argumentos separados por espacios, p. ej. `-y @modelcontextprotocol/server-filesystem D:\data` |
+| Url | http | Endpoint del servidor, p. ej. `http://localhost:3000/mcp` |
+| Enabled | - | Deshabilitado por defecto; al habilitarlo conecta de inmediato |
+
+**Campos avanzados (editar el JSON directamente):**
+
+- `Environment`: diccionario de variables de entorno para stdio
+- `Headers`: cabeceras HTTP adicionales (p. ej. Authorization)
+- `AllowedTools`: lista blanca de nombres de herramientas originales (vacío = todas)
+- `AllowedBeingIds`: ids de seres autorizados a usar el servidor (vacío = todos)
+
+## Nomenclatura y permisos de herramientas
+
+Cada herramienta MCP se registra con un prefijo:
+
+```
+mcp_{serverId}_{nombreOriginal}
+```
+
+Por ejemplo, con el id de servidor `fs`, su herramienta `read_file` se registra como `mcp_fs_read_file`.
+
+**Dos niveles de permiso:**
+
+| Clave de permiso | Efecto |
+|------------------|--------|
+| `mcp_{serverId}` | Nivel servidor: al deshabilitarlo, el ser no ve ninguna herramienta de ese servidor |
+| `mcp_{serverId}_{toolName}` | Nivel herramienta: deshabilita una sola herramienta |
+
+Ambos usan la acción `execute` y se configuran en ""Permisos"" bajo permisos de acciones de herramientas.
+
+## Página de gestión de MCP
+
+La página ""Servidores MCP"" de la interfaz web ofrece:
+
+- **Lista de servidores**: estado de conexión (conectado / fallido / pendiente / deshabilitado), nº conectados, total de herramientas
+- **Ver herramientas**: expanda un servidor para ver nombres, descripciones y esquemas de parámetros
+- **Probar herramienta**: invoque una herramienta en línea e inspeccione el resultado (introduzca argumentos JSON; `{}` = sin argumentos)
+- **Habilitar/Deshabilitar**: alterne el estado del servidor (deshabilitar desconecta de inmediato)
+- **Reconectar**: reintento manual tras un fallo de conexión
+- **Eliminar**: borra la configuración del servidor y cancela el registro de todas sus herramientas
+
+## Mecanismos de seguridad
+
+- **Deshabilitado por defecto**: la integración MCP debe habilitarse explícitamente y cada servidor está deshabilitado por defecto — doble protección
+- **Conexión perezosa**: los servidores conectan bajo demanda solo tras habilitarse; deshabilitar desconecta
+- **Truncado de resultados**: los resultados que superan la longitud máxima se truncan con un marcador
+- **Límite de herramientas**: el nº de herramientas MCP visibles por ser tiene un tope (por defecto 40) para evitar la inflación del contexto
+- **Protección de tiempo de espera**: una llamada se aborta tras el tiempo de espera (por defecto 60 segundos)
+
+## API HTTP
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/mcp/list-servers` | GET | Obtener la lista de estados de servidores |
+| `/api/mcp/list-tools?serverId=` | GET | Obtener las herramientas de un servidor |
+| `/api/mcp/add-server` | POST | Añadir un servidor |
+| `/api/mcp/toggle` | POST | Habilitar/deshabilitar un servidor |
+| `/api/mcp/remove-server` | POST | Eliminar un servidor |
+| `/api/mcp/reconnect` | POST | Reconectar un servidor |
+| `/api/mcp/test-tool` | POST | Probar una llamada a una herramienta |
+
+## Preguntas frecuentes
+
+**P: ¿No aparecen herramientas tras añadir un servidor?**
+R: Compruebe tres cosas en orden: ① el interruptor global ""Habilitar MCP"" está activo; ② el servidor está habilitado (deshabilitado por defecto); ③ el estado de conexión es ""conectado"" — si falla, pulse ""Reconectar"" e inspeccione el error.
+
+**P: ¿Un servidor stdio falla al conectar?**
+R: Asegúrese de que el comando existe y es ejecutable (p. ej. `npx` requiere Node.js en PATH) y de que los argumentos son correctos. Pruebe a ejecutarlo manualmente en un terminal.
+
+**P: ¿Se rechazan las llamadas a herramientas?**
+R: Revise los permisos de acciones de herramientas del ser: la clave de servidor `mcp_{id}` o la de herramienta pueden tener la acción `execute` deshabilitada.
+
+**P: ¿Cómo hago visible un servidor solo para seres específicos?**
+R: Enumere los ids permitidos en `AllowedBeingIds` del servidor; déjelo vacío para hacerlo visible a todos.
 ";
 
 #endregion

@@ -1750,6 +1750,163 @@ public abstract string AboutFailedPluginListLabel { get; }
     /// </summary>
     public abstract string SkillRequestFailed { get; }
 
+    // ===== MCP Page Localization =====
+
+    /// <summary>
+    /// Gets the MCP page browser title
+    /// </summary>
+    public abstract string PageTitleMcp { get; }
+
+    /// <summary>
+    /// Gets the MCP page header text
+    /// </summary>
+    public abstract string McpPageHeader { get; }
+
+    /// <summary>
+    /// Gets the MCP page subtitle text
+    /// </summary>
+    public abstract string McpPageSubtitle { get; }
+
+    /// <summary>
+    /// Gets the statistics line format ({0}=servers, {1}=connected, {2}=tools)
+    /// </summary>
+    public abstract string McpsStatFormat { get; }
+
+    /// <summary>
+    /// Gets the empty state text when no MCP servers are configured
+    /// </summary>
+    public abstract string McpsEmptyState { get; }
+
+    /// <summary>
+    /// Gets the back-to-beings link text
+    /// </summary>
+    public abstract string McpsBackToBeings { get; }
+
+    /// <summary>
+    /// Gets the add-server button text
+    /// </summary>
+    public abstract string McpBtnAddServer { get; }
+
+    /// <summary>
+    /// Gets the refresh button text
+    /// </summary>
+    public abstract string McpBtnRefresh { get; }
+
+    /// <summary>
+    /// Gets the enable button text
+    /// </summary>
+    public abstract string McpBtnToggleOn { get; }
+
+    /// <summary>
+    /// Gets the disable button text
+    /// </summary>
+    public abstract string McpBtnToggleOff { get; }
+
+    /// <summary>
+    /// Gets the reconnect button text
+    /// </summary>
+    public abstract string McpBtnReconnect { get; }
+
+    /// <summary>
+    /// Gets the remove button text
+    /// </summary>
+    public abstract string McpBtnRemove { get; }
+
+    /// <summary>
+    /// Gets the test-tool button text
+    /// </summary>
+    public abstract string McpBtnTest { get; }
+
+    /// <summary>
+    /// Gets the view-schema button text
+    /// </summary>
+    public abstract string McpBtnViewSchema { get; }
+
+    /// <summary>
+    /// Gets the tools toggle row text
+    /// </summary>
+    public abstract string McpBtnViewTools { get; }
+
+    /// <summary>
+    /// Gets the connected state label
+    /// </summary>
+    public abstract string McpStatusConnected { get; }
+
+    /// <summary>
+    /// Gets the failed state label
+    /// </summary>
+    public abstract string McpStatusFailed { get; }
+
+    /// <summary>
+    /// Gets the pending state label
+    /// </summary>
+    public abstract string McpStatusPending { get; }
+
+    /// <summary>
+    /// Gets the disabled state label
+    /// </summary>
+    public abstract string McpStatusDisabled { get; }
+
+    /// <summary>
+    /// Gets the confirm-remove message format ({0}=server id)
+    /// </summary>
+    public abstract string McpConfirmRemoveFormat { get; }
+
+    /// <summary>
+    /// Gets the prompt for the server id input
+    /// </summary>
+    public abstract string McpPromptServerId { get; }
+
+    /// <summary>
+    /// Gets the prompt for the display name input
+    /// </summary>
+    public abstract string McpPromptName { get; }
+
+    /// <summary>
+    /// Gets the prompt for the transport choice
+    /// </summary>
+    public abstract string McpPromptTransport { get; }
+
+    /// <summary>
+    /// Gets the prompt for the stdio command input
+    /// </summary>
+    public abstract string McpPromptCommand { get; }
+
+    /// <summary>
+    /// Gets the prompt for the stdio arguments input
+    /// </summary>
+    public abstract string McpPromptArgs { get; }
+
+    /// <summary>
+    /// Gets the prompt for the HTTP url input
+    /// </summary>
+    public abstract string McpPromptUrl { get; }
+
+    /// <summary>
+    /// Gets the prompt for the test-call arguments
+    /// </summary>
+    public abstract string McpPromptTestParams { get; }
+
+    /// <summary>
+    /// Gets the test result prefix
+    /// </summary>
+    public abstract string McpTestResultPrefix { get; }
+
+    /// <summary>
+    /// Gets the load-failed message format ({0}=error)
+    /// </summary>
+    public abstract string McpLoadFailedFormat { get; }
+
+    /// <summary>
+    /// Gets the generic request-failed message
+    /// </summary>
+    public abstract string McpRequestFailed { get; }
+
+    /// <summary>
+    /// Gets the enable-server-on-add question
+    /// </summary>
+    public abstract string McpPromptEnableNow { get; }
+
     // ===== Tasks Page Localization =====
 
     /// <summary>

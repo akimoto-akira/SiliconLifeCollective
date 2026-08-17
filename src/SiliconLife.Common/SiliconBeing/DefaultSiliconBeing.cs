@@ -115,6 +115,13 @@ public class DefaultSiliconBeing : SiliconBeingBase
             SkillManager.SyncAutoSkillTickObjects(this);
         }
 
+        // 0.5 Hot-reload MCP servers: config changes, server tool list
+        // notifications and failed-server retries (rate-limited internally)
+        if (McpManager.McpEnabled)
+        {
+            McpManager.Instance.RefreshIfNeeded();
+        }
+
         // 1. Check if AI config has changed (external disturbance - resets error count)
         if (CheckAndRebuildAIClient())
         {

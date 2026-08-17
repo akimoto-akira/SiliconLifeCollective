@@ -114,6 +114,9 @@ public abstract class HelpLocalizationBase
     /// <summary>Skills</summary>
     public abstract string Skills { get; }
 
+    /// <summary>MCP Servers</summary>
+    public abstract string Mcp { get; }
+
     #endregion
 
     #region Help Document Titles (Display Titles)
@@ -211,6 +214,9 @@ public abstract class HelpLocalizationBase
     /// <summary>Skills Title</summary>
     public abstract string Skills_Title { get; }
 
+    /// <summary>MCP Servers Title</summary>
+    public abstract string Mcp_Title { get; }
+
     #endregion
 
     #region Help Document Tags (Search Tags)
@@ -307,6 +313,9 @@ public abstract class HelpLocalizationBase
 
     /// <summary>Skills Tags</summary>
     public abstract string[] Skills_Tags { get; }
+
+    /// <summary>MCP Servers Tags</summary>
+    public abstract string[] Mcp_Tags { get; }
 
     #endregion
 }

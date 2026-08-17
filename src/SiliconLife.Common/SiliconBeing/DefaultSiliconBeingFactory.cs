@@ -181,6 +181,15 @@ public class DefaultSiliconBeingFactory : ISiliconBeingFactory
         being.SkillManager = skillManager;
         skillManager.SyncAutoSkillTickObjects(being);
 
+        // MCP tools: register wrapper tools from enabled MCP servers
+        // (filtered per being: AllowedBeingIds / AllowedTools / permissions)
+        if (McpManager.McpEnabled)
+        {
+            McpManager.Instance.EnsureLoaded();
+            McpManager.Instance.ConnectPendingServers();
+            McpManager.Instance.SyncToolsForBeing(being);
+        }
+
         GlobalACL? globalAcl = ServiceLocator.Instance.GlobalAcl;
         if (globalAcl != null)
         {

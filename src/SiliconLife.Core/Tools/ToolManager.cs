@@ -74,6 +74,14 @@ public class ToolManager
             {
                 _toolActions[tool.Name] = actionAttr.Actions;
             }
+            else if (tool is McpTool)
+            {
+                // MCP wrapper tools have no compile-time attributes; declare a
+                // single "execute" action so the permission matrix lists them
+                // and FilterActionEnum drops fully-disabled tools from the
+                // AI-visible schema (same "execute" convention as skills).
+                _toolActions[tool.Name] = new[] { "execute" };
+            }
 
             if (toolType.GetCustomAttribute<ChatOnlyAttribute>() != null)
             {
@@ -81,6 +89,28 @@ public class ToolManager
             }
         }
         _logger.Debug(null, $"Tool registered: {tool.Name}");
+    }
+
+    /// <summary>
+    /// Removes a tool registration along with its metadata. Used by the MCP
+    /// manager to unregister tools of servers that were disabled or removed.
+    /// </summary>
+    /// <param name="name">The tool name.</param>
+    /// <returns>True when a registration was removed.</returns>
+    public bool UnregisterTool(string name)
+    {
+        lock (_lock)
+        {
+            bool removed = _tools.Remove(name);
+            _toolScenarios.Remove(name);
+            _toolActions.Remove(name);
+            _chatOnlyTools.Remove(name);
+            if (removed)
+            {
+                _logger.Debug(null, $"Tool unregistered: {name}");
+            }
+            return removed;
+        }
     }
 
     /// <summary>

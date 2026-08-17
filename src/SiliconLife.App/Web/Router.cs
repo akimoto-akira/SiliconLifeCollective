@@ -118,6 +118,14 @@ public class Router
         RegisterController(() => new SkillController(), "/api/skills/import-md", "POST");
         RegisterController(() => new SkillController(), "/api/skills/delete", "POST");
         RegisterController(() => new SkillController(), "/api/skills/test", "POST");
+        RegisterController(() => new McpController(), "/mcp");
+        RegisterController(() => new McpController(), "/api/mcp/list-servers");
+        RegisterController(() => new McpController(), "/api/mcp/list-tools");
+        RegisterController(() => new McpController(), "/api/mcp/add-server", "POST");
+        RegisterController(() => new McpController(), "/api/mcp/toggle", "POST");
+        RegisterController(() => new McpController(), "/api/mcp/remove-server", "POST");
+        RegisterController(() => new McpController(), "/api/mcp/reconnect", "POST");
+        RegisterController(() => new McpController(), "/api/mcp/test-tool", "POST");
         RegisterController(() => new KnowledgeController(), "/knowledge");
         RegisterController(() => new KnowledgeController(), "/api/knowledge/graph");
         RegisterController(() => new ProjectController(), "/project");

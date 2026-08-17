@@ -54,6 +54,8 @@ public class HelpLocalizationEnUS : HelpLocalizationBase
     public override string Logging_Title => "Logging System";
     public override string Skills_Title => "Skills";
 
+    public override string Mcp_Title => "MCP Servers";
+
     public override string[] GettingStarted_Tags => new[]
         { "install", "start", "setup", "quick start", "getting started", "begin", "launch", "initialize" };
 
@@ -156,6 +158,8 @@ public class HelpLocalizationEnUS : HelpLocalizationBase
         { "logging system", "log", "records", "debug", "error", "warning", "monitor", "trace", "console", "file" };
     public override string[] Skills_Tags => new[]
         { "skills", "skill", "tool orchestration", "prompt template", "automation", "custom skill", "plugin", "workflow" };
+    public override string[] Mcp_Tags => new[]
+        { "mcp", "model context protocol", "external tools", "server", "stdio", "http", "tool integration", "extension" };
 
     public override string GettingStarted => @"
 # Quick Start
@@ -4675,6 +4679,134 @@ A: Use `export` or `export_md` to export as JSON/Markdown, save to a secure loca
 
 **Q: Can a skill recursively call itself?**
 A: No. Recursive skill calls are blocked during execution to prevent infinite loops.
+";
+
+    public override string Mcp => @"
+# MCP Servers
+
+## What is MCP?
+
+MCP (Model Context Protocol) is an open protocol that allows AI applications to connect to external tool servers. With the MCP integration, silicon beings can call tools provided by external MCP servers (such as file systems, databases, search, and more), greatly extending their capabilities.
+
+**Core concepts:**
+
+- **MCP Server**: an independently running process or HTTP service that exposes a set of tools
+- **Transport**: `stdio` (local subprocess) or `http` (Streamable HTTP)
+- **Tool**: an atomic operation exposed by the server; a prefix is added automatically on registration to silicon beings to guarantee global uniqueness
+
+## Enabling MCP
+
+The MCP integration is disabled by default. To enable it:
+
+1. Open the ""Config"" page in the web UI
+2. Find the ""Mcp"" group
+3. Turn on ""Enable MCP""
+
+## Global Configuration
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Enable MCP (McpEnabled) | Off | Master switch for the MCP integration |
+| MCP tool timeout (McpToolTimeoutSeconds) | 60 | Timeout per tool call in seconds |
+| Max MCP tools per being (MaxMcpToolsPerBeing) | 40 | Prevents context bloat |
+| Max MCP result length (McpMaxResponseLength) | 32768 | Longer results are truncated |
+
+## Adding an MCP Server
+
+### Option 1: Config page (recommended)
+
+1. Open the ""Config"" page → ""Mcp"" group
+2. Click the edit button of ""MCP Servers"" (McpServers)
+3. In the modal editor click ""Add Server"" and fill in the server details
+4. Each server is a card; add or delete servers at any time
+5. Click ""Save"" to submit
+
+### Option 2: MCP management page
+
+Open the ""MCP Servers"" page in the web UI and click ""Add Server""; follow the prompts step by step.
+
+### Server configuration fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| Id | Yes | Server identifier; lowercase letters/digits/underscores only (used as the tool-name prefix) |
+| Name | No | Display name (falls back to Id when empty) |
+| Transport | Yes | `stdio` (local command) or `http` (HTTP endpoint) |
+| Command | stdio | Executable command, e.g. `npx` |
+| Args | No | Command arguments (space separated), e.g. `-y @modelcontextprotocol/server-filesystem D:\data` |
+| Url | http | Server endpoint, e.g. `http://localhost:3000/mcp` |
+| Enabled | - | Disabled by default; enabling connects immediately |
+
+**Advanced fields (edit the JSON config directly):**
+
+- `Environment`: environment variables dictionary for stdio transport
+- `Headers`: additional request headers for HTTP transport (e.g. Authorization)
+- `AllowedTools`: whitelist of original tool names (empty = all tools of the server)
+- `AllowedBeingIds`: list of being ids allowed to use the server (empty = all beings)
+
+## Tool Naming and Permissions
+
+Every MCP tool is registered with a prefix:
+
+```
+mcp_{serverId}_{originalToolName}
+```
+
+For example, with server id `fs`, its `read_file` tool is registered as `mcp_fs_read_file`.
+
+**Two permission levels:**
+
+| Permission key | Effect |
+|----------------|--------|
+| `mcp_{serverId}` | Server level: when disabled, the being sees none of this server's tools |
+| `mcp_{serverId}_{toolName}` | Tool level: disables a single tool only |
+
+Both use the action `execute` and are configured on the ""Permissions"" page under tool action permissions.
+
+## MCP Management Page
+
+The ""MCP Servers"" page in the web UI provides:
+
+- **Server list**: connection state (connected / failed / pending / disabled), connected count, total tools
+- **Tool viewing**: expand a server to see all tool names, descriptions, and parameter schemas
+- **Tool testing**: invoke a tool online and inspect the result (enter JSON arguments; `{}` means none)
+- **Enable/Disable**: toggle the server state (disabling disconnects immediately)
+- **Reconnect**: manually retry after a connection failure
+- **Remove**: delete the server configuration and unregister all of its tools
+
+## Security Mechanisms
+
+- **Disabled by default**: the MCP integration must be enabled explicitly, and every server is disabled by default — double protection
+- **Lazy connection**: servers connect on demand only after being enabled; disabling disconnects
+- **Result truncation**: tool results longer than the maximum length are truncated with a marker
+- **Tool cap**: the number of MCP tools visible to each being is capped (default 40) to prevent context bloat
+- **Timeout protection**: a single call is aborted after the timeout (default 60 seconds)
+
+## HTTP API
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/mcp/list-servers` | GET | Get the server status list |
+| `/api/mcp/list-tools?serverId=` | GET | Get the tool list of a server |
+| `/api/mcp/add-server` | POST | Add a server |
+| `/api/mcp/toggle` | POST | Enable/disable a server |
+| `/api/mcp/remove-server` | POST | Remove a server |
+| `/api/mcp/reconnect` | POST | Reconnect a server |
+| `/api/mcp/test-tool` | POST | Test a tool call |
+
+## FAQ
+
+**Q: Tools do not appear after adding a server?**
+A: Check three things in order: ① the global ""Enable MCP"" switch is on; ② the server is enabled (disabled by default); ③ the connection state is ""connected"" — on failure click ""Reconnect"" and inspect the error message.
+
+**Q: A stdio server fails to connect?**
+A: Make sure the command exists and is executable (e.g. `npx` requires Node.js installed and on PATH) and the arguments are correct. Try running the command manually in a terminal first.
+
+**Q: Tool calls are rejected?**
+A: Check the being's tool action permissions: the server-level key `mcp_{id}` or the tool-level key may have the `execute` action disabled.
+
+**Q: How do I make a server visible only to specific beings?**
+A: List the allowed being ids in the server's `AllowedBeingIds`; leave it empty to make it visible to all beings.
 ";
 
     #endregion
