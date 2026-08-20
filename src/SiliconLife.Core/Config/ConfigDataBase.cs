@@ -95,6 +95,15 @@ public abstract class ConfigDataBase
     public abstract Dictionary<string, object> AIConfig { get; set; }
 
     /// <summary>
+    /// Gets or sets the maximum number of recent chat messages loaded into
+    /// AI context per request (default 20). Used as the fallback context window
+    /// when the AI client does not report a context window size; older messages
+    /// stay in storage and resurface via the memory pipeline.
+    /// </summary>
+    [ConfigGroup("Runtime", Order = 5, DisplayNameKey = "MaxContextMessages", DescriptionKey = "MaxContextMessages")]
+    public virtual int MaxContextMessages { get; set; } = 20;
+
+    /// <summary>
     /// Gets or sets the list of plugin directories for auto-discovery.
     /// Each entry can be an absolute path or a relative path (relative to the application base directory).
     /// If empty upon load, defaults to ["plugins"] (relative to the application base directory).

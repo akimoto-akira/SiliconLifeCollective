@@ -89,7 +89,8 @@ public class HunyuanClient : IAIClient
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly string _apiKey;
 
-    public const int MaxContextWindowTokens = 262144;
+    // Largest context window offered on TokenHub (the 1M third-party models).
+    public const int MaxContextWindowTokens = 1048576;
 
     public const string TokenHubEndpoint = "https://tokenhub.tencentmaas.com/v1";
     public const string LegacyEndpoint = "https://api.hunyuan.cloud.tencent.com/v1";
@@ -143,6 +144,18 @@ public class HunyuanClient : IAIClient
         if (string.IsNullOrEmpty(modelName)) return null;
         string lower = modelName.ToLowerInvariant();
         if (lower.Contains("hy3")) return 262144;
+        if (lower.Contains("hy-mt2")) return 8192;
+        if (lower.Contains("hunyuan-role") || lower.Contains("hy-role")) return 32768;
+        // Third-party language models served through TokenHub (模型列表, doc 1823/130051).
+        if (lower.Contains("deepseek-v4")) return 1048576;
+        if (lower == "glm-5.3" || lower == "glm-5.2") return 1048576;
+        if (lower.StartsWith("glm-5")) return 204800;
+        if (lower == "kimi-k3") return 1048576;
+        if (lower.StartsWith("kimi-k2")) return 262144;
+        if (lower == "minimax-m3") return 1048576;
+        if (lower.StartsWith("minimax-m")) return 204800;
+        if (lower.StartsWith("qwen3.5")) return 1014784;
+        if (lower.StartsWith("mimo-")) return 1048576;
         if (lower.Contains("hunyuan-lite") || lower.Contains("hunyuan-t1")) return 262144;
         if (lower.Contains("hunyuan-turbos")) return 131072;
         if (lower.Contains("hunyuan-a13b")) return 131072;
@@ -156,6 +169,12 @@ public class HunyuanClient : IAIClient
         if (string.IsNullOrEmpty(modelName)) return null;
         string lower = modelName.ToLowerInvariant();
         if (lower.Contains("hy3")) return true;
+        // The official TokenHub model list does not advertise Function
+        // Calling for the translation (hy-mt2) and role-play models.
+        if (lower.Contains("hy-mt2") || lower.Contains("hunyuan-role") || lower.Contains("hy-role")) return false;
+        // Every third-party language model on TokenHub advertises Function Calling.
+        if (lower.Contains("deepseek-v4") || lower.StartsWith("glm-") || lower.StartsWith("kimi-k")
+            || lower.StartsWith("minimax-m") || lower.StartsWith("qwen3.") || lower.StartsWith("mimo-")) return true;
         if (lower.StartsWith("hunyuan-turbos") || lower.StartsWith("hunyuan-t1") || lower.StartsWith("hunyuan-turbo") || lower == "hunyuan-functioncall") return true;
         if (lower.StartsWith("hunyuan-lite")) return false;
         return null;

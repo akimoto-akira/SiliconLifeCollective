@@ -16,6 +16,8 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.Loader;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.CodeAnalysis;
 
 namespace SiliconLife.Collective;
@@ -130,7 +132,7 @@ public class PluginLoader
         try
         {
             var context = new PluginLoadContext(dirName, pluginDir, isCollectible: true);
-            Assembly assembly = context.LoadFromAssemblyPath(dllPath);
+            Assembly assembly = context.LoadUnlocked(dllPath);
 
             Type[] pluginTypes = assembly.GetTypes()
                 .Where(t => typeof(IPlugin).IsAssignableFrom(t) && t != typeof(IPlugin) && !t.IsAbstract)
@@ -835,6 +837,19 @@ public class PluginLoader
                 }
             }
 
+            // 0.6 Certified-author bypass: an assembly-level [PluginAuthorCert] whose GUID matches
+            //     HMACSHA256(host salt, assembly name) marks the plugin as first-party; all scan
+            //     rules are skipped. Capability declarations are still read so runtime permission
+            //     bookkeeping (LoadedPlugin.Capabilities) behaves exactly as for scanned plugins.
+            if (IsCertifiedAuthor(reader, out string certGuid))
+            {
+                declaredCapabilities = ReadDeclaredCapabilities(reader);
+                _logger.Info(null,
+                    "Security scan bypassed for certified-author plugin: {0} (cert {1})",
+                    dllPath, certGuid);
+                return true;
+            }
+
             // 0.75. Read PluginCapability declarations from PE metadata before scanning.
             //       Declared capabilities relax the corresponding scan rules (see IsExemptedByCapability).
             //       This must happen before any scan step so that all five scan steps can apply exemptions.
@@ -1171,6 +1186,97 @@ public class PluginLoader
     }
 
     /// <summary>
+    /// Fixed salt mixed into the certified-author GUID derivation. Changing this value
+    /// invalidates every previously issued certificate GUID.
+    /// </summary>
+    private const string AuthorCertSalt = "SiliconLife.Collective.AuthorCert.v1.9B4F-C7A2-E51D";
+
+    /// <summary>
+    /// Computes the expected certified-author GUID for an assembly name:
+    /// the first 16 bytes of HMACSHA256(<see cref="AuthorCertSalt"/>, assemblyName)
+    /// interpreted as a GUID. One assembly name maps to exactly one valid GUID.
+    /// </summary>
+    /// <param name="assemblyName">The plugin assembly name (e.g., "ForgeMind").</param>
+    internal static Guid ComputeAuthorCertGuid(string assemblyName)
+    {
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(AuthorCertSalt));
+        byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(assemblyName));
+        return new Guid(hash.AsSpan(0, 16));
+    }
+
+    /// <summary>
+    /// Checks the PE metadata for a valid assembly-level <see cref="PluginAuthorCertAttribute"/>.
+    /// The declared GUID must equal <see cref="ComputeAuthorCertGuid"/> of this assembly's own name.
+    /// </summary>
+    /// <param name="reader">The metadata reader for the plugin DLL.</param>
+    /// <param name="certGuid">Output: the declared GUID string when valid; empty otherwise.</param>
+    /// <returns><see langword="true"/> if the plugin carries a valid certified-author GUID.</returns>
+    private static bool IsCertifiedAuthor(MetadataReader reader, out string certGuid)
+    {
+        certGuid = string.Empty;
+        if (!reader.IsAssembly)
+            return false;
+
+        string asmName = reader.GetString(reader.GetAssemblyDefinition().Name);
+        Guid expected = ComputeAuthorCertGuid(asmName);
+        const string CertAttrNamespace = "SiliconLife.Collective";
+        const string CertAttrName = "PluginAuthorCertAttribute";
+
+        foreach (CustomAttributeHandle attrHandle in reader.CustomAttributes)
+        {
+            CustomAttribute attr = reader.GetCustomAttribute(attrHandle);
+
+            // Same constructor-resolution pattern as ReadDeclaredCapabilities
+            if (attr.Constructor.Kind != HandleKind.MemberReference)
+                continue;
+
+            MemberReference ctorRef = reader.GetMemberReference((MemberReferenceHandle)attr.Constructor);
+            if (ctorRef.Parent.Kind != HandleKind.TypeReference)
+                continue;
+
+            TypeReference typeRef = reader.GetTypeReference((TypeReferenceHandle)ctorRef.Parent);
+            if (reader.GetString(typeRef.Namespace) != CertAttrNamespace ||
+                reader.GetString(typeRef.Name) != CertAttrName)
+                continue;
+
+            // Custom attribute blob layout (ECMA-335 §II.23.3):
+            //   Prolog   : 2 bytes → 0x01 0x00
+            //   FixedArg : SerString → compressed length + UTF-8 GUID string
+            try
+            {
+                BlobReader blobReader = reader.GetBlobReader(attr.Value);
+                if (blobReader.RemainingBytes < 2)
+                    continue;
+                if (blobReader.ReadUInt16() != 0x0001)
+                    continue;
+
+                string value = blobReader.ReadSerializedString();
+                if (value is null || !Guid.TryParse(value, out Guid provided))
+                {
+                    _logger.Warn(null, "Malformed [PluginAuthorCert] declaration in {0}; ignored", asmName);
+                    continue;
+                }
+
+                if (provided == expected)
+                {
+                    certGuid = value;
+                    return true;
+                }
+
+                _logger.Warn(null,
+                    "Rejected [PluginAuthorCert] in {0}: GUID {1} does not match the expected value for this assembly",
+                    asmName, provided);
+            }
+            catch (BadImageFormatException)
+            {
+                // Corrupted attribute blob — treat as absent
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Determines whether a forbidden type reference is exempted by a declared capability.
     /// </summary>
     /// <param name="capabilities">The set of capabilities declared by the plugin.</param>
@@ -1182,7 +1288,7 @@ public class PluginLoader
     /// </returns>
     /// <remarks>
     /// The following types are <b>never</b> exempted regardless of any capability declaration:
-    /// P/Invoke types, unsafe markers, dynamic IL emission, assembly loaders, and registry types.
+    /// P/Invoke types, unsafe markers, dynamic IL emission, and assembly loaders.
     /// </remarks>
     internal static bool IsExemptedByCapability(HashSet<Capability> capabilities, string ns, string name)
     {
@@ -1218,6 +1324,13 @@ public class PluginLoader
         {
             // Exempt the Process* type-level bans under System.Diagnostics
             if (ns == "System.Diagnostics" && name.StartsWith("Process", StringComparison.Ordinal))
+                return true;
+        }
+
+        if (capabilities.Contains(Capability.Registry))
+        {
+            // Exempt Microsoft.Win32 (Registry / RegistryKey, includes SafeHandles sub-namespace)
+            if (ns == "Microsoft.Win32" || ns.StartsWith("Microsoft.Win32.", StringComparison.Ordinal))
                 return true;
         }
 
@@ -1265,6 +1378,12 @@ public class PluginLoader
                 return true;
         }
 
+        if (capabilities.Contains(Capability.Registry))
+        {
+            if (value.StartsWith("Microsoft.Win32", StringComparison.Ordinal))
+                return true;
+        }
+
         return false;
     }
 
@@ -1305,10 +1424,38 @@ internal sealed class PluginLoadContext : AssemblyLoadContext
 {
     private readonly string _pluginDirectory;
 
+    // Streams handed to LoadFromStream are kept alive for the lifetime of the
+    // context: the portable-PDB reader may consume the symbol stream lazily.
+    // The context is collectible, so they are released when it is collected.
+    private readonly List<Stream> _ownedStreams = [];
+
     public PluginLoadContext(string name, string pluginDirectory, bool isCollectible)
         : base(name, isCollectible)
     {
         _pluginDirectory = pluginDirectory;
+    }
+
+    /// <summary>
+    /// Loads an assembly without locking its file on disk: the image is read
+    /// through a shared-read stream instead of LoadFromAssemblyPath, which
+    /// memory-maps the file and blocks rebuilds while the host is running.
+    /// The sibling .pdb (when present) is loaded the same way so debugger
+    /// breakpoints keep working.
+    /// </summary>
+    internal Assembly LoadUnlocked(string dllPath)
+    {
+        var assemblyStream = new FileStream(dllPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        _ownedStreams.Add(assemblyStream);
+
+        string pdbPath = Path.ChangeExtension(dllPath, ".pdb");
+        if (File.Exists(pdbPath))
+        {
+            var pdbStream = new FileStream(pdbPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            _ownedStreams.Add(pdbStream);
+            return LoadFromStream(assemblyStream, pdbStream);
+        }
+
+        return LoadFromStream(assemblyStream);
     }
 
     protected override Assembly? Load(AssemblyName assemblyName)
@@ -1330,7 +1477,7 @@ internal sealed class PluginLoadContext : AssemblyLoadContext
         string dllPath = Path.Combine(_pluginDirectory, $"{assemblyName.Name}.dll");
         if (File.Exists(dllPath))
         {
-            return LoadFromAssemblyPath(dllPath);
+            return LoadUnlocked(dllPath);
         }
 
         // 3. Not found anywhere, fall back to the default load context

@@ -252,7 +252,15 @@ public class FileSystemTimeStorage : ITimeStorage
             string dir = GetKeyDirectory(key);
             if (!Directory.Exists(dir)) return result;
 
-            foreach (string file in Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories))
+            // With a range, enumerate only the files that can possibly match it
+            // instead of scanning the whole key tree. This turns minute-level
+            // probes (e.g. Memory.FindLevelToCompress) from O(all entries) into
+            // O(entries within the minute).
+            IEnumerable<string> files = range.HasValue
+                ? EnumerateRangeFiles(dir, range.Value)
+                : Directory.GetFiles(dir, "*.json", SearchOption.AllDirectories);
+
+            foreach (string file in files)
             {
                 if (!TryParseTimestampFromFile(dir, file, out IncompleteDate fileTime)) continue;
                 if (range.HasValue && !range.Value.Matches(
@@ -269,6 +277,58 @@ public class FileSystemTimeStorage : ITimeStorage
         finally
         {
             _rwLock.ExitReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Enumerates only the files that can match <paramref name="range"/>:
+    /// the file and subtree at the range's own precision, plus the progressively
+    /// shallower files while every deeper component equals the default that
+    /// <see cref="IncompleteDate.Matches"/> substitutes for missing components
+    /// (month/day = 1, hour/minute/second = 0).
+    /// </summary>
+    private static IEnumerable<string> EnumerateRangeFiles(string keyDir, IncompleteDate range)
+    {
+        var segments = new List<string> { range.Year.ToString() };
+        var values = new List<int> { range.Year };
+        var defaults = new List<int> { 0 };
+
+        void AddComponent(int? value, int defaultValue)
+        {
+            if (!value.HasValue) return;
+            segments.Add(value.Value.ToString("D2"));
+            values.Add(value.Value);
+            defaults.Add(defaultValue);
+        }
+
+        AddComponent(range.Month, 1);
+        AddComponent(range.Day, 1);
+        AddComponent(range.Hour, 0);
+        AddComponent(range.Minute, 0);
+        AddComponent(range.Second, 0);
+
+        // Full-precision candidates: {path}.json and everything under {path}/
+        string fullPath = Path.Combine(keyDir, string.Join(Path.DirectorySeparatorChar.ToString(), segments));
+        string fullFile = fullPath + ".json";
+        if (File.Exists(fullFile))
+            yield return fullFile;
+
+        if (Directory.Exists(fullPath))
+        {
+            foreach (string file in Directory.GetFiles(fullPath, "*.json", SearchOption.AllDirectories))
+                yield return file;
+        }
+
+        // Shallower files match only while all deeper components equal the
+        // Matches() defaults; stop the chain at the first non-default component.
+        for (int depth = segments.Count - 1; depth >= 1; depth--)
+        {
+            if (values[depth] != defaults[depth])
+                yield break;
+
+            string shallowerFile = Path.Combine(keyDir, string.Join(Path.DirectorySeparatorChar.ToString(), segments.Take(depth))) + ".json";
+            if (File.Exists(shallowerFile))
+                yield return shallowerFile;
         }
     }
 

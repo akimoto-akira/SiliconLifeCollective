@@ -22,10 +22,25 @@ namespace SiliconLife.Common.AI;
 /// </summary>
 public class HunyuanClientFactory : IAIClientFactory, IAIClientFactoryHelp
 {
+    /// <summary>
+    /// Models currently offered on the TokenHub console (aligned with the
+    /// official 模型列表, doc 1823/130051): the Hunyuan language models
+    /// plus every third-party language model served through TokenHub.
+    /// Legacy Hunyuan ids such as hunyuan-lite / hunyuan-turbos-latest /
+    /// hunyuan-t1-latest were taken offline on 2026-06-10 and are no
+    /// longer listed here.
+    /// </summary>
     private static readonly string[] ModelIds =
     [
-        "hy3", "hy3-preview", "hunyuan-lite", "hunyuan-turbos-latest",
-        "hunyuan-t1-latest", "hunyuan-a13b", "hunyuan-functioncall",
+        "hy3", "hy3-preview", "hy-mt2-pro", "hy-mt2-plus", "hy-mt2-lite",
+        "hunyuan-role-latest", "hy-role",
+        "deepseek-v4-flash-202605", "deepseek-v4-pro-202606",
+        "deepseek-v4-flash", "deepseek-v4-pro",
+        "glm-5.3", "glm-5.2", "glm-5.1", "glm-5v-turbo", "glm-5-turbo", "glm-5",
+        "kimi-k2.7-code-highspeed", "kimi-k3", "kimi-k2.7-code", "kimi-k2.6", "kimi-k2.5",
+        "minimax-m3", "minimax-m2.7",
+        "qwen3.5-flash", "qwen3.5-plus",
+        "mimo-v2.5-pro",
     ];
 
     public IAIClient CreateClient(Dictionary<string, object> config)
@@ -41,7 +56,21 @@ public class HunyuanClientFactory : IAIClientFactory, IAIClientFactoryHelp
             ? ep.ToString()!
             : model.ToLowerInvariant() switch
             {
-                "hy3" or "hy3-preview" => HunyuanClient.TokenHubEndpoint,
+                // Every model currently listed on TokenHub goes to the
+                // TokenHub endpoint; anything else (user-configured legacy
+                // ids) falls back to the legacy platform endpoint.
+                "hy3" or "hy3-preview" or "hy-mt2-pro" or "hy-mt2-plus"
+                    or "hy-mt2-lite" or "hunyuan-role-latest" or "hy-role"
+                    or "deepseek-v4-flash-202605" or "deepseek-v4-pro-202606"
+                    or "deepseek-v4-flash" or "deepseek-v4-pro"
+                    or "glm-5.3" or "glm-5.2" or "glm-5.1" or "glm-5v-turbo"
+                    or "glm-5-turbo" or "glm-5"
+                    or "kimi-k2.7-code-highspeed" or "kimi-k3" or "kimi-k2.7-code"
+                    or "kimi-k2.6" or "kimi-k2.5"
+                    or "minimax-m3" or "minimax-m2.7"
+                    or "qwen3.5-flash" or "qwen3.5-plus"
+                    or "mimo-v2.5-pro"
+                    => HunyuanClient.TokenHubEndpoint,
                 _ => HunyuanClient.LegacyEndpoint
             };
 

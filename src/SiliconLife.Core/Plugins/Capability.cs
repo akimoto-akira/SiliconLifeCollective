@@ -26,7 +26,6 @@ namespace SiliconLife.Collective;
 ///   <item>Unsafe code (<c>[module: System.Security.UnverifiableCode]</c>)</item>
 ///   <item>Dynamic IL emission (<c>System.Reflection.Emit</c>)</item>
 ///   <item>Assembly dynamic loading (<c>System.Runtime.Loader</c>, <c>Assembly.Load*</c>)</item>
-///   <item>Windows Registry access (<c>Microsoft.Win32</c>)</item>
 ///   <item>Dynamic Roslyn compilation (<c>Microsoft.CodeAnalysis</c>)</item>
 ///   <item>Dangerous reflection members (<c>Type.GetType</c>, <c>Activator.CreateInstance</c>, etc.)</item>
 /// </list>
@@ -74,4 +73,14 @@ public enum Capability
     /// </code>
     /// </summary>
     AI = 3,
+
+    /// <summary>
+    /// Grants access to Windows Registry types under <c>Microsoft.Win32</c>:
+    /// <c>Registry</c>, <c>RegistryKey</c>, etc.
+    /// <para>Relaxes the blanket ban on the <c>Microsoft.Win32</c> namespace (Rule 6)</para>
+    /// <para>Registry access is inherently Windows-only. Plugins should guard with
+    /// <c>OperatingSystem.IsWindows()</c> before touching the registry and degrade
+    /// gracefully on other platforms.</para>
+    /// </summary>
+    Registry = 4,
 }

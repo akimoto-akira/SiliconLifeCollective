@@ -74,3 +74,45 @@ YDoc/
 .trae/
 .catpaw/
 cldr/
+
+# ============================================================
+# Unreal Engine 项目屏蔽规则
+# ============================================================
+
+# 编译产物（二进制与中间文件）
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# 着色器调试信息
+ShaderDebugInfo/
+
+# 项目自动生成的解决方案/工程文件
+*.sln
+*.xcodeproj
+*.xcworkspace
+
+# Visual Studio / C++ 数据库文件
+*.VC.db
+*.VC.opendb
+*.opensdf
+*.opendb
+*.sdf
+*.aps
+*.ipch
+
+# 插件目录下的编译产物
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+
+# 打包输出
+*.pak
+*.utoc
+*.ucas
+
+# 崩溃报告
+crashinfo/
+
+*uasset

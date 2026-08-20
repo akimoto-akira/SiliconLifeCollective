@@ -238,7 +238,16 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
     {
         string keyDirPrefix = GetKeyDirectoryPrefix(key);
         var result = new List<TimeEntry<T>>();
-        foreach (string p in EnumerateAllEntries(keyDirPrefix))
+
+        // With a range, enumerate only the paths that can possibly match it
+        // instead of walking the whole key tree. This turns minute-level
+        // probes (e.g. Memory.FindLevelToCompress) from O(all entries) into
+        // O(entries within the minute).
+        IEnumerable<string> paths = range.HasValue
+            ? EnumerateRangeEntries(key, range.Value)
+            : EnumerateAllEntries(keyDirPrefix);
+
+        foreach (string p in paths)
         {
             if (!TryParseTimestampFromPath(keyDirPrefix, p, out IncompleteDate ft)) continue;
             if (range.HasValue && !range.Value.Matches(new DateTime(ft.Year, ft.Month ?? 1, ft.Day ?? 1, ft.Hour ?? 0, ft.Minute ?? 0, ft.Second ?? 0))) continue;
@@ -246,6 +255,43 @@ public sealed class SpeedyTimeStorage : ITimeStorage, IDisposable
         }
         result.Sort((a, b) => a.Timestamp.CompareTo(b.Timestamp));
         return result;
+    }
+
+    /// <summary>
+    /// Enumerates only the pack entries that can match <paramref name="range"/>:
+    /// the entry and subtree at the range's own precision, plus the progressively
+    /// shallower entries while every deeper component equals the default that
+    /// <see cref="IncompleteDate.Matches"/> substitutes for missing components
+    /// (month/day = 1, hour/minute/second = 0).
+    /// </summary>
+    private IEnumerable<string> EnumerateRangeEntries(string key, IncompleteDate range)
+    {
+        // Full-precision candidates: {path}.json and everything under {path}/
+        string fullFile = GetTimeFilePath(key, range);
+        if (_pack.Exists(fullFile))
+            yield return fullFile;
+
+        foreach (string p in EnumerateAllEntriesUnder(fullFile[..^5] + "/"))
+            yield return p;
+
+        // Shallower entries, deepest first. Each matches only while all deeper
+        // components equal the Matches() defaults; stop at the first deviation.
+        var shallowerLevels = new List<(IncompleteDate Level, int Value, int Default)>();
+        if (range.Second.HasValue) shallowerLevels.Add((new IncompleteDate(range.Year, range.Month, range.Day, range.Hour, range.Minute), range.Second.Value, 0));
+        if (range.Minute.HasValue) shallowerLevels.Add((new IncompleteDate(range.Year, range.Month, range.Day, range.Hour), range.Minute.Value, 0));
+        if (range.Hour.HasValue)   shallowerLevels.Add((new IncompleteDate(range.Year, range.Month, range.Day), range.Hour.Value, 0));
+        if (range.Day.HasValue)    shallowerLevels.Add((new IncompleteDate(range.Year, range.Month), range.Day.Value, 1));
+        if (range.Month.HasValue)  shallowerLevels.Add((new IncompleteDate(range.Year), range.Month.Value, 1));
+
+        foreach (var (level, value, defaultValue) in shallowerLevels)
+        {
+            if (value != defaultValue)
+                yield break;
+
+            string path = GetTimeFilePath(key, level);
+            if (_pack.Exists(path))
+                yield return path;
+        }
     }
 
     public List<TimeEntry<T>> Query<T>(IncompleteDate? range)

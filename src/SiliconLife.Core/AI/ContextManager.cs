@@ -35,12 +35,14 @@ public class ContextManager
 
     /// <summary>
     /// Maximum number of recent chat messages loaded into context per AI request.
+    /// Read from configuration (editable on the settings page), guarded to at
+    /// least 1 and defaulting to 20 when configuration is unavailable.
     /// Used as fallback when IAIClient.ContextWindowTokens is null (unknown model).
     /// When ContextWindowTokens is available, token-budget-based trimming is used instead.
     /// Older messages are still preserved in storage and summarized into long-term
     /// memory via the compression pipeline.
     /// </summary>
-    private const int MaxContextMessages = 20;
+    private static int MaxContextMessages => Math.Max(1, Config.Instance?.Data?.MaxContextMessages ?? 20);
 
     /// <summary>
     /// Default context window token capacity used when ContextWindowTokens is null
@@ -62,6 +64,46 @@ public class ContextManager
     private const double CharsPerToken = 3.5;
 
     private static readonly ILogger _logger = LogManager.Instance.GetLogger<ContextManager>();
+
+    /// <summary>
+    /// Plugin-contributed system message sources (see <see cref="ISystemContextContributor"/>).
+    /// Shared across all ContextManager instances; guarded by <see cref="_contributorLock"/>.
+    /// </summary>
+    private static readonly List<ISystemContextContributor> _systemContextContributors = new();
+    private static readonly object _contributorLock = new();
+
+    /// <summary>
+    /// Registers a plugin contributor that may add a system message to every
+    /// AI request. Duplicate registrations (same instance or same Id) are ignored.
+    /// Typically called from <c>IPlugin.OnLoad</c>.
+    /// </summary>
+    public static void RegisterSystemContextContributor(ISystemContextContributor contributor)
+    {
+        ArgumentNullException.ThrowIfNull(contributor);
+        lock (_contributorLock)
+        {
+            if (_systemContextContributors.Any(c => ReferenceEquals(c, contributor) || c.Id == contributor.Id))
+            {
+                return;
+            }
+            _systemContextContributors.Add(contributor);
+        }
+        _logger.Info(null, "System context contributor registered: {0}", contributor.Id);
+    }
+
+    /// <summary>
+    /// Removes a previously registered contributor. Typically called from
+    /// <c>IPlugin.OnUnload</c>. No-op when the contributor is not registered.
+    /// </summary>
+    public static void UnregisterSystemContextContributor(ISystemContextContributor contributor)
+    {
+        ArgumentNullException.ThrowIfNull(contributor);
+        lock (_contributorLock)
+        {
+            _systemContextContributors.RemoveAll(c => ReferenceEquals(c, contributor) || c.Id == contributor.Id);
+        }
+    }
+
     private IAIClient _aiClient;
     private readonly SiliconBeingBase _being;
     private readonly SessionBase? _session;
@@ -457,6 +499,16 @@ public class ContextManager
             });
         }
 
+        // ===== Plugin system context (always preserved, like ScenarioContext) =====
+        foreach (string contribution in CollectPluginSystemContext())
+        {
+            request.Messages.Add(new ChatMessage
+            {
+                Role = MessageRole.System,
+                Content = contribution,
+            });
+        }
+
         // ===== Layer 6: KnowledgeContext (can be dropped) =====
         string? knowledgeContext = BuildKnowledgeContext();
 
@@ -695,6 +747,42 @@ public class ContextManager
         }
 
         return request;
+    }
+
+    /// <summary>
+    /// Collects non-empty system context contributions from all registered
+    /// plugin contributors. Each contributor is isolated: an exception only
+    /// skips its own contribution and is logged, never breaking the request.
+    /// </summary>
+    private List<string> CollectPluginSystemContext()
+    {
+        List<string> contributions = new();
+        ISystemContextContributor[] snapshot;
+        lock (_contributorLock)
+        {
+            if (_systemContextContributors.Count == 0)
+            {
+                return contributions;
+            }
+            snapshot = _systemContextContributors.ToArray();
+        }
+
+        foreach (ISystemContextContributor contributor in snapshot)
+        {
+            try
+            {
+                string? text = contributor.GetSystemContext(_being);
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    contributions.Add(text);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(_being.Id, "System context contributor '{0}' failed: {1}", contributor.Id, ex.Message);
+            }
+        }
+        return contributions;
     }
 
     /// <summary>
