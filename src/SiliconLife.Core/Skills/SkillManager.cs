@@ -226,8 +226,29 @@ public class SkillManager
                 continue;
             }
 
-            result.Add(new ToolDefinition(skill.Id, skill.Description, skill.ParameterSchema));
+            result.Add(new ToolDefinition(skill.Id, skill.Description, NormalizeObjectSchema(skill.ParameterSchema)));
         }
+        return result;
+    }
+
+    /// <summary>
+    /// Normalizes a skill parameter schema into a strict object schema before it
+    /// is sent to AI providers: top-level "type" is forced to "object" and
+    /// "properties" must be a dictionary — being-authored skills may declare
+    /// properties as an array (or omit it), which strict providers such as
+    /// Moonshot reject with HTTP 400.
+    /// </summary>
+    private static Dictionary<string, object> NormalizeObjectSchema(Dictionary<string, object>? schema)
+    {
+        var result = schema != null ? new Dictionary<string, object>(schema) : new Dictionary<string, object>();
+        result["type"] = "object";
+
+        bool propsValid = result.TryGetValue("properties", out var props) &&
+            (props is IDictionary<string, object>
+             || (props is System.Text.Json.JsonElement el && el.ValueKind == System.Text.Json.JsonValueKind.Object));
+        if (!propsValid)
+            result["properties"] = new Dictionary<string, object>();
+
         return result;
     }
 

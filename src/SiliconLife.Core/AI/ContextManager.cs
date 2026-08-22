@@ -261,6 +261,34 @@ public class ContextManager
 
         List<ChatMessage> history = _session.GetMessages(MaxContextMessages);
 
+        // The sliding window can cut an assistant tool-call request off while
+        // keeping its tool result. Some AI services reject a tool call ID with
+        // no originating request, so drop the earliest orphan tool result
+        // together with everything before it until the leading messages are
+        // self-consistent again.
+        while (history.Count > 0)
+        {
+            int toolIndex = history.FindIndex(msg => msg.Role == MessageRole.Tool);
+            if (toolIndex < 0) break;
+
+            ChatMessage toolMsg = history[toolIndex];
+            bool hasRequest = false;
+            for (int i = toolIndex - 1; i >= 0; --i)
+            {
+                if (history[i].Role == MessageRole.Assistant
+                    && ToolCallsContainId(history[i].ToolCallsJson, toolMsg.ToolCallId))
+                {
+                    hasRequest = true;
+                    break;
+                }
+            }
+            if (hasRequest) break;
+
+            _logger.Debug(_being.Id, "Dropped {0} leading history messages: tool result {1} has no matching tool-call request in window",
+                toolIndex + 1, toolMsg.ToolCallId);
+            history.RemoveRange(0, toolIndex + 1);
+        }
+
         // Add messages in chronological order (from earliest to latest)
         foreach (ChatMessage msg in history)
         {
@@ -273,6 +301,30 @@ public class ContextManager
 
         _logger.Debug(_being.Id, "Loaded {0} history messages from session {1} (window={2})",
             history.Count, _session.Id, MaxContextMessages);
+    }
+
+    /// <summary>
+    /// Returns true when the serialized tool-call list of an assistant message
+    /// contains a call with the given id, i.e. the tool result's originating
+    /// request is present. Malformed JSON counts as "no match" so a broken
+    /// request never keeps an orphan result alive.
+    /// </summary>
+    private static bool ToolCallsContainId(string? toolCallsJson, string? toolCallId)
+    {
+        if (string.IsNullOrEmpty(toolCallsJson) || string.IsNullOrEmpty(toolCallId))
+        {
+            return false;
+        }
+
+        try
+        {
+            List<ToolCall>? toolCalls = JsonSerializer.Deserialize<List<ToolCall>>(toolCallsJson);
+            return toolCalls != null && toolCalls.Any(toolCall => toolCall.Id == toolCallId);
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
     }
 
     /// <summary>

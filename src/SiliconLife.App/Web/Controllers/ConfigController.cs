@@ -21,6 +21,13 @@ namespace SiliconLife.App.Web.Controllers;
 [WebCode]
 public class ConfigController : Controller
 {
+    // Transport 等枚举以前端字符串（"Stdio"/"Http"）与配置文件序列化形式流转，
+    // 与 Config.cs / McpController 的 JsonStringEnumConverter 约定保持一致。
+    private static readonly System.Text.Json.JsonSerializerOptions McpListJsonOptions = new()
+    {
+        Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
+    };
+
     private readonly SkinManager _skinManager;
     private readonly DefaultLocalizationBase _loc;
 
@@ -227,7 +234,7 @@ public class ConfigController : Controller
             {
                 try
                 {
-                    var list = System.Text.Json.JsonSerializer.Deserialize<List<McpServerConfig>>(data.value);
+                    var list = System.Text.Json.JsonSerializer.Deserialize<List<McpServerConfig>>(data.value, McpListJsonOptions);
                     if (list == null)
                     {
                         RenderJson(new { success = false, message = _loc.ConfigErrorInvalidRequest });

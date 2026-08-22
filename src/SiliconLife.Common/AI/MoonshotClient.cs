@@ -356,10 +356,30 @@ public class MoonshotClient : IAIClient
             req.Tools = request.Tools.Select(t => new MoonshotTool
             {
                 Type = "function",
-                Function = new MoonshotToolFunction { Name = t.Name, Description = t.Description, Parameters = t.Parameters }
+                Function = new MoonshotToolFunction { Name = t.Name, Description = t.Description, Parameters = NormalizeObjectSchema(t.Parameters) }
             }).ToList();
         }
         return JsonSerializer.Serialize(req, _jsonOptions);
+    }
+
+    /// <summary>
+    /// Moonshot validates tool schemas strictly ("moonshot flavored json schema"):
+    /// parameters must be an object schema whose "properties" is an object.
+    /// Tool/skill/MCP schemas flow in from many sources, so enforce the shape here
+    /// as the last guard before serialization (HTTP 400 otherwise).
+    /// </summary>
+    private static Dictionary<string, object> NormalizeObjectSchema(Dictionary<string, object>? schema)
+    {
+        var result = schema != null ? new Dictionary<string, object>(schema) : new Dictionary<string, object>();
+        result["type"] = "object";
+
+        bool propsValid = result.TryGetValue("properties", out var props) &&
+            (props is IDictionary<string, object>
+             || (props is JsonElement el && el.ValueKind == JsonValueKind.Object));
+        if (!propsValid)
+            result["properties"] = new Dictionary<string, object>();
+
+        return result;
     }
 
     private static List<MoonshotMessage> MapMessages(List<ChatMessage> messages)
