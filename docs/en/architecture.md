@@ -452,7 +452,7 @@ Factories provide:
 | SiliconFlow | ✅ | Cloud | SiliconFlow (SiliconCloud) AI service, dynamic model list aggregation, 1M context window |
 | Volcengine Ark Doubao | ✅ | Cloud | ByteDance Doubao AI service |
 | Herdsman | ✅ | Local/Cloud | Authentication-free inference engine, compatible with OpenAI API format |
-| Meituan LongCat | ✅ | Cloud | Meituan's self-developed large model, compatible with OpenAI API format, API key authentication |
+| Meituan LongCat | ✅ | Cloud | Meituan's self-developed large model, LongCat-2.0 supports 1M context and thinking mode, compatible with OpenAI API format |
 | Qiniu Cloud AI | ✅ | Cloud | Qiniu cloud AI service, API key authentication |
 | Yi (01.AI) | ⚠️ | Cloud | Yi AI service (Deprecated: stopped new user registration) |
 | OpenAI | 💡 | Cloud | OpenAI API service (GPT series) |

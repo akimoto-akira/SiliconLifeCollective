@@ -586,8 +586,8 @@ AI 설정 편집기 인터페이스를 반환합니다.
     },
     "LongCat": {
       "apiKey": "...",
-      "endpoint": "...",
-      "model": "..."
+      "endpoint": "https://api.longcat.chat/openai",
+      "model": "LongCat-2.0"
     },
     "QiniuAI": {
       "apiKey": "...",

@@ -54,7 +54,7 @@
   - **Alibaba Cloud Bailian (DashScope)** — Cloud-KI-Service, kompatibel mit OpenAI-API, unterstützt 13+ Modelle, Multi-Region-Bereitstellung
   - **Volcengine Ark (VolcengineArk)** — ByteDance Cloud-KI-Service, unterstützt Streaming- und Non-Streaming-Modi, integrierte Ratensteuerung
   - **Herdsman** — Authentifizierungsfreie Inferenz-Engine, kompatibel mit OpenAI-API-Format
-  - **Meituan LongCat** — Meituans eigenes Großmodell, kompatibel mit OpenAI-API-Format, API-Schlüssel-Authentifizierung
+  - **Meituan LongCat** — Meituans eigenes Großmodell, LongCat-2.0 unterstützt 1M Kontext und Thinking-Modus, kompatibel mit OpenAI-API-Format
   - **Qiniu Cloud AI** — Qiniu Cloud-KI-Service, API-Schlüssel-Authentifizierung
   - **DeepSeek** — DeepSeek KI-Service direkt, Thinking-Modus, 1M Kontext, API-Schlüssel-Authentifizierung
   - **Zhipu AI (GLM)** — Zhipu Qingyan KI-Service, Thinking (GLM-5), Vision (modellabhängig), kostenloses Modell `glm-4-flash`, 1M Kontext

@@ -2465,12 +2465,14 @@ Herdsman 支持任何 GGUF 格式的模型，常用选择包括：
 ## 什么是 LongCat？
 
 LongCat 是美团自研的大语言模型服务平台，通过 OpenAI 兼容的 API 接口提供强大的 AI 能力。
+当前主推模型为 **LongCat-2.0**，支持 1M 上下文窗口和 128K 最大输出长度。
 
 **优势：**
 - 美团自研，中文理解能力强
-- OpenAI 兼容 API 格式
-- 针对业务场景优化
-- 支持长上下文窗口
+- OpenAI 兼容 API 格式（同时兼容 Anthropic 格式）
+- 高性能 Agentic 模型，适合智能体场景
+- 支持长上下文窗口（1M Tokens）
+- 支持思考模式（thinking）和推理内容输出
 - 云端运行，无需本地硬件
 
 ## 开始使用
@@ -2478,7 +2480,7 @@ LongCat 是美团自研的大语言模型服务平台，通过 OpenAI 兼容的 
 ### 第一步：注册账号
 
 访问 LongCat 开放平台注册：
-- 网址：`https://longcat.sensetime.com`
+- 网址：`https://longcat.chat/platform/`
 - 使用手机号或邮箱注册
 - 完成实名认证
 
@@ -2491,19 +2493,25 @@ LongCat 是美团自研的大语言模型服务平台，通过 OpenAI 兼容的 
 
 ### 第三步：查看可用模型
 
-在平台的 **模型列表** 中查看可用模型。
+在平台的 **模型列表** 中查看可用模型。当前支持：
+- **LongCat-2.0**：高性能 Agentic 模型，1M 上下文，128K 最大输出
 
 ## 在硅基生命中配置
 
 1. 选择 **LongCat** 作为 AI 客户端类型
 2. 设置 **API 密钥** 为你的 LongCat API Key
-3. 设置 **端点** 为 LongCat API 地址（默认端点已预配置）
-4. 设置 **模型** 为所需模型名称
-5. **上下文窗口 Tokens** 留空可自动检测
+3. 设置 **端点** 为 LongCat API 地址（默认端点已预配置：`https://api.longcat.chat/openai`）
+4. 设置 **模型** 为所需模型名称（默认：`LongCat-2.0`）
+5. **上下文窗口 Tokens** 留空可自动检测（LongCat-2.0 默认 1M）
 
 ## 计费方式
 
-LongCat 按 Token 用量付费。查看平台了解当前定价。
+LongCat 按 Token 用量付费。LongCat-2.0 定价：
+- 输入（未命中缓存）：¥5 / 百万 Tokens（折扣价 ¥2）
+- 输入（命中缓存）：¥0.10 / 百万 Tokens（折扣价 ¥0.04）
+- 输出：¥20 / 百万 Tokens（折扣价 ¥8）
+
+查看平台了解当前定价。
 
 ## 常见问题
 

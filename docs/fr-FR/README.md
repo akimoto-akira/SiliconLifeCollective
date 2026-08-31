@@ -60,7 +60,7 @@
   - **SiliconFlow** — Service IA cloud agrégateur, 100+ modèles open source, liste de modèles dynamique, 1M contexte
   - **Volcengine Ark** — Service IA cloud de ByteDance, prenant en charge les modes flux et non-flux, avec contrôle de débit intégré
   - **Herdsman** — Moteur d'inférence sans authentification, compatible avec le format API OpenAI
-  - **Meituan LongCat** — Grand modèle développé en interne par Meituan, compatible avec le format API OpenAI, authentification par clé API
+  - **Meituan LongCat** — Grand modèle développé en interne par Meituan, LongCat-2.0 prend en charge 1M de contexte et mode thinking, compatible avec le format API OpenAI
   - **Qiniu Cloud AI** — Service IA cloud de Qiniu, authentification par clé API
 - **32 systèmes calendaires** — Couverture complète des principaux calendriers du monde, incluant grégorien, lunaire chinois, islamique, hébraïque, japonais, persan, maya, calendriers historiques chinois, etc.
 - **Système de Réseau de Connaissances** — Graphe de connaissances basé sur des triplets (sujet-relation-objet), prenant en charge le stockage, la recherche et la découverte de chemins

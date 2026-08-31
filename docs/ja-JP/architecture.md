@@ -417,7 +417,7 @@
 | 月の暗面（Kimi） | ✅ | クラウド | 月の暗面 Kimi AI サービス、思考モード対応、262K コンテキスト |
 | Volcengine Ark（Doubao） | ✅ | クラウド | ByteDance Doubao AI サービス |
 | Herdsman | ✅ | ローカル/クラウド | 認証不要の推論エンジン、OpenAI API 形式互換 |
-| Meituan LongCat | ✅ | クラウド | 美団独自開発大規模モデル、OpenAI API 形式互換、API キー認証 |
+| Meituan LongCat | ✅ | クラウド | 美団独自開発大規模モデル、LongCat-2.0 は 1M コンテキストと思考モードをサポート、OpenAI API 形式互換 |
 | Qiniu Cloud AI | ✅ | クラウド | 七牛クラウド大規模モデル推論サービス、OpenAI API 形式互換、API キー認証 |
 | DeepSeek（直結） | ✅ | クラウド | DeepSeek AI サービス、思考モード対応、1M コンテキスト |
 | 01.AI | ⚠️ | クラウド | 01.AI サービス（⚠️非推奨：新規ユーザー登録停止） |

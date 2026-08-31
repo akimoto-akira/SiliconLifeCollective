@@ -446,7 +446,7 @@ Die Fabriken bieten:
 | Moonshot (Kimi) | ✅ | Cloud | Moonshot Kimi KI-Dienst, Thinking-Modus, Vision (K2.5+), 262K Kontext |
 | Volcengine Ark Doubao | ✅ | Cloud | ByteDance Doubao KI-Dienst |
 | Herdsman | ✅ | Lokal/Cloud | Authentifizierungsfreie Inferenz-Engine, kompatibel mit OpenAI-API-Format |
-| Meituan LongCat | ✅ | Cloud | Meituans eigenes Großmodell, kompatibel mit OpenAI-API-Format, API-Schlüssel-Authentifizierung |
+| Meituan LongCat | ✅ | Cloud | Meituans eigenes Großmodell, LongCat-2.0 unterstützt 1M Kontext und Thinking-Modus, kompatibel mit OpenAI-API-Format |
 | Qiniu Cloud AI | ✅ | Cloud | Qiniu Cloud-KI-Service, API-Schlüssel-Authentifizierung |
 | DeepSeek (Direktverbindung) | ✅ | Cloud | DeepSeek KI-Dienst, Thinking-Modus, 1M Kontext |
 | 01.AI (Yi) | ⚠️ | Cloud | 01.AI KI-Dienst (Veraltet: Neuregistrierung eingestellt) |

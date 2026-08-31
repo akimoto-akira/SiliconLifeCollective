@@ -66,6 +66,17 @@
 
 ## [미발표]
 
+### 2026-08-27
+
+#### 새로운 기능
+- LongCat 클라이언트를 LongCat-2.0 모델로 업그레이드
+  - 컨텍스트 윈도우를 128K에서 1M(1,048,576 Tokens)로 확장, 최대 출력 128K
+  - 사고 모드(thinking) 지원 추가, 요청 본문에 thinking type enabled 포함
+  - 사전 정의된 모델 목록 추가(LongCat-2.0 / Flash-Chat / Pro-Chat / Max-Chat), API 동적 가져오기 실패 시 폴백
+  - 기본 엔드포인트를 https://api.longcat.chat/openai 로 업데이트
+  - 13개 언어 파일에 모델 표시 이름 추가, 도움말 문서의 요금 정보 및 등록 링크 업데이트
+
+
 ### 2026-08-17
 
 #### 새로운 기능

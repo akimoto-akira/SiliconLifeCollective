@@ -130,8 +130,8 @@ Edytuj `src/SiliconLife.Default/Config/DefaultConfigData.cs` lub zmodyfikuj konf
   "AIClients": {
     "LongCat": {
       "ApiKey": "twój-klucz-api",
-      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
-      "Model": "twoja-nazwa-modelu"
+      "Endpoint": "https://api.longcat.chat/openai",
+      "Model": "LongCat-2.0"
     }
   }
 }

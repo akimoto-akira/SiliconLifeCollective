@@ -586,8 +586,8 @@ Zwraca stronę interfejsu konfiguracji systemu.
     },
     "LongCat": {
       "apiKey": "...",
-      "endpoint": "...",
-      "model": "..."
+      "endpoint": "https://api.longcat.chat/openai",
+      "model": "LongCat-2.0"
     },
     "QiniuAI": {
       "apiKey": "...",

@@ -53,7 +53,7 @@
   - **阿里云百炼（DashScope）** — 云端 AI 服务，兼容 OpenAI API，支持 13+ 模型，多区域部署
   - **火山引擎 Ark（VolcengineArk）** — 字节跳动云端 AI 服务，支持流式和非流式模式，内置速率控制
   - **牧马人推理引擎（Herdsman）** — 无需认证的推理引擎，兼容 OpenAI API 格式
-  - **美团 LongCat** — 美团自研大模型，兼容 OpenAI API 格式，API Key 认证
+  - **美团 LongCat** — 美团自研大模型，LongCat-2.0 支持 1M 上下文与思考模式，兼容 OpenAI API 格式
   - **七牛云 AI** — 七牛云大模型推理服务，兼容 OpenAI API 格式，API Key 认证
   - **DeepSeek（直连）** — 深度求索AI服务，支持 thinking 模式，1,048,576 上下文
   - **智谱 GLM** — 智谱清言AI服务，支持 thinking，按模型判断视觉，1,048,576 上下文

@@ -66,6 +66,17 @@ Le due versioni condividono le stesse interfacce e funzionalità, differendo sol
 
 ## [Non Pubblicato]
 
+### 2026-08-27
+
+#### Nuove Funzionalita
+- Client LongCat aggiornato al modello LongCat-2.0
+  - Finestra di contesto espansa da 128K a 1M (1.048.576 token), output massimo 128K
+  - Aggiunto supporto alla modalita thinking, il corpo della richiesta include thinking type enabled
+  - Aggiunta lista di modelli predefiniti (LongCat-2.0 / Flash-Chat / Pro-Chat / Max-Chat), fallback in caso di fallimento del recupero dinamico da API
+  - Endpoint predefinito aggiornato a https://api.longcat.chat/openai
+  - 13 file di lingua aggiornati con i nomi di visualizzazione dei modelli, documentazione di aiuto aggiornata con prezzi e link di registrazione
+
+
 ### 2026-08-17
 
 #### Nuove Funzionalità

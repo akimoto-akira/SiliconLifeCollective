@@ -456,7 +456,7 @@ Las fábricas proporcionan:
 | Moonshot (Kimi) | ✅ | Nube | Servicio de IA Kimi de Moonshot, soporta modo thinking y multimodal |
 | Volcengine Ark Doubao | ✅ | Nube | Servicio de IA Doubao de ByteDance |
 | Herdsman | ✅ | Local/Nube | Motor de inferencia sin autenticación, compatible con el formato API OpenAI |
-| Meituan LongCat | ✅ | Nube | Gran modelo de desarrollo propio de Meituan, compatible con el formato API OpenAI, autenticación por clave API |
+| Meituan LongCat | ✅ | Nube | Gran modelo de desarrollo propio de Meituan, LongCat-2.0 soporta contexto de 1M y modo thinking, compatible con el formato API OpenAI |
 | Qiniu Cloud AI | ✅ | Nube | Servicio de IA en la nube de Qiniu, autenticación por clave API |
 | DeepSeek (conexión directa) | ✅ | Nube | Servicio de IA DeepSeek, soporta modo thinking, ventana de contexto 1M |
 | 01.AI (Yi) | ⚠️ | Nube | Servicio de IA 01.AI (Obsoleto: registro de nuevos usuarios suspendido) |

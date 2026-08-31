@@ -450,7 +450,7 @@ Továrny poskytují:
 | Moonshot (Kimi) | ✅ | Cloud | Moonshot Kimi AI služba, 262K kontext, multimodální |
 | Volcengine Ark.Doubao | ✅ | Cloud | ByteDance Doubao AI služba |
 | Herdsman | ✅ | Lokální/Cloud | Inferenční engine bez autentizace, kompatibilní s OpenAI API formátem |
-| Meituan LongCat | ✅ | Cloud | Vlastní velký model Meituan, kompatibilní s OpenAI API formátem, autentizace API klíčem |
+| Meituan LongCat | ✅ | Cloud | Vlastni velky model Meituan, LongCat-2.0 podporuje kontext 1M a thinking rezim, kompatibilni s OpenAI API formatem |
 | Qiniu Cloud AI | ✅ | Cloud | Cloudová AI služba Qiniu, autentizace API klíčem |
 | DeepSeek (přímé připojení) | ✅ | Cloud | DeepSeek AI služba, thinking mode, 1M kontext |
 | 01.AI (Yi) | ⚠️ | Cloud | 01.AI AI služba (Zastaralé: registrace nových uživatelů zastavena) |

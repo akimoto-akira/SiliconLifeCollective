@@ -31,6 +31,13 @@ internal class LongCatRequest
     [JsonPropertyName("top_p")]
     public double? TopP { get; set; }
     public bool Stream { get; set; } = false;
+    [JsonPropertyName("thinking")]
+    public LongCatThinkingConfig? Thinking { get; set; }
+}
+
+internal class LongCatThinkingConfig
+{
+    public string Type { get; set; } = "enabled";
 }
 
 internal class LongCatMessage
@@ -76,6 +83,7 @@ internal class LongCatToolFunction
 /// LongCat (美团LongCat大模型) AI client implementation.
 /// Uses OpenAI-compatible API format with API Key authentication.
 /// Supports tool calling (function calling), streaming, and reasoning content.
+/// LongCat-2.0 supports 1M context window and 128K max output tokens.
 /// </summary>
 public class LongCatClient : IAIClient
 {
@@ -85,9 +93,10 @@ public class LongCatClient : IAIClient
     private readonly string _apiKey;
 
     /// <summary>
-    /// Maximum allowed context window token capacity for LongCat models (128K)
+    /// Maximum allowed context window token capacity for LongCat models (1M).
+    /// LongCat-2.0 supports a context window of 1,000,000 tokens with 128K max output.
     /// </summary>
-    public const int MaxContextWindowTokens = 131072; // 128K
+    public const int MaxContextWindowTokens = 1048576; // 1M
 
     public string Endpoint { get; }
 
@@ -99,6 +108,12 @@ public class LongCatClient : IAIClient
     /// </summary>
     private readonly int? _contextWindowTokens;
 
+    /// <summary>
+    /// Whether thinking (reasoning) mode is enabled.
+    /// When true, sends {"thinking":{"type":"enabled"}} in the request body.
+    /// </summary>
+    private readonly bool _thinkingEnabled;
+
     public bool? StreamingMode => null;
 
     public bool? SupportsToolCalls => true;
@@ -106,8 +121,7 @@ public class LongCatClient : IAIClient
     /// <summary>
     /// Gets the context window token capacity for the current model.
     /// Returns the user-configured value if provided, otherwise maps
-    /// by model name (LongCat-Flash-Chat=128K, LongCat-Pro-Chat=128K,
-    /// LongCat-Max-Chat=128K, others=null).
+    /// by model name (LongCat-2.0=1M, others=null).
     /// </summary>
     public int? ContextWindowTokens
     {
@@ -121,7 +135,7 @@ public class LongCatClient : IAIClient
 
     /// <summary>
     /// Gets whether this client supports vision input.
-    /// Models with vl/vision keywords in name return true; others return false.
+    /// LongCat-2.0 is text-only; returns false.
     /// </summary>
     public bool? SupportsVision => GetSupportsVisionForModel(DefaultModel);
 
@@ -133,12 +147,13 @@ public class LongCatClient : IAIClient
     /// <summary>
     /// Creates a new LongCat client with the specified endpoint and API key
     /// </summary>
-    /// <param name="endpoint">LongCat API endpoint URL</param>
+    /// <param name="endpoint">LongCat API endpoint URL (e.g., https://api.longcat.chat/openai)</param>
     /// <param name="apiKey">API key for authentication</param>
-    /// <param name="defaultModel">Default model name</param>
+    /// <param name="defaultModel">Default model name (e.g., LongCat-2.0)</param>
     /// <param name="contextWindowTokens">Optional context window token capacity override.
-    /// When provided, enables token-budget-based context trimming. Clamped to MaxContextWindowTokens (128K).</param>
-    public LongCatClient(string endpoint, string apiKey, string defaultModel = "LongCat-Flash-Chat", int? contextWindowTokens = null)
+    /// When provided, enables token-budget-based context trimming. Clamped to MaxContextWindowTokens (1M).</param>
+    /// <param name="thinkingEnabled">Whether to enable thinking (reasoning) mode. Default true.</param>
+    public LongCatClient(string endpoint, string apiKey, string defaultModel = "LongCat-2.0", int? contextWindowTokens = null, bool thinkingEnabled = true)
     {
         Endpoint = endpoint.TrimEnd('/');
         _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
@@ -146,6 +161,7 @@ public class LongCatClient : IAIClient
         _contextWindowTokens = contextWindowTokens.HasValue
             ? Math.Min(contextWindowTokens.Value, MaxContextWindowTokens)
             : null;
+        _thinkingEnabled = thinkingEnabled;
         _httpClient = new HttpClient
         {
             Timeout = TimeSpan.FromMinutes(5)
@@ -161,7 +177,8 @@ public class LongCatClient : IAIClient
 
     /// <summary>
     /// Maps model names to context window token capacities.
-    /// LongCat-Flash-Chat, LongCat-Pro-Chat, LongCat-Max-Chat all support 128K.
+    /// LongCat-2.0 supports 1M (1,048,576) context window.
+    /// Legacy models (LongCat-Flash-Chat, LongCat-Pro-Chat, LongCat-Max-Chat) support 128K.
     /// Returns null for unknown models (ContextManager will fall back to MaxContextMessages).
     /// </summary>
     internal static int? GetContextWindowTokensForModel(string? modelName)
@@ -170,14 +187,25 @@ public class LongCatClient : IAIClient
             return null;
 
         string lower = modelName.ToLowerInvariant();
+
+        // LongCat-2.0: 1M context window
+        if (lower.Contains("longcat-2") || lower.Equals("longcat-2.0") || lower.Equals("longcat2"))
+            return MaxContextWindowTokens; // 1M
+
+        // Legacy models: 128K context window
         if (lower.Contains("longcat-flash") || lower.Contains("longcat-pro") || lower.Contains("longcat-max"))
             return 131072; // 128K
+
+        // Generic LongCat fallback
+        if (lower.Contains("longcat"))
+            return MaxContextWindowTokens; // 1M
 
         return null;
     }
 
     /// <summary>
     /// Maps model names to vision support.
+    /// LongCat-2.0 is text-only; returns false.
     /// Models containing vl or vision keywords return true; others return false.
     /// </summary>
     internal static bool? GetSupportsVisionForModel(string? modelName)
@@ -482,7 +510,8 @@ public class LongCatClient : IAIClient
         {
             Model = model,
             Messages = MapMessages(request.Messages),
-            Stream = stream
+            Stream = stream,
+            Thinking = new LongCatThinkingConfig { Type = _thinkingEnabled ? "enabled" : "disabled" }
         };
 
         if (request.Tools != null && request.Tools.Count > 0)

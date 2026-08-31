@@ -54,7 +54,7 @@
   - **Alibaba Cloud Bailian（DashScope）** — クラウド AI サービス、OpenAI API 互換、13以上のモデルをサポート、マルチリージョンデプロイ
   - **Volcengine Ark** — ByteDance クラウド AI サービス、ストリーミング/非ストリーミングモード対応、内蔵レート制御
   - **Herdsman** — 認証不要の推論エンジン、OpenAI API 形式互換
-  - **Meituan LongCat** — 美団独自開発大規模モデル、OpenAI API 形式互換、API キー認証
+  - **Meituan LongCat** — 美団独自開発大規模モデル、LongCat-2.0 は 1M コンテキストと思考モードをサポート、OpenAI API 形式互換
   - **Qiniu Cloud AI** — 七牛クラウド大規模モデル推論サービス、OpenAI API 形式互換、API キー認証
   - **DeepSeek** — 思考モード対応、1M コンテキスト、OpenAI API 互換
   - **Zhipu AI（GLM）** — 思考モード対応、モデル別ビジョン、1M コンテキスト、OpenAI API 互換

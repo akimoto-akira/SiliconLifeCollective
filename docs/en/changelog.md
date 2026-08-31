@@ -66,6 +66,17 @@ Both versions share the same interfaces and functionality, differing only in sto
 
 ## [Unreleased]
 
+### 2026-08-27
+
+#### New Features
+- LongCat client upgraded to LongCat-2.0 model
+  - Context window expanded from 128K to 1M (1,048,576 tokens), max output 128K
+  - Added thinking mode support, request body includes thinking type enabled
+  - Added predefined model list (LongCat-2.0 / Flash-Chat / Pro-Chat / Max-Chat), falls back when API model fetch fails
+  - Default endpoint updated to https://api.longcat.chat/openai
+  - 13 language files updated with model display names, help docs updated with pricing and registration link
+
+
 ### 2026-08-17
 
 #### New Features

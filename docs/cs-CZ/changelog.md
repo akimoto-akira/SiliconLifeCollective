@@ -66,6 +66,17 @@ Obě verze sdílejí stejná rozhraní a funkce, liší se pouze v implementaci 
 
 ## [Nezveřejněno]
 
+### 2026-08-27
+
+#### Nove funkce
+- Klient LongCat aktualizovan na model LongCat-2.0
+  - Kontextove okno rozsireno z 128K na 1M (1 048 576 tokenu), maximalni vystup 128K
+  - Pridana podpora thinking rezimu, telo pozadavku obsahuje thinking type enabled
+  - Pridan preddefinovany seznam modelu (LongCat-2.0 / Flash-Chat / Pro-Chat / Max-Chat), fallback pri selhani dynamickeho ziskavani z API
+  - Vychozi endpoint aktualizovan na https://api.longcat.chat/openai
+  - 13 jazykovych souboru aktualizovano o zobrazovane nazvy modelu, dokumentace napovedy aktualizovana o ceny a registracni odkaz
+
+
 ### 2026-08-17
 
 #### Nové funkce

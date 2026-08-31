@@ -463,7 +463,7 @@ Les fabriques fournissent :
 | SiliconFlow | ✅ | Cloud | Service IA SiliconFlow, liste de modèles dynamique (100+ modèles open source), 1M contexte |
 | Volcengine Ark · Doubao | ✅ | Cloud | Service IA Doubao de ByteDance |
 | Herdsman | ✅ | Local/Cloud | Moteur d'inférence sans authentification, compatible avec le format API OpenAI |
-| Meituan LongCat | ✅ | Cloud | Grand modèle développé en interne par Meituan, compatible avec le format API OpenAI, authentification par clé API |
+| Meituan LongCat | ✅ | Cloud | Grand modèle développé en interne par Meituan, LongCat-2.0 prend en charge 1M de contexte et mode thinking, compatible avec le format API OpenAI |
 | Qiniu Cloud AI | ✅ | Cloud | Service IA cloud de Qiniu, authentification par clé API |
 | 01.AI (Yi) | ⚠️ | Cloud | Service IA 01.AI (Obsolète : inscription des nouveaux utilisateurs arrêtée) |
 | OpenAI | 💡 | Cloud | Service API OpenAI (série GPT) |

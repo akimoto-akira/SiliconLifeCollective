@@ -412,7 +412,7 @@ L'interfaccia `IAIClient` definisce gli attributi di dichiarazione delle capacit
 | Moonshot (Kimi) | ✅ | Cloud | Servizio AI Moonshot Kimi — MoonshotClient |
 | Volcengine Ark Doubao | ✅ | Cloud | Servizio AI ByteDance Doubao |
 | Herdsman | ✅ | Locale/Cloud | Motore di inferenza senza autenticazione, compatibile con il formato API OpenAI |
-| Meituan LongCat | ✅ | Cloud | Modello di grandi dimensioni sviluppato autonomamente da Meituan, compatibile con il formato API OpenAI, autenticazione con chiave API |
+| Meituan LongCat | ✅ | Cloud | Modello di grandi dimensioni sviluppato autonomamente da Meituan, LongCat-2.0 supporta contesto 1M e modalita thinking, compatibile con il formato API OpenAI |
 | Qiniu Cloud AI | ✅ | Cloud | Servizio di inferenza di modelli di grandi dimensioni di Qiniu Cloud, compatibile con il formato API OpenAI, autenticazione con chiave API |
 | DeepSeek (Connessione diretta) | ✅ | Cloud | Servizio AI DeepSeek — DeepSeekClient, supporta modalità thinking |
 | 01.AI | ⚠️ | Cloud | Servizio AI 01.AI (Deprecato: registrazione nuovi utenti interrotta) |

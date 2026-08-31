@@ -35,7 +35,7 @@
   - **Alibaba Cloud Bailian (DashScope)** — облачный AI-сервис, совместимый с OpenAI API, поддержка 13+ моделей, развёртывание в нескольких регионах
   - **Volcengine Ark** — облачный AI-сервис ByteDance, поддержка потокового и непотокового режимов, встроенный контроль скорости
   - **Herdsman** — движок вывода без аутентификации, совместимый с форматом OpenAI API
-  - **Meituan LongCat** — собственная большая модель Meituan, совместимая с форматом OpenAI API, аутентификация по API Key
+  - **Meituan LongCat** — Собственная большая модель Meituan, LongCat-2.0 поддерживает контекст 1M и режим thinking, совместимая с форматом OpenAI API
   - **Qiniu Cloud AI** — сервис вывода большой модели Qiniu Cloud, совместимый с форматом OpenAI API, аутентификация по API Key
   - **DeepSeek** — AI-сервис DeepSeek, режим thinking, 1M контекст, аутентификация по API Key
   - **Zhipu AI (GLM)** — AI-сервис Zhipu Qingyan, режим thinking (GLM-5), vision по модели, 1M контекст, бесплатная модель glm-4-flash

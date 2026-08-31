@@ -54,7 +54,7 @@
   - **Alibaba Cloud Bailian (DashScope)** — cloudová AI služba, kompatibilní s OpenAI API, podporuje 13+ modelů, nasazení ve více regionech
   - **Volcengine Ark** — cloudová AI služba ByteDance, podporuje streamovací a nestreamovací režim, vestavěné řízení rychlosti
   - **Herdsman** — inferenční engine bez autentizace, kompatibilní s OpenAI API formátem
-  - **Meituan LongCat** — vlastní velký model Meituan, kompatibilní s OpenAI API formátem, autentizace API klíčem
+  - **Meituan LongCat** — Vlastni velky model Meituan, LongCat-2.0 podporuje kontext 1M a thinking rezim, kompatibilni s OpenAI API formatem
   - **Qiniu Cloud AI** — cloudová AI služba Qiniu, autentizace API klíčem
   - **DeepSeek** — thinking mode, reasoning effort, až 1M kontextové okno
   - **Zhipu AI (GLM)** — thinking mode, vision podle modelu, bezplatné modely, až 1M kontext

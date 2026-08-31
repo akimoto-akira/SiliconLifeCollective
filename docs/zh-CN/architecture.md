@@ -407,7 +407,7 @@
 | 月之暗面（Kimi） | ✅ | 云端 | 月之暗面Kimi AI服务 — MoonshotClient |
 | 火山方舟引擎.豆包 | ✅ | 云端 | 字节跳动豆包AI服务 |
 | 牧马人推理引擎（Herdsman） | ✅ | 本地/云端 | 无需认证的推理引擎，兼容 OpenAI API 格式 |
-| 美团 LongCat | ✅ | 云端 | 美团自研大模型，兼容 OpenAI API 格式，API Key 认证 |
+| 美团 LongCat | ✅ | 云端 | 美团自研大模型，LongCat-2.0 支持 1M 上下文与思考模式，兼容 OpenAI API 格式 |
 | 七牛云 AI | ✅ | 云端 | 七牛云大模型推理服务，兼容 OpenAI API 格式，API Key 认证 |
 | DeepSeek（直连） | ✅ | 云端 | 深度求索AI服务 — DeepSeekClient，支持 thinking 模式 |
 | 零一万物 | ⚠️ | 云端 | 零一万物AI服务（已废弃：停止新用户注册） |

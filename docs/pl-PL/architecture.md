@@ -428,7 +428,7 @@ Interfejs `IAIClient` definiuje właściwości deklaracji możliwości klienta A
 | SiliconFlow | ✅ | Chmurowa | Usługa AI SiliconFlow, dynamiczna lista modeli, okno kontekstu 1M tokenów |
 | Volcengine Ark Doubao | ✅ | Chmurowa | Usługa AI ByteDance Doubao |
 | Herdsman | ✅ | Lokalna/Chmurowa | Silnik wnioskowania bez autoryzacji, kompatybilny z formatem OpenAI API |
-| Meituan LongCat | ✅ | Chmurowa | Autorski duży model Meituan, kompatybilny z formatem OpenAI API, autoryzacja przez klucz API |
+| Meituan LongCat | ✅ | Chmurowa | Autorski duzy model Meituan, LongCat-2.0 obsluguje kontekst 1M i tryb thinking, kompatybilny z formatem OpenAI API |
 | Qiniu Cloud AI | ✅ | Chmurowa | Chmurowa usługa wnioskowania dużych modeli Qiniu Cloud, kompatybilna z formatem OpenAI API, autoryzacja przez klucz API |
 | 01.AI (Yi) | ⚠️ | Chmurowa | Usługa AI 01.AI (Przestarzałe: rejestracja nowych użytkowników wstrzymana) |
 | OpenAI | 💡 | Chmurowa | Usługa OpenAI API (seria GPT) |

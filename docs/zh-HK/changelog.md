@@ -66,6 +66,17 @@
 
 ## [未發佈]
 
+### 2026-08-27
+
+#### 新功能
+- LongCat 客戶端升級至 LongCat-2.0 模型
+  - 上下文視窗從 128K 擴展至 1M（1,048,576 Tokens），最大輸出 128K
+  - 新增思考模式（thinking）支援，請求體攜帶 thinking type enabled
+  - 新增預定義模型列表（LongCat-2.0 / Flash-Chat / Pro-Chat / Max-Chat），API 動態取得失敗時回退至預定義列表
+  - 預設端點更新為 https://api.longcat.chat/openai
+  - 13 個語言檔案補充模型顯示名稱，說明檔案更新計費資訊與註冊連結
+
+
 ### 2026-08-17
 
 #### 新功能

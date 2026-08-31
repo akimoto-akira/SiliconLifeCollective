@@ -130,8 +130,8 @@ dotnet build
   "AIClients": {
     "LongCat": {
       "ApiKey": "API-키",
-      "Endpoint": "https://api.longcat.ai/v1/chat/completions",
-      "Model": "모델-이름"
+      "Endpoint": "https://api.longcat.chat/openai",
+      "Model": "LongCat-2.0"
     }
   }
 }

@@ -407,7 +407,7 @@ Markdown-файл (`soul.md`), хранящийся в каталоге данн
 | Moonshot (Kimi) | ✅ | Облачный | AI-сервис Moonshot Kimi — MoonshotClient |
 | Volcengine Ark.Doubao | ✅ | Облачный | AI-сервис ByteDance Doubao |
 | Движок вывода Herdsman (Herdsman) | ✅ | Локальный/Облачный | Движок вывода без аутентификации, совместимый с форматом OpenAI API |
-| Meituan LongCat | ✅ | Облачный | Собственная большая модель Meituan, совместимая с форматом OpenAI API, аутентификация по API Key |
+| Meituan LongCat | ✅ | Облачный | Собственная большая модель Meituan, LongCat-2.0 поддерживает контекст 1M и режим thinking, совместимая с форматом OpenAI API |
 | Qiniu Cloud AI | ✅ | Облачный | Сервис вывода больших моделей Qiniu Cloud, совместимый с форматом OpenAI API, аутентификация по API Key |
 | DeepSeek (прямое подключение) | ✅ | Облачный | AI-сервис DeepSeek — DeepSeekClient, поддержка режима thinking |
 | 01.AI | ⚠️ | Облачный | AI-сервис 01.AI (Устарело: регистрация новых пользователей остановлена) |

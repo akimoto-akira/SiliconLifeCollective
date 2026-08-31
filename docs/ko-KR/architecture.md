@@ -418,7 +418,7 @@
 | 실리콘 플로우 | ✅ | 클라우드 | 실리콘 플로우 AI 서비스, 100+ 모델 집합, 1M 컨텍스트 |
 | 바이트댄스 Ark.더우바오 | ✅ | 클라우드 | 바이트댄스 더우바오 AI 서비스 |
 | Herdsman | ✅ | 로컬/클라우드 | 인증 없는 추론 엔진, OpenAI API 형식 호환 |
-| Meituan LongCat | ✅ | 클라우드 | 메이퇀 자체 개발 대형 모델, OpenAI API 형식 호환, API 키 인증 |
+| Meituan LongCat | ✅ | 클라우드 | 메이퇴 자체 개발 대형 모델, LongCat-2.0은 1M 컨텍스트 및 사고 모드 지원, OpenAI API 형식 호환 |
 | Qiniu Cloud AI | ✅ | 클라우드 | 치니우 클라우드 대형 모델 추론 서비스, OpenAI API 형식 호환, API 키 인증 |
 | 링이완우(01.AI) | ⚠️ | 클라우드 | 폐기됨: 신규 사용자 등록 중단 |
 | OpenAI | 💡 | 클라우드 | OpenAI API 서비스(GPT 시리즈) |

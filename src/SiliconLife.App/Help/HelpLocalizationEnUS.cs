@@ -2509,12 +2509,14 @@ Herdsman supports any GGUF format model, including:
 ## What is LongCat?
 
 LongCat is a large language model platform developed by Meituan, providing powerful AI capabilities through an OpenAI-compatible API interface.
+The current flagship model is **LongCat-2.0**, supporting a 1M context window and 128K max output tokens.
 
 **Advantages:**
 - Developed by Meituan, strong Chinese language understanding
-- OpenAI-compatible API format
-- Optimized for business scenarios
-- Supports long context windows
+- OpenAI-compatible API format (also supports Anthropic format)
+- High-performance Agentic model, suitable for agent scenarios
+- Supports long context windows (1M tokens)
+- Supports thinking mode and reasoning content output
 - Cloud-based, no local hardware required
 
 ## Getting Started
@@ -2522,7 +2524,7 @@ LongCat is a large language model platform developed by Meituan, providing power
 ### Step 1: Register an Account
 
 Visit the LongCat open platform to register:
-- URL: `https://longcat.sensetime.com`
+- URL: `https://longcat.chat/platform/`
 - Register with phone number or email
 - Complete identity verification
 
@@ -2535,19 +2537,25 @@ Visit the LongCat open platform to register:
 
 ### Step 3: View Available Models
 
-Check available models in the platform's **Model List** section.
+Check available models in the platform's **Model List** section. Currently supported:
+- **LongCat-2.0**: High-performance Agentic model, 1M context, 128K max output
 
 ## Configuration in Silicon Life
 
 1. Select **LongCat** as the AI client type
 2. Set the **API Key** to your LongCat API Key
-3. Set the **Endpoint** to the LongCat API address (default endpoint is pre-configured)
-4. Set the **Model** to the desired model name
-5. Leave **Context Window Tokens** empty for auto-detection
+3. Set the **Endpoint** to the LongCat API address (default endpoint is pre-configured: `https://api.longcat.chat/openai`)
+4. Set the **Model** to the desired model name (default: `LongCat-2.0`)
+5. Leave **Context Window Tokens** empty for auto-detection (LongCat-2.0 defaults to 1M)
 
 ## Billing
 
-LongCat charges per token usage. Check the platform for current pricing.
+LongCat charges per token usage. LongCat-2.0 pricing:
+- Input (cache miss): ¥5 / million tokens (discount price ¥2)
+- Input (cache hit): ¥0.10 / million tokens (discount price ¥0.04)
+- Output: ¥20 / million tokens (discount price ¥8)
+
+Check the platform for current pricing.
 
 ## FAQ
 

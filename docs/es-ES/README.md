@@ -53,7 +53,7 @@
   - **Alibaba Cloud Bailian (DashScope)** — Servicio de IA en la nube, compatible con la API de OpenAI, soporta más de 13 modelos, despliegue en múltiples regiones
   - **Volcengine Ark (VolcengineArk)** — Servicio de IA en la nube de ByteDance, soporta modos de streaming y no streaming, con control de velocidad integrado
   - **Herdsman** — Motor de inferencia sin autenticación, compatible con el formato API OpenAI
-  - **Meituan LongCat** — Gran modelo de desarrollo propio de Meituan, compatible con el formato API OpenAI, autenticación por clave API
+  - **Meituan LongCat** — Gran modelo de desarrollo propio de Meituan, LongCat-2.0 soporta contexto de 1M y modo thinking, compatible con el formato API OpenAI
   - **Qiniu Cloud AI** — Servicio de IA en la nube de Qiniu, autenticación por clave API
   - **DeepSeek** — Servicio de IA DeepSeek, soporta modo thinking, ventana de contexto 1M
   - **Zhipu AI (GLM)** — Servicio de IA Zhipu Qingyan, modo thinking y visión por modelo, modelo gratuito glm-4-flash
