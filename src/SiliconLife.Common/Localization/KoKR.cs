@@ -1261,7 +1261,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["project_task"] = "프로젝트 작업",
         ["project_work_note"] = "프로젝트 작업 노트",
         ["webview_browser"] = "WebView 브라우저",
-        ["skill"] = "스킬"
+        ["skill"] = "스킬",
+        ["tts"] = "일괄 음성 합성"
     };
 
     public override string GetToolDisplayName(string toolName) =>

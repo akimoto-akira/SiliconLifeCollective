@@ -891,7 +891,8 @@ public override string MemoryPageHeader => "Просмотр памяти";
 
     private static readonly Dictionary<string, string> ToolDisplayNames = new()
     {
-        ["skill"] = "Навык"
+        ["skill"] = "Навык",
+        ["tts"] = "Пакетный синтез речи"
     };
 
     public override string GetToolDisplayName(string toolName) =>

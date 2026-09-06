@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>1.0.0</Version>
+    <Authors>HoshinoKennji</Authors>
+    <Company>HoshinoKennji</Company>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <RootNamespace>SiliconLife.Plugin.TTS</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SiliconLife.Core\SiliconLife.Core.csproj" />
+    <ProjectReference Include="..\SiliconLife.Common\SiliconLife.Common.csproj" />
+  </ItemGroup>
+
+  <!-- 构建后将插件 DLL 部署到宿主（SiliconLife.Fast）输出目录的 plugins/ 下，
+       供 PluginLoader 以 DLL 模式加载。只拷贝插件自身程序集（Core/Common 由宿主提供），
+       避免插件目录出现框架 DLL 反向污染安全扫描的 trusted TypeRefs。 -->
+  <Target Name="DeployToPlugins" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
+    <PropertyGroup>
+      <PluginDeployDir>..\SiliconLife.Fast\$(OutputPath)plugins\$(AssemblyName)\</PluginDeployDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <PluginOutput Include="$(OutputPath)$(AssemblyName).dll" />
+      <PluginOutput Include="$(OutputPath)$(AssemblyName).pdb" Condition="Exists('$(OutputPath)$(AssemblyName).pdb')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PluginOutput)" DestinationFolder="$(PluginDeployDir)" SkipUnchangedFiles="true" />
+    <Message Importance="high" Text="Deployed TTS plugin to $(PluginDeployDir)" />
+  </Target>
+
+</Project>

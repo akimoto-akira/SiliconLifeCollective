@@ -989,7 +989,8 @@ public override string AboutFailedPluginListLabel => "Wtyczki z błędem ładowa
         ["project_task"] = "Zadanie projektu",
         ["project_work_note"] = "Notatka robocza projektu",
         ["webview_browser"] = "Przeglądarka WebView",
-        ["skill"] = "Umiejętność"
+        ["skill"] = "Umiejętność",
+        ["tts"] = "Wsadowa synteza mowy"
     };
 
     public override string GetToolDisplayName(string toolName) =>

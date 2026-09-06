@@ -779,7 +779,8 @@ public override string GetSocialMediaName(string platform) => platform switch
         ["system"] = "Sistema",
         ["project_work_note"] = "Nota de trabalho do projeto",
         ["webview_browser"] = "Browser WebView",
-        ["skill"] = "Competência"
+        ["skill"] = "Competência",
+        ["tts"] = "Síntese de voz em lote"
     };
 
     public override string GetToolDisplayName(string toolName) =>

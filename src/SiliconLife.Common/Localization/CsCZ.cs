@@ -1036,7 +1036,8 @@ public override string WorkflowDetailInProgress => "Funkce detailu pracovního p
         ["project_task"] = "Projektový úkol",
         ["project_work_note"] = "Projektová pracovní poznámka",
         ["webview_browser"] = "Prohlížeč WebView",
-        ["skill"] = "Dovednost"
+        ["skill"] = "Dovednost",
+        ["tts"] = "Dávková syntéza řeči"
     };
 
     public override string GetToolDisplayName(string toolName) =>
