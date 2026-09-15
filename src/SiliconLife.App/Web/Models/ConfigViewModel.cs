@@ -31,6 +31,7 @@ public class ConfigItem
     public string PropertyName { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
     public string? Value { get; set; }
+    public string? DefaultValue { get; set; }
     public string? Description { get; set; }
     public int Order { get; set; }
     public string PropertyType { get; set; } = "string";

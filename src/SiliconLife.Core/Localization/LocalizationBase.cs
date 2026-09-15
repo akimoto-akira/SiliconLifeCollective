@@ -105,6 +105,13 @@ public abstract class LocalizationBase
     public abstract string FormatMemoryEventToolCall(string toolNames);
 
     /// <summary>
+    /// Gets the assistant message persisted when the user stops a reply mid-stream.
+    /// Also serves to terminate an orphan tool-call loop so the being is not
+    /// re-triggered by continuation on the next tick.
+    /// </summary>
+    public abstract string ReplyStoppedMessage { get; }
+
+    /// <summary>
     /// Formats a memory record for a task execution event.
     /// </summary>
     /// <param name="content">The AI response content for the task</param>

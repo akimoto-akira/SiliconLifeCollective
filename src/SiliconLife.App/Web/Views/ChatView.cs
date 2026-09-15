@@ -1185,6 +1185,19 @@ public class ChatView : ViewBase
             .Add(() => Js.Assign(() => Js.Id(() => "textarea").Prop(() => "style").Prop(() => "height"), () => Js.Id(() => "Math").Call(() => "min", () => Js.Id(() => "textarea").Prop(() => "scrollHeight"), () => Js.Num(() => "120")).Op(() => "+", () => (JsSyntax)Js.Str(() => "px"))));
         js.Add(() => Js.Func(() => "autoResize", () => new List<string> { "textarea" }, () => autoResizeBody));
 
+        // Escape HTML special characters for Think / tool-call sections (plain-text display areas):
+        // tags arriving via SSE (e.g. <a>) display literally instead of being parsed into real
+        // elements and breaking the layout. The main text is NOT escaped — it is rendered as
+        // markdown by marked, which allows raw HTML by design.
+        var escapeHtmlTextExpr = Js.Id(() => "text")
+            .Call(() => "replace", () => Js.Regex(() => @"&", () => "g"), () => Js.Str(() => "&amp;"))
+            .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
+            .Call(() => "replace", () => Js.Regex(() => @"<", () => "g"), () => Js.Str(() => "&lt;"))
+            .Call(() => "replace", () => Js.Regex(() => @">", () => "g"), () => Js.Str(() => "&gt;"));
+        var escapeHtmlTextBody = Js.Block()
+            .Add(() => Js.Return(() => escapeHtmlTextExpr));
+        js.Add(() => Js.Func(() => "escapeHtmlText", () => new List<string> { "text" }, () => escapeHtmlTextBody));
+
         var renderMdElementBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -1511,7 +1524,7 @@ public class ChatView : ViewBase
                 {
                     // Found the exact section — append response HTML into it
                     Js.Const(() => "responseHtml", () => Js.Str(() => "<div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>")
-                        .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "content")))
+                        .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "content"))))
                         .Op(() => "+", () => Js.Str(() => "</pre>"))),
                     Js.Id(() => "section").Call(() => "insertAdjacentHTML", () => Js.Str(() => "beforeend"), () => Js.Id(() => "responseHtml")).Stmt(),
                     Js.Return(() => Js.Id(() => "undefined"))
@@ -1549,7 +1562,7 @@ public class ChatView : ViewBase
             }))
             .Add(() => Js.Assign(() => Js.Id(() => "responseHtml"), () => Js.Id(() => "responseHtml")
                 .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))
-                .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "content")))
+                .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "content"))))
                 .Op(() => "+", () => Js.Str(() => "</pre></div>"))))
             .Add(() => Js.Id(() => "contentDiv").Call(() => "insertAdjacentHTML", () => Js.Str(() => "beforeend"), () => Js.Id(() => "responseHtml")).Stmt());
         js.Add(() => Js.Func(() => "updateToolResult", () => new List<string> { "toolCallId", "content" }, () => updateToolResultBody));
@@ -2227,7 +2240,7 @@ public class ChatView : ViewBase
                         Js.Const(() => "thinkSection", () => Js.Ternary(
                             () => Js.Id(() => "msg").Prop(() => "thinking"),
                             () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>" + vm.Localization.ChatThinkingSummary + "</summary><div class=\"msg-thinking-content\">")
-                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "thinking"))
+                                .Op(() => "+", () => (JsSyntax)Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "msg").Prop(() => "thinking")))
                                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details>")),
                             () => Js.Str(() => ""))),
                         Js.Assign(() => Js.Id(() => "div").Prop(() => "innerHTML"), () => Js.Str(() => "<div class=\"msg-tool-body\">")
@@ -2267,7 +2280,7 @@ public class ChatView : ViewBase
                         .Op(() => "+", () => Js.Str(() => "</div>"))))
                     .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
                         .Op(() => "+", () => Js.Str(() => "<pre class='msg-tool-code'>"))
-                        .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2"))))
+                        .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2")))))
                         .Op(() => "+", () => Js.Str(() => "</pre>"))))
                     .Add(() => Js.Const(() => "res", () => Js.Id(() => "resultMap").Index(() => Js.Id(() => "tc").Prop(() => "Id"))))
                     .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -2276,7 +2289,7 @@ public class ChatView : ViewBase
                         {
                             Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
                                 .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))
-                                .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content")))
+                                .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content"))))
                                 .Op(() => "+", () => Js.Str(() => "</pre>"))).Stmt()
                         })
                     }))
@@ -2327,7 +2340,7 @@ public class ChatView : ViewBase
                         .Op(() => "+", () => Js.Str(() => "</div>"))))
                     .Add(() => Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
                         .Op(() => "+", () => Js.Str(() => "<pre class='msg-tool-code'>"))
-                        .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2"))))
+                        .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2")))))
                         .Op(() => "+", () => Js.Str(() => "</pre>"))))
                     .Add(() => Js.Const(() => "res", () => Js.Id(() => "resultMap").Index(() => Js.Id(() => "tc").Prop(() => "Id"))))
                     .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
@@ -2336,7 +2349,7 @@ public class ChatView : ViewBase
                         {
                             Js.Assign(() => Js.Id(() => "toolHtml"), () => Js.Id(() => "toolHtml")
                                 .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))
-                                .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content")))
+                                .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content"))))
                                 .Op(() => "+", () => Js.Str(() => "</pre>"))).Stmt()
                         })
                     }))
@@ -2363,7 +2376,7 @@ public class ChatView : ViewBase
         var thinkingSection = Js.Ternary(
             () => Js.Id(() => "msg").Prop(() => "thinking"),
             () => Js.Str(() => "<details class=\"msg-collapsible\"><summary>" + vm.Localization.ChatThinkingSummary + "</summary><div class=\"msg-thinking-content\">")
-                .Op(() => "+", () => (JsSyntax)Js.Id(() => "msg").Prop(() => "thinking"))
+                .Op(() => "+", () => (JsSyntax)Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "msg").Prop(() => "thinking")))
                 .Op(() => "+", () => (JsSyntax)Js.Str(() => "</div></details>")),
             () => Js.Str(() => ""));
 
@@ -2776,6 +2789,7 @@ public class ChatView : ViewBase
         // Stopped event handler
         var stoppedHandlerBody = Js.Block()
             .Add(() => Js.Id(() => "hideStopButton").Invoke().Stmt())
+            .Add(() => Js.Id(() => "updateBeingStatus").Invoke().Stmt())
             .Add(() => Js.Const(() => "data", () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "event").Prop(() => "data"))))
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -2829,14 +2843,17 @@ public class ChatView : ViewBase
                     Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
                     {
                         { (Js.Id(() => "data").Prop(() => "isFinal").Not(), new List<JsSyntax> { Js.Id(() => "showStopButton").Invoke().Stmt() }) },
-                        { (null, new List<JsSyntax> { Js.Id(() => "hideStopButton").Invoke().Stmt(), Js.Id(() => "hideQueueIndicator").Invoke().Stmt() }) }
+                        // Stream ended: the being may keep running (tool rounds,
+                        // continuations) — sync the button with the real activity
+                        // state instead of hiding it unconditionally.
+                        { (null, new List<JsSyntax> { Js.Id(() => "updateBeingStatus").Invoke().Stmt(), Js.Id(() => "hideQueueIndicator").Invoke().Stmt() }) }
                     })
                 })}
             }));
 
-        // Message event handler (hide stop button on complete)
+        // Message event handler (sync stop button with activity state on complete)
         var messageEventHandlerBody = Js.Block()
-            .Add(() => Js.Id(() => "hideStopButton").Invoke().Stmt())
+            .Add(() => Js.Id(() => "updateBeingStatus").Invoke().Stmt())
             .Add(() => Js.Id(() => "hideQueueIndicator").Invoke().Stmt());
 
         // Override connectSSE: call original, then attach new event listeners
@@ -2857,11 +2874,41 @@ public class ChatView : ViewBase
 
         // --- Being Status Badge Functions ---
 
+        // Drive stop-button visibility from the being's real activity state:
+        // visible while the being is chatting (SingleChat/GroupChat, including
+        // tool-call rounds and continuations), hidden once it goes idle — so the
+        // button stays available for the whole conversation and does not linger
+        // when nothing is running.
+        var applyStopButtonActivityBody = Js.Block()
+            .Add(() => Js.Const(() => "chatting", () => Js.Id(() => "activity").Op(() => "===", () => Js.Str(() => "SingleChat")).Op(() => "||", () => (JsSyntax)Js.Id(() => "activity").Op(() => "===", () => Js.Str(() => "GroupChat")))))
+            .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
+            {
+                { (Js.Id(() => "chatting"), new List<JsSyntax> { Js.Id(() => "showStopButton").Invoke().Stmt() }) },
+                { (null, new List<JsSyntax> { Js.Id(() => "hideStopButton").Invoke().Stmt() }) }
+            }));
+        js.Add(() => Js.Func(() => "applyStopButtonActivity", () => new List<string> { "activity" }, () => applyStopButtonActivityBody));
+
+        // True when the found member entry is currently chatting.
+        var groupMemberChattingBody = Js.Block()
+            .Add(() => Js.Const(() => "b", () => Js.Id(() => "list").Call(() => "find", () => Js.Arrow(() => new List<string> { "x" }, () => Js.Id(() => "x").Prop(() => "id").Op(() => "===", () => Js.Id(() => "m").Prop(() => "id"))))))
+            .Add(() => Js.Return(() => Js.Id(() => "b").Op(() => "&&", () => (JsSyntax)Js.Id(() => "b").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "SingleChat")).Op(() => "||", () => (JsSyntax)Js.Id(() => "b").Prop(() => "activity").Op(() => "===", () => Js.Str(() => "GroupChat"))).Paren())));
+
+        // Group chats have no single being: consider the chat active when any
+        // being member of the session is in a chatting activity.
+        var updateStopButtonForGroupBody = Js.Block()
+            .Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/api/beings/list"))
+                .Call(() => "then", () => Js.Arrow(() => new List<string> { "r" }, () => Js.Id(() => "r").Call(() => "json")))
+                .Call(() => "then", () => Js.Arrow(() => new List<string> { "list" }, () => Js.Block()
+                    .Add(() => Js.Const(() => "chatting", () => Js.Id(() => "Array").Prop(() => "isArray").Invoke(() => Js.Id(() => "sessionMembers")).Op(() => "&&", () => (JsSyntax)Js.Id(() => "sessionMembers").Call(() => "some", () => Js.Arrow(() => new List<string> { "m" }, () => groupMemberChattingBody)))))
+                    .Add(() => Js.Id(() => "applyStopButtonActivity").Invoke(() => Js.Ternary(() => Js.Id(() => "chatting"), () => Js.Str(() => "SingleChat"), () => Js.Str(() => "Idle"))).Stmt()))));
+        js.Add(() => Js.Func(() => "updateStopButtonForGroup", () => new List<string> { }, () => updateStopButtonForGroupBody));
+
         var updateBeingStatusBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
                 { (Js.Id(() => "currentBeingId").Not(), new List<JsSyntax>
                     {
+                        Js.Id(() => "updateStopButtonForGroup").Invoke().Stmt(),
                         Js.Return(() => Js.Id(() => "undefined"))
                     }
                 )}
@@ -2882,6 +2929,7 @@ public class ChatView : ViewBase
                             }
                         )}
                     }))
+                    .Add(() => Js.Id(() => "applyStopButtonActivity").Invoke(() => Js.Id(() => "data").Prop(() => "activity")).Stmt())
                 )));
 
         var startStatusPollingBody = Js.Block()

@@ -816,6 +816,7 @@ public override string GetSocialMediaName(string platform) => platform switch
     public override string ConfigSecondsLabel => "秒：";
     public override string ConfigSaveButton => "保存";
     public override string ConfigCancelButton => "キャンセル";
+    public override string ConfigRestoreDefaultButton => "デフォルトに戻す";
     public override string ConfigNullValue => "空";
 
     public override string ConfigEditPrefix => "編集：";
@@ -2067,6 +2068,7 @@ public override string GetSocialMediaName(string platform) => platform switch
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[群聊] セッション {sessionId} で発言：{content}";
 
+    public override string ReplyStoppedMessage => "（返信はユーザーによって停止されました）";
     public override string FormatMemoryEventToolCall(string toolNames)
         => $"[ツール呼び出し] 実行ツール：{toolNames}";
 

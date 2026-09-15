@@ -47,7 +47,8 @@ public class ConfigView : ViewBase
                 var editBtn = H.Button(loc.ConfigEditButton).Class("btn btn-sm btn-edit")
                     .Data("key", item.PropertyName)
                     .Data("display", item.DisplayName)
-                    .Data("type", item.PropertyType);
+                    .Data("type", item.PropertyType)
+                    .Data("default", item.DefaultValue ?? "");
                 
                 if (!string.IsNullOrEmpty(enumValuesAttr))
                 {
@@ -173,8 +174,9 @@ public class ConfigView : ViewBase
                             ).Class("dict-actions")
                         ).Class("form-group").Id("inputMcpServerList").Style(new CssBuilder().InlineProperty("display", "none")),
                         H.Div(
-                            H.Button(loc.ConfigSaveButton).Class("btn btn-primary").Id("btnSave"),
-                            H.Button(loc.ConfigCancelButton).Class("btn btn-secondary").Id("btnCancel")
+                            H.Button(loc.ConfigRestoreDefaultButton).Class("btn btn-secondary").Id("btnRestoreDefault"),
+                            H.Button(loc.ConfigCancelButton).Class("btn btn-secondary").Id("btnCancel"),
+                            H.Button(loc.ConfigSaveButton).Class("btn btn-primary").Id("btnSave")
                         ).Class("form-actions")
                     ).Class("modal-content")
                 ).Class("modal-dialog")
@@ -691,6 +693,12 @@ public class ConfigView : ViewBase
 
         js.Add(() => Js.Let(() => "currentType", () => Js.Str(() => "string")));
                 js.Add(() => Js.Let(() => "isAIConfigDict", () => Js.Id(() => "false")));
+        // 当前打开的设置项上下文（"恢复默认值"按钮据此重填表单）
+        js.Add(() => Js.Let(() => "currentKey", () => Js.Str(() => "")));
+        js.Add(() => Js.Let(() => "currentDisplay", () => Js.Str(() => "")));
+        js.Add(() => Js.Let(() => "currentEnumValues", () => Js.Array()));
+        js.Add(() => Js.Let(() => "currentEnumDisplayNames", () => Js.Array()));
+        js.Add(() => Js.Let(() => "currentDefault", () => Js.Str(() => "")));
 
         var hideAllInputsBlock = Js.Block()
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputString")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "none")))
@@ -1711,7 +1719,7 @@ public class ConfigView : ViewBase
                 { (Js.Str(() => "bool"), new List<JsSyntax>
                     {
                         Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "inputBool")).Prop(() => "style").Prop(() => "display").Assign(() => Js.Str(() => "block")),
-                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueBool")).Prop(() => "checked").Assign(() => Js.Id(() => "value").Op(() => "===", () => Js.Str(() => "true"))),
+                        Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "editValueBool")).Prop(() => "checked").Assign(() => Js.Id(() => "String").Invoke(() => Js.Id(() => "value")).Call(() => "toLowerCase").Op(() => "===", () => Js.Str(() => "true"))),
                         Js.Break()
                     })
                 },
@@ -1941,6 +1949,17 @@ public class ConfigView : ViewBase
         saveConfigBlock.Add(() => Js.Id(() => "fetch").Invoke(() => Js.Str(() => "/config/save"), () => fetchOptions).Call(() => "then", () => Js.Arrow(() => new List<string> { "response" }, () => fetchThenBlock)));
         js.Add(() => Js.Func(() => "saveConfig", () => new List<string> { }, () => saveConfigBlock));
 
+        // 恢复默认值：用出厂默认值重填当前表单（不保存，由用户确认后再点保存）
+        var restoreDefaultBlock = Js.Block()
+            .Add(() => Js.Id(() => "openModal").Invoke(
+                () => Js.Id(() => "currentKey"),
+                () => Js.Id(() => "currentDefault").Op(() => "||", () => (JsSyntax)Js.Str(() => "")),
+                () => Js.Id(() => "currentDisplay"),
+                () => Js.Id(() => "currentType"),
+                () => Js.Id(() => "currentEnumValues"),
+                () => Js.Id(() => "currentEnumDisplayNames")).Stmt());
+        js.Add(() => Js.Func(() => "restoreDefault", () => new List<string> { }, () => restoreDefaultBlock));
+
         var initBlock = Js.Block();
 
         var btnClickBlock = Js.Block()
@@ -1954,6 +1973,11 @@ public class ConfigView : ViewBase
             .Add(() => Js.Const(() => "enumValues", () => Js.Ternary(() => Js.Id(() => "enumValuesStr"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "enumValuesStr")), () => Js.Array())))
             .Add(() => Js.Const(() => "enumDisplayNamesStr", () => Js.Id(() => "btn").Prop(() => "dataset").Prop(() => "enumDisplayNames")))
             .Add(() => Js.Const(() => "enumDisplayNames", () => Js.Ternary(() => Js.Id(() => "enumDisplayNamesStr"), () => Js.Id(() => "JSON").Call(() => "parse", () => Js.Id(() => "enumDisplayNamesStr")), () => Js.Array())))
+            .Add(() => Js.Assign(() => Js.Id(() => "currentKey"), () => Js.Id(() => "key")))
+            .Add(() => Js.Assign(() => Js.Id(() => "currentDisplay"), () => Js.Id(() => "display")))
+            .Add(() => Js.Assign(() => Js.Id(() => "currentEnumValues"), () => Js.Id(() => "enumValues")))
+            .Add(() => Js.Assign(() => Js.Id(() => "currentEnumDisplayNames"), () => Js.Id(() => "enumDisplayNames")))
+            .Add(() => Js.Assign(() => Js.Id(() => "currentDefault"), () => Js.Id(() => "btn").Prop(() => "dataset").Prop(() => "default")))
             .Add(() => Js.Id(() => "openModal").Invoke(() => Js.Id(() => "key"), () => Js.Id(() => "value"), () => Js.Id(() => "display"), () => Js.Id(() => "type"), () => Js.Id(() => "enumValues"), () => Js.Id(() => "enumDisplayNames")).Stmt());
         
         var forEachArrow = Js.Arrow(() => new List<string> { "btn" }, () => Js.Block()
@@ -1961,6 +1985,7 @@ public class ConfigView : ViewBase
         
         initBlock
             .Add(() => Js.Id(() => "document").Call(() => "querySelectorAll", () => Js.Str(() => ".btn-edit")).Call(() => "forEach", () => forEachArrow))
+            .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnRestoreDefault")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "restoreDefault").Invoke().Stmt())))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnSave")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "saveConfig").Invoke().Stmt())))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnCancel")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "closeModal").Invoke().Stmt())))
             .Add(() => Js.Id(() => "document").Call(() => "getElementById", () => Js.Str(() => "btnAddDictRow")).Call(() => "addEventListener", () => Js.Str(() => "click"), () => Js.Arrow(() => new List<string> { }, () => Js.Id(() => "addDictRow").Invoke(() => Js.Str(() => ""), () => Js.Str(() => "")).Stmt())))

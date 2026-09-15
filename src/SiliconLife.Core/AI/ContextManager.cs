@@ -1720,11 +1720,20 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
         {
             _logger.Info(_being.Id, "ThinkOnChatStreamAsync cancelled for channel {0}, stream abandoned", channelId);
             cancellationManager?.CompleteStream(channelId);
-            
+
             // Mark messages as read so next Tick won't retry this message
             // User explicitly cancelled, meaning they don't want a response
             CommitMessagesAsRead();
-            
+
+            // Terminate an orphan tool-call loop: if the stop happened after tool
+            // results were persisted (last message is a Tool result), the
+            // continuation check would re-trigger thinking on the next tick and
+            // the being would keep running despite the stop request. Persisting
+            // an assistant stop notice makes the last message non-continuable.
+            Language stopLang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase stopLoc = LocalizationManager.Instance.GetLocalization(stopLang);
+            DeliverOutput(stopLoc.ReplyStoppedMessage);
+
             return AIResponse.Failed("思考已被用户中止");
         }
         finally
@@ -1822,10 +1831,57 @@ return await GetResponseAsync(scenarioContext, scenario, projectId);
     /// <returns>The AI response</returns>
     public async Task<AIResponse> ThinkOnGroupChatStreamAsync(CancellationToken cancellationToken = default)
     {
-        _logger.Info(_being.Id, "ThinkOnGroupChatStream: being={0}", _being.Name);
+        _logger.Info(_being.Id, "ThinkOnGroupChatStream: being={0}, session={1}", _being.Name, _session?.Id.ToString() ?? "null");
+
+        // Resolve the effective cancellation token (same pattern as single chat):
+        // register with StreamCancellationManager so the WebUI stop button can
+        // abort group chat streams too.
+        CancellationToken effectiveToken = cancellationToken;
+        Guid channelId = _session?.Id ?? Guid.Empty;
+        StreamCancellationManager? cancellationManager = null;
+
+        if (channelId != Guid.Empty && cancellationToken == CancellationToken.None)
+        {
+            cancellationManager = ServiceLocator.Instance.GetService<StreamCancellationManager>();
+            if (cancellationManager != null)
+            {
+                effectiveToken = cancellationManager.CreateToken(channelId);
+            }
+        }
 
         string? scenarioContext = BuildGroupChatScenarioContext();
-        AIResponse response = await GetResponseStreamAsync(scenarioContext, cancellationToken, ToolScenarioFlag.Chat);
+        AIResponse response;
+        try
+        {
+            response = await GetResponseStreamAsync(scenarioContext, effectiveToken, ToolScenarioFlag.Chat);
+        }
+        catch (OperationCanceledException) when (effectiveToken.IsCancellationRequested)
+        {
+            _logger.Info(_being.Id, "ThinkOnGroupChatStreamAsync cancelled for channel {0}, stream abandoned", channelId);
+            cancellationManager?.CompleteStream(channelId);
+
+            // Mark messages as read so next Tick won't retry them, and terminate
+            // an orphan tool-call loop the same way as single chat does.
+            CommitMessagesAsRead();
+
+            Language stopLang = Config.Instance?.Data?.Language ?? Language.ZhCN;
+            LocalizationBase stopLoc = LocalizationManager.Instance.GetLocalization(stopLang);
+            DeliverOutput(stopLoc.ReplyStoppedMessage);
+
+            return AIResponse.Failed("思考已被用户中止");
+        }
+        finally
+        {
+            cancellationManager?.CompleteStream(channelId);
+
+            // Notify the IMManager message queue that processing is complete,
+            // so it can dispatch the next queued message for this channel.
+            IMManager? imManager = ServiceLocator.Instance.IMManager;
+            if (imManager != null && channelId != Guid.Empty)
+            {
+                imManager.NotifyMessageProcessed(channelId);
+            }
+        }
 
         if (response.Success && response.HasToolCalls)
         {

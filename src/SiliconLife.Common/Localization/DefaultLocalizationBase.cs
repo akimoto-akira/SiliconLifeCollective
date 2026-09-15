@@ -2281,6 +2281,11 @@ public abstract string AboutFailedPluginListLabel { get; }
     public abstract string ConfigCancelButton { get; }
 
     /// <summary>
+    /// Gets the text for the restore-defaults button (refills the edit form with factory defaults)
+    /// </summary>
+    public abstract string ConfigRestoreDefaultButton { get; }
+
+    /// <summary>
     /// Gets the display text for null values
     /// </summary>
     public abstract string ConfigNullValue { get; }
@@ -3646,6 +3651,8 @@ public abstract string AboutFailedPluginListLabel { get; }
     public abstract override string FormatMemoryEventSingleChat(string speakerName, string listenerName, string content);
     public abstract override string FormatMemoryEventGroupChat(string sessionId, string content);
     public abstract override string FormatMemoryEventToolCall(string toolNames);
+
+    public abstract override string ReplyStoppedMessage { get; }
     public abstract override string FormatMemoryEventTask(string content);
     public abstract override string FormatMemoryEventTimer(string content);
     public abstract override string FormatMemoryEventTimerError(string timerName, string error);

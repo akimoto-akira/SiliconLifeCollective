@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2026 Hoshino Kennji
+// Copyright (c) 2026 Hoshino Kennji
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -357,6 +357,17 @@ public class ConfigController : Controller
         var properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
         var groups = new Dictionary<string, ConfigGroup>();
 
+        // 默认值实例（"恢复默认值"按钮的数据来源）：反射创建同类型实例，属性初始化器即出厂默认值
+        AppConfigData? defaults = null;
+        try
+        {
+            defaults = (AppConfigData?)Activator.CreateInstance(config.GetType());
+        }
+        catch
+        {
+            // 具体类型缺少无参构造等极端情况：该项不提供恢复默认值
+        }
+
         foreach (var prop in properties)
         {
             if (!prop.CanRead)
@@ -390,21 +401,15 @@ public class ConfigController : Controller
                     displayValue = System.Text.Json.JsonSerializer.Serialize(dict);
                 }
             }
-            else if (value is System.Collections.IList list)
-            {
-                displayValue = System.Text.Json.JsonSerializer.Serialize(list);
-            }
             else
             {
-                displayValue = value switch
-                {
-                    Guid guid => guid.ToString(),
-                    TimeSpan ts => ts.ToString(),
-                    DateTime dt => dt.ToString("O"),
-                    null => null,
-                    _ => value.ToString()
-                };
+                displayValue = SerializeConfigValue(value);
             }
+
+            // 出厂默认值（AIConfig 不做客户端过滤：代码初始化值本身即完整出厂配置）
+            string? defaultValue = defaults != null
+                ? SerializeConfigValue(prop.GetValue(defaults))
+                : null;
 
             List<string>? enumValues = null;
             List<string>? enumDisplayNames = null;
@@ -509,6 +514,7 @@ public class ConfigController : Controller
                 PropertyName = prop.Name,
                 DisplayName = displayName,
                 Value = displayValue,
+                DefaultValue = defaultValue,
                 Description = description,
                 Order = order,
                 PropertyType = prop.Name == "WebSkin" || prop.Name == "AIClientType" ? "enum" : GetSimpleTypeName(prop.PropertyType),
@@ -640,6 +646,24 @@ public class ConfigController : Controller
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// 将配置属性值序列化为前端展示/编辑用的字符串（字典、列表序列化为 JSON，其余按类型格式化）。
+    /// 当前值与出厂默认值共用此格式，保证"恢复默认值"重填表单的格式一致。
+    /// </summary>
+    private static string? SerializeConfigValue(object? value)
+    {
+        return value switch
+        {
+            null => null,
+            System.Collections.IDictionary dict => System.Text.Json.JsonSerializer.Serialize(dict),
+            System.Collections.IList list => System.Text.Json.JsonSerializer.Serialize(list),
+            Guid guid => guid.ToString(),
+            TimeSpan ts => ts.ToString(),
+            DateTime dt => dt.ToString("O"),
+            _ => value.ToString()
+        };
     }
 
     private static string GetSimpleTypeName(Type type)

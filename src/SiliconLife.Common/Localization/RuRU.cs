@@ -490,6 +490,7 @@ public override string MemoryPageHeader => "Просмотр памяти";
     public override string ConfigSecondsLabel => "Секунды";
     public override string ConfigSaveButton => "Сохранить";
     public override string ConfigCancelButton => "Отмена";
+    public override string ConfigRestoreDefaultButton => "Восстановить значения по умолчанию";
     public override string ConfigNullValue => "(пусто)";
     public override string ConfigEditPrefix => "Редактирование: ";
     public override string ConfigDefaultGroupName => "Общие";
@@ -1188,6 +1189,7 @@ public override string MemoryPageHeader => "Просмотр памяти";
         => $"Беседа: {speakerName} -> {listenerName}: {content}";
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"Групповой чат ({sessionId}): {content}";
+    public override string ReplyStoppedMessage => "(Ответ остановлен пользователем)";
     public override string FormatMemoryEventToolCall(string toolNames)
         => $"Вызов инструментов: {toolNames}";
     public override string FormatMemoryEventTask(string content)

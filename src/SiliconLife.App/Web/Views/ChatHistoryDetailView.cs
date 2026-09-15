@@ -495,7 +495,7 @@ public class ChatHistoryDetailView : ViewBase
                     Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
                         .Op(() => "+", () => Js.Str(() => "<details class='msg-collapsible'><summary>💭 ")).Op(() => "+", () => Js.Str(() => "思考过程"))
                         .Op(() => "+", () => Js.Str(() => "</summary><div class='message-thinking'>"))
-                        .Op(() => "+", () => Js.Id(() => "msg").Prop(() => "thinking"))
+                        .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "msg").Prop(() => "thinking")))
                         .Op(() => "+", () => Js.Str(() => "</div></details>"))).Stmt()
                 })
             }))
@@ -562,7 +562,7 @@ public class ChatHistoryDetailView : ViewBase
                     // Individual request
                     .Add(() => Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
                         .Op(() => "+", () => Js.Str(() => "<pre class='msg-tool-code'>"))
-                        .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2"))))
+                        .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "JSON").Call(() => "stringify", () => Js.Id(() => "tc"), () => Js.Null(), () => Js.Num(() => "2")))))
                         .Op(() => "+", () => Js.Str(() => "</pre>"))))
                     // Matching result
                     .Add(() => Js.Let(() => "res", () => Js.Id(() => "resultMap").Index(() => Js.Id(() => "tc").Prop(() => "Id"))))
@@ -572,7 +572,7 @@ public class ChatHistoryDetailView : ViewBase
                         {
                             Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
                                 .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))
-                                .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content")))
+                                .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "res").Prop(() => "content"))))
                                 .Op(() => "+", () => Js.Str(() => "</pre>"))).Stmt()
                         })
                     }))
@@ -590,7 +590,7 @@ public class ChatHistoryDetailView : ViewBase
                             Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
                                 .Op(() => "+", () => Js.Str(() => "<div class='msg-tool-section'><div class='msg-tool-label'>Response:</div><pre class='msg-tool-code'>"))).Stmt(),
                             Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
-                                .Op(() => "+", () => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "msg").Prop(() => "toolResult")))).Stmt(),
+                                .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "decodeUnicode").Invoke(() => Js.Id(() => "msg").Prop(() => "toolResult"))))).Stmt(),
                             Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
                                 .Op(() => "+", () => Js.Str(() => "</pre></div>"))).Stmt()
                         })
@@ -658,7 +658,7 @@ public class ChatHistoryDetailView : ViewBase
                     Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
                         .Op(() => "+", () => Js.Str(() => "<details class='msg-collapsible'><summary>💭 思考过程</summary><div class='message-thinking'>"))).Stmt(),
                     Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
-                        .Op(() => "+", () => Js.Id(() => "msg").Prop(() => "thinking"))).Stmt(),
+                        .Op(() => "+", () => Js.Id(() => "escapeHtmlText").Invoke(() => Js.Id(() => "msg").Prop(() => "thinking")))).Stmt(),
                     Js.Assign(() => Js.Id(() => "html"), () => Js.Id(() => "html")
                         .Op(() => "+", () => Js.Str(() => "</div></details>"))).Stmt()
                 })
@@ -755,6 +755,18 @@ public class ChatHistoryDetailView : ViewBase
         }
         
         // Markdown rendering functions
+        // Escape HTML special characters for Think / tool-call sections (plain-text display areas):
+        // tags like <a> display literally instead of being parsed into real elements and breaking
+        // the layout. The main text is NOT escaped — it is rendered as markdown by marked.
+        var escapeHtmlTextExpr = Js.Id(() => "text")
+            .Call(() => "replace", () => Js.Regex(() => @"&", () => "g"), () => Js.Str(() => "&amp;"))
+            .Call(() => "replace", () => Js.Regex(() => "\"", () => "g"), () => Js.Str(() => "&quot;"))
+            .Call(() => "replace", () => Js.Regex(() => @"<", () => "g"), () => Js.Str(() => "&lt;"))
+            .Call(() => "replace", () => Js.Regex(() => @">", () => "g"), () => Js.Str(() => "&gt;"));
+        var escapeHtmlTextBody = Js.Block()
+            .Add(() => Js.Return(() => escapeHtmlTextExpr));
+        var escapeHtmlTextFunc = Js.Func(() => "escapeHtmlText", () => new List<string> { "text" }, () => escapeHtmlTextBody);
+
         var renderMdElementBody = Js.Block()
             .Add(() => Js.If(() => new List<(JsSyntax?, List<JsSyntax>)>
             {
@@ -855,6 +867,7 @@ public class ChatHistoryDetailView : ViewBase
         if (renderMessagesWithCyclesFunc != null)
             result = result.Add(() => renderMessagesWithCyclesFunc);
         return result
+            .Add(() => escapeHtmlTextFunc)
             .Add(() => renderMarkdownBodyFunc)
             .Add(() => markedLoadCheck)
             .Add(() => onloadAssign);

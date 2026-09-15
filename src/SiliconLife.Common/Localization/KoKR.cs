@@ -816,6 +816,7 @@ public override string GetSocialMediaName(string platform) => platform switch
     public override string ConfigSecondsLabel => "초:";
     public override string ConfigSaveButton => "저장";
     public override string ConfigCancelButton => "취소";
+    public override string ConfigRestoreDefaultButton => "기본값 복원";
     public override string ConfigNullValue => "없음";
 
     public override string ConfigEditPrefix => "편집:";
@@ -2067,6 +2068,7 @@ public override string GetSocialMediaName(string platform) => platform switch
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[그룹채팅] 세션 {sessionId}에서 발언: {content}";
 
+    public override string ReplyStoppedMessage => "(사용자가 응답을 중지했습니다)";
     public override string FormatMemoryEventToolCall(string toolNames)
         => $"[도구 호출] 도구 실행: {toolNames}";
 

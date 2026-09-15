@@ -816,6 +816,7 @@ public override string GetSocialMediaName(string platform) => platform switch
     public override string ConfigSecondsLabel => "秒：";
     public override string ConfigSaveButton => "保存";
     public override string ConfigCancelButton => "取消";
+    public override string ConfigRestoreDefaultButton => "恢复默认值";
     public override string ConfigNullValue => "空";
 
     public override string ConfigEditPrefix => "编辑：";
@@ -2077,6 +2078,7 @@ public override string GetSocialMediaName(string platform) => platform switch
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[群聊] 在会话 {sessionId} 中发言：{content}";
 
+    public override string ReplyStoppedMessage => "（回复已被用户停止）";
     public override string FormatMemoryEventToolCall(string toolNames)
         => $"[工具调用] 执行工具：{toolNames}";
 

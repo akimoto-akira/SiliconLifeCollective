@@ -816,6 +816,7 @@ public override string GetSocialMediaName(string platform) => platform switch
     public override string ConfigSecondsLabel => "Seconds: ";
     public override string ConfigSaveButton => "Save";
     public override string ConfigCancelButton => "Cancel";
+    public override string ConfigRestoreDefaultButton => "Restore Defaults";
     public override string ConfigNullValue => "null";
 
     public override string ConfigEditPrefix => "Edit: ";
@@ -2069,6 +2070,7 @@ public override string GetSocialMediaName(string platform) => platform switch
     public override string FormatMemoryEventGroupChat(string sessionId, string content)
         => $"[Group] Spoke in session {sessionId}: {content}";
 
+    public override string ReplyStoppedMessage => "(Reply stopped by user)";
     public override string FormatMemoryEventToolCall(string toolNames)
         => $"[Tool] Called tools: {toolNames}";
 
