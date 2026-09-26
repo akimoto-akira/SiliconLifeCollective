@@ -240,6 +240,11 @@ public static class DiskExecutor
             }
 
             string content = contentObj.ToString() ?? string.Empty;
+
+            // Normalize line endings to match the file's existing convention,
+            // so overwriting a CRLF file never produces mixed CRLF/LF content
+            content = NormalizeLineEndings(path, content);
+
             File.WriteAllText(path, content);
             _logger.Info(null, "Disk write: {0}, size={1}", path, content.Length);
             return ExecutorResult.Successful($"File written successfully: {path}");
@@ -249,6 +254,79 @@ public static class DiskExecutor
             _logger.Error(null, "Disk write failed: {0}, {1}", ex, path);
             return ExecutorResult.Failed($"Failed to write file: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Normalizes content line endings to match an existing file's dominant line ending.
+    /// Returns content unchanged when the file does not exist, is empty, or contains no line breaks.
+    /// Never throws: on detection failure the content is returned unchanged.
+    /// </summary>
+    private static string NormalizeLineEndings(string path, string content)
+    {
+        try
+        {
+            if (content.Length == 0 || !File.Exists(path))
+                return content;
+
+            string? eol = DetectLineEnding(path);
+            if (eol == null)
+                return content;
+
+            // Canonicalize to \n first, then apply the target ending
+            string unified = content.Replace("\r\n", "\n").Replace("\r", "\n");
+            return unified.Replace("\n", eol);
+        }
+        catch
+        {
+            return content;
+        }
+    }
+
+    /// <summary>
+    /// Detects the dominant line ending of a file by sampling up to 64KB.
+    /// Returns null when the file contains no line breaks.
+    /// </summary>
+    private static string? DetectLineEnding(string path)
+    {
+        const int sampleSize = 64 * 1024;
+        using FileStream stream = File.OpenRead(path);
+        byte[] buffer = new byte[(int)Math.Min(sampleSize, stream.Length)];
+        if (buffer.Length == 0)
+            return null;
+
+        int offset = 0;
+        while (offset < buffer.Length)
+        {
+            int read = stream.Read(buffer, offset, buffer.Length - offset);
+            if (read <= 0)
+                break;
+            offset += read;
+        }
+
+        int crlf = 0, lf = 0, cr = 0;
+        for (int i = 0; i < offset; i++)
+        {
+            if (buffer[i] == (byte)'\n')
+            {
+                lf++;
+            }
+            else if (buffer[i] == (byte)'\r')
+            {
+                if (i + 1 < offset && buffer[i + 1] == (byte)'\n')
+                    crlf++;
+                else if (i + 1 < offset)
+                    cr++;
+                // A \r on the last sampled byte is ignored: it may be the first half of \r\n
+            }
+        }
+
+        if (crlf == 0 && lf == 0 && cr == 0)
+            return null;
+        if (crlf >= lf && crlf >= cr)
+            return "\r\n";
+        if (lf >= cr)
+            return "\n";
+        return "\r";
     }
 
     private static ExecutorResult ExecuteAppendFile(string path, Dictionary<string, object> parameters)

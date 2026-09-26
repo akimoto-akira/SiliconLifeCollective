@@ -30,7 +30,10 @@ public class DiskTool : ITool
 
     public string Description =>
         "Perform file and directory operations. Actions: read_file, write_file, " +
-        "list_directory, delete_file, create_directory, exists, get_file_info, count_lines, read_lines, clear_file, replace_lines, replace_text, replace_text_all (not recommended for code editing), " +
+        "list_directory, delete_file, create_directory, exists, get_file_info, count_lines, read_lines, clear_file, " +
+        "replace_lines (removes line_count old lines at start_line and inserts content in place; " +
+        "line_count defaults to the number of content lines), " +
+        "replace_text, replace_text_all (not recommended for code editing), " +
         "list_drives (all drives with type and capacity information), " +
         "search_files (search files by name), search_content (search file contents).";
 
@@ -68,12 +71,12 @@ public class DiskTool : ITool
                 ["start_line"] = new Dictionary<string, object>
                 {
                     ["type"] = "integer",
-                    ["description"] = "1-based line number to start reading from (for read_lines action)"
+                    ["description"] = "1-based line number (for read_lines: first line to read; for replace_lines: first line to replace)"
                 },
                 ["line_count"] = new Dictionary<string, object>
                 {
                     ["type"] = "integer",
-                    ["description"] = "Number of lines to read (for read_lines action)"
+                    ["description"] = "Number of lines (for read_lines: lines to read; for replace_lines: number of old lines to remove before inserting content, defaults to the number of content lines)"
                 },
                 ["old_text"] = new Dictionary<string, object>
                 {
@@ -177,7 +180,7 @@ public class DiskTool : ITool
             if (!readResult.Success)
                 return ToolResult.Failed(readResult.Error ?? "Failed to read file for line count");
 
-            int lineCount = (readResult.Output ?? "").Split('\n').Length;
+            int lineCount = SplitLines(readResult.Output ?? "").Count;
             return ToolResult.Successful(lineCount.ToString());
         }
 
@@ -201,10 +204,10 @@ public class DiskTool : ITool
             if (!readResult.Success)
                 return ToolResult.Failed(readResult.Error ?? "Failed to read file");
 
-            string[] lines = (readResult.Output ?? "").Split('\n');
+            List<string> lines = SplitLines(readResult.Output ?? "");
             int zeroBasedStart = startLine - 1;
-            if (zeroBasedStart >= lines.Length)
-                return ToolResult.Failed($"start_line {startLine} exceeds file length ({lines.Length} lines)");
+            if (zeroBasedStart >= lines.Count)
+                return ToolResult.Failed($"start_line {startLine} exceeds file length ({lines.Count} lines)");
 
             string output = string.Join("\n", lines.Skip(zeroBasedStart).Take(lineCount));
             return ToolResult.Successful(output);
@@ -310,37 +313,49 @@ public class DiskTool : ITool
             if (!IsTextFile(path))
                 return ToolResult.Failed($"Cannot replace lines: '{path}' is not a text file. Only text and code files are supported.");
 
+            // Number of old lines to remove: explicit line_count, or default to the number of content lines
+            int removeCount;
+            if (parameters.TryGetValue("line_count", out object? removeCountObj))
+            {
+                if (!int.TryParse(removeCountObj?.ToString(), out int parsedRemove) || parsedRemove < 0)
+                    return ToolResult.Failed("Invalid 'line_count' parameter (must be a non-negative integer)");
+                removeCount = parsedRemove;
+            }
+            else
+            {
+                removeCount = -1; // resolved after content is split
+            }
+
             var readParams = new Dictionary<string, object>(requestParams);
             ExecutorRequest readRequest = new(callerId, path, "read_file", readParams);
             ExecutorResult readResult = DiskExecutor.Execute(readRequest);
             if (!readResult.Success)
                 return ToolResult.Failed(readResult.Error ?? "Failed to read file");
 
-            string[] lines = (readResult.Output ?? "").Split('\n');
-            int totalLines = lines.Length;
+            List<string> lines = SplitLines(readResult.Output ?? "");
+            int totalLines = lines.Count;
 
             if (startLine > totalLines)
                 return ToolResult.Failed($"'start_line' {startLine} is out of range (file has {totalLines} lines)");
 
-            string[] newLines = replaceContentObj.ToString()!.Split('\n');
+            string[] newLines = SplitLines(replaceContentObj.ToString()!).ToArray();
+            if (removeCount < 0)
+                removeCount = newLines.Length;
 
-            // Build result: lines before start_line, then overlay/append new lines
-            var resultLines = new List<string>(lines);
-            int zeroBasedStart = startLine - 1;
-            for (int i = 0; i < newLines.Length; i++)
-            {
-                int targetIndex = zeroBasedStart + i;
-                if (targetIndex < resultLines.Count)
-                    resultLines[targetIndex] = newLines[i];
-                else
-                    resultLines.Add(newLines[i]);
-            }
+            if (startLine - 1 + removeCount > totalLines)
+                return ToolResult.Failed($"Replacement range exceeds file: lines {startLine}-{startLine - 1 + removeCount} requested but file has only {totalLines} lines");
+
+            // Build result: remove exactly removeCount lines at start_line, then insert content at the same position
+            var resultLines = new List<string>(totalLines - removeCount + newLines.Length);
+            resultLines.AddRange(lines.Take(startLine - 1));
+            resultLines.AddRange(newLines);
+            resultLines.AddRange(lines.Skip(startLine - 1 + removeCount));
 
             var writeParams = new Dictionary<string, object> { ["content"] = string.Join("\n", resultLines) };
             ExecutorRequest writeRequest = new(callerId, path, "write_file", writeParams);
             ExecutorResult writeResult = DiskExecutor.Execute(writeRequest);
             return writeResult.Success
-                ? ToolResult.Successful("Lines replaced successfully")
+                ? ToolResult.Successful($"Lines replaced successfully: start_line={startLine}, removed {removeCount} line(s), inserted {newLines.Length} line(s), total lines {totalLines} -> {resultLines.Count}")
                 : ToolResult.Failed(writeResult.Error ?? "Failed to write file");
         }
 
@@ -370,11 +385,25 @@ public class DiskTool : ITool
 
         if (result.Success)
         {
-            // Truncate very long file contents
+            // Truncate very long file contents, keeping whole lines and telling the caller how to continue
             string output = result.Output ?? "";
             if (output.Length > 10000)
             {
-                output = output.Substring(0, 10000) + "\n... (truncated, total length: " + output.Length + " characters)";
+                string head = output.Substring(0, 10000);
+                int lastBreak = head.LastIndexOf('\n');
+                if (lastBreak >= 0)
+                {
+                    head = head.Substring(0, lastBreak);
+                    int linesShown = SplitLines(head).Count;
+                    int totalLines = SplitLines(output).Count;
+                    output = head +
+                        $"\n... (truncated: showing {linesShown} of {totalLines} lines; use read_lines with start_line={linesShown + 1} to continue)";
+                }
+                else
+                {
+                    output = head +
+                        $"\n... (truncated, total length: {output.Length} characters; file may contain extremely long lines)";
+                }
             }
             return ToolResult.Successful(output);
         }
@@ -476,4 +505,40 @@ public class DiskTool : ITool
     /// Delegates to DiskExecutor.IsTextFile for consistent logic.
     /// </summary>
     private static bool IsTextFile(string filePath) => DiskExecutor.IsTextFile(filePath);
+
+    /// <summary>
+    /// Splits content into lines, treating \r\n, \n and lone \r as line breaks.
+    /// A trailing line break does not produce an extra empty line, so line numbers
+    /// stay stable even when the file contains mixed line endings.
+    /// </summary>
+    private static List<string> SplitLines(string content)
+    {
+        var lines = new List<string>();
+        if (content.Length == 0)
+        {
+            lines.Add(string.Empty);
+            return lines;
+        }
+
+        int start = 0;
+        for (int i = 0; i < content.Length; i++)
+        {
+            char c = content[i];
+            if (c == '\n')
+            {
+                int end = i > start && content[i - 1] == '\r' ? i - 1 : i;
+                lines.Add(content.Substring(start, end - start));
+                start = i + 1;
+            }
+            else if (c == '\r' && (i + 1 >= content.Length || content[i + 1] != '\n'))
+            {
+                lines.Add(content.Substring(start, i - start));
+                start = i + 1;
+            }
+        }
+
+        if (start < content.Length)
+            lines.Add(content.Substring(start));
+        return lines;
+    }
 }
