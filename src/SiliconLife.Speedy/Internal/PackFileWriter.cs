@@ -20,10 +20,13 @@ namespace SiliconLife.Speedy.Internal;
 /// "data writing + Directory switching + Header dual-buffer atomic commit".
 /// </summary>
 /// <remarks>
-/// File layout (v2):
+/// File layout (v3):
 ///   [0..4K)   HeaderSlotA
 ///   [4K..8K)  HeaderSlotB
 ///   [8K..)    Data blocks + Directory (allocated via FreeList, 4K-aligned)
+/// The Directory area holds a hierarchical tree (<see cref="DirectoryNodeDto"/>), so path
+/// segments are stored once instead of repeating full paths, and opening a file rebuilds
+/// the in-memory tree directly.
 ///
 /// Commit protocol (atomicity key):
 ///   1. New data blocks are always allocated to new locations (COW), never overwriting old data;
@@ -183,11 +186,12 @@ internal sealed class PackFileWriter : IDisposable
     }
 
     /// <summary>
-    /// Safe commit protocol: first writes the new Directory to a new location and fsyncs, then writes the new Header
-    /// to the opposite slot and fsyncs, then switches the active slot, and finally releases the old Directory area
-    /// to the FreeList. A crash at any point will not leave the active slot pointing to an incomplete state.
+    /// Safe commit protocol: first writes the new Directory (hierarchical v3 tree) to a new location and fsyncs,
+    /// then writes the new Header to the opposite slot and fsyncs, then switches the active slot, and finally
+    /// releases the old Directory area to the FreeList. A crash at any point will not leave the active slot
+    /// pointing to an incomplete state.
     /// </summary>
-    public void WriteDirectoryAndCommit(IReadOnlyDictionary<string, DirectoryEntry> entries)
+    public void WriteDirectoryAndCommit(DirectoryNodeDto root)
     {
         lock (_lock)
         {
@@ -195,7 +199,7 @@ internal sealed class PackFileWriter : IDisposable
             var oldDirLength = _header.DirectoryLength;
 
             // 1. Serialize and allocate new Directory area (new location, does not overwrite old Directory).
-            var dirBytes = MessagePackSerializer.Serialize(entries);
+            var dirBytes = MessagePackSerializer.Serialize(root);
             var alignedSize = AlignUp(dirBytes.Length);
             var newDirOffset = AllocateSpaceInternal(alignedSize);
 
@@ -233,8 +237,8 @@ internal sealed class PackFileWriter : IDisposable
     }
 
     /// <summary>Compatible with old signature; equivalent to WriteDirectoryAndCommit.</summary>
-    public void WriteDirectory(IReadOnlyDictionary<string, DirectoryEntry> entries)
-        => WriteDirectoryAndCommit(entries);
+    public void WriteDirectory(DirectoryNodeDto root)
+        => WriteDirectoryAndCommit(root);
 
     /// <summary>Forces all buffered writes to disk.</summary>
     public void Flush()

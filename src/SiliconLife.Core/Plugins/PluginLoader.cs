@@ -68,6 +68,13 @@ public class PluginLoader
     public IReadOnlyList<IPlugin> Plugins => _loadedPlugins.Select(p => p.Plugin).ToList();
 
     /// <summary>
+    /// Gets the plugins that additionally implement <see cref="IPluginSettings"/>.
+    /// Their declared settings are rendered as "plugin" groups in the host settings UI.
+    /// </summary>
+    public IReadOnlyList<IPluginSettings> PluginsWithSettings =>
+        _loadedPlugins.Select(p => p.Plugin).OfType<IPluginSettings>().ToList();
+
+    /// <summary>
     /// Gets the list of plugins that failed to load.
     /// </summary>
     public IReadOnlyList<FailedPluginInfo> FailedPlugins => _failedPlugins.AsReadOnly();
@@ -250,10 +257,11 @@ public class PluginLoader
         List<MetadataReference> additionalRefs = CollectScannedSiblingDllReferences(pluginDir, trustedTypeRefs);
 
         // 3. Compile source code via Roslyn directly (one compilation, get both bytes and assembly)
-        string concatenatedSource = string.Join(Environment.NewLine, sourceFiles.Select(f => File.ReadAllText(f)));
+        // Each file becomes its own syntax tree: file-scoped and block namespaces, plus
+        // top-of-file usings, coexist correctly (concatenating files would break them).
         var compilationCore = new CompilationCore(typeof(IPlugin).Assembly);
         (byte[] assemblyBytes, Assembly? assembly, List<string> compileErrors) = CompileToBytesAndAssembly(
-            concatenatedSource, compilationCore, additionalRefs);
+            sourceFiles, compilationCore, additionalRefs);
 
         if (assembly == null || compileErrors.Count > 0)
         {
@@ -282,7 +290,9 @@ public class PluginLoader
         try
         {
             // 5. Scan compiled assembly with existing security scan
-            if (!ScanForbiddenReferences(tempDllPath, out List<string> violations, trustedTypeRefs, out HashSet<Capability> capabilities))
+            // CS-source compilation only references the host's closed reference set,
+            // so TypeRefs into those assemblies are compiler-required (trustFrameworkTypeRefs).
+            if (!ScanForbiddenReferences(tempDllPath, out List<string> violations, trustedTypeRefs, out HashSet<Capability> capabilities, trustFrameworkTypeRefs: true))
             {
                 _logger.Error(null,
                     "[CS-Source] Plugin rejected: {0} violated {1} security rule(s):\n  - {2}",
@@ -331,19 +341,23 @@ public class PluginLoader
     }
 
     /// <summary>
-    /// Compiles CS source code once using Roslyn, returning both the raw assembly bytes
+    /// Compiles CS source files once using Roslyn, returning both the raw assembly bytes
     /// (for security scanning via temp DLL) and the loaded Assembly (for type instantiation).
+    /// Each file is parsed as its own syntax tree so file-scoped namespaces, block
+    /// namespaces and per-file usings all compile correctly.
     /// This avoids double-compilation.
     /// </summary>
     private static (byte[] Bytes, Assembly? Assembly, List<string> Errors) CompileToBytesAndAssembly(
-        string sourceCode,
+        IEnumerable<string> sourceFiles,
         CompilationCore compilationCore,
         List<MetadataReference> additionalRefs)
     {
-        var syntaxTree = Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(
-            sourceCode,
-            Microsoft.CodeAnalysis.CSharp.CSharpParseOptions.Default.WithLanguageVersion(
-                Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp13));
+        var parseOptions = Microsoft.CodeAnalysis.CSharp.CSharpParseOptions.Default.WithLanguageVersion(
+            Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp13);
+
+        var syntaxTrees = sourceFiles
+            .Select(f => Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(File.ReadAllText(f), parseOptions))
+            .ToArray();
 
         // Build references: base refs from CompilationCore + additional refs from sibling DLLs
         // We need to reconstruct base refs since CompilationCore doesn't expose them
@@ -386,13 +400,61 @@ public class PluginLoader
         // Add IPlugin assembly reference (SiliconLife.Core)
         allRefs.Add(MetadataReference.CreateFromFile(typeof(IPlugin).Assembly.Location));
 
+        // Add host capability assemblies so CS-source plugins can use the official
+        // storage (Speedy) and OSM PBF dependencies (Google.Protobuf / Microsoft.Data.Sqlite).
+        // These are loaded in the host runtime; absence is tolerated (best effort).
+        try
+        {
+            var speedyAssembly = Assembly.Load("SiliconLife.Speedy");
+            allRefs.Add(MetadataReference.CreateFromFile(speedyAssembly.Location));
+        }
+        catch { /* host without Speedy */ }
+
+        try
+        {
+            var protobufType = Type.GetType("Google.Protobuf.MessageParser, Google.Protobuf");
+            if (protobufType != null)
+                allRefs.Add(MetadataReference.CreateFromFile(protobufType.Assembly.Location));
+        }
+        catch { /* host without Google.Protobuf */ }
+
+        try
+        {
+            var sqliteType = Type.GetType("Microsoft.Data.Sqlite.SqliteConnection, Microsoft.Data.Sqlite");
+            if (sqliteType != null)
+                allRefs.Add(MetadataReference.CreateFromFile(sqliteType.Assembly.Location));
+        }
+        catch { /* host without Microsoft.Data.Sqlite */ }
+
+        // Framework assemblies required by common plugin code (tasks/parallel, ADO.NET, spans).
+        // These are part of the runtime; missing ones are tolerated (best effort).
+        foreach (string frameworkAsmName in new[]
+                 {
+                     "System.Threading.Tasks",
+                     "System.Threading.Tasks.Parallel",
+                     "System.Data.Common",
+                     "System.ComponentModel.Primitives",
+                     "System.ComponentModel",
+                     "System.Memory",
+                     "System.Collections",
+                     "System.Linq.Expressions",
+                 })
+        {
+            try
+            {
+                var frameworkAsm = Assembly.Load(frameworkAsmName);
+                allRefs.Add(MetadataReference.CreateFromFile(frameworkAsm.Location));
+            }
+            catch { /* framework assembly not present in this runtime */ }
+        }
+
         // Add additional refs (scanned sibling DLLs)
         allRefs.AddRange(additionalRefs);
 
         string assemblyName = $"SiliconLife_CSPlugin_{Guid.NewGuid():N}";
         var compilation = Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create(
             assemblyName,
-            [syntaxTree],
+            syntaxTrees,
             allRefs,
             new Microsoft.CodeAnalysis.CSharp.CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 .WithOptimizationLevel(OptimizationLevel.Release)
@@ -558,6 +620,34 @@ public class PluginLoader
         "MediatR",
         "MediatR.Contracts",
     };
+
+    /// <summary>
+    /// Shared-framework assembly names referenced by the host's closed CS-source reference set.
+    /// TypeRefs resolving into these (or into <see cref="TrustedAssemblies"/> / SiliconLife.*)
+    /// are compiler-required for source-compiled plugins and are exempted from TypeRef scanning
+    /// in CS-source mode only. DLL-mode plugins keep the strict type-level scan.
+    /// </summary>
+    private static readonly HashSet<string> FrameworkAssemblies = new(StringComparer.Ordinal)
+    {
+        "System.Private.CoreLib", "System.Runtime", "System.Collections", "System.Linq",
+        "System.Linq.Expressions", "System.Memory", "System.Threading.Tasks",
+        "System.Threading.Tasks.Parallel", "System.Threading", "System.Data.Common",
+        "System.ComponentModel.Primitives", "System.Text.Json", "System.Text.RegularExpressions",
+        "System.Net.Primitives", "System.Console", "System.Private.Uri", "netstandard",
+        "System.Runtime.InteropServices", "System.Runtime.CompilerServices",
+        "System.Buffers", "System.Numerics.Vectors", "System.Collections.Immutable",
+    };
+
+    private static bool IsFrameworkOrTrustedAssemblyReference(System.Reflection.Metadata.MetadataReader reader, EntityHandle scope)
+    {
+        if (scope.Kind != HandleKind.AssemblyReference)
+            return false;
+        var asmRef = reader.GetAssemblyReference((AssemblyReferenceHandle)scope);
+        string asmName = reader.GetString(asmRef.Name);
+        return TrustedAssemblies.Contains(asmName)
+            || FrameworkAssemblies.Contains(asmName)
+            || asmName.StartsWith("SiliconLife.", StringComparison.Ordinal);
+    }
 
     /// <summary>
     /// Forbidden namespace prefixes. All types under any namespace matching a prefix in this array are forbidden.
@@ -810,7 +900,7 @@ public class PluginLoader
     /// <param name="trustedTypeRefs">TypeRef set from whitelisted DLLs (transitive exemption)</param>
     /// <param name="declaredCapabilities">Output: the set of capabilities declared by the plugin via <see cref="PluginCapabilityAttribute"/>; empty if none.</param>
     /// <returns>Returns true if scan passes, false if any violations exist</returns>
-    private static bool ScanForbiddenReferences(string dllPath, out List<string> violations, HashSet<(string Namespace, string Name)> trustedTypeRefs, out HashSet<Capability> declaredCapabilities)
+    private static bool ScanForbiddenReferences(string dllPath, out List<string> violations, HashSet<(string Namespace, string Name)> trustedTypeRefs, out HashSet<Capability> declaredCapabilities, bool trustFrameworkTypeRefs = false)
     {
         violations = new List<string>();
         declaredCapabilities = new HashSet<Capability>();
@@ -871,6 +961,15 @@ public class PluginLoader
 
                 // 0.5. Transitive exemption: skip TypeRefs introduced by whitelisted DLLs
                 if (trustedTypeRefs.Contains((ns, name)))
+                {
+                    continue;
+                }
+
+                // 0.6. CS-source mode: references into the closed reference set are compiler-required.
+                //      Plugins compiled from source can only see assemblies the host referenced; those
+                //      TypeRefs are an unavoidable part of the emitted IL (e.g. span helpers used by
+                //      Google.Protobuf / System.Memory), not forbidden capabilities.
+                if (trustFrameworkTypeRefs && IsFrameworkOrTrustedAssemblyReference(reader, typeRef.ResolutionScope))
                 {
                     continue;
                 }

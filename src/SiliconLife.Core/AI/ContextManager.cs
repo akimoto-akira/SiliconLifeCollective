@@ -1388,7 +1388,11 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
         {
             // Connection error: try fallback with global config
             _logger.Warn(_being.Id, "Being {0}: AI client connection error, attempting fallback to global config", _being.Name, ex);
-            
+
+#if DEBUG
+            SaveAIDebugLog(request, AIResponse.Failed($"Connection error: {ex.Message}"), scenarioContext);
+#endif
+
             return await ExecuteWithFallbackClientAsync(request);
         }
     }
@@ -1439,6 +1443,25 @@ AIRequest request = BuildRequest(scenarioContext, scenario: scenario, projectId:
                 
                 if (!chunk.Success)
                 {
+#if DEBUG
+                    // 流式请求失败（HTTP 错误码/连接错误等）同样落盘，便于精读根因
+                    SaveAIDebugLog(request, chunk, scenarioContext);
+#endif
+                    // 流式被上游限流/过载（429/5xx，如 Qiniu 网关对流式请求限流而
+                    // 非流式稳定 200）时，回退非流式重试一次，避免用户看到可用性错误。
+                    _logger.Warn(_being.Id, "Stream failed: {0}; falling back to non-streaming request",
+                        chunk.ErrorMessage ?? "unknown");
+                    AIResponse fallback = await GetResponseAsync(scenarioContext, scenario, projectId);
+                    if (fallback.Success)
+                    {
+                        // 前端已收到 Stream Start 事件，补发 End 收尾；正文由调用方按普通消息投递
+                        StreamChunk fallbackEnd = StreamChunk.End(streamId,
+                            promptTokens: fallback.PromptTokens,
+                            completionTokens: fallback.CompletionTokens,
+                            totalTokens: fallback.TotalTokens);
+                        DeliverStreamChunk(fallbackEnd);
+                        return fallback;
+                    }
                     return chunk;
                 }
 

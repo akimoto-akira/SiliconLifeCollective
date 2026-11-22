@@ -101,6 +101,13 @@ public class ConfigController : Controller
                 return;
             }
 
+            // Handle plugin settings items (keys starting with "plugin.<pluginId>.<settingKey>")
+            if (data.key.StartsWith("plugin."))
+            {
+                SavePluginSettingItem(data.key, data.value);
+                return;
+            }
+
             var prop = typeof(AppConfigData).GetProperty(data.key);
             if (prop == null || !prop.CanWrite)
             {
@@ -534,7 +541,141 @@ public class ConfigController : Controller
             group.Items = group.Items.OrderBy(i => i.Order).ToList();
         }
 
+        // 插件设置分组：实现 IPluginSettings 的插件声明项，渲染为独立的"插件"分组
+        AddPluginSettingGroups(groups, config);
+
         return groups.Values.ToList();
+    }
+
+    /// <summary>
+    /// 追加插件设置分组：遍历 PluginLoader 中实现 <see cref="IPluginSettings"/> 的插件，
+    /// 每个插件渲染为一个配置组（组名 = 插件名），项来自
+    /// <see cref="IPluginSettings.GetSettingDefinitions"/> 与当前值。
+    /// 保存时以前缀 "plugin.&lt;pluginId&gt;.&lt;settingKey&gt;" 路由（见 <see cref="SavePluginSettingItem"/>）。
+    /// </summary>
+    private void AddPluginSettingGroups(Dictionary<string, ConfigGroup> groups, AppConfigData config)
+    {
+        var pluginLoader = ServiceLocator.Instance.GetService<PluginLoader>();
+        if (pluginLoader == null)
+            return;
+
+        foreach (var plugin in pluginLoader.PluginsWithSettings)
+        {
+            var pluginMeta = (IPlugin)plugin;
+            var groupName = pluginMeta.GetName(config.Language);
+            if (!groups.ContainsKey(groupName))
+                groups[groupName] = new ConfigGroup { Name = groupName };
+
+            foreach (var def in plugin.GetSettingDefinitions())
+            {
+                if (string.IsNullOrEmpty(def.Key))
+                    continue;
+
+                object? current = plugin.GetSettingValue(def.Key) ?? def.DefaultValue;
+                groups[groupName].Items.Add(new ConfigItem
+                {
+                    PropertyName = $"plugin.{pluginMeta.Id}.{def.Key}",
+                    DisplayName = def.DisplayName,
+                    Value = SerializeSettingValue(current),
+                    DefaultValue = SerializeSettingValue(def.DefaultValue),
+                    Description = def.Description,
+                    Order = def.Order,
+                    PropertyType = def.Type,
+                    EnumValues = def.EnumValues,
+                    EnumDisplayNames = def.EnumDisplayNames
+                });
+            }
+        }
+    }
+
+    /// <summary>处理插件设置保存：解析 "plugin.&lt;pluginId&gt;.&lt;settingKey&gt;" 并路由到对应插件。</summary>
+    private void SavePluginSettingItem(string fullKey, string? value)
+    {
+        try
+        {
+            var plugin = ResolvePluginSetting(fullKey, out var settingKey);
+            if (plugin == null)
+            {
+                RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorPropertyNotFound, fullKey) });
+                return;
+            }
+
+            var def = plugin.GetSettingDefinitions().FirstOrDefault(d => d.Key == settingKey);
+            if (def == null)
+            {
+                RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorPropertyNotFound, fullKey) });
+                return;
+            }
+
+            // 空串 → null：插件端回退默认值（"清空输入 = 恢复默认"语义）
+            object? settingValue = null;
+            if (!string.IsNullOrEmpty(value))
+            {
+                switch (def.Type)
+                {
+                    case PluginSettingTypes.String:
+                        settingValue = value;
+                        break;
+                    case PluginSettingTypes.Int:
+                        if (int.TryParse(value, out var intVal)) settingValue = intVal;
+                        else { RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertInt, value) }); return; }
+                        break;
+                    case PluginSettingTypes.Double:
+                        if (double.TryParse(value, out var doubleVal)) settingValue = doubleVal;
+                        else { RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertDouble, value) }); return; }
+                        break;
+                    case PluginSettingTypes.Bool:
+                        if (bool.TryParse(value, out var boolVal)) settingValue = boolVal;
+                        else { RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertBool, value) }); return; }
+                        break;
+                    case PluginSettingTypes.Enum:
+                        if (def.EnumValues != null && def.EnumValues.Contains(value)) settingValue = value;
+                        else { RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorConvertEnum, value, def.Type) }); return; }
+                        break;
+                    default:
+                        RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorUnsupportedType, def.Type) });
+                        return;
+                }
+            }
+
+            plugin.SetSettingValue(def.Key, settingValue);
+            RenderJson(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            RenderJson(new { success = false, message = string.Format(_loc.ConfigErrorSaveFailed, ex.Message) });
+        }
+    }
+
+    /// <summary>解析 "plugin.&lt;pluginId&gt;.&lt;settingKey&gt;"：返回插件实例与设置键。</summary>
+    private IPluginSettings? ResolvePluginSetting(string fullKey, out string settingKey)
+    {
+        settingKey = "";
+        const string prefix = "plugin.";
+        if (!fullKey.StartsWith(prefix, StringComparison.Ordinal))
+            return null;
+
+        var rest = fullKey[prefix.Length..];
+        var idx = rest.IndexOf('.');
+        if (idx <= 0 || idx == rest.Length - 1)
+            return null;
+
+        var pluginId = rest[..idx];
+        settingKey = rest[(idx + 1)..];
+
+        var pluginLoader = ServiceLocator.Instance.GetService<PluginLoader>();
+        return pluginLoader?.PluginsWithSettings.FirstOrDefault(p => ((IPlugin)p).Id == pluginId);
+    }
+
+    /// <summary>序列化插件设置值用于前端展示/编辑（与 <see cref="SerializeConfigValue"/> 的显示格式一致）。</summary>
+    private static string? SerializeSettingValue(object? value)
+    {
+        return value switch
+        {
+            null => null,
+            bool b => b.ToString(),
+            _ => value.ToString()
+        };
     }
 
     private void AddAIConfigItems(Dictionary<string, ConfigGroup> groups, AppConfigData config)

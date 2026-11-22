@@ -19,7 +19,7 @@ namespace SiliconLife.Speedy;
 
 /// <summary>
 /// Read/write entry point for .spk data packages. Internally integrates:
-///   · In-memory <see cref="DirectoryMap"/> (directory index)
+///   · In-memory <see cref="DirectoryMap"/> (hierarchical directory index, one level per path segment)
 ///   · <see cref="EntryCache"/> (TTL/LRU cache, supports pin)
 ///   · <see cref="WriteAheadLog"/> (write-ahead log, ensures batch atomicity)
 ///   · <see cref="PackFileWriter"/> dual-buffer Header commit protocol
@@ -32,6 +32,8 @@ namespace SiliconLife.Speedy;
 ///   2. Dual Header slots are written alternately and fsynced, ensuring at least one slot is in a consistent state at any time;
 ///   3. WAL records each batch of pending operations (including data bodies); if the main file's Header switch is not yet complete,
 ///      this batch can be reapplied to the main file by replaying WAL upon restart.
+/// Format: only v3 is accepted — the Directory is stored as a hierarchical tree (path segments deduplicated,
+/// directory enumeration no longer scans the whole key space). Older v1/v2 files are rejected on open.
 /// Thread safety: public members can be called concurrently across threads.
 /// </remarks>
 public sealed class SpeedyPack : IDisposable
@@ -91,10 +93,10 @@ public sealed class SpeedyPack : IDisposable
 
     /// <summary>
     /// Opens an existing .spk file and loads its Directory; creates automatically if the file does not exist.
+    /// Only the current v3 format is accepted; older (v1/v2) files fail with an explicit error.
     /// The following crash recovery actions are performed on open:
-    ///   1. If legacy v1 format is detected, migrate to v2 in place first;
-    ///   2. Read dual Header slots and select the valid one with the largest Sequence as the active Header;
-    ///   3. Scan .wal, replay all "committed but not yet applied" batches and clear WAL.
+    ///   1. Read dual Header slots and select the valid one with the largest Sequence as the active Header;
+    ///   2. Scan .wal, replay all "committed but not yet applied" batches and clear WAL.
     /// </summary>
     public static SpeedyPack Open(string filePath, SpeedyPackOptions? options = null)
     {
@@ -121,17 +123,15 @@ public sealed class SpeedyPack : IDisposable
                 newReader, options.ReadOnly ? null : newWriter, newQueue, newWal);
         }
 
-        // 1. Detect legacy v1 files and migrate in place.
-        UpgradeLegacyFileIfNeeded(filePath);
-
-        // 2. Read active Header + load Directory.
+        // 1. Read active Header + load Directory (hierarchical v3 tree).
         var reader = PackFileReader.Open(filePath);
         var active = reader.TryReadActiveHeader()
             ?? throw new InvalidDataException(
-                $"Both header slots of '{filePath}' are corrupted. " +
-                $"Recovery from WAL alone is not supported when both headers are unreadable.");
+                $"'{filePath}' is not a readable v3 .spk file: both header slots are invalid " +
+                $"(wrong magic, corrupted CRC, or an unsupported older v1/v2 format). " +
+                $"Only v3 is supported; older files are not migrated.");
         var directory = reader.LoadDirectory(active.Header);
-        directoryMap.LoadFrom(directory);
+        directoryMap.LoadFromDto(directory);
 
         if (options.ReadOnly)
         {
@@ -139,10 +139,10 @@ public sealed class SpeedyPack : IDisposable
                 reader, writer: null, writeQueue: null, wal: null);
         }
 
-        // 3. Open writer (rebuild FreeList).
-        var writer = PackFileWriter.Open(filePath, directory, active.Header, active.Slot);
+        // 2. Open writer (rebuild FreeList) from the loaded directory.
+        var writer = PackFileWriter.Open(filePath, directoryMap.Snapshot(), active.Header, active.Slot);
 
-        // 4. Open WAL and recover any committed but not yet applied batches.
+        // 3. Open WAL and recover any committed but not yet applied batches.
         var wal = new WriteAheadLog(filePath + ".wal");
         wal.Open();
         var pendingBatches = wal.RecoverCommittedBatches();
@@ -303,18 +303,7 @@ public sealed class SpeedyPack : IDisposable
     public SpkFileInfo GetFileInfo()
     {
         var header = _reader.ReadHeader();
-        var snapshot = _directoryMap.Snapshot();
-
-        int jsonEntries = 0, rawEntries = 0, textEntries = 0;
-        foreach (var entry in snapshot.Values)
-        {
-            switch (entry.ContentType)
-            {
-                case "json": jsonEntries++; break;
-                case "raw": rawEntries++; break;
-                case "text": textEntries++; break;
-            }
-        }
+        var (totalEntries, jsonEntries, rawEntries, textEntries) = _directoryMap.CountByContentType();
 
         var fileSize = new FileInfo(_filePath).Length;
 
@@ -326,7 +315,7 @@ public sealed class SpeedyPack : IDisposable
             Flags: header.Flags,
             DirectoryOffset: header.DirectoryOffset,
             DirectoryLength: header.DirectoryLength,
-            TotalEntries: snapshot.Count,
+            TotalEntries: totalEntries,
             JsonEntries: jsonEntries,
             RawEntries: rawEntries,
             TextEntries: textEntries);
@@ -394,7 +383,7 @@ public sealed class SpeedyPack : IDisposable
                         newEntries[normalizedPath] = newEntry;
                     }
 
-                    tempWriter.WriteDirectoryAndCommit(newEntries);
+                    tempWriter.WriteDirectoryAndCommit(DirectoryMap.BuildDto(newEntries));
                     tempWriter.Flush();
                 }
 
@@ -505,79 +494,5 @@ public sealed class SpeedyPack : IDisposable
         }
 
         _writeQueue!.EnqueueBatch(opList);
-    }
-
-    // ─── Legacy v1 Migration ─────────────────────────────────────────────────────
-
-    /// <summary>
-    /// Detects if the file is in v1 legacy format; if so, migrates it to v2 dual Header format.
-    /// Migration is done via "temporary file + atomic File.Move", the original file is not damaged during the process.
-    /// </summary>
-    private static void UpgradeLegacyFileIfNeeded(string filePath)
-    {
-        // First check the header in read-only mode to avoid competing for exclusive access with subsequent PackFileReader.
-        SpkHeader? v1Header;
-        Dictionary<string, DirectoryEntry>? legacyDirectory = null;
-        using (var probe = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        {
-            // If either v2 slot is valid, the file is considered v2, return directly.
-            var slotA = SpkHeader.TryReadSlot(probe, 0);
-            var slotB = SpkHeader.TryReadSlot(probe, 1);
-            if (slotA != null || slotB != null) return;
-
-            // Otherwise try reading v1 legacy header.
-            v1Header = SpkHeader.TryReadLegacyV1(probe);
-            if (v1Header == null) return; // Not v1 nor valid v2, handled by upper layer
-
-            if (v1Header.DirectoryLength > 0)
-            {
-                probe.Position = v1Header.DirectoryOffset;
-                var buf = new byte[v1Header.DirectoryLength];
-                var read = 0;
-                while (read < buf.Length)
-                {
-                    var n = probe.Read(buf, read, buf.Length - read);
-                    if (n <= 0) break;
-                    read += n;
-                }
-                legacyDirectory = MessagePackSerializer.Deserialize<Dictionary<string, DirectoryEntry>>(buf)
-                                  ?? new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
-            }
-            else
-            {
-                legacyDirectory = new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
-            }
-        }
-
-        // Rewrite all entries to a temporary v2 file.
-        var tmpPath = filePath + ".v2upgrade.tmp";
-        if (File.Exists(tmpPath))
-        {
-            try { File.Delete(tmpPath); } catch { /* ignore */ }
-        }
-
-        using (var legacyReader = PackFileReader.Open(filePath))
-        using (var newWriter = PackFileWriter.Create(tmpPath))
-        {
-            var newEntries = new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
-            foreach (var (path, oldEntry) in legacyDirectory)
-            {
-                var data = legacyReader.ReadAt(oldEntry.Offset, oldEntry.Length);
-                var newEntry = newWriter.AppendEntryUpdate(path, data, oldEntry.ContentType, oldEntry);
-                newEntries[path] = newEntry;
-            }
-            newWriter.WriteDirectoryAndCommit(newEntries);
-            newWriter.Flush();
-        }
-
-        // Atomically replace original file; keep original file intact on failure.
-        File.Move(tmpPath, filePath, overwrite: true);
-
-        // Clean up possible old .wal after migration (v1 has no WAL, but just in case of residue).
-        var walPath = filePath + ".wal";
-        if (File.Exists(walPath))
-        {
-            try { File.Delete(walPath); } catch { /* ignore */ }
-        }
     }
 }

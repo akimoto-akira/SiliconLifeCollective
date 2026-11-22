@@ -37,10 +37,7 @@ namespace SiliconLife.Speedy.Internal;
 /// crash recovery:
 ///   * Both slots have valid CRC → choose the one with larger Sequence as the active slot;
 ///   * Only one slot has valid CRC → choose it;
-///   * Both invalid → try parsing in v1 legacy format, then trigger upgrade.
-///
-/// Compatibility: v1 old files have Header length of 32B at offset 0, without Sequence / CRC;
-/// SpeedyPack triggers a full migration to v2 when v1 is detected during Open.
+///   * Both invalid → the file is rejected (only v3 is supported; older formats are not migrated).
 /// </summary>
 internal sealed class SpkHeader
 {
@@ -53,8 +50,8 @@ internal sealed class SpkHeader
     public const int HeaderPayloadSize = HeaderBodySize + HeaderCrcSize; // 32
 
     public static readonly byte[] MagicBytes = { 0x53, 0x50, 0x4B, 0x59 }; // "SPKY"
-    public const ushort CurrentVersion = 2;
-    public const ushort LegacyVersion = 1;
+    /// <summary>Current format version (v3: hierarchical Directory tree). Only v3 is accepted.</summary>
+    public const ushort CurrentVersion = 3;
 
     public byte[] Magic { get; set; } = MagicBytes;
     public ushort Version { get; set; } = CurrentVersion;
@@ -63,7 +60,7 @@ internal sealed class SpkHeader
     public int DirectoryLength { get; set; }
     public long Sequence { get; set; } = 0;
 
-    /// <summary>Creates a brand new v2 Header with Sequence=1.</summary>
+    /// <summary>Creates a brand new v3 Header with Sequence=1.</summary>
     public static SpkHeader CreateNew()
     {
         return new SpkHeader
@@ -100,7 +97,8 @@ internal sealed class SpkHeader
 
     /// <summary>
     /// Tries to read the Header from the specified slot and verify CRC. Invalid (wrong Magic / CRC error /
-    /// Version error / beyond file length) returns null.
+    /// non-v3 Version / beyond file length) returns null. Only the current v3 version is accepted;
+    /// older formats are intentionally not read.
     /// </summary>
     public static SpkHeader? TryReadSlot(Stream stream, int slotIndex)
     {
@@ -134,35 +132,6 @@ internal sealed class SpkHeader
             DirectoryOffset = BitConverter.ToInt64(body, 8),
             DirectoryLength = BitConverter.ToInt32(body, 16),
             Sequence = BitConverter.ToInt64(body, 20)
-        };
-    }
-
-    /// <summary>
-    /// Tries to read the header at the beginning of the file in v1 legacy format (32B, no CRC/Sequence).
-    /// Only used to identify old files and trigger migration.
-    /// </summary>
-    public static SpkHeader? TryReadLegacyV1(Stream stream)
-    {
-        if (stream.Length < 32) return null;
-        stream.Position = 0;
-        var buf = new byte[32];
-        if (!ReadFully(stream, buf, 32)) return null;
-
-        var magic = new byte[4];
-        Buffer.BlockCopy(buf, 0, magic, 0, 4);
-        if (!magic.AsSpan().SequenceEqual(MagicBytes)) return null;
-
-        var version = BitConverter.ToUInt16(buf, 4);
-        if (version != LegacyVersion) return null;
-
-        return new SpkHeader
-        {
-            Magic = magic,
-            Version = version,
-            Flags = BitConverter.ToUInt16(buf, 6),
-            DirectoryOffset = BitConverter.ToInt64(buf, 8),
-            DirectoryLength = BitConverter.ToInt32(buf, 16),
-            Sequence = 0
         };
     }
 

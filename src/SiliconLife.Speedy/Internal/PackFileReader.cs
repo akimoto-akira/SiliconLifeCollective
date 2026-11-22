@@ -44,7 +44,7 @@ internal sealed class PackFileReader : IDisposable
 
     /// <summary>
     /// Selects the current active Header. Prefers the slot with valid CRC and larger Sequence between the two.
-    /// If both slots are invalid, returns null (caller uses this to determine if legacy / error handling is needed).
+    /// If both slots are invalid, returns null (the caller rejects the file — only v3 is supported).
     /// </summary>
     public (SpkHeader Header, int Slot)? TryReadActiveHeader()
     {
@@ -62,29 +62,20 @@ internal sealed class PackFileReader : IDisposable
     }
 
     /// <summary>
-    /// Reads the Directory area pointed to by a Header and deserializes it.
+    /// Reads the Directory area pointed to by a Header and deserializes the hierarchical v3 tree.
     /// </summary>
-    public Dictionary<string, DirectoryEntry> LoadDirectory(SpkHeader header)
+    public DirectoryNodeDto LoadDirectory(SpkHeader header)
     {
         lock (_lock)
         {
             if (header.DirectoryLength == 0)
-                return new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
+                return new DirectoryNodeDto();
 
             _stream.Position = header.DirectoryOffset;
             var dirBytes = _reader.ReadBytes(header.DirectoryLength);
 
-            var map = MessagePackSerializer.Deserialize<Dictionary<string, DirectoryEntry>>(dirBytes)
-                      ?? new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
-
-            // Ensure the returned dictionary uses Ordinal comparer to avoid case sensitivity differences.
-            if (!ReferenceEquals(map.Comparer, StringComparer.Ordinal))
-            {
-                var reCompared = new Dictionary<string, DirectoryEntry>(StringComparer.Ordinal);
-                foreach (var (k, v) in map) reCompared[k] = v;
-                return reCompared;
-            }
-            return map;
+            return MessagePackSerializer.Deserialize<DirectoryNodeDto>(dirBytes)
+                   ?? new DirectoryNodeDto();
         }
     }
 

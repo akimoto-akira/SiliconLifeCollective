@@ -4,6 +4,8 @@
     <ProjectReference Include="..\SiliconLife.Core\SiliconLife.Core.csproj" />
     <ProjectReference Include="..\SiliconLife.Common\SiliconLife.Common.csproj" />
     <ProjectReference Include="..\SiliconLife.App\SiliconLife.App.csproj" />
+    <!-- Speedy 是插件的官方数据存储：宿主加载该程序集，CS 源码插件编译时才可引用 -->
+    <ProjectReference Include="..\SiliconLife.Speedy\SiliconLife.Speedy.csproj" />
   </ItemGroup>
 
   <ItemGroup>

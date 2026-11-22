@@ -194,7 +194,7 @@ internal sealed class WriteQueue : IDisposable
         }
 
         // ─── Step 3: Write new Directory + atomically switch dual Header slots ───
-        var snapshot = _directoryMap.Snapshot();
+        var snapshot = _directoryMap.SnapshotDto();
         _writer.WriteDirectoryAndCommit(snapshot);
 
         // ─── Step 4: At this point the new state has taken effect on disk, WAL can be safely cleared ───

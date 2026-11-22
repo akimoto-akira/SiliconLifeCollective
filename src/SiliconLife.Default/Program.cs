@@ -63,7 +63,8 @@ public class Program
         // so plugins can register types/factories during OnLoad()
         ServiceLocator.Instance.Register<ITypeRegistry>(new TypeRegistry());
         ServiceLocator.Instance.Register<IObjectFactory>(new ObjectFactory());
-        _logger.Info(null, "Registered: TypeRegistry, ObjectFactory");
+        ServiceLocator.Instance.Register(new OsmFileAccessService());
+        _logger.Info(null, "Registered: TypeRegistry, ObjectFactory, OsmFileAccessService");
 
         // Resolve plugin directories: if empty, default to ["plugins"] relative to base directory
         if (configData.PluginDirectories.Count == 0)
